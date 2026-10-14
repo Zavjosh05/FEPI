@@ -1,0 +1,30 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Capas descargadas de IDEFOR (se regeneran con src/descargar_capas.py)
+datos/edomex/
+
+# Resultados de corridas: solo se versiona el piloto
+resultados/*
+!resultados/piloto_2023_2024/
+
+# Archivos auxiliares de QGIS / GDAL / GeoPackage
+*.aux.xml
+*.gpkg-shm
+*.gpkg-wal
+*.gpkg-journal
+*.qgs~
+*.qgz~
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
