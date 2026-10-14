@@ -4,6 +4,40 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.3.0] - 2026-10-14
+
+### Agregado
+
+- `correr --bloques`: procesa la zona por bloques en memoria para cubrir todo el estado sin
+  pasar de ~4 GB de RAM. Los resultados son los mismos que de una sola vez: no cambia el umbral
+  NDVI, el margen 0.10, el dNBR 0.27 ni el periodo de incendios.
+  - Bloques de 20.48 km (`--tam-bloque`, en píxeles, múltiplo de 1024), alineados a la malla
+    interna de los COG de cada tesela Sentinel-2 para no releer datos. Se saltan los que no tocan
+    la zona (84 de 144 para el estado).
+  - Cada incendio se calcula una sola vez y da una sola fila aunque cruce bloques.
+  - Con `--umbral-ndvi auto`, el histograma de Otsu se arma por bloques y es idéntico al de
+    todos los valores juntos.
+  - Reanudar: si la corrida se corta, el mismo comando sigue desde el último bloque. El avance
+    vive en `<salida>/progreso_<base>_<actual>/` (KB, más los pedazos del ráster de cambio) y se
+    borra al terminar. `--reiniciar` lo descarta.
+- `--nubes-max` (60 por defecto) y `--escenas-max` (máximo de escenas menos nubladas por tesela en
+  los compuestos anuales; sin tope por defecto), también en `calibrar`.
+- `--guardar-indices` / `--no-guardar-indices` para los rásters de NDVI y dNBR.
+- `bloques_<base>_<actual>.csv`: escenas, segundos y RAM pico de cada bloque.
+- El modo `demo` comprueba que por bloques da exactamente lo mismo que de una sola vez.
+- `src/comparar_resultados.py`: compara dos corridas (balance por unidad, incendios por clave y
+  píxeles distintos del ráster de cambio).
+
+### Cambiado
+
+- Las escenas de cada año se buscan una sola vez para toda la zona; cada bloque usa las que se
+  traslapan con él.
+- Los rásters de NDVI y dNBR ya solo se guardan por defecto de una sola vez. Con `--bloques` hay
+  que pedirlos.
+- `cambio_<base>_<actual>.tif` se escribe en mosaicos de 512 px (antes en tiras); los valores no
+  cambian.
+- README: secciones "Uso", "Cobertura geográfica" (con los tiempos medidos) y "Pendientes".
+
 ## [0.2.0] - 2026-10-14
 
 ### Agregado

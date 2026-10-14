@@ -32,7 +32,8 @@ bosque_actual = bosque_base − pérdida_por_incendio − otras_pérdidas + gana
 FEPI/
 ├── src/
 │   ├── prototipo_masa_forestal.py   Calculadora (subcomandos demo, calibrar, correr)
-│   └── descargar_capas.py           Descarga las capas del Estado de México desde IDEFOR
+│   ├── descargar_capas.py           Descarga las capas del Estado de México desde IDEFOR
+│   └── comparar_resultados.py       Compara dos corridas (balance, incendios, ráster de cambio)
 ├── datos/
 │   ├── piloto/                      Recortes usados en el piloto (versionados)
 │   └── edomex/                      Capas estatales descargadas (no se versionan)
@@ -60,7 +61,8 @@ pip install -r requirements.txt
 
 **Imágenes Sentinel-2: no se descargan a mano.** El script las lee directo del catálogo
 [Earth Search](https://earth-search.aws.element84.com/v1) (AWS Open Data), sin cuenta ni costo.
-Solo necesita internet. Por ahora no hay caché: cada corrida vuelve a leer los píxeles.
+Solo necesita internet. No hay caché en disco (el equipo tiene poco espacio): cada corrida vuelve
+a leer los píxeles.
 
 **Capas vectoriales: deben estar en disco.** Para el piloto ya están en `datos/piloto/`. Las del
 estado completo se bajan del WFS de [IDEFOR](https://idefor.cnf.gob.mx) (CONAFOR) con:
@@ -92,7 +94,8 @@ De dónde sale cada dato y en qué condiciones se puede usar: ver
 Todos los comandos se corren desde la raíz del repositorio, con el venv activado.
 
 ```bash
-# 1. Probar la lógica con datos inventados (no descarga nada; el balance debe dar 516 ha)
+# 1. Probar la lógica con datos inventados (no descarga nada; el balance debe dar 516 ha y
+#    procesar por bloques debe dar lo mismo que de una sola vez). Tarda unos segundos
 python src/prototipo_masa_forestal.py demo
 
 # 2. Calibrar el umbral de NDVI con un CSV lon,lat,clase (1 bosque, 0 no bosque)
@@ -121,33 +124,115 @@ python src/prototipo_masa_forestal.py correr --aoi datos/valle_de_bravo.gpkg \
   --salida resultados/valle_de_bravo_2023_2024
 ```
 
+Para todo el estado se agrega `--bloques` (ver [Cobertura geográfica](#cobertura-geográfica)):
+
+```bash
+python src/prototipo_masa_forestal.py correr --aoi datos/edomex/estado_mexico.gpkg \
+  --anio-base 2023 --anio 2024 --umbral-ndvi auto \
+  --zona-forestal datos/edomex/usv_serie7_edomex.gpkg \
+  --incendios datos/edomex/incendios_conafor_edomex.gpkg \
+  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
+  --bloques --salida resultados/edomex_2023_2024
+```
+
 `--umbral-ndvi auto` usa el umbral de Otsu, que es provisional. Con un valor calibrado se pasa el
 número (por ejemplo `--umbral-ndvi 0.55`). `python src/prototipo_masa_forestal.py correr -h` muestra
 todas las opciones.
 
-Salidas de `correr`: `balance_<base>_<actual>.csv`, `incendios_dnbr.csv`, `ndvi_<año>.tif`,
-`dnbr.tif` y `cambio_<base>_<actual>.tif` (0 sin bosque, 1 estable, 2 pérdida por incendio,
-3 otra pérdida, 4 ganancia). Todo está en EPSG:32614 (UTM 14N).
+Salidas de `correr`, todas en EPSG:32614 (UTM 14N):
+
+| Archivo | Contenido |
+|---|---|
+| `balance_<base>_<actual>.csv` | Balance por unidad (hectáreas) |
+| `incendios_dnbr.csv` | Cada incendio: superficie del polígono contra lo quemado según el dNBR |
+| `cambio_<base>_<actual>.tif` | uint8 comprimido: 0 sin bosque, 1 estable, 2 pérdida por incendio, 3 otra pérdida, 4 ganancia |
+| `bloques_<base>_<actual>.csv` | Cada bloque: escenas leídas, segundos y RAM pico del proceso |
+| `ndvi_<año>.tif`, `dnbr.tif` | Índices en float32. Se guardan por defecto solo de una sola vez; con `--bloques` hay que pedirlos con `--guardar-indices` (~1.5 GB cada uno para el estado) |
+
+Para comparar dos corridas (por ejemplo, con y sin `--bloques`):
+
+```bash
+python src/comparar_resultados.py resultados/piloto_2023_2024 resultados/otra_corrida
+```
+
+Compara valor por valor el balance (por unidad), los incendios (por clave) y el ráster de cambio
+(píxeles distintos), y dice si todo es idéntico.
 
 ## Cobertura geográfica
 
 El script **no tiene ninguna zona fija**: calcula sobre el polígono que se le pase en `--aoi`.
 La proyección (UTM 14N) cubre todo el Estado de México y las capas de `datos/edomex/` cubren el
-estado completo.
+estado completo. Hay dos modos:
 
-En la práctica, **solo se ha probado a escala municipal** (el piloto abarca dos municipios,
-unas 34,000 ha). Correrlo de una vez sobre todo el estado (2.23 millones de ha) no es viable con
-la versión actual:
+- **De una sola vez** (el de siempre): carga cada capa completa en memoria. Sirve para municipios
+  o Delegaciones. El piloto (dos municipios, unas 34,000 ha) tarda unos 5 minutos.
+- **Por bloques** (`--bloques`): para zonas grandes, como todo el estado (2.23 millones de ha,
+  125 municipios, 9 teselas Sentinel-2). De una sola vez no cabría: el rectángulo del estado son
+  21,211 × 21,215 píxeles de 10 m (450 millones), ~1.8 GB por capa float32 más las máscaras.
 
-- El rectángulo del estado a 10 m son ~450 millones de píxeles, y el script guarda cada capa
-  completa en memoria: ~1.8 GB por capa de NDVI o dNBR, más las máscaras. Supera la RAM de un
-  equipo de 16 GB.
-- El estado abarca varias teselas Sentinel-2, que habría que releer en cada corrida porque no
-  hay caché.
-- Calcula el dNBR incendio por incendio: ~1,000 por año en el estado.
+Los dos modos dan **exactamente el mismo resultado**: mismo balance, mismo ráster de cambio y una
+fila por incendio. El modo `demo` lo comprueba con datos inventados (bloques que se saltan,
+incendios que cruzan bloques o se enciman, umbral fijo y automático, corridas interrumpidas).
+**Con datos reales todavía no se ha comprobado** (ver [Pendientes](#pendientes)). Aquí "datos
+reales" significa las mismas fuentes del proyecto (imágenes Sentinel-2 de Earth Search y capas de
+IDEFOR), en lugar de los datos inventados del demo; no hace falta ningún dato adicional.
 
-Mientras no se procese por bloques, lo recomendable es correr por municipio o por Delegación y
-sumar los balances (las hectáreas se pueden sumar).
+### Cómo funciona el modo por bloques
+
+- **Bloques en memoria.** La zona se divide en bloques de hasta 2,048 × 2,048 píxeles (20.48 km;
+  se cambia con `--tam-bloque`). Cada bloque lee sus compuestos, calcula, suma al balance y
+  libera la memoria. Los bloques no se enciman, así que cada píxel cuenta una sola vez, y los que
+  no tocan la zona se saltan: para el estado son 84 de los 144 que tiene el rectángulo.
+- **Alineados a la malla de los COG.** Earth Search guarda cada banda en bloques internos de
+  10.24 km (1,024 px en B04 y B08, 512 px en B8A, B12 y SCL) que arrancan en el origen de cada
+  tesela (`proj:transform`). Un bloque de 20 km sin alinear toca hasta 3 × 3 bloques internos y
+  lee más del doble de lo que usa; uno alineado de 20.48 km toca exactamente 2 × 2. Como las
+  teselas vecinas tienen la malla desfasada, la zona se reparte en un "dominio" por tesela,
+  cortado en los orígenes de las teselas (cada 100 km), y dentro de cada dominio los bloques
+  siguen la malla de su tesela. Solo se releen, en las costuras, los bloques internos de la tesela
+  vecina que se mete en el dominio (las teselas se traslapan ~10 km y esa franja siempre se lee
+  de las dos). La SCL además lee un píxel de más en cada borde (así remuestrea `odc-stac`), lo que
+  alcanza a los bloques internos vecinos; pesa muy poco frente a B04 y B08.
+- **Incendios.** El dNBR de cada incendio se calcula igual que antes, una sola vez y en su propia
+  ventana (polígono + 200 m), antes de los bloques. Su máscara de quemado se reparte entre los
+  bloques que toca, así que un incendio que cruza bloques sigue siendo una fila.
+- **Umbral automático.** Con `--umbral-ndvi auto` primero se leen los compuestos del año base de
+  todos los bloques y se guarda en memoria solo el NDVI dentro del estado (0.83 GB); con eso se
+  calcula Otsu y luego se lee el año actual bloque por bloque. Con un umbral numérico no hace
+  falta: cada bloque lee sus dos años y termina.
+- **Solo salidas pequeñas.** En disco quedan los CSV y el ráster de cambio (uint8 comprimido). Los
+  rásters de NDVI y dNBR (~1.5 GB cada uno para el estado) solo se guardan con `--guardar-indices`.
+- **Reanudar.** Mientras corre, `<salida>/progreso_<base>_<actual>/` guarda cada incendio y cada
+  bloque terminado (pocos KB por renglón, más el pedazo del ráster de cambio de cada bloque, que en
+  total pesa lo mismo que el ráster final). Si la corrida se corta, se repite el mismo comando y
+  sigue desde el último bloque. Con umbral automático, si se corta antes de terminar de leer el
+  año base, esa lectura empieza de nuevo. Si cambian los parámetros o las escenas del catálogo, el
+  script se niega a mezclar corridas: `--reiniciar` empieza de cero. Al terminar, la carpeta se
+  borra.
+- **Leer menos.** `--nubes-max` (60 % por defecto) descarta escenas más nubladas, también en el
+  dNBR. `--escenas-max N` deja las N escenas menos nubladas de cada tesela para cada compuesto
+  anual. Los valores por defecto dan el resultado de siempre.
+
+### Tiempos
+
+Medidos en el equipo de Joshua (15.7 GB de RAM, conexión de ~5–8 MB/s), 14-oct-2026, con el
+código anterior (bloques de 20 km sin alinear):
+
+| Qué | Tiempo | Datos leídos |
+|---|---|---|
+| Compuesto nov-dic 2023 de un bloque de 20 × 20 km cerca del Nevado de Toluca (x = 425,000, y = 2,120,000), 9 escenas | 51 s | 253 MB |
+| Compuesto nov-dic 2024 del mismo bloque, 18 escenas | 69 s | 542 MB |
+| dNBR de un incendio | ~8.5 s | ~22 MB |
+
+En el periodo 2023-11 a 2024-10 hay 1,085 incendios en el estado. Escalando esas mediciones, el
+estado completo tardaría ~6–7 h y leería ~110 GB (compuestos ~3.7 h, incendios ~2.6 h).
+
+Con los bloques alineados, los compuestos deberían leer ~2.2 veces menos datos (2 × 2 bloques
+internos por bloque en vez de 3 × 3) y, como la conexión es el cuello de botella, tardar más o
+menos eso menos: ~1.5–2 h. Los incendios no cambian (~2.6 h), así que el total quedaría en
+~4–4.5 h, y menos con `--escenas-max`. **Es un estimado: no está medido.** La RAM por bloque
+depende del número de escenas; se estima en 1.5–2.5 GB, más 0.83 GB con umbral automático (meta:
+menos de 4 GB). `bloques_<base>_<actual>.csv` registra los segundos y la RAM pico de cada bloque.
 
 ## Resultados del piloto (Amecameca y Tlalmanalco, 2023 → 2024)
 
@@ -165,9 +250,12 @@ verificar (tala, plaga, nieve o ruido). Detalles en
 
 1. Calibrar el umbral de NDVI con ~100 puntos de referencia.
 2. Conseguir los polígonos de reforestación de PS, RHF y CC, con año de plantación y sobrevivencia.
-3. Caché de compuestos y procesamiento por bloques, para cubrir todo el estado.
-4. Validar contra Hansen GFC y visitas de campo.
-5. Escenarios de recuperación y un tablero para la Dirección General y las áreas responsables.
+3. Probar `--bloques` con datos reales (Sentinel-2 y las capas de `datos/`): repetir el piloto
+   con y sin bloques (debe dar lo mismo), luego 2 o 3 municipios midiendo tiempo y RAM, y al
+   final el estado completo.
+4. Bajar el tiempo de los incendios (~2.6 h para el estado), que no cambió con los bloques.
+5. Validar contra Hansen GFC y visitas de campo.
+6. Escenarios de recuperación y un tablero para la Dirección General y las áreas responsables.
 
 ## Fuentes de datos y licencias
 
