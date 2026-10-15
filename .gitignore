@@ -10,9 +10,11 @@ __pycache__/
 # Capas descargadas de IDEFOR (se regeneran con src/descargar_capas.py)
 datos/edomex/
 
-# Resultados de corridas: solo se versiona el piloto
+# Resultados de corridas: solo se versionan el piloto y el estado completo (sin bitácoras)
 resultados/*
 !resultados/piloto_2023_2024/
+!resultados/edomex_2023_2024/
+resultados/**/*.log
 
 # Archivos auxiliares de QGIS / GDAL / GeoPackage
 *.aux.xml

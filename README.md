@@ -173,9 +173,16 @@ estado completo. Hay dos modos:
 Los dos modos dan **exactamente el mismo resultado**: mismo balance, mismo ráster de cambio y una
 fila por incendio. El modo `demo` lo comprueba con datos inventados (bloques que se saltan,
 incendios que cruzan bloques o se enciman, umbral fijo y automático, corridas interrumpidas).
-**Con datos reales todavía no se ha comprobado** (ver [Pendientes](#pendientes)). Aquí "datos
-reales" significa las mismas fuentes del proyecto (imágenes Sentinel-2 de Earth Search y capas de
-IDEFOR), en lugar de los datos inventados del demo; no hace falta ningún dato adicional.
+**Con datos reales también se comprobó** (14-oct-2026), es decir con las mismas fuentes del
+proyecto (Sentinel-2 de Earth Search y capas de IDEFOR), no con datos adicionales:
+
+- El piloto da idéntico de una sola vez, por bloques y contra el piloto guardado: mismo balance,
+  mismos 14 incendios y 0 píxeles distintos.
+- Un cuadro de 12 km en la esquina donde se juntan 4 teselas (14QLF, 14QLG, 14QMF, 14QMG; x =
+  399,960, y = 2,100,000) también da idéntico de las dos formas. Son 4 bloques, uno por tesela,
+  con 8 incendios.
+
+El estado completo ya se corrió: ver [Resultados del estado](#resultados-del-estado-2023--2024).
 
 ### Cómo funciona el modo por bloques
 
@@ -227,12 +234,26 @@ código anterior (bloques de 20 km sin alinear):
 En el periodo 2023-11 a 2024-10 hay 1,085 incendios en el estado. Escalando esas mediciones, el
 estado completo tardaría ~6–7 h y leería ~110 GB (compuestos ~3.7 h, incendios ~2.6 h).
 
-Con los bloques alineados, los compuestos deberían leer ~2.2 veces menos datos (2 × 2 bloques
-internos por bloque en vez de 3 × 3) y, como la conexión es el cuello de botella, tardar más o
-menos eso menos: ~1.5–2 h. Los incendios no cambian (~2.6 h), así que el total quedaría en
-~4–4.5 h, y menos con `--escenas-max`. **Es un estimado: no está medido.** La RAM por bloque
-depende del número de escenas; se estima en 1.5–2.5 GB, más 0.83 GB con umbral automático (meta:
-menos de 4 GB). `bloques_<base>_<actual>.csv` registra los segundos y la RAM pico de cada bloque.
+Medidos el mismo día con `--bloques` (bloques alineados, umbral automático):
+
+| Corrida | Tiempo | RAM pico |
+|---|---|---|
+| Piloto: 2 municipios, 1 tesela, 4 bloques, 14 incendios | 2 min 12 s | 1.2 GB |
+| Amanalco, Coatepec Harinas y Villa Guerrero: 73,700 ha, 4 teselas, 7 bloques, 72 incendios | 9 min 51 s | 2.0 GB |
+| Estado completo: 9 teselas, 84 bloques, 1,085 incendios | ~2 h 08 min | 4.2 GB |
+
+En el estado, los 84 bloques sumaron 34 minutos (mediana de 23 s por bloque, máximo 53 s con
+60 + 113 escenas) y los incendios el resto. La RAM pico (4.2 GB) incluye los 0.83 GB del umbral
+automático.
+
+En la de 3 municipios, cada bloque tardó de 13 a 47 s (~23.5 s en promedio, con los dos años),
+según cuántas escenas lo cubren: hasta 36 + 72 donde se traslapan dos teselas. Cada incendio tardó
+~5.5 s. Escalado a los 84 bloques y 1,085 incendios del estado, serían **~2–2.5 h** (compuestos
+~35 min, incendios ~1.7 h) con una RAM de ~2 GB, más 0.83 GB del umbral automático.
+
+La velocidad de la conexión cambia mucho: ese mismo día el piloto tardó 11 min en un momento y
+2 min en otro. Con una conexión lenta, el estado podría tardar varias horas más.
+`bloques_<base>_<actual>.csv` registra los segundos y la RAM pico de cada bloque.
 
 ## Resultados del piloto (Amecameca y Tlalmanalco, 2023 → 2024)
 
@@ -246,14 +267,40 @@ estaban en bosque, y solo 54 ha seguían sin copa al cierre. Las "otras pérdida
 verificar (tala, plaga, nieve o ruido). Detalles en
 [`resultados/piloto_2023_2024/LEEME.md`](resultados/piloto_2023_2024/LEEME.md).
 
+## Resultados del estado (2023 → 2024)
+
+Corrida con `--bloques` el 14–15 de octubre de 2026. Usó umbral NDVI 0.51 (Otsu sobre todo el
+estado, provisional), 115 y 213 escenas, 9 teselas y 1,085 incendios.
+
+| | Hectáreas |
+|---|---|
+| Bosque 2023 | 459,262 |
+| Pérdida por incendio | 708 |
+| Otras pérdidas (por verificar) | 7,788 |
+| Ganancia | 2,684 |
+| **Bosque 2024** | **453,450** (−5,812, −1.3 %) |
+
+- **Incendios:** CONAFOR reportó 52,325 ha de polígonos. De ellas, 16,214 ha tienen dNBR ≥ 0.27;
+  8,388 ha estaban en bosque, y solo 708 ha seguían sin copa al cierre. En 258 incendios el dNBR
+  no detectó nada quemado: probablemente fueron superficiales o pequeños.
+- **Mayor pérdida neta:** Tlatlaya (−633 ha), Luvianos (−590), Atlautla (−461), Ocuilan (−440),
+  Temascaltepec (−404) y Santo Tomás (−378, el 19 % de su bosque). Casi todo son "otras
+  pérdidas", que hay que verificar (tala, plaga, nieve o ruido).
+- **El umbral automático cambia con la zona que se corre** (0.50 en el piloto, 0.51 en el
+  estado). Por eso Amecameca da 7,051 ha de bosque en esta corrida y 7,123 ha en el piloto. Para
+  comparar corridas conviene fijar un umbral numérico.
+
+Detalles en [`resultados/edomex_2023_2024/LEEME.md`](resultados/edomex_2023_2024/LEEME.md).
+
 ## Pendientes
 
-1. Calibrar el umbral de NDVI con ~100 puntos de referencia.
+1. Calibrar el umbral de NDVI con ~100 puntos de referencia. Mientras tanto, `auto` cambia según
+   la zona que se corre, así que conviene fijar un umbral numérico para comparar corridas.
 2. Conseguir los polígonos de reforestación de PS, RHF y CC, con año de plantación y sobrevivencia.
-3. Probar `--bloques` con datos reales (Sentinel-2 y las capas de `datos/`): repetir el piloto
-   con y sin bloques (debe dar lo mismo), luego 2 o 3 municipios midiendo tiempo y RAM, y al
-   final el estado completo.
-4. Bajar el tiempo de los incendios (~2.6 h para el estado), que no cambió con los bloques.
+3. Verificar las "otras pérdidas" del estado (7,788 ha), empezando por Tlatlaya, Luvianos,
+   Atlautla, Ocuilan, Temascaltepec y Santo Tomás.
+4. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
+   más lenta y no cambió con los bloques.
 5. Validar contra Hansen GFC y visitas de campo.
 6. Escenarios de recuperación y un tablero para la Dirección General y las áreas responsables.
 

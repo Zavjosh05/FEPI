@@ -4,6 +4,30 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.3.1] - 2026-10-15
+
+### Agregado
+
+- `resultados/edomex_2023_2024/`: balance, incendios, ráster de cambio, tiempos por bloque y
+  `LEEME.md` de la primera corrida del estado completo. `.gitignore` ahora versiona esa carpeta,
+  sin las bitácoras (`*.log`).
+
+### Cambiado
+
+- README: resultados de las pruebas de `--bloques` con datos reales (Sentinel-2 e IDEFOR).
+  - El piloto da idéntico de una sola vez, por bloques y contra el piloto guardado.
+  - Un cuadro en la esquina de 4 teselas da idéntico de las dos formas.
+  - Tiempos y RAM medidos: piloto en 2 min 12 s con 1.2 GB; 3 municipios en 9 min 51 s con
+    2.0 GB.
+  - Nuevo estimado para el estado: ~2–2.5 h.
+- README: primera corrida del estado completo (2023 → 2024), con su `LEEME.md` en
+  `resultados/edomex_2023_2024/`.
+  - Bosque: 459,262 → 453,450 ha (−1.3 %); 708 ha perdidas por incendio, 7,788 por otras causas
+    (por verificar) y 2,684 ganadas.
+  - Tardó ~2 h 08 min con 4.2 GB de RAM.
+- README: el umbral automático cambia según la zona que se corre; se recomienda fijar uno numérico
+  para comparar corridas.
+
 ## [0.3.0] - 2026-10-14
 
 ### Agregado
