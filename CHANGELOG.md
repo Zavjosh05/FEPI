@@ -4,6 +4,42 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.4.0] - 2026-10-22
+
+### Agregado
+
+- `src/mapa_cambio.py`: dibuja el mapa PNG de una corrida, con el ráster de cambio y el cambio
+  neto por unidad. En zonas grandes, cada celda muestra la pérdida o ganancia si la hay. Los
+  colores están validados para daltonismo.
+- `resultados/edomex_2023_2024/mapa_cambio_2023_2024.png`: el mapa del estado.
+- `matplotlib` en `requirements.txt` (solo para el mapa).
+- `src/mapa_interactivo.py` y `src/plantilla_mapa.html`: página HTML interactiva de una o varias
+  corridas. Ofrece zoom, capas que se prenden y apagan, cambio neto por municipio, búsqueda,
+  detalle por periodo y tabla ordenable, con tema claro y oscuro. Queda en `docs/mapa_edomex.html`.
+  - Selector "Comparar" para pasar de una comparación a otra: 2023 → 2024, 2024 → 2025,
+    2023 → 2025 y el preliminar de 2026, que va aparte.
+- `correr --ventana INICIO FIN` (MM-DD; por defecto 11-01 12-31): días del año de los compuestos.
+  El periodo de incendios arranca en el inicio de la ventana.
+- El dNBR de los incendios se lee en paralelo (`--hilos-incendios`, 6 por defecto). Las escenas
+  de todos los incendios se buscan en una sola consulta al catálogo, y GDAL guarda en RAM (512 MB,
+  nada en disco) los pedazos de imagen ya bajados. El resultado es idéntico: el piloto y los 3
+  municipios dan igual que antes, y el demo lo comprueba. Con 72 incendios, la corrida bajó de
+  9 min 51 s a 7 min 9 s, aun compartiendo la conexión con otra corrida.
+- Límites de espera en las conexiones: GDAL corta si no conecta en 30 s o si deja de recibir
+  datos por 60 s, y cada consulta al catálogo tiene un límite de 120 s. Antes, una conexión
+  colgada podía dejar la corrida esperando para siempre; ahora falla con error y se reanuda con el
+  mismo comando.
+- `corrida_<base>_<actual>.json` en cada corrida: ventana, umbral, escenas, número de incendios y
+  fecha.
+- `resultados/edomex_2023_2025/`: balance 2023 → 2025 corrido directo, con umbral fijo 0.51.
+- `resultados/edomex_2025_2026_sepoct/`: preliminar de 2026. Compara del 1 de septiembre al 20 de
+  octubre de 2025 con lo mismo de 2026, las imágenes más recientes, con umbral automático. Es otra
+  temporada, así que sus hectáreas no se comparan con las de los balances de noviembre-diciembre.
+- `resultados/edomex_2024_2025/`: balance del estado 2024 → 2025, el más reciente posible. Usa
+  imágenes de noviembre-diciembre de 2025 y el umbral fijo 0.51 del periodo anterior, para que
+  los dos periodos se puedan comparar. Todavía no hay polígonos de incendios de 2025, así que esas
+  pérdidas quedan en "otras pérdidas".
+
 ## [0.3.1] - 2026-10-15
 
 ### Agregado

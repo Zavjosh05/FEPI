@@ -14,6 +14,10 @@ datos/edomex/
 resultados/*
 !resultados/piloto_2023_2024/
 !resultados/edomex_2023_2024/
+!resultados/edomex_2024_2025/
+!resultados/edomex_2023_2025/
+!resultados/edomex_2025_2026_sepoct/
+resultados/**/tiempo.txt
 resultados/**/*.log
 
 # Archivos auxiliares de QGIS / GDAL / GeoPackage

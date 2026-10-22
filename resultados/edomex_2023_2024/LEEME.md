@@ -10,6 +10,7 @@ Primera corrida del balance para todo el estado, con `--bloques`, el 14–15 de 
 | `incendios_dnbr.csv` | Los 1,085 incendios del periodo: superficie del polígono contra lo quemado según el dNBR |
 | `cambio_2023_2024.tif` | uint8: 0 sin bosque, 1 estable, 2 pérdida por incendio, 3 otra pérdida, 4 ganancia (EPSG:32614) |
 | `bloques_2023_2024.csv` | Cada bloque: escenas, segundos y RAM pico |
+| `mapa_cambio_2023_2024.png` | Mapa del cambio y del cambio neto por municipio, hecho con `src/mapa_cambio.py` |
 
 No se guardaron los rásters de NDVI ni de dNBR; pesarían ~1.5 GB cada uno.
 

@@ -1,0 +1,527 @@
+<title>__NOMBRE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Cabecera con el resumen del periodo; mapa (2/3) y panel de detalle (1/3); tabla completa abajo.
+   En teléfono todo se apila. Colores del mapa validados para daltonismo en los dos temas. */
+:root {
+  --bg: #f2f3ee; --surface: #fcfcfa; --ink: #13170f; --ink-2: #4a4f45; --ink-3: #767b6f;
+  --line: #d9dbd1; --accent: #1d6b4f; --accent-ink: #ffffff; --hover: rgba(29, 107, 79, .08);
+  --sin-bosque: #e4e3dc; --c-estable: #1baf7a; --c-incendio: #a3221d; --c-otra: #eb6834; --c-ganancia: #2a78d6;
+  --div-0: #a8201a; --div-1: #e34948; --div-2: #f09a96; --div-3: #e9e8e2; --div-4: #86b6ef; --div-5: #2a78d6;
+  --rayado: #bdbcb3; --contorno: #3f443a; --limites: #8a8d83; --sel: #13170f; --aviso-bg: #fbf1dc; --aviso-ink: #5c4300;
+  --f-titulo: "Barlow Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  --f-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111310; --surface: #1a1c18; --ink: #eef0ea; --ink-2: #c0c4b8; --ink-3: #8b8f84;
+    --line: #2f322c; --accent: #57c497; --accent-ink: #0d1a14; --hover: rgba(87, 196, 151, .12);
+    --sin-bosque: #30322d; --c-estable: #199e70; --c-incendio: #b8336a; --c-otra: #c98500; --c-ganancia: #3987e5;
+    --div-0: #f08380; --div-1: #d24a48; --div-2: #8f3a37; --div-3: #3a3b36; --div-4: #2f5f9e; --div-5: #5aa0f0;
+    --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111310; --surface: #1a1c18; --ink: #eef0ea; --ink-2: #c0c4b8; --ink-3: #8b8f84;
+  --line: #2f322c; --accent: #57c497; --accent-ink: #0d1a14; --hover: rgba(87, 196, 151, .12);
+  --sin-bosque: #30322d; --c-estable: #199e70; --c-incendio: #b8336a; --c-otra: #c98500; --c-ganancia: #3987e5;
+  --div-0: #f08380; --div-1: #d24a48; --div-2: #8f3a37; --div-3: #3a3b36; --div-4: #2f5f9e; --div-5: #5aa0f0;
+  --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-texto); }
+.pagina {
+  max-width: 1320px; margin: 0 auto; display: grid; gap: 20px;
+  padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-titulo); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: .01em; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.05; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+.etiqueta { font-family: var(--f-titulo); font-weight: 500; font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.cabecera { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+.cabecera p { margin: 4px 0 0; color: var(--ink-2); max-width: 62ch; }
+.segmentos { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 3px; gap: 3px; flex-wrap: wrap; }
+.segmentos button {
+  font: 600 .95rem var(--f-texto); color: var(--ink-2); background: transparent; border: 0; border-radius: 6px;
+  padding: 6px 14px; cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.segmentos button[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); }
+.segmentos .separador { width: 1px; background: var(--line); margin: 4px 2px; }
+.segmentos button.preliminar { border: 1px dashed var(--ink-3); }
+.segmentos button small { font: 500 .72rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; opacity: .85; }
+.aviso p { margin: 0; } .aviso p + p { margin-top: 6px; }
+.detalle .tabla-detalle { overflow-x: auto; }
+.segmentos button:hover:not([aria-checked="true"]) { background: var(--hover); color: var(--ink); }
+button:focus-visible, input:focus-visible, tr:focus-visible, .u:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cifra { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; align-content: start; }
+.cifra b { font-family: var(--f-titulo); font-weight: 600; font-size: 1.7rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cifra small { color: var(--ink-3); font-size: .82rem; }
+.cifra .muestra { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.aviso { background: var(--aviso-bg); color: var(--aviso-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; }
+.principal { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 880px) { .principal { grid-template-columns: minmax(0, 1fr); } }
+.tarjeta { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.mapa-tarjeta { display: grid; min-width: 0; }
+.barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--line); }
+.buscar { display: flex; align-items: center; gap: 8px; }
+.buscar input {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 10px; width: min(240px, 60vw);
+}
+.lienzo { position: relative; min-width: 0; }
+#mapa { display: block; width: 100%; height: clamp(360px, 64vh, 660px); touch-action: none; cursor: grab; }
+#mapa:active { cursor: grabbing; }
+.raster { image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.fondo path { fill: var(--sin-bosque); stroke: none; pointer-events: none; }
+.u { stroke: var(--limites); stroke-width: .6; vector-effect: non-scaling-stroke; fill: transparent; cursor: pointer; }
+.vista-neto .fondo, .vista-neto .raster { display: none; }
+.vista-neto .u { stroke: var(--surface); stroke-width: .8; }
+.vista-neto .u.k0 { fill: var(--div-0); } .vista-neto .u.k1 { fill: var(--div-1); } .vista-neto .u.k2 { fill: var(--div-2); }
+.vista-neto .u.k3 { fill: var(--div-3); } .vista-neto .u.k4 { fill: var(--div-4); } .vista-neto .u.k5 { fill: var(--div-5); }
+.vista-neto .u.poco { fill: url(#rayas); }
+.u.encima { stroke: var(--sel); stroke-width: 1.6; }
+.contorno { fill: none; stroke: var(--contorno); stroke-width: 1.4; vector-effect: non-scaling-stroke; pointer-events: none; }
+.seleccion { fill: none; stroke: var(--sel); stroke-width: 2.6; vector-effect: non-scaling-stroke; pointer-events: none; }
+.zoom-botones { position: absolute; top: 12px; right: 12px; display: grid; gap: 4px; }
+.zoom-botones button {
+  width: 34px; height: 34px; font: 600 1.1rem var(--f-texto); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+}
+.zoom-botones button:hover { background: var(--hover); }
+.escala { position: absolute; left: 14px; bottom: 12px; font-size: .78rem; color: var(--ink-2); pointer-events: none; }
+.escala span { display: block; height: 4px; background: var(--ink); margin-top: 2px; }
+.globo {
+  position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; font-size: .88rem; box-shadow: 0 6px 20px rgba(0, 0, 0, .12); min-width: 180px; z-index: 2;
+}
+.globo b { font-family: var(--f-titulo); font-size: 1.05rem; font-weight: 600; display: block; }
+.globo dl, .detalle dl { display: grid; grid-template-columns: 1fr auto; gap: 1px 14px; margin: 4px 0 0; }
+.globo dt, .detalle dt { color: var(--ink-2); }
+.globo dd, .detalle dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.lado { display: grid; gap: 16px; min-width: 0; }
+.lado section { padding: 16px; display: grid; gap: 10px; }
+.detalle table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.detalle th, .detalle td { padding: 4px 0; text-align: right; border-bottom: 1px solid var(--line); }
+.detalle th:first-child, .detalle td:first-child { text-align: left; color: var(--ink-2); font-weight: 400; }
+.detalle thead th { font-family: var(--f-titulo); font-weight: 600; color: var(--ink); }
+.detalle .vacio { color: var(--ink-2); margin: 0; }
+.leyenda { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.leyenda label, .leyenda li { display: flex; align-items: center; gap: 8px; font-size: .92rem; }
+.leyenda input { margin: 0; accent-color: var(--accent); }
+.leyenda .muestra { width: 16px; height: 12px; border-radius: 3px; flex: none; }
+.leyenda .cifra-ha { margin-left: auto; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.leyenda .apagada { opacity: .45; }
+.nota-mapa { font-size: .82rem; color: var(--ink-3); margin: 0; }
+.tabla-tarjeta { display: grid; min-width: 0; }
+.tabla-barra { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.tabla-barra label { display: flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: .92rem; }
+.desliza { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; min-width: 760px; }
+.municipios th { position: sticky; top: 0; background: var(--surface); z-index: 1; text-align: right; padding: 0; border-bottom: 1px solid var(--line); }
+.municipios th:first-child, .municipios td:first-child { text-align: left; }
+.municipios th button {
+  width: 100%; font: 600 .82rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2);
+  background: none; border: 0; padding: 10px 12px; text-align: inherit; cursor: pointer; white-space: nowrap;
+}
+.municipios th[aria-sort] button { color: var(--ink); }
+.municipios td { padding: 7px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.municipios tbody tr { cursor: pointer; }
+.municipios tbody tr:hover { background: var(--hover); }
+.municipios tbody tr[aria-selected="true"] { background: var(--hover); box-shadow: inset 3px 0 0 var(--accent); }
+.municipios .chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.pie { color: var(--ink-3); font-size: .85rem; display: grid; gap: 6px; max-width: 90ch; }
+.pie p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<!--FIN_HEAD-->
+<div class="pagina">
+  <header class="cabecera">
+    <div>
+      <div class="etiqueta">Calculadora forestal · PROBOSQUE · prototipo</div>
+      <h1 id="titulo">Masa forestal</h1>
+      <p id="subtitulo"></p>
+    </div>
+    <div>
+      <div class="etiqueta" id="etq-periodo">Comparar</div>
+      <div class="segmentos" role="radiogroup" aria-labelledby="etq-periodo" id="periodos"></div>
+    </div>
+  </header>
+
+  <section class="cifras" id="cifras" aria-label="Resumen del periodo"></section>
+  <div class="aviso" id="aviso" role="note" hidden></div>
+
+  <div class="principal">
+    <div class="tarjeta mapa-tarjeta">
+      <div class="barra">
+        <div class="segmentos" role="radiogroup" aria-label="Qué mostrar en el mapa" id="vistas">
+          <button type="button" role="radio" data-vista="cobertura" aria-checked="true">Cambio de cobertura</button>
+          <button type="button" role="radio" data-vista="neto" aria-checked="false">Cambio neto por municipio</button>
+        </div>
+        <div class="buscar">
+          <label for="buscar" class="etiqueta">Buscar</label>
+          <input id="buscar" list="lista-unidades" placeholder="Municipio" autocomplete="off">
+          <datalist id="lista-unidades"></datalist>
+        </div>
+      </div>
+      <div class="lienzo" id="lienzo">
+        <svg id="mapa" role="img" aria-label="Mapa del cambio de masa forestal por municipio"></svg>
+        <div class="zoom-botones">
+          <button type="button" id="acercar" aria-label="Acercar">+</button>
+          <button type="button" id="alejar" aria-label="Alejar">−</button>
+          <button type="button" id="restablecer" aria-label="Ver todo">⤢</button>
+        </div>
+        <div class="escala" id="escala"></div>
+        <div class="globo" id="globo" hidden></div>
+      </div>
+    </div>
+
+    <aside class="lado">
+      <section class="tarjeta detalle" id="detalle" aria-live="polite"></section>
+      <section class="tarjeta">
+        <h3 id="leyenda-titulo">Capas</h3>
+        <ul class="leyenda" id="leyenda"></ul>
+        <p class="nota-mapa" id="nota-mapa"></p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="tarjeta tabla-tarjeta" aria-labelledby="tabla-titulo">
+    <div class="tabla-barra">
+      <h2 id="tabla-titulo">Municipios</h2>
+      <label><input type="checkbox" id="solo-bosque" checked> Solo municipios con bosque</label>
+    </div>
+    <div class="desliza">
+      <table class="municipios">
+        <thead><tr id="encabezados"></tr></thead>
+        <tbody id="filas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="pie" id="pie"></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script type="application/json" id="datos">__DATOS__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("datos").textContent);
+  const I = Object.fromEntries(D.campos.map((c, i) => [c, i]));
+  const nf = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 });
+  const nf1 = new Intl.NumberFormat("es-MX", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const ha = v => nf.format(Math.round(v)) + " ha";
+  const signo = v => (v > 0 ? "+" : v < 0 ? "−" : "") + nf.format(Math.abs(Math.round(v)));
+  const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + nf1.format(Math.abs(v)) + " %";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const CORTES = [-5, -2, -0.5, 0.5, 2];
+  const ETQ_NETO = ["Pierde más de 5 %", "Pierde 2–5 %", "Pierde 0.5–2 %", "Casi igual (±0.5 %)", "Gana 0.5–2 %", "Gana más de 2 %"];
+  const CLASES = [
+    { k: 1, nombre: "Bosque estable", token: "--c-estable" },
+    { k: 2, nombre: "Pérdida por incendio", token: "--c-incendio", campo: "inc" },
+    { k: 3, nombre: "Otra pérdida, por verificar", token: "--c-otra", campo: "otras" },
+    { k: 4, nombre: "Ganancia", token: "--c-ganancia", campo: "gan" },
+  ];
+
+  // Por defecto, el balance anual más reciente de un año
+  const anuales = D.periodos.map((p, i) => [p, i]).filter(([p]) => !p.preliminar);
+  const inicial = anuales.length
+    ? anuales.sort((a, b) => (b[0].actual - a[0].actual) || ((a[0].actual - a[0].base) - (b[0].actual - b[0].base)))[0][1]
+    : 0;
+  const st = { p: inicial, vista: "cobertura", sel: null, capas: { 1: true, 2: true, 3: true, 4: true },
+               orden: { col: "neto", asc: true }, soloBosque: true };
+  const P = () => D.periodos[st.p];
+  const fila = (nombre, p = P()) => p.filas[nombre];
+  const pct = f => (!f || f[I.base] < D.minimo) ? null : f[I.neto] / f[I.base] * 100;
+  const clase = f => {
+    if (!f || f[I.base] < D.minimo) return "poco";
+    const v = pct(f); let k = 0;
+    while (k < CORTES.length && v >= CORTES[k]) k++;
+    return "k" + k;
+  };
+
+  // ---------- Cabecera y cifras ----------
+  const nombreZona = D.titulo;
+  document.getElementById("titulo").textContent = "Masa forestal · " + nombreZona;
+  const periodosEl = document.getElementById("periodos");
+  const botonesPeriodo = [];
+  D.periodos.forEach((p, i) => {
+    if (p.preliminar && i > 0 && !D.periodos[i - 1].preliminar) {
+      const sep = document.createElement("span"); sep.className = "separador"; sep.setAttribute("aria-hidden", "true");
+      periodosEl.appendChild(sep);
+    }
+    const b = document.createElement("button");
+    b.type = "button"; b.setAttribute("role", "radio"); b.dataset.i = i;
+    b.innerHTML = p.etiqueta + (p.preliminar ? `<small>${p.sufijo.replace(/[()]/g, "").trim()} · preliminar</small>` : "");
+    if (p.preliminar) { b.classList.add("preliminar"); b.title = "Otra temporada: no se compara con los balances anuales"; }
+    b.addEventListener("click", () => cambiarPeriodo(i));
+    periodosEl.appendChild(b); botonesPeriodo.push(b);
+  });
+  if (D.periodos.length < 2) periodosEl.parentElement.hidden = true;
+
+  function pintarCabecera() {
+    const p = P(), t = p.tot, neto = t.actual - t.base;
+    botonesPeriodo.forEach(b => b.setAttribute("aria-checked", String(Number(b.dataset.i) === st.p)));
+    document.getElementById("subtitulo").textContent =
+      `Superficie con cobertura arbórea dentro de la zona forestal, medida con imágenes Sentinel-2 ${p.meses} de ${p.base} y de ${p.actual}.`;
+    const tile = (etq, valor, nota, token) =>
+      `<div class="cifra"><span class="etiqueta">${token ? `<span class="muestra" style="background:var(${token})"></span>` : ""}${etq}</span><b>${valor}</b><small>${nota}</small></div>`;
+    document.getElementById("cifras").innerHTML = [
+      tile(`Bosque ${p.base_txt}`, nf.format(t.base), "hectáreas"),
+      tile(`Bosque ${p.actual_txt}`, nf.format(t.actual), "hectáreas"),
+      tile("Cambio neto", signo(neto), `ha · ${pctTxt(neto / t.base * 100)}`),
+      tile("Pérdida por incendio", nf.format(t.inc), p.fuego_incompleto ? "ha · incompleta (ver aviso)" : "ha", "--c-incendio"),
+      tile("Otras pérdidas", nf.format(t.otras), "ha · por verificar", "--c-otra"),
+      tile("Ganancia", nf.format(t.gan), "ha", "--c-ganancia"),
+    ].join("");
+    const aviso = document.getElementById("aviso");
+    aviso.hidden = !p.notas.length;
+    aviso.innerHTML = p.notas.map(n => `<p>${n}</p>`).join("");
+  }
+
+  // ---------- Mapa ----------
+  const W = D.ancho, H = D.alto;
+  const svg = d3.select("#mapa").attr("viewBox", `0 0 ${W} ${H}`).attr("preserveAspectRatio", "xMidYMid meet");
+  const defs = svg.append("defs");
+  const patron = defs.append("pattern").attr("id", "rayas").attr("patternUnits", "userSpaceOnUse")
+    .attr("width", 7).attr("height", 7).attr("patternTransform", "rotate(45)");
+  patron.append("rect").attr("width", 7).attr("height", 7).style("fill", "var(--surface)");
+  patron.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 7).style("stroke", "var(--rayado)").attr("stroke-width", 2.5);
+  const g = svg.append("g");
+  g.append("g").attr("class", "fondo").selectAll("path").data(D.unidades).join("path").attr("d", u => u.d);
+  const raster = g.append("image").attr("class", "raster").attr("width", W).attr("height", H).attr("x", 0).attr("y", 0);
+  const unidades = g.append("g").selectAll("path").data(D.unidades).join("path")
+    .attr("class", "u").attr("d", u => u.d).attr("tabindex", -1)
+    .on("pointerenter", (e, u) => { d3.select(e.currentTarget).classed("encima", true).raise(); mostrarGlobo(e, u); })
+    .on("pointermove", (e, u) => mostrarGlobo(e, u))
+    .on("pointerleave", e => { d3.select(e.currentTarget).classed("encima", false); ocultarGlobo(); })
+    .on("click", (e, u) => seleccionar(u.nombre, false));
+  g.append("path").attr("class", "contorno").attr("d", D.contorno);
+  const selPath = g.append("path").attr("class", "seleccion");
+
+  const zoom = d3.zoom().scaleExtent([1, 40])
+    .translateExtent([[-W * 0.05, -H * 0.05], [W * 1.05, H * 1.05]])
+    .on("zoom", e => { g.attr("transform", e.transform); pintarEscala(e.transform.k); ocultarGlobo(); });
+  svg.call(zoom).on("dblclick.zoom", null);
+  const dur = reduceMotion ? 0 : 500;
+  document.getElementById("acercar").onclick = () => svg.transition().duration(dur).call(zoom.scaleBy, 1.8);
+  document.getElementById("alejar").onclick = () => svg.transition().duration(dur).call(zoom.scaleBy, 1 / 1.8);
+  document.getElementById("restablecer").onclick = () => svg.transition().duration(dur).call(zoom.transform, d3.zoomIdentity);
+  function zoomA(bbox) {
+    const [x0, y0, x1, y1] = bbox;
+    const k = Math.min(40, 0.75 / Math.max((x1 - x0) / W, (y1 - y0) / H));
+    const t = d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k);
+    svg.transition().duration(reduceMotion ? 0 : 700).call(zoom.transform, t);
+  }
+
+  function pintarEscala(k) {
+    const rect = document.getElementById("mapa").getBoundingClientRect();
+    const pxPorUnidad = Math.min(rect.width / W, rect.height / H) * k;   // píxeles de pantalla por celda
+    const metrosPorPx = D.celda / pxPorUnidad;
+    const objetivo = metrosPorPx * 110, n = 10 ** Math.floor(Math.log10(objetivo));
+    const largo = [5, 2, 1].map(m => m * n).find(v => v <= objetivo) || n;
+    const el = document.getElementById("escala");
+    el.innerHTML = `${largo >= 1000 ? nf.format(largo / 1000) + " km" : nf.format(largo) + " m"}<span style="width:${largo / metrosPorPx}px"></span>`;
+  }
+  window.addEventListener("resize", () => pintarEscala(d3.zoomTransform(svg.node()).k));
+
+  // Ráster de clases: viene como PNG gris (clase x 50); se colorea con los tokens del tema
+  const clasesCache = {}, imagenCache = {};
+  function leerClases(i) {
+    if (clasesCache[i]) return clasesCache[i];
+    clasesCache[i] = new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas"); c.width = W; c.height = H;
+        const ctx = c.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, W, H).data, out = new Uint8Array(W * H);
+        for (let j = 0; j < out.length; j++) out[j] = Math.round(px[j * 4] / 50);
+        res(out);
+      };
+      img.src = D.periodos[i].img;
+    });
+    return clasesCache[i];
+  }
+  const hex = s => { s = s.trim().replace("#", ""); return [0, 2, 4].map(o => parseInt(s.slice(o, o + 2), 16)); };
+  const temaOscuro = () => getComputedStyle(document.documentElement).colorScheme.includes("dark");
+  async function pintarRaster() {
+    const css = getComputedStyle(document.documentElement);
+    const colores = {}; CLASES.forEach(c => { colores[c.k] = st.capas[c.k] ? hex(css.getPropertyValue(c.token)) : null; });
+    const clave = [st.p, temaOscuro(), ...CLASES.map(c => st.capas[c.k])].join("|");
+    if (!imagenCache[clave]) {
+      const cls = await leerClases(st.p);
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const ctx = c.getContext("2d"), img = ctx.createImageData(W, H), d = img.data;
+      for (let j = 0; j < cls.length; j++) {
+        const col = colores[cls[j]];
+        if (col) { const o = j * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255; }
+      }
+      ctx.putImageData(img, 0, 0);
+      imagenCache[clave] = c.toDataURL("image/png");
+    }
+    raster.attr("href", imagenCache[clave]);
+  }
+
+  function pintarCoropletas() {
+    unidades.attr("class", u => "u " + clase(fila(u.nombre)));
+    d3.select("#mapa").classed("vista-neto", st.vista === "neto");
+  }
+
+  // ---------- Globo (al pasar el cursor) ----------
+  const globo = document.getElementById("globo"), lienzo = document.getElementById("lienzo");
+  function mostrarGlobo(e, u) {
+    const f = fila(u.nombre);
+    globo.innerHTML = `<b>${u.nombre}</b>` + (f ? `<dl>
+      <dt>Bosque ${P().base_txt}</dt><dd>${ha(f[I.base])}</dd>
+      <dt>Bosque ${P().actual_txt}</dt><dd>${ha(f[I.actual])}</dd>
+      <dt>Cambio neto</dt><dd>${signo(f[I.neto])} ha</dd>
+      <dt></dt><dd>${f[I.base] < D.minimo ? "poco bosque" : pctTxt(pct(f))}</dd></dl>` : "<div>Sin datos</div>");
+    globo.hidden = false;
+    const r = lienzo.getBoundingClientRect(), gw = globo.offsetWidth, gh = globo.offsetHeight;
+    let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+    if (x + gw > r.width - 8) x = e.clientX - r.left - gw - 14;
+    if (y + gh > r.height - 8) y = e.clientY - r.top - gh - 14;
+    globo.style.left = Math.max(8, x) + "px"; globo.style.top = Math.max(8, y) + "px";
+  }
+  const ocultarGlobo = () => { globo.hidden = true; };
+
+  // ---------- Panel de detalle y leyenda ----------
+  function pintarDetalle() {
+    const el = document.getElementById("detalle");
+    if (!st.sel) {
+      el.innerHTML = `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver sus cifras en cada periodo.</p>`;
+      return;
+    }
+    const filas = [["Bosque inicial", "base"], ["Pérdida por incendio", "inc"], ["Otras pérdidas", "otras"],
+                   ["Ganancia", "gan"], ["Bosque final", "actual"], ["Cambio neto", "neto"]];
+    const cols = D.periodos.map(p => ({ p, f: p.filas[st.sel] }));
+    el.innerHTML = `<h3>${st.sel}</h3>
+      <div class="tabla-detalle"><table><thead><tr><th>Hectáreas</th>${cols.map(c => `<th title="${c.p.etiqueta}${c.p.preliminar ? " · preliminar" : ""}">${c.p.corto}</th>`).join("")}</tr></thead>
+      <tbody>${filas.map(([etq, campo]) => `<tr><td>${etq}</td>${cols.map(c => `<td>${c.f ? (campo === "neto" ? signo(c.f[I.neto]) : nf.format(Math.round(c.f[I[campo]]))) : "—"}</td>`).join("")}</tr>`).join("")}
+      <tr><td>Cambio neto (%)</td>${cols.map(c => `<td>${c.f && c.f[I.base] >= D.minimo ? pctTxt(pct(c.f)) : "—"}</td>`).join("")}</tr></tbody></table></div>
+      ${cols.some(c => c.p.preliminar) ? `<p class="vacio">* Preliminar, otra temporada: no se compara con las demás columnas.</p>` : ""}
+      ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}`;
+  }
+
+  function pintarLeyenda() {
+    const ul = document.getElementById("leyenda"), t = P().tot, nota = document.getElementById("nota-mapa");
+    if (st.vista === "cobertura") {
+      document.getElementById("leyenda-titulo").textContent = "Capas";
+      const haClase = { 1: t.base - t.inc - t.otras, 2: t.inc, 3: t.otras, 4: t.gan };
+      ul.innerHTML = CLASES.map(c => `<li><label class="${st.capas[c.k] ? "" : "apagada"}">
+          <input type="checkbox" data-k="${c.k}" ${st.capas[c.k] ? "checked" : ""}>
+          <span class="muestra" style="background:var(${c.token})"></span>${c.nombre}
+          <span class="cifra-ha">${ha(haClase[c.k])}</span></label></li>`).join("") +
+        `<li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin bosque o fuera de la zona forestal</li>`;
+      ul.querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+        st.capas[inp.dataset.k] = inp.checked; pintarLeyenda(); pintarRaster();
+      }));
+      nota.textContent = `Cada celda de ${nf.format(D.celda)} m muestra la pérdida o ganancia si la hay, así que se ven más grandes de lo que son; las hectáreas reales están arriba. Apaga capas para ver una sola clase.`;
+    } else {
+      document.getElementById("leyenda-titulo").textContent = "Cambio neto";
+      const cuenta = {}; D.unidades.forEach(u => { const k = clase(fila(u.nombre)); cuenta[k] = (cuenta[k] || 0) + 1; });
+      ul.innerHTML = ETQ_NETO.map((etq, k) => `<li><span class="muestra" style="background:var(--div-${k})"></span>${etq}<span class="cifra-ha">${cuenta["k" + k] || 0}</span></li>`).join("") +
+        `<li><svg class="muestra" viewBox="0 0 16 12" aria-hidden="true"><rect width="16" height="12" fill="url(#rayas)"></rect></svg>Menos de ${nf.format(D.minimo)} ha de bosque<span class="cifra-ha">${cuenta.poco || 0}</span></li>`;
+      nota.textContent = "Cambio neto de cada municipio como porcentaje de su bosque inicial. El número a la derecha es cuántos municipios hay en cada clase.";
+    }
+  }
+
+  // ---------- Tabla ----------
+  const COLS = [
+    { c: "nombre", t: "Municipio" }, { c: "base", t: "Bosque inicial" }, { c: "inc", t: "Incendio" },
+    { c: "otras", t: "Otras pérdidas" }, { c: "gan", t: "Ganancia" }, { c: "actual", t: "Bosque final" },
+    { c: "neto", t: "Neto (ha)" }, { c: "pct", t: "Neto (%)" },
+  ];
+  const enc = document.getElementById("encabezados");
+  enc.innerHTML = COLS.map(col => `<th scope="col" data-c="${col.c}"><button type="button">${col.t}</button></th>`).join("");
+  enc.querySelectorAll("th").forEach(th => th.querySelector("button").addEventListener("click", () => {
+    const c = th.dataset.c;
+    st.orden = { col: c, asc: st.orden.col === c ? !st.orden.asc : (c === "nombre" || c === "neto" || c === "pct") };
+    pintarTabla();
+  }));
+  document.getElementById("solo-bosque").addEventListener("change", e => { st.soloBosque = e.target.checked; pintarTabla(); });
+
+  function pintarTabla() {
+    const p = P();
+    let lista = Object.entries(p.filas).map(([nombre, f]) => ({ nombre, f, pct: pct(f) }));
+    if (st.soloBosque) lista = lista.filter(x => x.f[I.base] > 0);
+    const val = x => st.orden.col === "nombre" ? x.nombre : st.orden.col === "pct" ? (x.pct ?? Infinity) : x.f[I[st.orden.col]];
+    lista.sort((a, b) => {
+      const va = val(a), vb = val(b);
+      const r = typeof va === "string" ? va.localeCompare(vb, "es") : va - vb;
+      return st.orden.asc ? r : -r;
+    });
+    enc.querySelectorAll("th").forEach(th => {
+      if (th.dataset.c === st.orden.col) th.setAttribute("aria-sort", st.orden.asc ? "ascending" : "descending");
+      else th.removeAttribute("aria-sort");
+    });
+    const tb = document.getElementById("filas");
+    tb.innerHTML = lista.map(x => `<tr tabindex="0" data-n="${x.nombre.replace(/"/g, "&quot;")}" aria-selected="${x.nombre === st.sel}">
+      <td>${x.nombre}</td><td>${nf.format(Math.round(x.f[I.base]))}</td><td>${nf.format(Math.round(x.f[I.inc]))}</td>
+      <td>${nf.format(Math.round(x.f[I.otras]))}</td><td>${nf.format(Math.round(x.f[I.gan]))}</td>
+      <td>${nf.format(Math.round(x.f[I.actual]))}</td><td>${signo(x.f[I.neto])}</td>
+      <td>${x.pct == null ? "—" : `<span class="chip" style="background:var(--div-${clase(x.f).slice(1)})"></span>${pctTxt(x.pct)}`}</td></tr>`).join("");
+    tb.querySelectorAll("tr").forEach(tr => {
+      tr.addEventListener("click", () => seleccionar(tr.dataset.n, true));
+      tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); seleccionar(tr.dataset.n, true); } });
+    });
+  }
+
+  // ---------- Selección, búsqueda, vistas, periodos ----------
+  const porNombre = Object.fromEntries(D.unidades.map(u => [u.nombre, u]));
+  document.getElementById("lista-unidades").innerHTML = D.unidades.map(u => `<option value="${u.nombre}"></option>`).join("");
+  document.getElementById("buscar").addEventListener("change", e => {
+    const q = e.target.value.trim().toLowerCase();
+    const u = D.unidades.find(x => x.nombre.toLowerCase() === q) || D.unidades.find(x => x.nombre.toLowerCase().includes(q));
+    if (u) seleccionar(u.nombre, true);
+  });
+  function seleccionar(nombre, acercar) {
+    st.sel = nombre;
+    const u = porNombre[nombre];
+    selPath.attr("d", u ? u.d : null);
+    if (u && acercar) zoomA(u.bbox);
+    document.querySelectorAll("#filas tr").forEach(tr => tr.setAttribute("aria-selected", String(tr.dataset.n === nombre)));
+    const tr = [...document.querySelectorAll("#filas tr")].find(t => t.dataset.n === nombre);
+    if (tr && !acercar) tr.scrollIntoView({ block: "nearest" });
+    pintarDetalle();
+  }
+  document.querySelectorAll("#vistas button").forEach(b => b.addEventListener("click", () => {
+    st.vista = b.dataset.vista;
+    document.querySelectorAll("#vistas button").forEach(x => x.setAttribute("aria-checked", String(x === b)));
+    pintarCoropletas(); pintarLeyenda();
+  }));
+  function cambiarPeriodo(i) {
+    st.p = i;
+    pintarCabecera(); pintarCoropletas(); pintarLeyenda(); pintarTabla(); pintarDetalle(); pintarRaster(); pintarPie();
+  }
+
+  function pintarPie() {
+    const p = P();
+    const esc = p.escenas && p.escenas[0] ? ` (${p.escenas[0]} y ${p.escenas[1]} escenas)` : "";
+    const inc = p.incendios && p.incendios.n ? ` Incendios del periodo: ${nf.format(p.incendios.n)}; de ${ha(p.incendios.poligono)} reportadas por CONAFOR, ${ha(p.incendios.quemado)} tienen dNBR ≥ 0.27 y ${ha(p.incendios.perdido)} quedaron sin copa.` : "";
+    document.getElementById("pie").innerHTML = `
+      <p><strong>Método.</strong> Bosque = NDVI ≥ ${p.umbral.toFixed(2)} (umbral provisional) dentro de la zona forestal de INEGI Serie VII, con compuestos Sentinel-2 L2A ${p.meses} de cada año${esc}. Un píxel cambia de clase solo si su NDVI cambió al menos 0.10. Quemado = dNBR ≥ 0.27 dentro de los polígonos de incendio de CONAFOR.${inc} Las “otras pérdidas” están por verificar: pueden ser tala, plaga, nieve o ruido.</p>
+      <p><strong>Fuentes.</strong> Contiene datos modificados de Copernicus Sentinel ${p.base}–${p.actual} (ESA, vía Earth Search en AWS). Fuente: INEGI, Conjunto de datos vectoriales de uso del suelo y vegetación, escala 1:250 000, serie VII. Fuente: CONAFOR, Concentrado Nacional de Polígonos de Incendios Forestales, vía IDEFOR. Análisis propio; no es una postura oficial del INEGI ni de CONAFOR.</p>`;
+  }
+
+  // Volver a colorear el ráster si cambia el tema
+  const alCambiarTema = () => pintarRaster();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", alCambiarTema);
+  new MutationObserver(alCambiarTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  cambiarPeriodo(st.p);
+  pintarEscala(1);
+})();
+</script>

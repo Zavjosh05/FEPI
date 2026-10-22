@@ -1,0 +1,14 @@
+{
+ "anio_base": 2024,
+ "anio": 2025,
+ "ventana": ["11-01", "12-31"],
+ "umbral_ndvi": 0.51,
+ "umbral_pedido": "0.51",
+ "escenas": {"2024": 213, "2025": 202},
+ "incendios": 7,
+ "nubes_max": 60.0,
+ "escenas_max": null,
+ "bloques": true,
+ "fecha": "2026-10-21T19:38:32",
+ "nota": "Escrito a mano a partir de correr.log: la corrida arrancó antes de que el script escribiera este archivo."
+}

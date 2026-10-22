@@ -94,6 +94,8 @@ VENTANA_COBERTURA = ("11-01", "12-31")
 NUBES_MAX = 60               # % máximo de nubes por escena (eo:cloud_cover); --nubes-max
 BLOQUE_COG = 1024            # bloque interno de los COG: 1024 px de 10 m = 512 px de 20 m = 10.24 km
 LADO_TESELA = 100_000        # las teselas Sentinel-2 (MGRS) arrancan cada 100 km
+HILOS_INCENDIOS = 6          # incendios que se calculan a la vez (--hilos-incendios)
+CACHE_RAM_MB = 512           # caché de GDAL en memoria para las lecturas de los COG
 
 # Códigos del ráster de cambio
 SIN_BOSQUE, ESTABLE, PERD_INCENDIO, PERD_OTRA, GANANCIA = 0, 1, 2, 3, 4
@@ -398,7 +400,16 @@ class CapasVector:
 # ==========================================================================
 def _configurar_lectura():
     from odc.stac import configure_rio
-    configure_rio(cloud_defaults=True, aws={"aws_unsigned": True})
+    # Caché en RAM (no en disco) de los pedazos de COG ya bajados: los incendios cercanos y de
+    # fechas parecidas leen los mismos bloques internos, y así no se bajan otra vez.
+    # Límites de espera: sin ellos, una conexión colgada deja la corrida esperando para siempre.
+    # Se corta si no conecta en 30 s o si deja de llegar información por 60 s (una descarga lenta
+    # pero viva no se corta); GDAL reintenta y, si no se recupera, la corrida falla con error y se
+    # puede reanudar con el mismo comando.
+    configure_rio(cloud_defaults=True, aws={"aws_unsigned": True},
+                  CPL_VSIL_CURL_CACHE_SIZE=str(CACHE_RAM_MB * 2**20),
+                  GDAL_HTTP_CONNECTTIMEOUT="30", GDAL_HTTP_LOW_SPEED_TIME="60",
+                  GDAL_HTTP_LOW_SPEED_LIMIT="1")
 
 
 def geobox_de(gdf):
@@ -412,7 +423,7 @@ def geobox_de(gdf):
 def buscar_items(geobox, inicio, fin, nubes_max=NUBES_MAX):
     from pystac_client import Client
     bbox = list(geobox.geographic_extent.boundingbox)
-    cat = Client.open(STAC_URL)
+    cat = Client.open(STAC_URL, timeout=120)  # sin límite, una consulta colgada no termina nunca
     for col in COLECCIONES:
         items = list(cat.search(collections=[col], bbox=bbox, datetime=f"{inicio}/{fin}",
                                 query={"eo:cloud_cover": {"lt": nubes_max}}).items())
@@ -449,12 +460,12 @@ def limitar_escenas(items, maximo):
     return [it for it in items if id(it) in elegidas]
 
 
-def items_anuales(geobox, anio, nubes_max=NUBES_MAX, escenas_max=None):
-    """Escenas de nov-dic del año para toda la zona (una sola búsqueda en el catálogo)."""
-    ini, fin = VENTANA_COBERTURA
+def items_anuales(geobox, anio, nubes_max=NUBES_MAX, escenas_max=None, ventana=VENTANA_COBERTURA):
+    """Escenas de la ventana del año (nov-dic por defecto) para toda la zona, en una sola búsqueda."""
+    ini, fin = ventana
     items = buscar_items(geobox, f"{anio}-{ini}", f"{anio}-{fin}", nubes_max)
     if not items:
-        sys.exit(f"No hay imágenes Sentinel-2 para nov-dic {anio} en la zona.")
+        sys.exit(f"No hay imágenes Sentinel-2 del {ini} al {fin} de {anio} en la zona.")
     elegidas = limitar_escenas(items, escenas_max)
     extra = f" (de {len(items)}; máximo {escenas_max} por tesela)" if len(elegidas) < len(items) else ""
     print(f"  {len(elegidas)} escenas para el compuesto de {anio}{extra}")
@@ -517,8 +528,8 @@ def compuesto_indice(items, indice, geobox) -> np.ndarray:
     return serie.chunk({"time": -1}).median("time", skipna=True).compute().values
 
 
-def ndvi_anual(geobox, anio, nubes_max=NUBES_MAX, escenas_max=None) -> np.ndarray:
-    return compuesto_indice(items_anuales(geobox, anio, nubes_max, escenas_max), "ndvi", geobox)
+def ndvi_anual(geobox, anio, nubes_max=NUBES_MAX, escenas_max=None, ventana=VENTANA_COBERTURA) -> np.ndarray:
+    return compuesto_indice(items_anuales(geobox, anio, nubes_max, escenas_max, ventana), "ndvi", geobox)
 
 
 def ventana_incendio(geobox_total, geom):
@@ -536,15 +547,41 @@ def ventana_incendio(geobox_total, geom):
     return r0, r1, c0, c1
 
 
-def dnbr_incendio(geobox_total, geom, fecha, nubes_max=NUBES_MAX):
+class CatalogoLocal:
+    """Escenas de toda la zona y de todo el periodo de los incendios, buscadas en una sola consulta.
+
+    Cada incendio filtra aquí las suyas (misma huella, fechas y nubes que pediría al catálogo), en
+    lugar de hacer dos consultas propias. Si el filtro no encuentra nada, pregunta al catálogo como
+    antes (por ejemplo, para probar la segunda colección).
+    """
+
+    def __init__(self, geobox, inicio, fin, nubes_max=NUBES_MAX):
+        from shapely.geometry import shape
+        self.nubes_max = nubes_max
+        self.items = buscar_items(geobox, inicio, fin, nubes_max)
+        self.huellas = [shape(it.geometry) for it in self.items]
+        self.fechas = [pd.Timestamp(it.properties["datetime"]).tz_convert("UTC").tz_localize(None)
+                       for it in self.items]
+
+    def buscar(self, geobox, inicio, fin):
+        from shapely.geometry import box
+        caja = box(*geobox.geographic_extent.boundingbox)
+        # Igual que la consulta inicio/fin: desde las 00:00 de inicio hasta el final del día fin
+        t0, t1 = pd.Timestamp(str(inicio)), pd.Timestamp(str(fin)) + pd.Timedelta(days=1)
+        res = [it for it, h, t in zip(self.items, self.huellas, self.fechas) if t0 <= t < t1 and h.intersects(caja)]
+        return res or buscar_items(geobox, inicio, fin, self.nubes_max)
+
+
+def dnbr_incendio(geobox_total, geom, fecha, nubes_max=NUBES_MAX, catalogo=None):
     """dNBR = NBR antes - NBR después, en la ventana del polígono (alineada a la malla total)."""
     w = ventana_incendio(geobox_total, geom)
     if w is None:
         return None
     r0, r1, c0, c1 = w
     sub = geobox_total[r0:r1, c0:c1]
-    antes = buscar_items(sub, (fecha - timedelta(days=75)).date(), (fecha - timedelta(days=5)).date(), nubes_max)
-    despues = buscar_items(sub, (fecha + timedelta(days=10)).date(), (fecha + timedelta(days=70)).date(), nubes_max)
+    buscar = catalogo.buscar if catalogo else (lambda g, i, f: buscar_items(g, i, f, nubes_max))
+    antes = buscar(sub, (fecha - timedelta(days=75)).date(), (fecha - timedelta(days=5)).date())
+    despues = buscar(sub, (fecha + timedelta(days=10)).date(), (fecha + timedelta(days=70)).date())
     if not antes or not despues:
         return None
     dnbr = compuesto_indice(antes, "nbr", sub) - compuesto_indice(despues, "nbr", sub)
@@ -815,7 +852,7 @@ class Resultado:
 
 def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios, nombres, *,
                          anio_base, anio, umbral, margen, umbral_dnbr, salida, firma,
-                         guardar_indices=False, reiniciar=False, log=print) -> Resultado:
+                         guardar_indices=False, reiniciar=False, hilos=1, log=print) -> Resultado:
     """Balance, incendios y ráster de cambio, bloque por bloque.
 
     Procesar de una sola vez es el caso de un solo bloque que cubre toda la malla.
@@ -829,38 +866,67 @@ def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios
         luego se calcula Otsu con todos y se sigue con el año actual.
     leer_ndvi(anio, bloque) -> (arreglo float32 del bloque, número de escenas)
     leer_dnbr(geom, fecha) -> ((filas, columnas) en la malla total, dNBR) o None
+    hilos: incendios que se leen a la vez. Se procesan y guardan en su orden, así que el
+    resultado es idéntico al de leerlos uno por uno.
     """
     salida = Path(salida)
     sufijo = f"{anio_base}_{anio}"
     prog = Progreso(salida / f"progreso_{sufijo}", firma, reiniciar, log)
     indices = Indices(salida, geobox, anio_base, anio, prog.nuevo) if guardar_indices else None
-    n = len(nombres)
 
     # 1. Incendios: dNBR de cada uno en su ventana, una sola vez
     quemas = {i: r for i, r in prog.incendios.items() if r is not None}
+    faltan = [(i, inc) for i, inc in enumerate(incendios) if i not in prog.incendios]
     if incendios:
-        log(f"dNBR por incendio ({len(incendios)}; {len(prog.incendios)} ya calculados)")
-    for i, (clave, fecha, geom) in enumerate(incendios):
-        if i in prog.incendios:
-            continue
-        res = leer_dnbr(geom, fecha)
-        if res is None:
-            log(f"  incendio {clave}: sin imágenes antes/después, se omite")
-            prog.guardar_incendio(i, None)
-            continue
-        (rs, cs), d = res
-        poly = rasterizar([geom], [1], d.shape, geobox[rs, cs].affine, dtype="uint8").astype(bool)
-        q = poly & (np.nan_to_num(d, nan=0) >= umbral_dnbr)
-        r = {"incendio": clave, "fecha_inicio": f"{fecha:%Y-%m-%d}",
-             "poligono_ha": round(poly.sum() * HA_PIXEL, 2),
-             "quemado_dnbr_ha": round(q.sum() * HA_PIXEL, 2),
-             "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3),
-             "ventana": (rs.start, rs.stop, cs.start, cs.stop), "q": q}
-        if indices:
-            indices.escribir("dnbr", rs, cs, d, poly)
-        prog.guardar_incendio(i, r)
-        quemas[i] = r
-        log(f"  incendio {clave} ({fecha:%Y-%m-%d}): {q.sum() * HA_PIXEL:.1f} ha quemadas")
+        log(f"dNBR por incendio ({len(incendios)}; {len(prog.incendios)} ya calculados"
+            + (f"; {hilos} a la vez" if hilos > 1 and faltan else "") + ")")
+    if hilos > 1 and len(faltan) > 1:
+        # Las lecturas corren adelantadas en paralelo; el proceso y el guardado van en orden
+        from concurrent.futures import ThreadPoolExecutor
+        ejecutor = ThreadPoolExecutor(hilos)
+        futuros = {i: ejecutor.submit(leer_dnbr, geom, fecha) for i, (_, fecha, geom) in faltan}
+        obtener = lambda i, geom, fecha: futuros[i].result()  # noqa: E731
+    else:
+        ejecutor = None
+        obtener = lambda i, geom, fecha: leer_dnbr(geom, fecha)  # noqa: E731
+    try:
+        for i, (clave, fecha, geom) in faltan:
+            _procesar_incendio(i, clave, fecha, geom, obtener(i, geom, fecha), geobox, umbral_dnbr,
+                               indices, prog, quemas, log)
+    finally:
+        if ejecutor:
+            ejecutor.shutdown(wait=True, cancel_futures=True)
+
+    return _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas,
+                             anio_base=anio_base, anio=anio, umbral=umbral, margen=margen,
+                             salida=salida, sufijo=sufijo, log=log)
+
+
+def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices, prog, quemas, log):
+    """Máscara de quemado y cifras de un incendio a partir de su dNBR; lo guarda en el avance."""
+    if res is None:
+        log(f"  incendio {clave}: sin imágenes antes/después, se omite")
+        prog.guardar_incendio(i, None)
+        return
+    (rs, cs), d = res
+    poly = rasterizar([geom], [1], d.shape, geobox[rs, cs].affine, dtype="uint8").astype(bool)
+    q = poly & (np.nan_to_num(d, nan=0) >= umbral_dnbr)
+    r = {"incendio": clave, "fecha_inicio": f"{fecha:%Y-%m-%d}",
+         "poligono_ha": round(poly.sum() * HA_PIXEL, 2),
+         "quemado_dnbr_ha": round(q.sum() * HA_PIXEL, 2),
+         "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3),
+         "ventana": (rs.start, rs.stop, cs.start, cs.stop), "q": q}
+    if indices:
+        indices.escribir("dnbr", rs, cs, d, poly)
+    prog.guardar_incendio(i, r)
+    quemas[i] = r
+    log(f"  incendio {clave} ({fecha:%Y-%m-%d}): {q.sum() * HA_PIXEL:.1f} ha quemadas")
+
+
+def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas, *,
+                      anio_base, anio, umbral, margen, salida, sufijo, log):
+    """Pasos 2 a 5 de calcular_por_bloques, con los incendios ya calculados."""
+    n = len(nombres)
 
     # 2. Bloques que tocan la zona; de los demás solo importa qué unidades tocan
     pendientes, n_zona = [], 0
@@ -985,7 +1051,7 @@ def cmd_calibrar(a):
     _configurar_lectura()
     aoi = gpd.read_file(a.aoi)
     gb = geobox_de(aoi)
-    ndvi = ndvi_anual(gb, a.anio, a.nubes_max, a.escenas_max)
+    ndvi = ndvi_anual(gb, a.anio, a.nubes_max, a.escenas_max, tuple(a.ventana))
 
     pts = pd.read_csv(a.puntos)
     g = gpd.GeoDataFrame(pts, geometry=gpd.points_from_xy(pts["lon"], pts["lat"]), crs="EPSG:4326").to_crs(CRS)
@@ -1041,18 +1107,18 @@ def cmd_correr(a):
         inc = inc[inc.intersects(zona_aoi)].copy()
         inc["_fecha"] = leer_fechas(inc[a.campo_fecha])
         # Periodo del balance: del inicio del compuesto base al inicio del compuesto actual
-        ini, fin = pd.Timestamp(a.anio_base, 11, 1), pd.Timestamp(a.anio, 11, 1)
+        ini, fin = pd.Timestamp(f"{a.anio_base}-{a.ventana[0]}"), pd.Timestamp(f"{a.anio}-{a.ventana[0]}")
         fuera = inc[(inc["_fecha"] >= fin)]
         inc = inc[(inc["_fecha"] >= ini) & (inc["_fecha"] < fin)]
         print(f"Incendios en el periodo {ini:%Y-%m-%d} a {fin - pd.Timedelta(days=1):%Y-%m-%d}: {len(inc)}")
         if len(fuera):
-            print(f"  ({len(fuera)} incendio(s) posteriores al 1 de noviembre de {a.anio} quedan para el siguiente periodo)")
+            print(f"  ({len(fuera)} incendio(s) posteriores al {fin:%Y-%m-%d} quedan para el siguiente periodo)")
         for i, (_, fila) in enumerate(inc.iterrows(), start=1):
             clave = fila.get(a.campo_id, i) if a.campo_id else i
             incendios.append((clave, fila["_fecha"], fila.geometry))
 
     print("Cobertura base y actual")
-    escenas = {anio: Escenas(items_anuales(gb, anio, a.nubes_max, a.escenas_max), gb.crs)
+    escenas = {anio: Escenas(items_anuales(gb, anio, a.nubes_max, a.escenas_max, tuple(a.ventana)), gb.crs)
                for anio in (a.anio_base, a.anio)}
     if a.bloques:
         origenes = origenes_teselas(escenas[a.anio_base].items + escenas[a.anio].items)
@@ -1072,17 +1138,26 @@ def cmd_correr(a):
             return np.full(b.forma, np.nan, dtype="float32"), 0
         return compuesto_indice(its, "ndvi", gbb), len(its)
 
+    catalogo = None
+    if len(incendios) > 1:
+        fechas = [f for _, f, _ in incendios]
+        catalogo = CatalogoLocal(gb, (min(fechas) - timedelta(days=75)).date(),
+                                 (max(fechas) + timedelta(days=70)).date(), a.nubes_max)
+        print(f"Escenas para el dNBR, buscadas una vez: {len(catalogo.items)}")
+
     def leer_dnbr(geom, fecha):
-        return dnbr_incendio(gb, geom, fecha, a.nubes_max)
+        return dnbr_incendio(gb, geom, fecha, a.nubes_max, catalogo)
 
     guardar = a.guardar_indices if a.guardar_indices is not None else not a.bloques
-    firma = {k: v for k, v in vars(a).items() if k not in ("cmd", "salida", "reiniciar")}
+    # Lo que no cambia el resultado no entra en la firma (se puede reanudar con otro valor)
+    firma = {k: v for k, v in vars(a).items() if k not in ("cmd", "salida", "reiniciar", "hilos_incendios")}
     firma["escenas"] = {str(anio): _huella_ids(e.items) for anio, e in escenas.items()}
     firma["malla_bloques"] = hashlib.sha1(",".join(b.id for b in bloques).encode()).hexdigest()[:16]
     res = calcular_por_bloques(gb, bloques, capas, leer_ndvi, leer_dnbr, incendios, nombres,
                                anio_base=a.anio_base, anio=a.anio, umbral=a.umbral_ndvi,
                                margen=a.margen_cambio, umbral_dnbr=a.umbral_dnbr, salida=out,
-                               firma=firma, guardar_indices=guardar, reiniciar=a.reiniciar)
+                               firma=firma, guardar_indices=guardar, reiniciar=a.reiniciar,
+                               hilos=a.hilos_incendios)
     if a.zona_forestal:
         print(f"  Zona forestal de referencia: {res.zona_ha:,.0f} ha")
 
@@ -1095,6 +1170,15 @@ def cmd_correr(a):
     tabla.to_csv(out / f"balance_{a.anio_base}_{a.anio}.csv", index=False)
     if len(res.incendios):
         res.incendios.to_csv(out / "incendios_dnbr.csv", index=False)
+    # Cómo se hizo la corrida (lo lee src/mapa_interactivo.py)
+    from datetime import datetime
+    (out / f"corrida_{a.anio_base}_{a.anio}.json").write_text(json.dumps({
+        "anio_base": a.anio_base, "anio": a.anio, "ventana": list(a.ventana),
+        "umbral_ndvi": round(float(res.umbral), 4), "umbral_pedido": str(a.umbral_ndvi),
+        "escenas": {str(k): len(e.items) for k, e in escenas.items()},
+        "incendios": len(incendios), "nubes_max": a.nubes_max, "escenas_max": a.escenas_max,
+        "bloques": a.bloques, "fecha": datetime.now().isoformat(timespec="seconds"),
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
     res.progreso.borrar()
     print("\n" + tabla.to_string(index=False))
     print(f"\nResultados en {out.resolve()}")
@@ -1230,12 +1314,12 @@ def comprobar_bloques():
         return envuelta
 
     with tempfile.TemporaryDirectory() as tmp:
-        def calcular(nombre, bloques_, umbral, ndvi_=leer_ndvi, dnbr_=leer_dnbr):
+        def calcular(nombre, bloques_, umbral, ndvi_=leer_ndvi, dnbr_=leer_dnbr, hilos=1):
             salida = Path(tmp) / nombre
             res = calcular_por_bloques(gb, bloques_, capas, ndvi_, dnbr_, incendios, nombres,
                                        anio_base=2023, anio=2024, umbral=umbral, margen=0.10,
                                        umbral_dnbr=UMBRAL_DNBR, salida=salida,
-                                       firma={"demo": umbral}, log=lambda *x: None)
+                                       firma={"demo": umbral}, hilos=hilos, log=lambda *x: None)
             res.progreso.borrar()
             with rasterio.open(salida / "cambio_2023_2024.tif") as src:
                 return res, src.read(1)
@@ -1251,25 +1335,30 @@ def comprobar_bloques():
         for umbral in (0.55, "auto"):
             igual("una sola vez", umbral, *calcular(f"una_{umbral}", [Bloque(0, n, 0, n)], umbral))
             igual("por bloques", umbral, *calcular(f"bloques_{umbral}", bloques, umbral))
+            igual("por bloques, incendios en paralelo", umbral,
+                  *calcular(f"hilos_{umbral}", bloques, umbral, hilos=3))
 
         # Corridas interrumpidas (en los incendios y a media corrida) y luego reanudadas. Con
         # "auto" se lee primero el año base de todos los bloques y luego el actual de cada uno.
         en_zona = len(bloques) - saltados
-        for umbral, nombre, cortes in [(0.55, "corte_inc", {"dnbr_": cortar_tras(leer_dnbr, 2)}),
-                                       (0.55, "corte_bloques", {"ndvi_": cortar_tras(leer_ndvi, 15)}),
-                                       ("auto", "corte_auto", {"ndvi_": cortar_tras(leer_ndvi, en_zona + 3)})]:
+        for umbral, nombre, cortes, hilos in [
+                (0.55, "corte_inc", {"dnbr_": cortar_tras(leer_dnbr, 2)}, 1),
+                (0.55, "corte_inc_hilos", {"dnbr_": cortar_tras(leer_dnbr, 2)}, 3),
+                (0.55, "corte_bloques", {"ndvi_": cortar_tras(leer_ndvi, 15)}, 1),
+                ("auto", "corte_auto", {"ndvi_": cortar_tras(leer_ndvi, en_zona + 3)}, 1)]:
             try:
-                calcular(nombre, bloques, umbral, **cortes)
+                calcular(nombre, bloques, umbral, hilos=hilos, **cortes)
                 raise AssertionError(f"{nombre}: la corrida no se interrumpió")
             except Corte:
                 pass
             assert (Path(tmp) / nombre / "progreso_2023_2024").exists()
-            igual(f"{nombre} reanudada", umbral, *calcular(nombre, bloques, umbral))
+            igual(f"{nombre} reanudada", umbral, *calcular(nombre, bloques, umbral, hilos=hilos))
             assert not (Path(tmp) / nombre / "progreso_2023_2024").exists()
 
     print(f"Por bloques = de una sola vez: {len(bloques)} bloques ({saltados} fuera de la zona, "
           f"saltados), {len(incendios)} incendios ({cruzan} cruzan bloques), umbral fijo y automático, "
-          "corridas interrumpidas y reanudadas: mismo balance, mismo ráster de cambio, una fila por incendio")
+          "incendios uno por uno y en paralelo, corridas interrumpidas y reanudadas: mismo balance, "
+          "mismo ráster de cambio, una fila por incendio")
 
 
 def cmd_demo(a):
@@ -1338,6 +1427,15 @@ def cmd_demo(a):
         print(f"Archivos de prueba en {out.resolve()}")
 
 
+def _mes_dia(texto):
+    """Valida una fecha MM-DD para --ventana."""
+    try:
+        pd.Timestamp(f"2001-{texto}")
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"'{texto}' no es una fecha MM-DD válida")
+    return texto
+
+
 def main():
     p = argparse.ArgumentParser(description="Prototipo de la Calculadora de masa forestal (PROBOSQUE)")
     sp = p.add_subparsers(dest="cmd", required=True)
@@ -1349,6 +1447,11 @@ def main():
         sub.add_argument("--escenas-max", type=int, default=None,
                          help="máximo de escenas por tesela para cada compuesto anual (las menos "
                               "nubladas); por defecto todas")
+        sub.add_argument("--ventana", nargs=2, metavar=("INICIO", "FIN"), type=_mes_dia,
+                         default=list(VENTANA_COBERTURA),
+                         help="días del año del compuesto, MM-DD MM-DD (por defecto 11-01 12-31). Las dos "
+                              "fechas de un balance deben usar la misma ventana; otra temporada da otras "
+                              "hectáreas, que no se comparan con las de nov-dic")
 
     d = sp.add_parser("demo", help="probar la lógica con datos inventados")
     d.add_argument("--salida", default=None)
@@ -1393,6 +1496,9 @@ def main():
     r.add_argument("--guardar-indices", action=argparse.BooleanOptionalAction, default=None,
                    help="guardar los rásters de NDVI y dNBR (float32, ~1.5 GB cada uno para el estado); "
                         "por defecto sí de una sola vez y no con --bloques")
+    r.add_argument("--hilos-incendios", type=int, default=HILOS_INCENDIOS,
+                   help=f"incendios cuyo dNBR se lee a la vez; por defecto {HILOS_INCENDIOS}. No cambia "
+                        "el resultado; 1 = uno por uno")
     r.add_argument("--reiniciar", action="store_true",
                    help="descartar el avance de una corrida interrumpida y empezar de nuevo")
 

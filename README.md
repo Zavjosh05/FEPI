@@ -33,7 +33,12 @@ FEPI/
 ├── src/
 │   ├── prototipo_masa_forestal.py   Calculadora (subcomandos demo, calibrar, correr)
 │   ├── descargar_capas.py           Descarga las capas del Estado de México desde IDEFOR
-│   └── comparar_resultados.py       Compara dos corridas (balance, incendios, ráster de cambio)
+│   ├── comparar_resultados.py       Compara dos corridas (balance, incendios, ráster de cambio)
+│   ├── mapa_cambio.py               Dibuja el mapa PNG de una corrida
+│   ├── mapa_interactivo.py          Arma la página HTML interactiva (con plantilla_mapa.html)
+│   └── plantilla_mapa.html          Diseño y código de esa página
+├── docs/
+│   └── mapa_edomex.html             Página interactiva del estado (todos los periodos)
 ├── datos/
 │   ├── piloto/                      Recortes usados en el piloto (versionados)
 │   └── edomex/                      Capas estatales descargadas (no se versionan)
@@ -139,6 +144,23 @@ python src/prototipo_masa_forestal.py correr --aoi datos/edomex/estado_mexico.gp
 número (por ejemplo `--umbral-ndvi 0.55`). `python src/prototipo_masa_forestal.py correr -h` muestra
 todas las opciones.
 
+`--ventana INICIO FIN` cambia los días del año de los compuestos (por defecto `11-01 12-31`).
+Sirve para lo más reciente cuando todavía no llega noviembre-diciembre. Por ejemplo, el preliminar
+de 2026 compara del 1 de septiembre al 20 de octubre de 2025 y de 2026:
+
+```bash
+python src/prototipo_masa_forestal.py correr --aoi datos/edomex/estado_mexico.gpkg \
+  --anio-base 2025 --anio 2026 --ventana 09-01 10-20 --umbral-ndvi auto \
+  --zona-forestal datos/edomex/usv_serie7_edomex.gpkg \
+  --incendios datos/edomex/incendios_conafor_edomex.gpkg \
+  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
+  --bloques --salida resultados/edomex_2025_2026_sepoct
+```
+
+En otra temporada el verdor cambia: en lluvias, pastos y cultivos se ven verdes. Por eso las
+hectáreas de otra ventana no se comparan con las de noviembre-diciembre. Lo que sí vale es el
+cambio entre los dos años de la misma ventana.
+
 Salidas de `correr`, todas en EPSG:32614 (UTM 14N):
 
 | Archivo | Contenido |
@@ -157,6 +179,50 @@ python src/comparar_resultados.py resultados/piloto_2023_2024 resultados/otra_co
 
 Compara valor por valor el balance (por unidad), los incendios (por clave) y el ráster de cambio
 (píxeles distintos), y dice si todo es idéntico.
+
+Para dibujar el mapa de una corrida (`correr` no lo hace):
+
+```bash
+python src/mapa_cambio.py resultados/edomex_2023_2024 \
+  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN --titulo "Estado de México"
+```
+
+Deja `mapa_cambio_<base>_<actual>.png` en la carpeta de la corrida, con dos paneles:
+
+- **Izquierda:** el ráster de cambio. En zonas grandes, cada celda junta varios píxeles y muestra
+  la pérdida o ganancia si la hay, así que se ven más grandes de lo que son; las hectáreas reales
+  van en la leyenda.
+- **Derecha:** el cambio neto de bosque de cada unidad, en porcentaje.
+
+No sobrescribe un mapa que ya exista, a menos que se use `--sobrescribir`.
+
+### Página interactiva
+
+[`docs/mapa_edomex.html`](docs/mapa_edomex.html) se abre directo en el navegador, sin servidor.
+Solo necesita internet para cargar la librería D3. Permite:
+
+- acercar y arrastrar el mapa, o buscar un municipio por nombre;
+- ver el ráster de cambio, con cada clase como capa que se prende y apaga, o el cambio neto por
+  municipio;
+- ver las cifras de un municipio al pasar el cursor, y su detalle en todos los periodos al
+  elegirlo;
+- elegir qué comparar: 2023 → 2024, 2024 → 2025, 2023 → 2025, o el preliminar de 2026, que va
+  aparte y avisa que es otra temporada;
+- ordenar la tabla de municipios.
+
+Se adapta al tema claro u oscuro y a pantallas de teléfono. Para regenerarla con todas las
+corridas:
+
+```bash
+python src/mapa_interactivo.py resultados/edomex_2023_2024 resultados/edomex_2024_2025 \
+  resultados/edomex_2023_2025 resultados/edomex_2025_2026_sepoct \
+  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
+  --titulo "Estado de México" --salida docs/mapa_edomex.html
+```
+
+Cada comparación es su propia corrida de `correr`; la página no las suma. Las corridas deben ser de
+la misma zona (mismo `--aoi`). Como está en `docs/`, se puede publicar
+con GitHub Pages si el repositorio es público.
 
 ## Cobertura geográfica
 
@@ -255,6 +321,19 @@ La velocidad de la conexión cambia mucho: ese mismo día el piloto tardó 11 mi
 2 min en otro. Con una conexión lenta, el estado podría tardar varias horas más.
 `bloques_<base>_<actual>.csv` registra los segundos y la RAM pico de cada bloque.
 
+**Incendios en paralelo.** El dNBR es la parte más lenta, y casi todo ese tiempo se va en esperar
+respuestas del servidor, no en bajar datos. Por eso el script:
+
+- lee varios incendios a la vez (`--hilos-incendios`, 6 por defecto);
+- busca las escenas de todos los incendios en una sola consulta al catálogo;
+- guarda en RAM, no en disco, los pedazos de imagen ya bajados, porque los incendios cercanos
+  comparten bloques.
+
+Cada incendio se procesa y guarda en su orden, así que el resultado es el mismo que uno por uno.
+Con los 72 incendios de los 3 municipios, la corrida bajó de 9 min 51 s a 7 min 9 s, aun
+compartiendo la conexión con otra corrida. Paralelizar los bloques no ayuda: ahí el límite es la
+conexión, y solo subiría la RAM.
+
 ## Resultados del piloto (Amecameca y Tlalmanalco, 2023 → 2024)
 
 | Municipio | Bosque 2023 | Pérdida por incendio | Otras pérdidas | Ganancia | Bosque 2024 |
@@ -290,7 +369,43 @@ estado, provisional), 115 y 213 escenas, 9 teselas y 1,085 incendios.
   estado). Por eso Amecameca da 7,051 ha de bosque en esta corrida y 7,123 ha en el piloto. Para
   comparar corridas conviene fijar un umbral numérico.
 
+Mapa: [`resultados/edomex_2023_2024/mapa_cambio_2023_2024.png`](resultados/edomex_2023_2024/mapa_cambio_2023_2024.png).
 Detalles en [`resultados/edomex_2023_2024/LEEME.md`](resultados/edomex_2023_2024/LEEME.md).
+
+## Todas las comparaciones del estado
+
+Cada fila es su propia corrida con `--bloques`, del 21 al 22 de octubre de 2026. Se exploran en
+[`docs/mapa_edomex.html`](docs/mapa_edomex.html).
+
+| Comparación | Bosque inicial | Pérdida por incendio | Otras pérdidas | Ganancia | Bosque final | Cambio neto |
+|---|---|---|---|---|---|---|
+| 2023 → 2024 | 459,262 | 708 | 7,788 | 2,684 | 453,450 | −5,812 (−1.3 %) |
+| 2024 → 2025 | 450,768 | 0 ¹ | 3,336 | 4,519 | 451,950 | +1,182 (+0.3 %) |
+| 2023 → 2025 | 459,262 | 245 ¹ | 7,329 | 2,946 | 454,634 | −4,628 (−1.0 %) |
+| 2025 → 2026, sep-oct (preliminar) ² | 434,687 | 0 ¹ | 20,758 | 17,897 | 431,826 | −2,861 (−0.7 %) |
+
+Hectáreas. Las tres primeras usan noviembre-diciembre y el umbral fijo 0.51.
+
+¹ Todavía no hay polígonos de incendios de 2025 ni de 2026, así que esa pérdida cae en "otras
+pérdidas". En 2023 → 2025 solo cuentan los incendios hasta octubre de 2024.
+
+² Compara del 1 de septiembre al 20 de octubre de 2025 con lo mismo de 2026, las imágenes más
+recientes. Es el final de las lluvias, con más nubes y vegetación que cambia de verdor. Por eso
+sus pérdidas y ganancias son varias veces mayores que en noviembre-diciembre, y en algunos
+municipios se ven exageradas: en Valle de Bravo daría −13.6 %. Sirve para ver dónde revisar, no
+como cifra final, y no se compara con las otras filas.
+
+Las cifras son coherentes entre sí:
+
+- 2023 → 2025 parte del mismo bosque de 2023 que 2023 → 2024.
+- Sumar los dos periodos de un año (−5,812 + 1,182 = −4,630 ha) da casi lo mismo que la corrida
+  directa de dos años (−4,628 ha).
+- El bosque final de un balance no es igual al inicial del siguiente (453,450 contra 450,768 ha
+  en 2024). El final conserva el bosque de 2023 que bajó del umbral por menos de 0.10 de NDVI,
+  mientras que el balance siguiente mide 2024 desde cero.
+
+Tiempos: 2024 → 2025 tardó 49 min, el preliminar 25 min y 2023 → 2025 43 min, con 1,092 incendios
+en paralelo. La RAM pico fue de 3.5 a 4.6 GB.
 
 ## Pendientes
 
@@ -302,7 +417,11 @@ Detalles en [`resultados/edomex_2023_2024/LEEME.md`](resultados/edomex_2023_2024
 4. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
    más lenta y no cambió con los bloques.
 5. Validar contra Hansen GFC y visitas de campo.
-6. Escenarios de recuperación y un tablero para la Dirección General y las áreas responsables.
+6. Agregar los incendios de 2025 al balance 2024 → 2025 cuando CONAFOR publique su capa, y correr
+   el balance 2025 → 2026 en enero de 2027, cuando exista el compuesto de noviembre-diciembre
+   de 2026.
+7. Escenarios de recuperación y ampliar la página interactiva como tablero para la Dirección
+   General y las áreas responsables.
 
 ## Fuentes de datos y licencias
 

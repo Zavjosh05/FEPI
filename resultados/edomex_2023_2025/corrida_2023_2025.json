@@ -1,0 +1,19 @@
+{
+ "anio_base": 2023,
+ "anio": 2025,
+ "ventana": [
+  "11-01",
+  "12-31"
+ ],
+ "umbral_ndvi": 0.51,
+ "umbral_pedido": "0.51",
+ "escenas": {
+  "2023": 115,
+  "2025": 202
+ },
+ "incendios": 1092,
+ "nubes_max": 60,
+ "escenas_max": null,
+ "bloques": true,
+ "fecha": "2026-10-22T00:52:06"
+}
