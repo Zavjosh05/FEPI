@@ -4,6 +4,14 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.4.1] - 2026-10-22
+
+### Cambiado
+
+- Página interactiva: los botones de comparación se cambiaron por un selector de años **Desde →
+  Hasta**. Las combinaciones sin corrida dicen "sin datos"; si eliges una, el otro año se ajusta
+  al más cercano que sí tiene. 2026 aparece como "sep-oct (preliminar)" y solo se compara con 2025.
+
 ## [0.4.0] - 2026-10-22
 
 ### Agregado

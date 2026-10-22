@@ -206,8 +206,10 @@ Solo necesita internet para cargar la librería D3. Permite:
   municipio;
 - ver las cifras de un municipio al pasar el cursor, y su detalle en todos los periodos al
   elegirlo;
-- elegir qué comparar: 2023 → 2024, 2024 → 2025, 2023 → 2025, o el preliminar de 2026, que va
-  aparte y avisa que es otra temporada;
+- comparar años con un selector **Desde → Hasta**: 2023 → 2024, 2024 → 2025, 2023 → 2025 o
+  2025 → 2026. El de 2026 es el preliminar de septiembre-octubre, va marcado así y avisa que es
+  otra temporada. Las combinaciones sin corrida dicen "sin datos"; si eliges una, el otro año se
+  ajusta al más cercano que sí tiene;
 - ordenar la tabla de municipios.
 
 Se adapta al tema claro u oscuro y a pantallas de teléfono. Para regenerarla con todas las

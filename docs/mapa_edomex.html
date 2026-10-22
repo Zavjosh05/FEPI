@@ -61,9 +61,21 @@ h3 { font-size: 1.1rem; }
   padding: 6px 14px; cursor: pointer; font-variant-numeric: tabular-nums;
 }
 .segmentos button[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); }
-.segmentos .separador { width: 1px; background: var(--line); margin: 4px 2px; }
-.segmentos button.preliminar { border: 1px dashed var(--ink-3); }
-.segmentos button small { font: 500 .72rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; opacity: .85; }
+.comparar { display: grid; gap: 6px; justify-items: start; }
+.selector-anios { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.selector-anios label { display: grid; gap: 3px; }
+.selector-anios .flecha { font: 600 1.3rem var(--f-titulo); color: var(--ink-3); padding-bottom: 6px; }
+.selector-anios select {
+  font: 600 1.05rem var(--f-texto); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 34px 7px 12px; min-width: 9.5rem;
+  font-variant-numeric: tabular-nums; cursor: pointer; appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%);
+  background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat;
+}
+.selector-anios select:hover { border-color: var(--ink-3); }
+.selector-anios select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.comparar .pista { font-size: .85rem; color: var(--ink-3); margin: 0; max-width: 44ch; }
+.comparar .pista.preliminar { color: var(--aviso-ink); background: var(--aviso-bg); padding: 4px 8px; border-radius: 6px; }
 .aviso p { margin: 0; } .aviso p + p { margin-top: 6px; }
 .detalle .tabla-detalle { overflow-x: auto; }
 .segmentos button:hover:not([aria-checked="true"]) { background: var(--hover); color: var(--ink); }
@@ -159,8 +171,15 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       <p id="subtitulo"></p>
     </div>
     <div>
-      <div class="etiqueta" id="etq-periodo">Comparar</div>
-      <div class="segmentos" role="radiogroup" aria-labelledby="etq-periodo" id="periodos"></div>
+      <div class="comparar" id="comparar">
+        <div class="etiqueta">Comparar años</div>
+        <div class="selector-anios">
+          <label><span class="etiqueta">Desde</span><select id="desde"></select></label>
+          <span class="flecha" aria-hidden="true">→</span>
+          <label><span class="etiqueta">Hasta</span><select id="hasta"></select></label>
+        </div>
+        <p class="pista" id="pista"></p>
+      </div>
     </div>
   </header>
 
@@ -260,25 +279,57 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   // ---------- Cabecera y cifras ----------
   const nombreZona = D.titulo;
   document.getElementById("titulo").textContent = "Masa forestal · " + nombreZona;
-  const periodosEl = document.getElementById("periodos");
-  const botonesPeriodo = [];
+  // ---------- Selector de años: Desde → Hasta ----------
+  // Cada par de años con corrida es una comparación. Si hay un balance anual (nov-dic) y uno
+  // preliminar del mismo par, se usa el anual.
+  const par = (b, a) => `${b}-${a}`;
+  const porPar = {};
   D.periodos.forEach((p, i) => {
-    if (p.preliminar && i > 0 && !D.periodos[i - 1].preliminar) {
-      const sep = document.createElement("span"); sep.className = "separador"; sep.setAttribute("aria-hidden", "true");
-      periodosEl.appendChild(sep);
-    }
-    const b = document.createElement("button");
-    b.type = "button"; b.setAttribute("role", "radio"); b.dataset.i = i;
-    b.innerHTML = p.etiqueta + (p.preliminar ? `<small>${p.sufijo.replace(/[()]/g, "").trim()} · preliminar</small>` : "");
-    if (p.preliminar) { b.classList.add("preliminar"); b.title = "Otra temporada: no se compara con los balances anuales"; }
-    b.addEventListener("click", () => cambiarPeriodo(i));
-    periodosEl.appendChild(b); botonesPeriodo.push(b);
+    const k = par(p.base, p.actual);
+    if (!(k in porPar) || (D.periodos[porPar[k]].preliminar && !p.preliminar)) porPar[k] = i;
   });
-  if (D.periodos.length < 2) periodosEl.parentElement.hidden = true;
+  const valido = (b, a) => par(b, a) in porPar;
+  const aniosDesde = [...new Set(D.periodos.map(p => p.base))].sort();
+  const aniosHasta = [...new Set(D.periodos.map(p => p.actual))].sort();
+  const selDesde = document.getElementById("desde"), selHasta = document.getElementById("hasta");
+  // Un año "Hasta" que solo existe como preliminar (p. ej. 2026, que aún no tiene nov-dic) lo dice en su nombre
+  const soloPreliminar = a => D.periodos.filter(p => p.actual === a).every(p => p.preliminar);
+  const nombreHasta = a => {
+    const p = D.periodos.find(x => x.actual === a && x.preliminar);
+    return soloPreliminar(a) && p ? `${a} · ${p.sufijo.replace(/[()]/g, "").trim()} (preliminar)` : String(a);
+  };
+  selDesde.innerHTML = aniosDesde.map(a => `<option value="${a}">${a}</option>`).join("");
+  selHasta.innerHTML = aniosHasta.map(a => `<option value="${a}">${nombreHasta(a)}</option>`).join("");
+
+  // El año más cercano con corrida, si el par elegido no existe
+  const cercano = (lista, objetivo, ok) => lista.filter(ok).sort((x, y) => Math.abs(x - objetivo) - Math.abs(y - objetivo) || x - y)[0];
+  selDesde.addEventListener("change", () => {
+    const b = Number(selDesde.value), a0 = Number(selHasta.value);
+    const a = valido(b, a0) ? a0 : cercano(aniosHasta, a0, a => valido(b, a));
+    if (a != null) cambiarPeriodo(porPar[par(b, a)]);
+  });
+  selHasta.addEventListener("change", () => {
+    const a = Number(selHasta.value), b0 = Number(selDesde.value);
+    const b = valido(b0, a) ? b0 : cercano(aniosDesde, b0, b => valido(b, a));
+    if (b != null) cambiarPeriodo(porPar[par(b, a)]);
+  });
+  function pintarSelector() {
+    const p = P();
+    selDesde.value = String(p.base); selHasta.value = String(p.actual);
+    // Las opciones sin corrida para el otro año elegido quedan deshabilitadas
+    [...selDesde.options].forEach(o => { o.disabled = false; o.textContent = o.value + (valido(Number(o.value), p.actual) ? "" : " · sin datos"); });
+    [...selHasta.options].forEach(o => { o.disabled = false; o.textContent = nombreHasta(Number(o.value)) + (valido(p.base, Number(o.value)) ? "" : " · sin datos"); });
+    const pista = document.getElementById("pista");
+    pista.classList.toggle("preliminar", p.preliminar);
+    pista.textContent = p.preliminar
+      ? `Preliminar: compara las imágenes ${p.meses} de ${p.base} y de ${p.actual}, otra temporada que la de los balances anuales.`
+      : `Compara las imágenes ${p.meses} de ${p.base} y de ${p.actual}. Si eliges un año sin datos, el otro se ajusta al más cercano que sí tiene.`;
+  }
+  if (D.periodos.length < 2) document.getElementById("comparar").hidden = true;
 
   function pintarCabecera() {
     const p = P(), t = p.tot, neto = t.actual - t.base;
-    botonesPeriodo.forEach(b => b.setAttribute("aria-checked", String(Number(b.dataset.i) === st.p)));
+    pintarSelector();
     document.getElementById("subtitulo").textContent =
       `Superficie con cobertura arbórea dentro de la zona forestal, medida con imágenes Sentinel-2 ${p.meses} de ${p.base} y de ${p.actual}.`;
     const tile = (etq, valor, nota, token) =>
