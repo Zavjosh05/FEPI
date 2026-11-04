@@ -19,10 +19,17 @@ bosque_actual = bosque_base − pérdida_por_incendio − otras_pérdidas + gana
 
 - **Cobertura anual:** compuesto Sentinel-2 L2A (10 m) de noviembre-diciembre: ya pasaron las
   lluvias, las parcelas están secas y aún no empieza la temporada de incendios.
-- **Bosque:** NDVI ≥ umbral **dentro de la zona forestal** de INEGI Serie VII (claves `B*` y `VSA/*`).
+- **Bosque:** NDVI ≥ umbral **dentro de la zona forestal** de INEGI Serie VII: bosques (`B*`),
+  selva baja caducifolia (`SBC`), matorrales (`MC`, `MDR`) y vegetación secundaria arbórea
+  (`VSA/*`). Ver [Zona forestal ampliada](#zona-forestal-ampliada).
+- **Desglose:** el balance sale también por clave de la Serie VII y por tipo de bosque (coníferas,
+  encino, mesófilo, selva baja caducifolia, zonas semiáridas y otro).
 - **Cambio:** un píxel solo cambia de clase si, además de cruzar el umbral, su NDVI varió ≥ 0.10.
 - **Quemado:** dNBR ≥ 0.27 (USGS, moderada-baja o mayor) dentro de los polígonos de incendio de
   CONAFOR. La pérdida en un píxel quemado se atribuye al incendio; si no, va a "otras pérdidas".
+- **Destino de las otras pérdidas:** cada píxel se clasifica como agrícola, pecuario, urbano u otro
+  con un clasificador entrenado con Sentinel-2 y las zonas no forestales de la Serie VII
+  (ver [Uso al que pasó el terreno](#uso-al-que-pasó-el-terreno-cf-dev-07-opción-a)).
 - **Reforestación:** recuperación **esperada** (polígonos de PS/RHF/CC × sobrevivencia) contra la
   **observada** por el satélite.
 
@@ -170,6 +177,12 @@ Salidas de `correr`, todas en EPSG:32614 (UTM 14N):
 | `balance_<base>_<actual>.csv` | Balance por unidad (hectáreas) |
 | `incendios_dnbr.csv` | Cada incendio: superficie del polígono contra lo quemado según el dNBR |
 | `cambio_<base>_<actual>.tif` | uint8 comprimido: 0 sin bosque, 1 estable, 2 pérdida por incendio, 3 otra pérdida, 4 ganancia |
+| `vegetacion_<base>_<actual>.csv` | Por unidad y clave de la Serie VII (CF-DEV-03): zona forestal, bosque inicial, pérdida por incendio, otras pérdidas, ganancia, bosque final y cambio neto. Suma lo mismo que el balance |
+| `tipo_bosque_<base>_<actual>.csv` | Lo mismo por unidad y tipo de bosque (CF-DEV-04) |
+| `destino_perdidas_<base>_<actual>.csv` | Otras pérdidas de cada unidad según el uso al que pasó el terreno (CF-DEV-07): agrícola, pecuario, urbano, otro y sin dato |
+| `destino_exactitud_<base>_<actual>.csv` | Exactitud del clasificador con las muestras reservadas: matriz de confusión, exactitud de productor y de usuario por clase, global y kappa |
+| `destino_<base>_<actual>.tif` | uint8 comprimido: 0 no aplica, 1 agrícola, 2 pecuario, 3 urbano, 4 otro, 5 sin dato |
+| `corrida_<base>_<actual>.json` | Parámetros de la corrida, zona forestal y resumen del clasificador (muestras, exactitud, importancia de cada rasgo) |
 | `bloques_<base>_<actual>.csv` | Cada bloque: escenas leídas, segundos y RAM pico del proceso |
 | `ndvi_<año>.tif`, `dnbr.tif` | Índices en float32. Se guardan por defecto solo de una sola vez; con `--bloques` hay que pedirlos con `--guardar-indices` (~1.5 GB cada uno para el estado) |
 
@@ -180,7 +193,8 @@ python src/comparar_resultados.py resultados/piloto_2023_2024 resultados/otra_co
 ```
 
 Compara valor por valor el balance (por unidad), los incendios (por clave) y el ráster de cambio
-(píxeles distintos), y dice si todo es idéntico.
+(píxeles distintos), y dice si todo es idéntico. Si las dos carpetas tienen los desgloses y el
+destino, también los compara; si solo una los tiene (las corridas anteriores a 0.6.0), los omite.
 
 Para dibujar el mapa de una corrida (`correr` no lo hace):
 
@@ -208,6 +222,9 @@ Solo necesita internet para cargar la librería D3. Permite:
   municipio;
 - ver las cifras de un municipio al pasar el cursor, y su detalle en todos los periodos al
   elegirlo;
+- ver el desglose por tipo de bosque del periodo elegido: del estado cuando no hay municipio
+  elegido y del municipio cuando sí. Solo aparece en las corridas que traen
+  `tipo_bosque_<base>_<actual>.csv` (desde 0.6.0);
 - comparar años con un selector **Desde → Hasta**: 2023 → 2024, 2024 → 2025, 2023 → 2025 o
   2025 → 2026. El de 2026 es el preliminar de septiembre-octubre, va marcado así y avisa que es
   otra temporada. Las combinaciones sin corrida dicen "sin datos"; si eliges una, el otro año se
@@ -450,8 +467,8 @@ y trae la columna `clase` vacía.
 ## Decisiones de diseño
 
 Tomadas el 3 de noviembre de 2026 para cubrir las necesidades CF-DEV-03, 04 y 07 del Módulo 13
-de la propuesta. **Todavía no están programadas:** el código y los resultados siguen con la zona
-anterior hasta que se implementen y se vuelvan a correr los balances.
+de la propuesta. **Programadas en la versión 0.6.0.** Los resultados del estado que aparecen
+arriba siguen siendo de la zona anterior hasta que se vuelvan a correr los balances.
 
 ### Zona forestal ampliada
 
@@ -473,6 +490,37 @@ vegetación de zonas semiáridas.
 - **Cautela:** la selva baja caducifolia empieza a tirar hojas en noviembre-diciembre, y el
   matorral casi nunca llega al umbral de NDVI. El umbral único de 0.51 sigue siendo provisional y
   quizá necesite valores por tipo (CF-DEV-09).
+- **En el código:** es el valor por defecto de `--clases-forestales`. Para repetir una corrida
+  anterior se pasa `--clases-forestales "^(B|VSA/)"`.
+
+### Cruce con la Serie VII y tipo de bosque (CF-DEV-03 y 04)
+
+La clave (`CLAVE`) de la Serie VII se rasteriza en cada bloque junto con la zona forestal (son los
+mismos píxeles, solo cambia el valor que se escribe). El balance se cuenta por unidad y clave,
+bloque por bloque, y sale en `vegetacion_<base>_<actual>.csv`. Agrupando las claves sale
+`tipo_bosque_<base>_<actual>.csv`. Los dos suman lo mismo que el balance. Los píxeles de una
+reforestación fuera de la zona forestal van como "(reforestación fuera de la zona forestal)",
+tipo "Otro".
+
+Agrupación propuesta de los cinco tipos que pide CF-DEV-04:
+
+| Tipo | Claves de la Serie VII | Hectáreas en el estado |
+|---|---|---|
+| Coníferas | `BA`, `BP`, `BPQ`, `BJ`, `BB`, `BG` y sus `VSA/` | 299,156 |
+| Encino | `BQ`, `BQP` y sus `VSA/` | 133,464 |
+| Mesófilo de montaña | `BM` y `VSA/BM` | 11,358 |
+| Selva baja caducifolia | `SBC` y `VSA/SBC` | 42,569 |
+| Vegetación de zonas semiáridas | `MC`, `MDR` | 14,064 |
+| Otro | `BC` (bosque cultivado) y lo que no encaje | 11,965 |
+| **Total** | `^(B\|S\|M\|VSA/)` | **512,577** |
+
+Notas sobre la propuesta:
+- `BPQ` (pino-encino) va con coníferas porque domina el pino; `BQP` (encino-pino), con encino.
+- `BG` (bosque de galería, 212 ha) no es de coníferas, pero es muy poco; se dejó ahí como pedía
+  la propuesta. Se puede mover cambiando `TIPOS_BOSQUE` en el script.
+- Se agregó `VSA/BM` (743 ha) a mesófilo, aunque la propuesta solo decía `BM`: es la vegetación
+  secundaria arbórea del mismo bosque.
+- Las hectáreas son de la zona forestal (polígonos de la Serie VII), no del bosque medido.
 
 ### Uso al que pasó el terreno (CF-DEV-07): opción A
 
@@ -485,6 +533,78 @@ agricultura (`TA*`, `TR*`) para agrícola, pastizales (`PI`, `PC`) para pecuario
 (`AH`) para urbano. Usa solo las fuentes que ya tiene el proyecto. Sus limitaciones: las
 etiquetas del INEGI son de antes de 2023, y el resultado es una estimación con su propia
 exactitud, que hay que reportar.
+
+Cómo quedó programada (se activa sola con `--zona-forestal`; `--no-clasificar-destino` la apaga):
+
+- **Qué se clasifica:** cada píxel de "otra pérdida" (código 3 del ráster de cambio), con su
+  cobertura del año actual. La pérdida por incendio no se clasifica.
+- **Rasgos:** mediana del compuesto del año actual (la misma ventana, nov-dic por defecto) de
+  B03, B04, B08, B8A, B11 y B12, más NDVI (B08, B04), NBR (B8A, B12), NDBI (B11, B08) y MNDWI
+  (B03, B11). Las bandas de 20 m pasan a 10 m por vecino más cercano. Solo se leen los píxeles
+  que hacen falta (las pérdidas y las muestras), no se guarda ninguna imagen; aun así, cada bloque
+  lee 6 bandas más del año actual.
+- **Etiquetas:** las zonas no forestales de la Serie VII. Agrícola: `T*` (temporal), `R*` (riego)
+  y `HA` (humedad); pecuario: `PI` y `PC`; urbano: `AH`; otro: todo lo demás (vegetación
+  secundaria arbustiva y herbácea, pastizal halófilo, pradera de alta montaña, agua, sin
+  vegetación, tular...). La indicación decía "TA\* y TR\*"; en la Serie VII la agricultura de riego
+  es `R*` (no hay claves `TR`), así que se tomaron `T*` y `R*`.
+- **Muestreo:** una retícula de 250 m sobre la malla total, solo fuera de la zona forestal y
+  dentro de la zona de interés. Como la retícula es de la malla total, da los mismos puntos con o
+  sin bloques. Se balancea con un máximo de 1,500 muestras por clase en cada región de 100 km (la
+  malla de las teselas Sentinel-2), elegidas al azar con semilla fija.
+- **Clasificador:** bosque aleatorio de scikit-learn (200 árboles, clases balanceadas, semilla
+  fija). Se entrena uno solo para toda la corrida, al final, con las muestras de todos los bloques
+  ordenadas por posición. Por eso da lo mismo por bloques (el `demo` lo comprueba).
+- **Exactitud:** las muestras de 1 de cada 5 celdas de 5 km quedan fuera del entrenamiento y sirven
+  de prueba. Es una prueba espacial, porque las muestras vecinas se parecen y medirían de más.
+  `destino_exactitud_<base>_<actual>.csv` trae la matriz de confusión, la exactitud de productor y
+  de usuario por clase, la global y kappa. **Mide el acuerdo con la Serie VII, cuyas etiquetas son
+  anteriores a 2023**: una parcela que cambió de uso después cuenta como error aunque el
+  clasificador acierte.
+- **Sin dato:** si a un píxel le falta algún rasgo (ninguna escena válida en alguna banda), queda
+  como código 5.
+- **Ganancia por programa (CF-DEV-05):** pendiente, faltan los polígonos de PROBOSQUE. La función
+  `ganancia_por_programa` del script marca dónde se conecta.
+
+### Verificación de 0.6.0 (3-nov-2026)
+
+- **`demo`:** pasa. Por bloques, de una sola vez, con incendios en paralelo y en corridas
+  interrumpidas da los mismos desgloses, el mismo clasificador y el mismo destino.
+- **Piloto con la zona anterior** (`--clases-forestales "^(B|VSA/)"`, de una sola vez): balance,
+  incendios y ráster de cambio IDÉNTICOS a `resultados/piloto_2023_2024`.
+- **Piloto con la zona nueva, por bloques:** también IDÉNTICO al guardado, porque Amecameca y
+  Tlalmanalco no tienen claves `S*` ni `M*`: la ampliación no les cambia nada. Contra la corrida de
+  una sola vez, todas las salidas nuevas (vegetación, tipo, destino, exactitud y ráster de destino)
+  dan IDÉNTICO.
+  - Por tipo: coníferas 14,051 ha de bosque inicial y −329 ha de cambio neto; encino 2,664 ha y
+    −24 ha.
+  - Destino de las 372 ha de otras pérdidas: agrícola 115, pecuario 58, urbano 5 y otro 194.
+  - Clasificador: exactitud 67 % (kappa 0.40) con 743 muestras de prueba. Pecuario se quedó sin
+    muestras de prueba: el pastizal del piloto cae en pocas celdas de 5 km.
+- **Efecto de la zona nueva**, en Otzoloapan (selva baja) y Tequixquiac (matorral crasicaule),
+  2023 → 2024, umbral 0.51, por bloques:
+
+  | | Zona anterior | Zona nueva | Diferencia |
+  |---|---|---|---|
+  | Zona forestal | 3,326 ha | 6,567 ha | +3,241 |
+  | Bosque 2023, Otzoloapan | 3,229 | 4,762 | +1,532 (selva baja) |
+  | Bosque 2023, Tequixquiac | 0 | 166 | +166 (de 1,581 ha de matorral) |
+  | Otras pérdidas, Otzoloapan | 124 | 312 | +188 |
+
+  - El matorral casi no llega al umbral: solo 166 de sus 1,581 ha cuentan como bosque.
+  - La selva baja perdió el 11 % de su bosque inicial en "otras pérdidas" (291 de 2,568 ha),
+    contra 1 % en coníferas. Lo más probable es que sea la caída de hojas de noviembre-diciembre,
+    no pérdida real. Confirma la cautela de arriba: la selva baja necesita su propio umbral o su
+    propia ventana.
+  - Clasificador en esta zona: exactitud 48 % (kappa 0.21). Confunde sobre todo pecuario con otro
+    (pastizal inducido contra vegetación secundaria arbustiva). Es baja: si en el estado sale
+    parecida, conviene revisar los rasgos (por ejemplo, agregar otra temporada) o pasar a la
+    opción B.
+- **Costo:** con `--no-clasificar-destino` el balance y los desgloses salen idénticos. El
+  clasificador no subió la RAM pico (3.6 GB en las dos corridas), pero los bloques tardaron unas
+  2.6 veces más (356 s contra 138 s; la corrida con clasificador compartía la conexión con otra).
+  Los incendios no cambian.
+- Las corridas de prueba están en `resultados/verificacion/` (git las ignora).
 
 **Opción guardada (B), por si se llega a requerir:** usar un mapa de cobertura del suelo ya
 hecho, como fuente nueva:
@@ -501,21 +621,26 @@ reconocida externamente en lugar de una propia.
 
 1. Calibrar el umbral de NDVI con ~100 puntos de referencia. Mientras tanto, `auto` cambia según
    la zona que se corre, así que conviene fijar un umbral numérico para comparar corridas.
-2. Conseguir los polígonos de reforestación de PS, RHF y CC, con año de plantación y sobrevivencia.
-3. Verificar las "otras pérdidas" del estado (7,788 ha), empezando por Tlatlaya, Luvianos,
-   Atlautla, Ocuilan, Temascaltepec y Santo Tomás.
-4. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
+2. Conseguir los polígonos de reforestación de PS, RHF y CC, con año de plantación, sobrevivencia
+   y programa. Con el programa se completa la ganancia por programa (CF-DEV-05).
+3. Volver a correr los balances del estado con la zona ampliada (0.6.0), para tener los desgloses
+   por clave y tipo, el destino de las otras pérdidas y la página con el desglose por tipo.
+   Revisar la exactitud del clasificador de destino a escala estatal.
+4. Verificar las "otras pérdidas" del estado (7,788 ha), empezando por Tlatlaya, Luvianos,
+   Atlautla, Ocuilan, Temascaltepec y Santo Tomás. El destino de las otras pérdidas (0.6.0) ayuda
+   a elegir qué revisar, pero sus etiquetas son del INEGI, anteriores a 2023.
+5. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
    más lenta y no cambió con los bloques.
-5. Validación (CF-DEV-09): la comparación con Hansen ya está hecha. Falta:
+6. Validación (CF-DEV-09): la comparación con Hansen ya está hecha. Falta:
    - fotointerpretar los 105 puntos de `resultados/validacion_hansen/muestra_puntos_2023_2024.csv`;
    - hacer que `calibrar` lea el NDVI por bloques o solo en los puntos, porque hoy arma el
      compuesto de toda la `--aoi` de una vez y con el estado no cabe en memoria;
    - repetir la validación cuando se vuelvan a correr los balances con la zona ampliada;
    - comparar con las verificaciones de campo de los programas, cuando existan.
-6. Agregar los incendios de 2025 al balance 2024 → 2025 cuando CONAFOR publique su capa, y correr
+7. Agregar los incendios de 2025 al balance 2024 → 2025 cuando CONAFOR publique su capa, y correr
    el balance 2025 → 2026 en enero de 2027, cuando exista el compuesto de noviembre-diciembre
    de 2026.
-7. Escenarios de recuperación y ampliar la página interactiva como tablero para la Dirección
+8. Escenarios de recuperación y ampliar la página interactiva como tablero para la Dirección
    General y las áreas responsables.
 
 ## Fuentes de datos y licencias

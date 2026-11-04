@@ -57,17 +57,25 @@ Convenciones:
       liberan uno por uno. Cada bloque se alinea a la malla interna de los COG de su
       tesela Sentinel-2, para no leer dos veces los mismos datos. El resultado es
       idéntico al de procesar todo de una vez (el modo demo lo comprueba).
+    - Con --zona-forestal, el balance se desglosa además por clave de la Serie VII
+      (CF-DEV-03) y por tipo de bosque (CF-DEV-04), y cada píxel de "otra pérdida" se
+      clasifica según el uso al que pasó: agrícola, pecuario, urbano u otro (CF-DEV-07,
+      opción A: clasificador entrenado con el compuesto del año actual y las zonas no
+      forestales de la Serie VII).
 """
 
 from __future__ import annotations
 
 import argparse
 import base64
+import contextlib
 import hashlib
 import json
 import math
 import os
+import re
 import shutil
+import warnings
 import sys
 import time
 import zlib
@@ -102,6 +110,41 @@ SIN_BOSQUE, ESTABLE, PERD_INCENDIO, PERD_OTRA, GANANCIA = 0, 1, 2, 3, 4
 
 COLUMNAS_BALANCE = ["bosque_base_ha", "perdida_incendio_ha", "otras_perdidas_ha", "ganancia_ha",
                     "ganancia_en_reforestacion_ha", "bosque_afectado_por_fuego_ha", "bosque_actual_ha"]
+
+# Zona forestal: claves de la Serie VII que cuentan (bosques, selva baja caducifolia, matorrales y
+# vegetación secundaria arbórea). Antes del 3-nov-2026 era ^(B|VSA/).
+CLASES_FORESTALES = r"^(B|S|M|VSA/)"
+CAMPO_DESCRIPCION = "DESCRIPCIO"
+
+# Desglose por clave de la Serie VII (CF-DEV-03) y por tipo de bosque (CF-DEV-04)
+COLUMNAS_VEG = ["zona_forestal_ha", "bosque_base_ha", "perdida_incendio_ha", "otras_perdidas_ha",
+                "ganancia_ha", "bosque_actual_ha"]
+SIN_CLAVE = "(reforestación fuera de la zona forestal)"
+TIPOS_BOSQUE = [  # (tipo, claves de la Serie VII); lo que no encaja va a "Otro" (p. ej. BC, bosque cultivado)
+    ("Coníferas", r"^(VSA/)?(BA|BP|BPQ|BJ|BB|BG)$"),
+    ("Encino", r"^(VSA/)?(BQ|BQP)$"),
+    ("Mesófilo de montaña", r"^(VSA/)?BM$"),
+    ("Selva baja caducifolia", r"^(VSA/)?SBC$"),
+    ("Vegetación de zonas semiáridas", r"^(MC|MDR)$"),
+]
+TIPO_OTRO = "Otro"
+TIPOS_ORDEN = [t for t, _ in TIPOS_BOSQUE] + [TIPO_OTRO]
+
+# Uso al que pasó el terreno en las "otras pérdidas" (CF-DEV-07, opción A). Códigos del ráster
+# destino: 0 no aplica, 1 agrícola, 2 pecuario, 3 urbano, 4 otro, 5 sin dato.
+DESTINOS = ["agricola", "pecuario", "urbano", "otro", "sin_dato"]
+SIN_DATO_DESTINO = 5
+CLASES_AGRICOLA = r"^(T|R|HA$)"   # temporal (TA, TAP...), riego (RA, RAS...) y humedad (HA)
+CLASES_PECUARIO = r"^(PI|PC)$"    # pastizal inducido y cultivado
+CLASES_URBANO = r"^AH$"           # asentamientos humanos
+# Lo demás fuera de la zona forestal entrena "otro": vegetación secundaria arbustiva y herbácea,
+# pastizal halófilo, pradera de alta montaña, agua, sin vegetación, tular, etc.
+BANDAS_RASGOS = ["green", "red", "nir", "nir08", "swir16", "swir22"]  # B03 B04 B08 B8A B11 B12
+RASGOS = BANDAS_RASGOS + ["ndvi", "nbr", "ndbi", "mndwi"]
+PASO_MUESTRA = 25            # una muestra de entrenamiento cada 25 px (250 m) de la malla total
+MUESTRAS_MAX = 1500          # máximo por clase y región (entrenamiento + prueba)
+REGION_M = 100_000           # regiones de 100 km (la malla de las teselas Sentinel-2)
+CELDA_PRUEBA_M = 5_000       # las muestras de 1 de cada 5 celdas de 5 km se reservan para prueba
 
 
 # ==========================================================================
@@ -200,6 +243,197 @@ def balance_de_conteos(conteos: np.ndarray, nombres) -> pd.DataFrame:
         fila["cambio_neto_ha"] = round(fila["bosque_actual_ha"] - fila["bosque_base_ha"], 2)
         filas.append(fila)
     return pd.DataFrame(filas)
+
+
+# --- Desglose por clave de la Serie VII y por tipo de bosque (CF-DEV-03 y 04) ---------------
+def tipo_bosque(clave) -> str:
+    """Tipo de bosque de una clave de la Serie VII (ver TIPOS_BOSQUE); None o sin tipo = Otro."""
+    for tipo, patron in TIPOS_BOSQUE:
+        if clave and re.match(patron, clave):
+            return tipo
+    return TIPO_OTRO
+
+
+def conteos_vegetacion(cambio, base, actual, zona, unidades, claves_r, n, k) -> np.ndarray:
+    """Píxeles de la zona por unidad y clave, para sumarlos bloque por bloque.
+
+    claves_r: ráster con el número de clave (1..k; 0 = reforestación fuera de la zona forestal).
+    Fila u * (k + 1) + clave. Columnas: zona, base, pérdida por incendio, otra pérdida,
+    ganancia, actual (el orden de COLUMNAS_VEG).
+    """
+    idx = (unidades.astype(np.int64) * (k + 1) + claves_r)[zona]
+    cz = cambio[zona]
+    m = (n + 1) * (k + 1)
+    columnas = [np.ones(idx.size, bool), base[zona], cz == PERD_INCENDIO, cz == PERD_OTRA,
+                cz == GANANCIA, actual[zona]]
+    return np.stack([np.bincount(idx[c], minlength=m) for c in columnas], axis=1).astype(np.int64)
+
+
+def _fila_ha(px, columnas):
+    fila = {col: round(float(v) * HA_PIXEL, 2) for col, v in zip(columnas, px)}
+    fila["cambio_neto_ha"] = round(fila["bosque_actual_ha"] - fila["bosque_base_ha"], 2)
+    return fila
+
+
+def tablas_vegetacion(conteos, nombres, claves, descripciones=None):
+    """(por clave, por tipo de bosque) en hectáreas, a partir de los conteos sumados de todos los
+    bloques. El tipo se suma en píxeles antes de pasar a hectáreas, así que cuadra con el balance."""
+    k = len(claves)
+    etiquetas = [None] + list(claves)
+    descripciones = descripciones or {}
+    filas, por_tipo = [], defaultdict(lambda: np.zeros(conteos.shape[1], dtype=np.int64))
+    for idx in np.flatnonzero(conteos[:, 0]):
+        u, kk = divmod(int(idx), k + 1)
+        if u == 0:  # fuera de toda unidad
+            continue
+        clave = etiquetas[kk]
+        tipo = tipo_bosque(clave)
+        filas.append({"unidad": nombres[u - 1], "clave": clave or SIN_CLAVE,
+                      "descripcion": descripciones.get(clave, ""), "tipo_bosque": tipo,
+                      **_fila_ha(conteos[idx], COLUMNAS_VEG)})
+        por_tipo[(u, TIPOS_ORDEN.index(tipo))] += conteos[idx]
+    tipos = [{"unidad": nombres[u - 1], "tipo_bosque": TIPOS_ORDEN[t], **_fila_ha(px, COLUMNAS_VEG)}
+             for (u, t), px in sorted(por_tipo.items())]
+    cols_veg = ["unidad", "clave", "descripcion", "tipo_bosque", *COLUMNAS_VEG, "cambio_neto_ha"]
+    cols_tipo = ["unidad", "tipo_bosque", *COLUMNAS_VEG, "cambio_neto_ha"]
+    return pd.DataFrame(filas, columns=cols_veg), pd.DataFrame(tipos, columns=cols_tipo)
+
+
+# --- Uso al que pasó el terreno en las otras pérdidas (CF-DEV-07, opción A) ------------------
+def clase_destino(clave, agricola=CLASES_AGRICOLA, pecuario=CLASES_PECUARIO, urbano=CLASES_URBANO) -> int:
+    """Etiqueta de entrenamiento de una clave no forestal de la Serie VII: 1 agrícola, 2 pecuario,
+    3 urbano, 4 otro."""
+    for codigo, patron in enumerate((agricola, pecuario, urbano), start=1):
+        if re.search(patron, str(clave)):
+            return codigo
+    return 4
+
+
+@dataclass(frozen=True)
+class Muestreo:
+    """Cómo se toman las muestras de entrenamiento del clasificador de destino."""
+    paso: int = PASO_MUESTRA              # una muestra cada `paso` píxeles de la malla total
+    max_por_grupo: int = MUESTRAS_MAX     # por clase y región
+    region_m: float = REGION_M
+    celda_prueba_m: float = CELDA_PRUEBA_M
+    arboles: int = 200
+
+
+def puntos_muestra(b, dentro, zona, etiquetas, paso):
+    """Píxeles del bloque en la retícula de muestreo (filas y columnas de la malla total que caen
+    en paso // 2 + k * paso), dentro de la zona de interés, fuera de la zona forestal y con
+    etiqueta. Como la retícula es de la malla total, da los mismos puntos con o sin bloques.
+    Regresa filas y columnas locales del bloque y la etiqueta."""
+    off = paso // 2
+    rr = np.arange(b.r0 + (off - b.r0) % paso, b.r1, paso) - b.r0
+    cc = np.arange(b.c0 + (off - b.c0) % paso, b.c1, paso) - b.c0
+    f, c = (x.ravel() for x in np.meshgrid(rr, cc, indexing="ij"))
+    ok = dentro[f, c] & ~zona[f, c] & (etiquetas[f, c] > 0)
+    return f[ok], c[ok], etiquetas[f, c][ok]
+
+
+def entrenar_destino(filas, cols, clases, X, transform, muestreo=Muestreo()):
+    """Bosque aleatorio que separa agrícola, pecuario, urbano y otro con los rasgos Sentinel-2.
+
+    filas, cols: posición de cada muestra en la malla total; clases 1..4 (de la Serie VII).
+    - Las muestras se ordenan por posición, así que da lo mismo de qué bloques vengan.
+    - Se balancean: como máximo muestreo.max_por_grupo por clase y región de 100 km (elegidas al
+      azar con semilla fija), para que ninguna clase ni región domine.
+    - Las de 1 de cada 5 celdas de 5 km se reservan para medir la exactitud (prueba espacial: las
+      muestras vecinas se parecen y medirían de más).
+    Regresa (modelo o None si no hay al menos dos clases, tabla de exactitud, resumen).
+    """
+    from sklearn.ensemble import RandomForestClassifier
+
+    orden = np.lexsort((cols, filas))
+    filas, cols, clases, X = filas[orden], cols[orden], clases[orden].astype(np.int64), X[orden]
+    ok = np.isfinite(X).all(axis=1)
+    filas, cols, clases, X = filas[ok], cols[ok], clases[ok], X[ok]
+    x = transform.c + (cols + 0.5) * transform.a
+    y = transform.f + (filas + 0.5) * transform.e
+    region = np.unique(np.stack([np.floor(x / muestreo.region_m), np.floor(y / muestreo.region_m)], 1),
+                       axis=0, return_inverse=True)[1].ravel() if len(x) else np.zeros(0, int)
+    grupo = region.astype(np.int64) * 8 + clases
+    azar = np.random.default_rng(0).permutation(len(grupo))
+    en_orden = np.argsort(grupo[azar], kind="stable")  # grupos juntos, en el orden al azar
+    g = grupo[azar][en_orden]
+    inicio = np.r_[0, np.flatnonzero(np.diff(g)) + 1] if len(g) else np.zeros(0, int)
+    rango = np.arange(len(g)) - np.repeat(inicio, np.diff(np.r_[inicio, len(g)]))
+    elegidos = np.sort(azar[en_orden[rango < muestreo.max_por_grupo]])
+    clases, X, x, y = clases[elegidos], X[elegidos], x[elegidos], y[elegidos]
+    cx = np.floor(x / muestreo.celda_prueba_m).astype(np.int64)
+    cy = np.floor(y / muestreo.celda_prueba_m).astype(np.int64)
+    prueba = ((cx * 73_856_093) ^ (cy * 19_349_663)) % 5 == 0
+
+    resumen = {"muestras_disponibles": int(ok.sum()), "muestras_entrenamiento": int((~prueba).sum()),
+               "muestras_prueba": int(prueba.sum()), "regiones": int(region.max() + 1) if len(region) else 0,
+               "rasgos": RASGOS}
+    nombres = DESTINOS[:4]
+    filas_tabla = [{"clase": nombres[k - 1], "entrenamiento": int(((clases == k) & ~prueba).sum()),
+                    "prueba": int(((clases == k) & prueba).sum())} for k in range(1, 5)]
+    if len(np.unique(clases[~prueba])) < 2:
+        return None, pd.DataFrame(filas_tabla), resumen
+    modelo = RandomForestClassifier(n_estimators=muestreo.arboles, min_samples_leaf=2,
+                                    class_weight="balanced", random_state=0, n_jobs=-1)
+    modelo.fit(X[~prueba], clases[~prueba])
+    modelo.n_jobs = 1  # al predecir, un hilo: la suma de los árboles va siempre en el mismo orden
+    resumen["importancia_rasgos"] = {r: round(float(v), 3) for r, v in zip(RASGOS, modelo.feature_importances_)}
+    if prueba.any():
+        cm = np.zeros((4, 4), dtype=np.int64)
+        np.add.at(cm, (clases[prueba] - 1, modelo.predict(X[prueba]).astype(int) - 1), 1)
+        total, diag = cm.sum(), np.diag(cm)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            productor, usuario = diag / cm.sum(1), diag / cm.sum(0)
+        pe = (cm.sum(0) * cm.sum(1)).sum() / total**2
+        resumen["exactitud_global"] = round(float(diag.sum() / total), 4)
+        resumen["kappa"] = round(float((diag.sum() / total - pe) / (1 - pe)), 4) if pe < 1 else None
+        for k, fila in enumerate(filas_tabla):
+            fila["exactitud_productor"] = None if np.isnan(productor[k]) else round(float(productor[k]), 4)
+            fila["exactitud_usuario"] = None if np.isnan(usuario[k]) else round(float(usuario[k]), 4)
+            fila.update({f"pred_{nombres[j]}": int(cm[k, j]) for j in range(4)})
+        filas_tabla.append({"clase": "global", "entrenamiento": resumen["muestras_entrenamiento"],
+                            "prueba": resumen["muestras_prueba"],
+                            "exactitud_global": resumen["exactitud_global"], "kappa": resumen["kappa"]})
+    tabla = pd.DataFrame(filas_tabla)
+    for col in tabla.columns:
+        if col == "entrenamiento" or col == "prueba" or col.startswith("pred_"):
+            tabla[col] = tabla[col].astype("Int64")  # enteros con huecos en la fila "global"
+    return modelo, tabla, resumen
+
+
+def predecir_destino(modelo, X) -> np.ndarray:
+    """Clase de destino (1-4) de cada fila de rasgos; SIN_DATO_DESTINO si falta algún rasgo o no
+    hay modelo."""
+    out = np.full(len(X), SIN_DATO_DESTINO, dtype=np.uint8)
+    ok = np.isfinite(X).all(axis=1) if len(X) else np.zeros(0, bool)
+    if modelo is not None and ok.any():
+        out[ok] = modelo.predict(X[ok]).astype(np.uint8)
+    return out
+
+
+def tabla_destino(conteos, nombres, presentes) -> pd.DataFrame:
+    """Hectáreas de otras pérdidas por unidad y destino. conteos: (n + 1) x 6 píxeles por código
+    0..5 del ráster destino; presentes: unidades que lleva el balance."""
+    filas = []
+    for i, nombre in enumerate(nombres, start=1):
+        if not presentes[i]:
+            continue
+        fila = {"unidad": nombre, "otras_perdidas_ha": round(float(conteos[i, 1:].sum()) * HA_PIXEL, 2)}
+        fila.update({f"{d}_ha": round(float(conteos[i, k]) * HA_PIXEL, 2) for k, d in enumerate(DESTINOS, 1)})
+        filas.append(fila)
+    return pd.DataFrame(filas, columns=["unidad", "otras_perdidas_ha", *[f"{d}_ha" for d in DESTINOS]])
+
+
+def ganancia_por_programa(*_):
+    """CF-DEV-05, pendiente: ganancia observada por programa (PS, RHF, CC).
+
+    Punto de conexión. Faltan los polígonos de PROBOSQUE con su programa. Cuando lleguen: pasarlos
+    con --reforestacion y un campo de programa, rasterizarlos por bloque con su número de programa
+    (como CapasVector.unidades) y contar aquí cambio == GANANCIA por unidad y programa, igual que
+    conteos_vegetacion, para sumarlo bloque por bloque. Hoy la ganancia dentro de los polígonos
+    solo se cuenta en conjunto (ganancia_en_reforestacion_ha del balance).
+    """
+    raise NotImplementedError("CF-DEV-05: faltan los polígonos de reforestación de PROBOSQUE")
 
 
 def histograma_ndvi(valores, bins: int = 200):
@@ -365,15 +599,24 @@ class CapasVector:
     marca cada píxel según si su centro cae dentro del polígono.
     """
 
-    def __init__(self, aoi, zona_forestal=None, reforestacion=None, unidades=None):
-        self.aoi, self.zf, self.refo, self.uni = aoi, zona_forestal, reforestacion, unidades
+    def __init__(self, aoi, zona_forestal=None, reforestacion=None, unidades=None, etiquetas=None):
+        """zona_forestal puede traer la columna "_clave" (número de clave de la Serie VII, 1..k) y
+        etiquetas, la columna "_destino" (1..4): las zonas no forestales con que se entrena el
+        clasificador de destino."""
+        self.aoi, self.zf, self.refo, self.uni, self.etq = aoi, zona_forestal, reforestacion, unidades, etiquetas
 
     @staticmethod
-    def _rasterizar(gdf, geobox, numerar=False, dtype="uint8"):
-        """1 dentro de los polígonos o, con numerar, el número de polígono (1..n)."""
+    def _rasterizar(gdf, geobox, numerar=False, dtype="uint8", campo=None):
+        """1 dentro de los polígonos, el valor de `campo` o, con numerar, el número de polígono (1..n).
+        Los píxeles marcados son los mismos con cualquier valor (solo cambia qué se escribe)."""
         from shapely.geometry import box
         idx = np.sort(gdf.sindex.query(box(*geobox.boundingbox[:4])))  # solo los que tocan el bloque
-        vals = (idx + 1).tolist() if numerar else [1] * len(idx)
+        if numerar:
+            vals = (idx + 1).tolist()
+        elif campo is not None and campo in gdf.columns:
+            vals = gdf[campo].iloc[idx].astype(int).tolist()
+        else:
+            vals = [1] * len(idx)
         return rasterizar(gdf.geometry.iloc[idx], vals, tuple(geobox.shape), geobox.affine, dtype=dtype)
 
     def dentro(self, geobox):
@@ -385,14 +628,25 @@ class CapasVector:
             return dentro.astype("int32")
         return self._rasterizar(self.uni, geobox, numerar=True, dtype="int32")
 
+    def etiquetas(self, geobox):
+        """Etiqueta de destino (1..4) de las zonas no forestales; 0 donde no hay."""
+        if self.etq is None:
+            return np.zeros(tuple(geobox.shape), dtype=np.uint8)
+        return self._rasterizar(self.etq, geobox, campo="_destino")
+
     def de_bloque(self, geobox):
+        """dentro, zona, en_refo, unidades y claves (número de clave de la Serie VII en la zona;
+        0 fuera de ella o en reforestación fuera de la zona forestal)."""
         dentro = self.dentro(geobox)
         en_refo = (np.zeros(tuple(geobox.shape), dtype=bool) if self.refo is None
                    else self._rasterizar(self.refo, geobox).astype(bool))
         zona = dentro.copy()
+        claves = np.zeros(tuple(geobox.shape), dtype=np.int16)
         if self.zf is not None:  # lo reforestado fuera de la zona forestal también cuenta
-            zona &= self._rasterizar(self.zf, geobox).astype(bool) | en_refo
-        return dentro, zona, en_refo, self.unidades(geobox, dentro)
+            claves = self._rasterizar(self.zf, geobox, dtype="int16", campo="_clave")
+            zona &= (claves > 0) | en_refo
+            claves[~zona] = 0
+        return dentro, zona, en_refo, self.unidades(geobox, dentro), claves
 
 
 # ==========================================================================
@@ -526,6 +780,60 @@ def compuesto_indice(items, indice, geobox) -> np.ndarray:
         partes.append(((x1 - x2) / (x1 + x2)).where(ok))
     serie = xr.concat(partes, dim="time") if len(partes) > 1 else partes[0]
     return serie.chunk({"time": -1}).median("time", skipna=True).compute().values
+
+
+def _dif_norm(a, b):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return (a - b) / (a + b)
+
+
+def rasgos_en_puntos(items, geobox, filas, cols) -> np.ndarray:
+    """Rasgos del clasificador de destino (RASGOS) en los píxeles (filas, cols) del geobox.
+
+    Para cada escena: reflectancia de B03, B04, B08, B8A, B11 y B12 (las de 20 m pasan a 10 m por
+    vecino más cercano: así un píxel da lo mismo con cualquier ventana) y los índices NDVI (B08,
+    B04), NBR (B8A, B12), NDBI (B11, B08) y MNDWI (B03, B11), con nubes y sombras enmascaradas
+    con la SCL. Luego la mediana temporal de cada uno, igual que el compuesto de NDVI. Solo se
+    guardan los puntos pedidos, no las imágenes completas: lee los bloques de COG como el
+    compuesto, pero ocupa poca memoria. Regresa (puntos x len(RASGOS)) float32; NaN sin dato.
+    """
+    from odc.stac import load
+
+    out = np.full((len(filas), len(RASGOS)), np.nan, dtype="float32")
+    if not len(filas) or not items:
+        return out
+    import xarray as xr
+    fy, fx = xr.DataArray(np.asarray(filas), dims="p"), xr.DataArray(np.asarray(cols), dims="p")
+    grupos = defaultdict(list)
+    for it in items:
+        grupos[tuple(_escala(it, b) for b in BANDAS_RASGOS)].append(it)
+    crudos = []
+    for escalas, its in grupos.items():
+        ds = load(its, bands=[*BANDAS_RASGOS, "scl"], geobox=geobox, groupby="solar_day",
+                  chunks={"x": 2048, "y": 2048}, resampling="nearest")
+        pts = ds.isel(y=fy, x=fx).compute()
+        crudos.append((escalas, {b: pts[b].values for b in [*BANDAS_RASGOS, "scl"]}))
+    # Por pedazos de puntos, para no tener en memoria todas las escenas en float32
+    for i0 in range(0, len(filas), 50_000):
+        sl = slice(i0, i0 + 50_000)
+        series = []
+        for escalas, v in crudos:
+            ok = np.isin(v["scl"][:, sl], SCL_VALIDOS)
+            refl = []
+            for b, (esc, off) in zip(BANDAS_RASGOS, escalas):
+                ok &= v[b][:, sl] > 0
+                refl.append(v[b][:, sl].astype("float32") * esc + off)
+            x = np.stack(refl, axis=-1)
+            x[~ok] = np.nan
+            series.append(x)
+        x = np.concatenate(series)  # (escenas, puntos, bandas)
+        g, r, nir, n8, s1, s2 = (x[..., j] for j in range(len(BANDAS_RASGOS)))
+        todo = np.concatenate([x, np.stack([_dif_norm(nir, r), _dif_norm(n8, s2), _dif_norm(s1, nir),
+                                            _dif_norm(g, s1)], axis=-1)], axis=-1)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)  # puntos sin ninguna escena válida
+            out[sl] = np.nanmedian(todo, axis=0)
+    return out
 
 
 def ndvi_anual(geobox, anio, nubes_max=NUBES_MAX, escenas_max=None, ventana=VENTANA_COBERTURA) -> np.ndarray:
@@ -804,14 +1112,18 @@ class Progreso:
             self._agregar("incendios.jsonl", reg)
         self.incendios[i] = r
 
-    def guardar_bloque(self, b: Bloque, cambio, conteos, parciales, info):
+    def guardar_bloque(self, b: Bloque, cambio, conteos, parciales, info, vegetacion=None, extra=None):
+        """vegetacion: conteos por unidad y clave (conteos_vegetacion); extra: arreglos que van en la
+        pieza junto al ráster de cambio (los rasgos del clasificador de destino)."""
         tmp = self.carpeta / "cambio" / f"{b.id}.tmp"
         with open(tmp, "wb") as f:
-            np.savez_compressed(f, cambio=cambio)
+            np.savez_compressed(f, cambio=cambio, **(extra or {}))
         os.replace(tmp, self.pieza(b.id))
         reg = {"id": b.id, "ventana": [b.r0, b.r1, b.c0, b.c1], **info,
                "conteos": {str(i): conteos[i].tolist() for i in np.flatnonzero(conteos[:, 0]) if i > 0},
                "incendios": {str(i): list(v) for i, v in parciales.items()}}
+        if vegetacion is not None:
+            reg["vegetacion"] = {str(i): vegetacion[i].tolist() for i in np.flatnonzero(vegetacion[:, 0])}
         self._agregar("bloques.jsonl", reg)  # al final: marca el bloque como terminado
         self.bloques[b.id] = reg
 
@@ -848,11 +1160,18 @@ class Resultado:
     umbral: float
     zona_ha: float
     progreso: Progreso
+    vegetacion: pd.DataFrame | None = None   # por unidad y clave de la Serie VII
+    tipos: pd.DataFrame | None = None        # por unidad y tipo de bosque
+    destino: pd.DataFrame | None = None      # otras pérdidas por unidad y uso al que pasaron
+    exactitud: pd.DataFrame | None = None    # del clasificador de destino, con datos reservados
+    resumen_destino: dict | None = None
 
 
 def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios, nombres, *,
                          anio_base, anio, umbral, margen, umbral_dnbr, salida, firma,
-                         guardar_indices=False, reiniciar=False, hilos=1, log=print) -> Resultado:
+                         guardar_indices=False, reiniciar=False, hilos=1, log=print,
+                         claves=None, descripciones=None, leer_rasgos=None,
+                         muestreo=Muestreo()) -> Resultado:
     """Balance, incendios y ráster de cambio, bloque por bloque.
 
     Procesar de una sola vez es el caso de un solo bloque que cubre toda la malla.
@@ -868,6 +1187,12 @@ def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios
     leer_dnbr(geom, fecha) -> ((filas, columnas) en la malla total, dNBR) o None
     hilos: incendios que se leen a la vez. Se procesan y guardan en su orden, así que el
     resultado es idéntico al de leerlos uno por uno.
+    claves: claves de la Serie VII con número 1..k en capas (columna "_clave"); con ellas se
+    desglosa por clave y por tipo de bosque. None = sin desglose.
+    leer_rasgos(bloque, filas, cols) -> rasgos del año actual en esos píxeles del bloque. Con
+    él se clasifica el destino de las otras pérdidas: cada bloque guarda los rasgos de sus
+    otras pérdidas y de sus puntos de muestreo, y al final se entrena un solo clasificador con
+    todas las muestras (ordenadas por posición) y se predice. Así da lo mismo por bloques.
     """
     salida = Path(salida)
     sufijo = f"{anio_base}_{anio}"
@@ -899,7 +1224,8 @@ def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios
 
     return _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas,
                              anio_base=anio_base, anio=anio, umbral=umbral, margen=margen,
-                             salida=salida, sufijo=sufijo, log=log)
+                             salida=salida, sufijo=sufijo, log=log, claves=claves,
+                             descripciones=descripciones, leer_rasgos=leer_rasgos, muestreo=muestreo)
 
 
 def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices, prog, quemas, log):
@@ -923,10 +1249,25 @@ def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices,
     log(f"  incendio {clave} ({fecha:%Y-%m-%d}): {q.sum() * HA_PIXEL:.1f} ha quemadas")
 
 
+def _rasgos_bloque(b, gbb, cambio, dentro, zona, r_uni, capas, leer_rasgos, muestreo):
+    """Rasgos de las otras pérdidas del bloque (en orden de filas, igual que cambio == PERD_OTRA)
+    y de sus puntos de muestreo, para guardarlos en la pieza del bloque."""
+    pf, pc = np.nonzero(cambio == PERD_OTRA)
+    mf, mc, my = puntos_muestra(b, dentro, zona, capas.etiquetas(gbb), muestreo.paso)
+    filas, cols = np.concatenate([pf, mf]), np.concatenate([pc, mc])
+    X = leer_rasgos(b, filas, cols) if len(filas) else np.empty((0, len(RASGOS)), dtype="float32")
+    X = np.asarray(X, dtype="float32")
+    return {"x_perdida": X[:len(pf)], "u_perdida": r_uni[pf, pc].astype(np.int32),
+            "x_muestra": X[len(pf):], "y_muestra": my.astype(np.uint8),
+            "f_muestra": (mf + b.r0).astype(np.int32), "c_muestra": (mc + b.c0).astype(np.int32)}
+
+
 def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas, *,
-                      anio_base, anio, umbral, margen, salida, sufijo, log):
+                      anio_base, anio, umbral, margen, salida, sufijo, log, claves=None,
+                      descripciones=None, leer_rasgos=None, muestreo=Muestreo()):
     """Pasos 2 a 5 de calcular_por_bloques, con los incendios ya calculados."""
     n = len(nombres)
+    nk = len(claves) if claves is not None else 0  # número de claves de la Serie VII
 
     # 2. Bloques que tocan la zona; de los demás solo importa qué unidades tocan
     pendientes, n_zona = [], 0
@@ -971,7 +1312,7 @@ def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices,
     for b in pendientes:
         t0 = time.perf_counter()
         gbb = b.geobox(geobox)
-        dentro, zona, en_refo, r_uni = capas.de_bloque(gbb)
+        dentro, zona, en_refo, r_uni, r_clave = capas.de_bloque(gbb)
         if b.id in guardados:
             vals, n_b, seg_b = guardados.pop(b.id)
             ndvi_base = np.full(b.forma, np.nan, dtype=vals.dtype)
@@ -999,11 +1340,15 @@ def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices,
             parciales[i] = [int((q & base[en_b]).sum()), int((q & base[en_b] & ~actual[en_b]).sum())]
         cambio = mapa_cambio(base, actual, quemado)
         conteos = conteos_unidades(cambio, base, actual, quemado, en_refo, r_uni, n)
+        veg = (conteos_vegetacion(cambio, base, actual, zona, r_uni, r_clave, n, nk)
+               if claves is not None else None)
+        extra = (_rasgos_bloque(b, gbb, cambio, dentro, zona, r_uni, capas, leer_rasgos, muestreo)
+                 if leer_rasgos is not None else None)
         seg = time.perf_counter() - t0 + seg_b
         ram = ram_pico_mb()
         prog.guardar_bloque(b, cambio, conteos, parciales, {
             "malla": b.malla, "zona_px": int(zona.sum()), "escenas_base": n_b, "escenas_actual": n_a,
-            "segundos": round(seg, 1), "ram_pico_mb": None if ram is None else round(ram)})
+            "segundos": round(seg, 1), "ram_pico_mb": None if ram is None else round(ram)}, veg, extra)
         if len(bloques) > 1:
             log(f"  [{len(prog.bloques)}/{n_zona}] bloque {b.id} {b.malla}: {n_b} + {n_a} escenas, "
                 f"{seg:.0f} s" + ("" if ram is None else f", RAM pico {ram / 1024:.1f} GB"))
@@ -1027,20 +1372,57 @@ def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices,
                   "perdido_al_cierre_ha": round(np.int64(parciales[i][1]) * HA_PIXEL, 2),
                   "dnbr_mediana": r["dnbr_mediana"]} for i, r in sorted(quemas.items())]
 
+    vegetacion = tipos = None
+    if claves is not None:
+        cveg = np.zeros(((n + 1) * (nk + 1), len(COLUMNAS_VEG)), dtype=np.int64)
+        for reg in prog.bloques.values():
+            for i, fila in reg.get("vegetacion", {}).items():
+                cveg[int(i)] += np.asarray(fila, dtype=np.int64)
+        vegetacion, tipos = tablas_vegetacion(cveg, nombres, claves, descripciones)
+
+    # Clasificador de destino: un solo modelo con las muestras de todos los bloques
+    modelo = destino = exactitud = resumen = None
+    if leer_rasgos is not None:
+        partes = {"f_muestra": [np.zeros(0, np.int32)], "c_muestra": [np.zeros(0, np.int32)],
+                  "y_muestra": [np.zeros(0, np.uint8)], "x_muestra": [np.zeros((0, len(RASGOS)), "float32")]}
+        for reg in prog.bloques.values():
+            with np.load(prog.pieza(reg["id"])) as z:
+                for nombre, lista in partes.items():
+                    lista.append(z[nombre].reshape(-1, len(RASGOS)) if nombre == "x_muestra" else z[nombre])
+        modelo, exactitud, resumen = entrenar_destino(*(np.concatenate(v) for v in partes.values()),
+                                                      geobox.affine, muestreo)
+        if modelo is None:
+            log("  Aviso: no hay muestras de al menos dos clases de destino; las otras pérdidas quedan "
+                "como 'sin dato'")
+        cdest = np.zeros((n + 1, len(DESTINOS) + 1), dtype=np.int64)
+
     import rasterio
     from rasterio.windows import Window
-    with rasterio.open(salida / f"cambio_{sufijo}.tif", "w", **_perfil_tif(geobox, "uint8")) as dst:
+    ruta_destino = salida / f"destino_{sufijo}.tif"
+    with rasterio.open(salida / f"cambio_{sufijo}.tif", "w", **_perfil_tif(geobox, "uint8")) as dst, \
+            (rasterio.open(ruta_destino, "w", **_perfil_tif(geobox, "uint8")) if leer_rasgos is not None
+             else contextlib.nullcontext()) as dst_dest:
         for reg in prog.bloques.values():
             r0, r1, c0, c1 = reg["ventana"]
+            ventana = Window(c0, r0, c1 - c0, r1 - r0)
             with np.load(prog.pieza(reg["id"])) as z:
-                dst.write(z["cambio"], 1, window=Window(c0, r0, c1 - c0, r1 - r0))
+                dst.write(z["cambio"], 1, window=ventana)
+                if leer_rasgos is not None:
+                    pred = predecir_destino(modelo, z["x_perdida"].reshape(-1, len(RASGOS)))
+                    pieza = np.zeros(z["cambio"].shape, dtype=np.uint8)
+                    pieza[z["cambio"] == PERD_OTRA] = pred  # mismo orden en que se guardaron los rasgos
+                    dst_dest.write(pieza, 1, window=ventana)
+                    np.add.at(cdest, (z["u_perdida"], pred), 1)
+    if leer_rasgos is not None:
+        destino = tabla_destino(cdest, nombres, conteos[:, 0] > 0)
     pd.DataFrame([{"bloque": reg["id"], "malla": reg["malla"], "fila0": reg["ventana"][0],
                    "fila1": reg["ventana"][1], "col0": reg["ventana"][2], "col1": reg["ventana"][3],
                    "zona_ha": round(reg["zona_px"] * HA_PIXEL, 2), "escenas_base": reg["escenas_base"],
                    "escenas_actual": reg["escenas_actual"], "segundos": reg["segundos"],
                    "ram_pico_mb": reg["ram_pico_mb"]} for reg in prog.bloques.values()]
                  ).to_csv(salida / f"bloques_{sufijo}.csv", index=False)
-    return Resultado(tabla, pd.DataFrame(filas_inc), umbral, zona_px * HA_PIXEL, prog)
+    return Resultado(tabla, pd.DataFrame(filas_inc), umbral, zona_px * HA_PIXEL, prog,
+                     vegetacion, tipos, destino, exactitud, resumen)
 
 
 # ==========================================================================
@@ -1087,10 +1469,27 @@ def cmd_correr(a):
     gb = geobox_de(aoi)
     ny, nx = gb.shape
     zona_aoi = aoi.union_all()
-    zf = refo = uni = None
+    zf = refo = uni = etq = claves = descripciones = None
     if a.zona_forestal:
-        zf = gpd.read_file(a.zona_forestal).to_crs(CRS)
-        zf = zf[zf[a.campo_clase].astype(str).str.contains(a.clases_forestales, regex=True)]
+        usv = gpd.read_file(a.zona_forestal).to_crs(CRS)
+        clave_txt = usv[a.campo_clase].astype(str)
+        with warnings.catch_warnings():  # pandas avisa que la expresión tiene grupos; no se usan
+            warnings.simplefilter("ignore", UserWarning)
+            forestal = clave_txt.str.contains(a.clases_forestales, regex=True)
+        zf = usv[forestal].copy()
+        claves = sorted(clave_txt[forestal].unique())
+        zf["_clave"] = clave_txt[forestal].map({c: i for i, c in enumerate(claves, start=1)}).astype("int16")
+        if CAMPO_DESCRIPCION in usv.columns:
+            descripciones = (usv[forestal].assign(_c=clave_txt[forestal])
+                             .groupby("_c")[CAMPO_DESCRIPCION].first().astype(str).to_dict())
+        print(f"Zona forestal: {len(claves)} claves de {a.campo_clase} con {a.clases_forestales!r}: "
+              + ", ".join(claves))
+        if a.clasificar_destino is not False:
+            etq = usv[~forestal].copy()
+            etq["_destino"] = [clase_destino(c, a.clases_agricola, a.clases_pecuario, a.clases_urbano)
+                               for c in clave_txt[~forestal]]
+    elif a.clasificar_destino:
+        sys.exit("--clasificar-destino necesita --zona-forestal (sus zonas no forestales son las etiquetas).")
     if a.reforestacion:
         refo = gpd.read_file(a.reforestacion).to_crs(CRS)
     if a.unidades:
@@ -1099,7 +1498,7 @@ def cmd_correr(a):
         nombres = uni[a.campo_unidad].astype(str).tolist()
     else:
         nombres = ["zona piloto"]
-    capas = CapasVector(aoi, zf, refo, uni)
+    capas = CapasVector(aoi, zf, refo, uni, etq)
 
     incendios = []
     if a.incendios:
@@ -1148,6 +1547,10 @@ def cmd_correr(a):
     def leer_dnbr(geom, fecha):
         return dnbr_incendio(gb, geom, fecha, a.nubes_max, catalogo)
 
+    def leer_rasgos(b, filas, cols):
+        gbb = b.geobox(gb)
+        return rasgos_en_puntos(escenas[a.anio].en(gbb), gbb, filas, cols)
+
     guardar = a.guardar_indices if a.guardar_indices is not None else not a.bloques
     # Lo que no cambia el resultado no entra en la firma (se puede reanudar con otro valor)
     firma = {k: v for k, v in vars(a).items() if k not in ("cmd", "salida", "reiniciar", "hilos_incendios")}
@@ -1157,33 +1560,58 @@ def cmd_correr(a):
                                anio_base=a.anio_base, anio=a.anio, umbral=a.umbral_ndvi,
                                margen=a.margen_cambio, umbral_dnbr=a.umbral_dnbr, salida=out,
                                firma=firma, guardar_indices=guardar, reiniciar=a.reiniciar,
-                               hilos=a.hilos_incendios)
+                               hilos=a.hilos_incendios, claves=claves, descripciones=descripciones,
+                               leer_rasgos=leer_rasgos if etq is not None else None)
     if a.zona_forestal:
         print(f"  Zona forestal de referencia: {res.zona_ha:,.0f} ha")
 
+    sufijo = f"{a.anio_base}_{a.anio}"
     tabla = res.balance
     if refo is not None and uni is not None:
         esp = recuperacion_esperada(refo, uni, a.campo_unidad, a.campo_anio, a.campo_sobrev,
                                     a.anio_base, a.anio, a.sobrev_default)
         tabla = tabla.merge(esp, on="unidad", how="left").fillna(0)
     tabla.insert(1, "umbral_ndvi", res.umbral)
-    tabla.to_csv(out / f"balance_{a.anio_base}_{a.anio}.csv", index=False)
+    tabla.to_csv(out / f"balance_{sufijo}.csv", index=False)
     if len(res.incendios):
         res.incendios.to_csv(out / "incendios_dnbr.csv", index=False)
+    if res.vegetacion is not None:
+        res.vegetacion.to_csv(out / f"vegetacion_{sufijo}.csv", index=False)
+        res.tipos.to_csv(out / f"tipo_bosque_{sufijo}.csv", index=False)
+    if res.destino is not None:
+        res.destino.to_csv(out / f"destino_perdidas_{sufijo}.csv", index=False)
+        res.exactitud.to_csv(out / f"destino_exactitud_{sufijo}.csv", index=False)
     # Cómo se hizo la corrida (lo lee src/mapa_interactivo.py)
     from datetime import datetime
-    (out / f"corrida_{a.anio_base}_{a.anio}.json").write_text(json.dumps({
+    (out / f"corrida_{sufijo}.json").write_text(json.dumps({
         "anio_base": a.anio_base, "anio": a.anio, "ventana": list(a.ventana),
         "umbral_ndvi": round(float(res.umbral), 4), "umbral_pedido": str(a.umbral_ndvi),
         "escenas": {str(k): len(e.items) for k, e in escenas.items()},
         "incendios": len(incendios), "nubes_max": a.nubes_max, "escenas_max": a.escenas_max,
         "bloques": a.bloques, "fecha": datetime.now().isoformat(timespec="seconds"),
+        "clases_forestales": a.clases_forestales if a.zona_forestal else None,
+        "zona_forestal_ha": round(res.zona_ha, 2) if a.zona_forestal else None,
+        "destino": res.resumen_destino,
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     res.progreso.borrar()
     print("\n" + tabla.to_string(index=False))
+    if res.tipos is not None:
+        tot = res.tipos.groupby("tipo_bosque", sort=False)[COLUMNAS_VEG[1:] + ["cambio_neto_ha"]].sum()
+        print("\nPor tipo de bosque (ha):\n" + tot.round(1).to_string())
+    if res.destino is not None:
+        tot = res.destino.drop(columns="unidad").sum()
+        print("\nUso al que pasaron las otras pérdidas (ha): "
+              + ", ".join(f"{d} {tot[f'{d}_ha']:,.1f}" for d in DESTINOS))
+        r = res.resumen_destino
+        if r.get("exactitud_global") is not None:
+            print(f"  Clasificador: exactitud {r['exactitud_global']:.1%} (kappa {r['kappa']}) con "
+                  f"{r['muestras_prueba']:,} muestras reservadas y {r['muestras_entrenamiento']:,} de "
+                  "entrenamiento. Mide el acuerdo con la Serie VII, anterior a 2023, no con el campo.")
     print(f"\nResultados en {out.resolve()}")
     print("Códigos del ráster de cambio: 0 sin bosque, 1 bosque estable, 2 pérdida por incendio, "
           "3 otra pérdida, 4 ganancia")
+    if res.destino is not None:
+        print("Códigos del ráster de destino: 0 no aplica, 1 agrícola, 2 pecuario, 3 urbano, 4 otro, 5 sin dato")
     ram = ram_pico_mb()
     if ram is not None:
         print(f"RAM pico del proceso: {ram / 1024:.1f} GB")
@@ -1225,8 +1653,27 @@ def comprobar_bloques():
     dnbr[205:250, 130:170] += 0.30
 
     aoi = gpd.GeoDataFrame(geometry=[caja(0, 0, n, n).difference(caja(200, 180, n, n))], crs=CRS)
-    zf = gpd.GeoDataFrame(geometry=[caja(0, 0, 190, n), caja(195, 30, 290, 130)], crs=CRS)
-    refo = gpd.GeoDataFrame(geometry=[caja(200, 40, 280, 120)], crs=CRS)
+    zf = gpd.GeoDataFrame({"CLAVE": ["BP", "VSA/BQ", "SBC", "BC"]},
+                          geometry=[caja(0, 0, 100, n), caja(100, 0, 190, 200), caja(195, 30, 290, 130),
+                                    caja(100, 200, 190, n)], crs=CRS)
+    claves = sorted(zf["CLAVE"])
+    zf["_clave"] = zf["CLAVE"].map({c: i for i, c in enumerate(claves, start=1)}).astype("int16")
+    # La segunda reforestación queda en parte fuera de la zona forestal (clave 0)
+    refo = gpd.GeoDataFrame(geometry=[caja(200, 40, 280, 120), caja(150, 260, 200, 290)], crs=CRS)
+    # Zonas no forestales que entrenan el clasificador de destino
+    etq = gpd.GeoDataFrame({"CLAVE": ["TA", "H2O", "AH", "PI", "RA"]},
+                           geometry=[caja(190, 0, n, 30), caja(190, 30, 195, 130), caja(290, 30, n, 130),
+                                     caja(190, 130, n, 220), caja(190, 220, n, n)], crs=CRS)
+    etq["_destino"] = [clase_destino(c) for c in etq["CLAVE"]]
+    assert etq["_destino"].tolist() == [1, 4, 3, 2, 1]
+    lab = rasterizar(etq.geometry, etq["_destino"].tolist(), (n, n), gb.affine, dtype="uint8")
+    centros = rng.uniform(0, 1, (5, len(RASGOS)))  # 0 = bosque, 1..4 = destinos
+    rasgos = (centros[lab] + rng.normal(0, 0.15, (n, n, len(RASGOS)))).astype("float32")
+    rasgos[200:240, 120:140] = centros[1] + rng.normal(0, 0.15, (40, 20, len(RASGOS)))  # tala hacia cultivo
+    rasgos[200:240, 140:160] = centros[3] + rng.normal(0, 0.15, (40, 20, len(RASGOS)))  # y hacia urbano
+    rasgos[200:203, 120:160] = np.nan                                                  # sin dato
+    rasgos[::11, ::13, 2] = np.nan                                                     # muestras sin dato
+    muestreo = Muestreo(paso=7, max_por_grupo=40, region_m=1000, celda_prueba_m=300, arboles=30)
     # "Esquina" toca la zona solo con una astilla: no tiene píxeles dentro, pero sí fila (en ceros).
     # "Rincón" solo tiene píxeles en un bloque que se salta: también lleva su fila en ceros.
     uni = gpd.GeoDataFrame({"nombre": ["Norte", "Sur", "Esquina", "Rincón"]},
@@ -1250,11 +1697,14 @@ def comprobar_bloques():
     def leer_ndvi(anio, b):
         return ndvi[anio][b.r0:b.r1, b.c0:b.c1].copy(), 1
 
+    def leer_rasgos(b, filas, cols):
+        return rasgos[b.r0 + filas, b.c0 + cols].copy()
+
     def referencia(umbral):
         """El cálculo original de `correr`, sobre arreglos completos."""
         dentro = rasterizar(aoi.geometry, [1], (n, n), gb.affine, dtype="uint8").astype(bool)
-        en_refo = rasterizar(refo.geometry, [1], (n, n), gb.affine, dtype="uint8").astype(bool)
-        zona = dentro & (rasterizar(zf.geometry, [1, 1], (n, n), gb.affine, dtype="uint8").astype(bool)
+        en_refo = rasterizar(refo.geometry, [1] * len(refo), (n, n), gb.affine, dtype="uint8").astype(bool)
+        zona = dentro & (rasterizar(zf.geometry, [1] * len(zf), (n, n), gb.affine, dtype="uint8").astype(bool)
                          | en_refo)
         if umbral == "auto":
             umbral = umbral_otsu(ndvi[2023][dentro])
@@ -1275,8 +1725,46 @@ def comprobar_bloques():
                           "perdido_al_cierre_ha": round((q & b[rs, cs] & ~a[rs, cs]).sum() * HA_PIXEL, 2),
                           "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3)})
         r_uni = rasterizar(uni.geometry, range(1, len(uni) + 1), (n, n), gb.affine)
-        return (balance(b, a, quemado, en_refo, r_uni, nombres), pd.DataFrame(filas),
-                mapa_cambio(b, a, quemado), umbral)
+        cambio = mapa_cambio(b, a, quemado)
+        bal = balance(b, a, quemado, en_refo, r_uni, nombres)
+
+        # Por clave y tipo de bosque, contando unidad por unidad y clave por clave
+        r_clave = rasterizar(zf.geometry, zf["_clave"].tolist(), (n, n), gb.affine, dtype="int16")
+        r_clave[~zona] = 0
+        k = len(claves)
+        cveg = np.zeros(((len(nombres) + 1) * (k + 1), len(COLUMNAS_VEG)), dtype=np.int64)
+        for i in range(1, len(nombres) + 1):
+            for kk in range(k + 1):
+                m = (r_uni == i) & (r_clave == kk) & zona
+                cveg[i * (k + 1) + kk] = [m.sum(), (m & b).sum(), (m & (cambio == PERD_INCENDIO)).sum(),
+                                          (m & (cambio == PERD_OTRA)).sum(), (m & (cambio == GANANCIA)).sum(),
+                                          (m & a).sum()]
+        veg, tipos = tablas_vegetacion(cveg, nombres, claves)
+
+        # Destino: muestras en la retícula de toda la malla, un modelo, predicción de cada pérdida
+        rr = np.arange(muestreo.paso // 2, n, muestreo.paso)
+        mf, mc = (x.ravel() for x in np.meshgrid(rr, rr, indexing="ij"))
+        ok = dentro[mf, mc] & ~zona[mf, mc] & (lab[mf, mc] > 0)
+        mf, mc = mf[ok], mc[ok]
+        modelo, exactitud, _ = entrenar_destino(mf, mc, lab[mf, mc], rasgos[mf, mc], gb.affine, muestreo)
+        pf, pc = np.nonzero(cambio == PERD_OTRA)
+        pred = predecir_destino(modelo, rasgos[pf, pc])
+        destino_r = np.zeros((n, n), dtype=np.uint8)
+        destino_r[pf, pc] = pred
+        cdest = np.zeros((len(nombres) + 1, len(DESTINOS) + 1), dtype=np.int64)
+        np.add.at(cdest, (r_uni[pf, pc], pred), 1)
+        destino = tabla_destino(cdest, nombres, np.bincount(r_uni.ravel(), minlength=len(nombres) + 1) > 0)
+
+        # Los desgloses cuadran con el balance
+        suma = veg.groupby("unidad")[COLUMNAS_VEG[1:]].sum().reindex(bal["unidad"]).fillna(0)
+        assert np.allclose(suma.to_numpy(), bal.set_index("unidad")[COLUMNAS_VEG[1:]].to_numpy()), \
+            "El desglose por clave no cuadra con el balance"
+        assert np.allclose(destino["otras_perdidas_ha"], bal["otras_perdidas_ha"]), \
+            "El destino no cuadra con las otras pérdidas"
+        assert set(destino_r[pf, pc]) >= {1, 3, SIN_DATO_DESTINO}, "El demo debe tener destinos variados"
+        return {"balance": bal, "incendios": pd.DataFrame(filas), "cambio": cambio, "umbral": umbral,
+                "vegetacion": veg, "tipos": tipos, "destino": destino, "exactitud": exactitud,
+                "destino_r": destino_r}
 
     # Bloques alineados a tres "teselas" con mallas desfasadas (en cuadros de 1 km)
     origenes = [(x0 - 20, y0 + 20, "T1"), (x0 + 960, y0, "T2"), (x0 + 1980, y0 - 980, "T3")]
@@ -1285,7 +1773,7 @@ def comprobar_bloques():
     for b in bloques:
         cobertura[b.ventana] += 1
     assert (cobertura == 1).all(), "Los bloques se enciman o dejan huecos"
-    capas = CapasVector(aoi, zf, refo, uni)
+    capas = CapasVector(aoi, zf, refo, uni, etq)
     dentro = {b: capas.dentro(b.geobox(gb)) for b in bloques}
     saltados = [b for b in bloques if not dentro[b].any()]
     rincon = rasterizar([caja(275, 275, n, n)], [1], (n, n), gb.affine, dtype="uint8").astype(bool)
@@ -1319,17 +1807,21 @@ def comprobar_bloques():
             res = calcular_por_bloques(gb, bloques_, capas, ndvi_, dnbr_, incendios, nombres,
                                        anio_base=2023, anio=2024, umbral=umbral, margen=0.10,
                                        umbral_dnbr=UMBRAL_DNBR, salida=salida,
-                                       firma={"demo": umbral}, hilos=hilos, log=lambda *x: None)
+                                       firma={"demo": umbral}, hilos=hilos, log=lambda *x: None,
+                                       claves=claves, leer_rasgos=leer_rasgos, muestreo=muestreo)
             res.progreso.borrar()
-            with rasterio.open(salida / "cambio_2023_2024.tif") as src:
-                return res, src.read(1)
+            with rasterio.open(salida / "cambio_2023_2024.tif") as src, \
+                    rasterio.open(salida / "destino_2023_2024.tif") as src_d:
+                return res, src.read(1), src_d.read(1)
 
-        def igual(nombre, umbral, res, cambio):
-            ref_bal, ref_inc, ref_cambio, ref_umbral = referencia(umbral)
-            assert res.umbral == ref_umbral, f"{nombre}: umbral distinto"
-            pd.testing.assert_frame_equal(res.balance, ref_bal, check_exact=True, obj=f"{nombre}: balance")
-            pd.testing.assert_frame_equal(res.incendios, ref_inc, check_exact=True, obj=f"{nombre}: incendios")
-            assert np.array_equal(cambio, ref_cambio), f"{nombre}: el ráster de cambio no coincide"
+        def igual(nombre, umbral, res, cambio, destino_r):
+            ref = referencia(umbral)
+            assert res.umbral == ref["umbral"], f"{nombre}: umbral distinto"
+            for campo in ("balance", "incendios", "vegetacion", "tipos", "destino", "exactitud"):
+                pd.testing.assert_frame_equal(getattr(res, campo), ref[campo], check_exact=True,
+                                              obj=f"{nombre}: {campo}")
+            assert np.array_equal(cambio, ref["cambio"]), f"{nombre}: el ráster de cambio no coincide"
+            assert np.array_equal(destino_r, ref["destino_r"]), f"{nombre}: el ráster de destino no coincide"
             assert res.incendios["incendio"].is_unique, f"{nombre}: incendio contado dos veces"
 
         for umbral in (0.55, "auto"):
@@ -1358,7 +1850,8 @@ def comprobar_bloques():
     print(f"Por bloques = de una sola vez: {len(bloques)} bloques ({saltados} fuera de la zona, "
           f"saltados), {len(incendios)} incendios ({cruzan} cruzan bloques), umbral fijo y automático, "
           "incendios uno por uno y en paralelo, corridas interrumpidas y reanudadas: mismo balance, "
-          "mismo ráster de cambio, una fila por incendio")
+          "mismo ráster de cambio, una fila por incendio, mismo desglose por clave y tipo de bosque, "
+          "mismo clasificador y mismo destino de las otras pérdidas")
 
 
 def cmd_demo(a):
@@ -1474,8 +1967,22 @@ def main():
                    help="cambio mínimo de NDVI para contar pérdida o ganancia")
     r.add_argument("--zona-forestal", help="polígonos de uso de suelo (p. ej. INEGI Serie VII)")
     r.add_argument("--campo-clase", default="CLAVE")
-    r.add_argument("--clases-forestales", default=r"^(B|VSA/)",
-                   help="expresión regular de las claves que cuentan como zona forestal")
+    r.add_argument("--clases-forestales", default=CLASES_FORESTALES,
+                   help="expresión regular de las claves que cuentan como zona forestal; por defecto "
+                        f"{CLASES_FORESTALES.replace('%', '%%')}: bosques, selva baja caducifolia, matorrales "
+                        "y vegetación secundaria arbórea (512,577 ha en el Estado de México). Hasta el "
+                        "3-nov-2026 era ^(B|VSA/) (484,695 ha)")
+    r.add_argument("--clasificar-destino", action=argparse.BooleanOptionalAction, default=None,
+                   help="clasificar en agrícola, pecuario, urbano u otro el terreno de las otras pérdidas "
+                        "(CF-DEV-07); por defecto sí cuando hay --zona-forestal. Lee 6 bandas más del año "
+                        "actual")
+    r.add_argument("--clases-agricola", default=CLASES_AGRICOLA,
+                   help=f"claves no forestales que entrenan 'agrícola'; por defecto {CLASES_AGRICOLA}")
+    r.add_argument("--clases-pecuario", default=CLASES_PECUARIO,
+                   help=f"claves que entrenan 'pecuario'; por defecto {CLASES_PECUARIO}")
+    r.add_argument("--clases-urbano", default=CLASES_URBANO,
+                   help=f"claves que entrenan 'urbano'; por defecto {CLASES_URBANO}. Las demás no "
+                        "forestales entrenan 'otro'")
     r.add_argument("--incendios")
     r.add_argument("--campo-fecha", default="FECHAINIC")
     r.add_argument("--campo-id", default="CLAVEINC", help="campo que identifica cada incendio")

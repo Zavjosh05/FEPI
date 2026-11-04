@@ -128,6 +128,10 @@ button:focus-visible, input:focus-visible, tr:focus-visible, .u:focus-visible { 
 .detalle th:first-child, .detalle td:first-child { text-align: left; color: var(--ink-2); font-weight: 400; }
 .detalle thead th { font-family: var(--f-titulo); font-weight: 600; color: var(--ink); }
 .detalle .vacio { color: var(--ink-2); margin: 0; }
+.detalle h4 { font-family: var(--f-titulo); font-weight: 600; font-size: 1.02rem; margin: 6px 0 0; letter-spacing: .01em; }
+.detalle .tipos td + td, .detalle .tipos th + th { padding-left: 10px; white-space: nowrap; }
+.detalle .tipos tfoot td { font-weight: 600; border-bottom: 0; }
+.detalle .tipos tfoot td:first-child { color: var(--ink); }
 .leyenda { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .leyenda label, .leyenda li { display: flex; align-items: center; gap: 8px; font-size: .92rem; }
 .leyenda input { margin: 0; accent-color: var(--accent); }
@@ -449,10 +453,33 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const ocultarGlobo = () => { globo.hidden = true; };
 
   // ---------- Panel de detalle y leyenda ----------
+  // Desglose por tipo de bosque (CF-DEV-04): solo en las corridas que traen tipo_bosque_*.csv
+  const IT = Object.fromEntries((D.campos_tipo || []).map((c, i) => [c, i]));
+  const hayTipos = D.periodos.some(p => p.tipos);
+  function tablaTipos(porTipo) {
+    const tipos = (D.tipos || []).filter(t => porTipo && porTipo[t] && (porTipo[t][IT.base] > 0 || porTipo[t][IT.actual] > 0));
+    if (!tipos.length) return `<p class="vacio">Sin bosque en la zona forestal en esta comparación.</p>`;
+    const n = v => nf.format(Math.round(v));
+    const suma = k => tipos.reduce((s, t) => s + porTipo[t][IT[k]], 0);
+    const renglon = (etq, base, perd, gan, neto) => `<tr><td>${etq}</td><td>${n(base)}</td><td>${n(perd)}</td><td>${n(gan)}</td><td>${signo(neto)}</td></tr>`;
+    return `<div class="tabla-detalle"><table class="tipos"><thead><tr><th>Hectáreas</th><th>Inicial</th><th>Pérdida</th><th>Ganancia</th><th>Neto</th></tr></thead>
+      <tbody>${tipos.map(t => { const f = porTipo[t]; return renglon(t, f[IT.base], f[IT.inc] + f[IT.otras], f[IT.gan], f[IT.neto]); }).join("")}</tbody>
+      ${tipos.length > 1 ? `<tfoot>${renglon("Total", suma("base"), suma("inc") + suma("otras"), suma("gan"), suma("neto"))}</tfoot>` : ""}</table></div>`;
+  }
+  function seccionTipos(porTipo, quien) {
+    if (!hayTipos) return "";
+    const p = P();
+    const titulo = `<h4>Por tipo de bosque · ${p.etiqueta}${p.preliminar ? " (preliminar)" : ""}</h4>`;
+    if (!p.tipos) return titulo + `<p class="vacio">Esta comparación se corrió antes del desglose por tipo de bosque.</p>`;
+    return titulo + `<p class="vacio">${quien}. Pérdida = por incendio + otras.</p>` + tablaTipos(porTipo);
+  }
+
   function pintarDetalle() {
     const el = document.getElementById("detalle");
     if (!st.sel) {
-      el.innerHTML = `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver sus cifras en cada periodo.</p>`;
+      const p = P();
+      el.innerHTML = `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver sus cifras en cada periodo${hayTipos ? " y por tipo de bosque" : ""}.</p>`
+        + seccionTipos(p.tipos && p.tipos.tot, `${D.titulo}, total`);
       return;
     }
     const filas = [["Bosque inicial", "base"], ["Pérdida por incendio", "inc"], ["Otras pérdidas", "otras"],
@@ -463,7 +490,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       <tbody>${filas.map(([etq, campo]) => `<tr><td>${etq}</td>${cols.map(c => `<td>${c.f ? (campo === "neto" ? signo(c.f[I.neto]) : nf.format(Math.round(c.f[I[campo]]))) : "—"}</td>`).join("")}</tr>`).join("")}
       <tr><td>Cambio neto (%)</td>${cols.map(c => `<td>${c.f && c.f[I.base] >= D.minimo ? pctTxt(pct(c.f)) : "—"}</td>`).join("")}</tr></tbody></table></div>
       ${cols.some(c => c.p.preliminar) ? `<p class="vacio">* Preliminar, otra temporada: no se compara con las demás columnas.</p>` : ""}
-      ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}`;
+      ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}
+      ${seccionTipos(P().tipos && P().tipos.filas[st.sel], st.sel)}`;
   }
 
   function pintarLeyenda() {

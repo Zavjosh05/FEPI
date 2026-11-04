@@ -7,7 +7,9 @@ Arma un solo archivo HTML (sin servidor) para explorar el balance de masa forest
 
   - mapa con zoom y arrastre: el ráster de cambio (con capas que se prenden y apagan) o el
     cambio neto por unidad, en porcentaje;
-  - al pasar o tocar una unidad, sus cifras; al elegirla, su detalle en todos los periodos;
+  - al pasar o tocar una unidad, sus cifras; al elegirla, su detalle en todos los periodos y su
+    desglose por tipo de bosque (si la corrida trae tipo_bosque_*.csv); sin unidad elegida, el
+    desglose de toda la zona;
   - selector de periodo (una corrida por periodo, p. ej. 2023 → 2024 y 2024 → 2025);
   - tabla ordenable de todas las unidades.
 
@@ -37,11 +39,29 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mapa_cambio import leer_cambio_agregado  # noqa: E402
+from prototipo_masa_forestal import TIPOS_ORDEN  # noqa: E402
 
 BOSQUE_MINIMO_HA = 500
 CAMPOS = {"bosque_base_ha": "base", "perdida_incendio_ha": "inc", "otras_perdidas_ha": "otras",
           "ganancia_ha": "gan", "bosque_afectado_por_fuego_ha": "afect", "bosque_actual_ha": "actual",
           "cambio_neto_ha": "neto"}
+# Desglose por tipo de bosque (tipo_bosque_<base>_<actual>.csv, desde 0.6.0)
+CAMPOS_TIPO = {"bosque_base_ha": "base", "perdida_incendio_ha": "inc", "otras_perdidas_ha": "otras",
+               "ganancia_ha": "gan", "bosque_actual_ha": "actual", "cambio_neto_ha": "neto"}
+
+
+def _tipos(carpeta, clave):
+    """{"filas": {unidad: {tipo: [cifras]}}, "tot": {tipo: [cifras]}} o None si la corrida no lo tiene."""
+    ruta = Path(carpeta) / f"tipo_bosque_{clave}.csv"
+    if not ruta.exists():
+        return None
+    t = pd.read_csv(ruta)
+    filas = {}
+    for _, r in t.iterrows():
+        filas.setdefault(str(r["unidad"]), {})[r["tipo_bosque"]] = [round(float(r[c]), 2) for c in CAMPOS_TIPO]
+    tot = t.groupby("tipo_bosque")[list(CAMPOS_TIPO)].sum()
+    tot = {tipo: [round(float(v), 1) for v in tot.loc[tipo]] for tipo in TIPOS_ORDEN if tipo in tot.index}
+    return {"filas": filas, "tot": tot}
 
 
 def _png_clases(arr) -> str:
@@ -122,7 +142,7 @@ def preparar_periodo(carpeta, ancho_px):
             "actual_txt": f"{meses_corto} {actual}" if preliminar else str(actual),
             "corto": f"{str(base)[2:]}→{str(actual)[2:]}{'*' if preliminar else ''}", "sufijo": sufijo,
             "umbral": round(float(bal["umbral_ndvi"].iloc[0]), 2), "escenas": escenas,
-            "tot": tot, "filas": filas, "incendios": inc, "notas": notas,
+            "tot": tot, "filas": filas, "incendios": inc, "notas": notas, "tipos": _tipos(carpeta, clave),
             "fuego_incompleto": any("incendios" in n for n in notas),
             "img": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs)}
 
@@ -188,6 +208,7 @@ def main():
     (alto, ancho), f = malla[0], malla[1]
     datos = {"titulo": a.titulo, "ancho": ancho, "alto": alto, "celda": 10 * f,
              "minimo": BOSQUE_MINIMO_HA, "campos": list(CAMPOS.values()),
+             "campos_tipo": list(CAMPOS_TIPO.values()), "tipos": TIPOS_ORDEN,
              "unidades": unidades, "contorno": contorno, "periodos": periodos}
 
     plantilla = (Path(__file__).resolve().parent / "plantilla_mapa.html").read_text(encoding="utf-8")

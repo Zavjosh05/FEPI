@@ -4,6 +4,62 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.6.0] - 2026-11-03
+
+Programa las decisiones de diseño del 3 de noviembre (CF-DEV-03, CF-DEV-04 y CF-DEV-07, opción A).
+
+### Cambiado
+
+- La zona forestal por defecto (`--clases-forestales`) pasa de `^(B|VSA/)` a `^(B|S|M|VSA/)`:
+  agrega selva baja caducifolia (`SBC`) y matorrales (`MC`, `MDR`). En el Estado de México son
+  512,577 ha en lugar de 484,695. Los balances estatales guardados son de la zona anterior y hay
+  que volver a correrlos. Para repetir una corrida anterior: `--clases-forestales "^(B|VSA/)"`.
+- `src/comparar_resultados.py` compara también los desgloses, el destino y su ráster cuando las
+  dos carpetas los tienen; si solo una los tiene (corridas anteriores), los omite sin fallar.
+
+### Agregado
+
+- **Cruce con la Serie VII (CF-DEV-03):** la clave (`CLAVE`) se rasteriza por bloque y
+  `vegetacion_<base>_<actual>.csv` da, por unidad y clave, la zona forestal, el bosque inicial, la
+  pérdida por incendio, las otras pérdidas, la ganancia y el bosque final. Suma lo mismo que el
+  balance.
+- **Tipo de bosque (CF-DEV-04):** `tipo_bosque_<base>_<actual>.csv`, por unidad y tipo: coníferas
+  (BA, BP, BPQ, BJ, BB, BG y sus VSA/), encino (BQ, BQP y sus VSA/), mesófilo de montaña (BM y
+  VSA/BM), selva baja caducifolia (SBC, VSA/SBC), vegetación de zonas semiáridas (MC, MDR) y otro
+  (BC, bosque cultivado, y lo que no encaje).
+- **Uso al que pasó el terreno (CF-DEV-07, opción A):** cada píxel de "otra pérdida" se clasifica
+  como agrícola, pecuario, urbano u otro.
+  - Bosque aleatorio (scikit-learn, 200 árboles) con la mediana nov-dic del año actual de B03,
+    B04, B08, B8A, B11, B12, NDVI, NBR, NDBI y MNDWI.
+  - Etiquetas de las zonas no forestales de la Serie VII: `T*`, `R*` y `HA` agrícola; `PI` y `PC`
+    pecuario; `AH` urbano; lo demás, otro. Muestras en una retícula de 250 m, como máximo 1,500
+    por clase y región de 100 km.
+  - Exactitud con las muestras de 1 de cada 5 celdas de 5 km, reservadas
+    (`destino_exactitud_<base>_<actual>.csv`). Mide el acuerdo con la Serie VII, anterior a 2023.
+  - Salidas `destino_perdidas_<base>_<actual>.csv` por unidad y `destino_<base>_<actual>.tif`
+    (uint8). Se desactiva con `--no-clasificar-destino`; las clases de entrenamiento se cambian
+    con `--clases-agricola`, `--clases-pecuario` y `--clases-urbano`.
+  - Lee 6 bandas más del año actual, solo en los píxeles que necesita.
+- La ganancia por programa (CF-DEV-05) queda pendiente: `ganancia_por_programa` marca el punto de
+  conexión para cuando lleguen los polígonos de PROBOSQUE.
+- `demo`: comprueba que el desglose por clave y tipo, el clasificador, la tabla de destino y su
+  ráster salen idénticos por bloques, de una sola vez, con incendios en paralelo y en corridas
+  interrumpidas y reanudadas.
+- Página interactiva: desglose por tipo de bosque del periodo elegido, del estado (sin municipio
+  elegido) y de cada municipio. Las corridas sin `tipo_bosque_*.csv` lo dicen.
+- `requirements.txt`: scikit-learn 1.9.1.
+
+### Verificado
+
+- El piloto con `--clases-forestales "^(B|VSA/)"` da IDÉNTICO a `resultados/piloto_2023_2024`. Con
+  la zona nueva también, porque el piloto no tiene claves `S*` ni `M*`. Por bloques y de una sola
+  vez, todas las salidas nuevas dan IDÉNTICO.
+- En Otzoloapan y Tequixquiac la zona nueva agrega 3,241 ha de zona forestal y 1,698 ha de bosque
+  2023. La selva baja pierde 11 % en "otras pérdidas", probablemente por la caída de hojas.
+- Exactitud del clasificador de destino: 67 % (kappa 0.40) en el piloto y 48 % (kappa 0.21) en
+  Otzoloapan y Tequixquiac. No sube la RAM, pero los bloques tardan ~2.6 veces más.
+- Los balances estatales todavía no se vuelven a correr con la zona nueva.
+
 ## [0.5.0] - 2026-11-03
 
 ### Agregado

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Compara dos carpetas de resultados de `correr`: balance, incendios y ráster de cambio.
+Compara dos carpetas de resultados de `correr`: balance, incendios y ráster de cambio y, si están
+en las dos, los desgloses por clave y tipo de bosque, el destino de las otras pérdidas y su ráster.
 
 Uso (desde la raíz del repositorio):
     python src/comparar_resultados.py resultados/piloto_2023_2024 C:/temp/piloto_bloques
@@ -22,7 +23,12 @@ COLUMNAS_INCENDIO = ["fecha_inicio", "poligono_ha", "quemado_dnbr_ha", "quemado_
 
 
 def _tablas(ruta_a, ruta_b, clave):
+    """clave: columna (o lista de columnas) que identifica cada fila."""
     ta, tb = pd.read_csv(ruta_a), pd.read_csv(ruta_b)
+    if isinstance(clave, (list, tuple)):
+        def indice(t):
+            return t.set_index(t[list(clave)].astype(str).agg(" / ".join, axis=1))
+        return indice(ta), indice(tb)
     ka = clave if clave in ta.columns else "CLAVEINC"
     kb = clave if clave in tb.columns else "CLAVEINC"
     ta, tb = ta.set_index(ta[ka].astype(str)), tb.set_index(tb[kb].astype(str))
@@ -39,7 +45,8 @@ def comparar_tabla(ruta_a, ruta_b, clave, columnas=None) -> list[str]:
         problemas.append("hay claves repetidas")
         return problemas
     comunes = sorted(set(ta.index) & set(tb.index))
-    cols = [c for c in (columnas or ta.columns) if c in ta.columns and c in tb.columns and c != clave]
+    claves = set(clave) if isinstance(clave, (list, tuple)) else {clave}
+    cols = [c for c in (columnas or ta.columns) if c in ta.columns and c in tb.columns and c not in claves]
     a, b = ta.loc[comunes, cols], tb.loc[comunes, cols]
     distinto = (a != b) & ~(a.isna() & b.isna())
     for fila, col in zip(*np.nonzero(distinto.to_numpy())):
@@ -69,16 +76,27 @@ def main():
     args = p.parse_args()
     a, b = Path(args.a), Path(args.b)
 
+    # (archivo, comparación, ¿obligatorio?). Los desgloses y el destino (desde 0.6.0) solo se
+    # comparan si están en las dos carpetas: las corridas anteriores no los tienen.
     revisiones = [
-        (f"balance_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "unidad")),
-        ("incendios_dnbr.csv", lambda x, y: comparar_tabla(x, y, "incendio", COLUMNAS_INCENDIO)),
-        (f"cambio_{args.periodo}.tif", comparar_raster),
+        (f"balance_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "unidad"), True),
+        ("incendios_dnbr.csv", lambda x, y: comparar_tabla(x, y, "incendio", COLUMNAS_INCENDIO), True),
+        (f"cambio_{args.periodo}.tif", comparar_raster, True),
+        (f"vegetacion_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, ["unidad", "clave"]), False),
+        (f"tipo_bosque_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, ["unidad", "tipo_bosque"]), False),
+        (f"destino_perdidas_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "unidad"), False),
+        (f"destino_exactitud_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "clase"), False),
+        (f"destino_{args.periodo}.tif", comparar_raster, False),
     ]
     todo_igual = True
-    for nombre, funcion in revisiones:
-        if not (a / nombre).exists() or not (b / nombre).exists():
-            print(f"{nombre}: falta en {'A' if not (a / nombre).exists() else 'B'}")
-            todo_igual = False
+    for nombre, funcion, obligatorio in revisiones:
+        en_a, en_b = (a / nombre).exists(), (b / nombre).exists()
+        if not en_a or not en_b:
+            if obligatorio:
+                print(f"{nombre}: falta en {'A' if not en_a else 'B'}")
+                todo_igual = False
+            elif en_a or en_b:
+                print(f"{nombre}: solo está en {'A' if en_a else 'B'} (no se compara)")
             continue
         problemas = funcion(a / nombre, b / nombre)
         todo_igual &= not problemas
