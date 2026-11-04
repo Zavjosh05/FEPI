@@ -61,8 +61,9 @@ SIN_BOSQUE, ESTABLE, PERD_INCENDIO, PERD_OTRA, GANANCIA = 0, 1, 2, 3, 4
 # Clases del ráster de coincidencia
 FUERA, ZONA, AMBOS, SOLO_PROTO, SOLO_HANSEN = 0, 1, 2, 3, 4
 
-PREDETERMINADAS = [("resultados/edomex_2023_2024/cambio_2023_2024.tif", "2024"),
-                   ("resultados/edomex_2024_2025/cambio_2024_2025.tif", "2025")]
+# Las comparaciones de un año de la serie estatal (desde 0.7.0; antes, las corridas directas)
+PREDETERMINADAS = [("resultados/edomex_serie_2023_2025/cambio_2023_2024.tif", "2024"),
+                   ("resultados/edomex_serie_2023_2025/cambio_2024_2025.tif", "2025")]
 
 # Colores (skill dataviz: primeros tres tonos categóricos, validados en todos los pares)
 SUPERFICIE = "#fcfcfb"
@@ -533,8 +534,9 @@ def main():
     p.add_argument("--aoi", default="datos/edomex/estado_mexico.gpkg")
     p.add_argument("--zona-forestal", default="datos/edomex/usv_serie7_edomex.gpkg")
     p.add_argument("--campo-clase", default="CLAVE")
-    p.add_argument("--clases-forestales", default=r"^(B|VSA/)",
-                   help="las mismas que usó la corrida del prototipo (las de 2023→2024 y 2024→2025: ^(B|VSA/))")
+    p.add_argument("--clases-forestales", default=r"^(B|S|M|VSA/)",
+                   help="las mismas que usó la corrida del prototipo (desde 0.6.0, ^(B|S|M|VSA/); las corridas "
+                        "directas anteriores usaban ^(B|VSA/))")
     p.add_argument("--unidades", default="datos/edomex/municipios_edomex.gpkg")
     p.add_argument("--campo-unidad", default="NOM_MUN")
     p.add_argument("--tolerancia-m", type=float, default=30,

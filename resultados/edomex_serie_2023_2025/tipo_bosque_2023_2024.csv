@@ -1,0 +1,225 @@
+unidad,tipo_bosque,zona_forestal_ha,bosque_base_ha,perdida_incendio_ha,otras_perdidas_ha,ganancia_ha,bosque_actual_ha,cambio_neto_ha
+Acambay de Ruíz Castañeda,Coníferas,1047.61,944.0,0.0,20.61,1.69,925.08,-18.92
+Acambay de Ruíz Castañeda,Encino,8215.85,7728.88,7.65,80.92,23.67,7663.98,-64.9
+Acolman,Vegetación de zonas semiáridas,378.17,2.7,0.0,0.01,141.61,144.3,141.6
+Aculco,Encino,2592.52,2476.54,0.0,14.83,2.12,2463.83,-12.71
+Aculco,Selva baja caducifolia,69.3,51.93,0.0,2.76,0.71,49.88,-2.05
+Aculco,Vegetación de zonas semiáridas,59.36,29.68,0.0,18.74,0.02,10.96,-18.72
+Almoloya de Alquisiras,Coníferas,2302.28,2237.91,0.0,21.84,3.76,2219.83,-18.08
+Almoloya de Alquisiras,Encino,3344.61,3242.48,0.0,35.41,5.8,3212.87,-29.61
+Almoloya de Alquisiras,Mesófilo de montaña,498.43,495.19,0.0,3.3,0.48,492.37,-2.82
+Almoloya de Juárez,Coníferas,1478.82,1426.83,0.0,19.3,3.03,1410.56,-16.27
+Amanalco,Coníferas,9866.6,9772.55,4.32,75.65,11.52,9704.1,-68.45
+Amanalco,Encino,581.7,573.61,0.0,7.43,0.29,566.47,-7.14
+Amatepec,Coníferas,4716.06,4624.97,0.0,35.85,11.44,4600.56,-24.41
+Amatepec,Encino,8891.16,8509.91,3.65,97.85,18.34,8426.75,-83.16
+Amatepec,Mesófilo de montaña,198.16,196.75,0.0,0.71,0.27,196.31,-0.44
+Amatepec,Selva baja caducifolia,628.95,579.1,0.0,11.07,3.54,571.57,-7.53
+Amecameca,Coníferas,7246.81,6315.36,51.39,228.45,54.89,6090.41,-224.95
+Amecameca,Encino,746.81,735.34,0.0,6.63,1.72,730.43,-4.91
+Apaxco,Encino,0.55,0.03,0.0,0.0,0.0,0.03,0.0
+Apaxco,Vegetación de zonas semiáridas,352.08,78.08,0.0,3.68,0.34,74.74,-3.34
+Atizapán de Zaragoza,Coníferas,0.43,0.1,0.0,0.05,0.0,0.05,-0.05
+Atizapán de Zaragoza,Encino,491.95,362.22,0.1,6.29,25.43,381.26,19.04
+Atlacomulco,Coníferas,1201.45,1192.57,1.16,1.77,0.28,1189.92,-2.65
+Atlacomulco,Encino,1909.7,1773.28,0.0,45.22,3.08,1731.14,-42.14
+Atlautla,Coníferas,5803.59,5125.7,0.06,435.44,26.48,4716.68,-409.02
+Atlautla,Encino,1022.62,991.11,0.0,57.43,5.52,939.2,-51.91
+Axapusco,Encino,89.67,82.76,0.0,0.0,3.3,86.06,3.3
+Axapusco,Vegetación de zonas semiáridas,1686.88,46.93,0.0,2.26,102.71,147.38,100.45
+Axapusco,Otro,76.77,3.6,0.0,0.6,9.51,12.51,8.91
+Ayapango,Coníferas,40.27,34.14,0.0,0.76,1.51,34.89,0.75
+Ayapango,Encino,32.49,31.64,0.0,0.11,0.22,31.75,0.11
+Capulhuac,Encino,180.48,170.49,0.0,2.15,0.33,168.67,-1.82
+Coacalco de Berriozábal,Encino,281.13,230.6,0.0,0.91,41.68,271.37,40.77
+Coacalco de Berriozábal,Vegetación de zonas semiáridas,365.39,102.49,0.0,0.1,175.56,277.95,175.46
+Coatepec Harinas,Coníferas,9238.33,8904.11,23.27,90.47,104.67,8895.04,-9.07
+Coatepec Harinas,Encino,643.84,613.29,0.0,7.36,2.65,608.58,-4.71
+Coatepec Harinas,Mesófilo de montaña,2382.71,2291.39,0.78,31.43,23.32,2282.5,-8.89
+Coyotepec,Encino,67.45,63.62,0.0,1.35,0.0,62.27,-1.35
+Coyotepec,Vegetación de zonas semiáridas,77.92,3.4,0.0,0.48,0.05,2.97,-0.43
+Chalco,Coníferas,3961.52,3861.13,5.8,18.44,14.68,3851.57,-9.56
+Chalco,Encino,782.45,674.7,2.47,45.99,5.18,631.42,-43.28
+Chalco,Otro,78.23,10.01,0.0,1.73,0.15,8.43,-1.58
+Chapa de Mota,Coníferas,2029.94,1983.62,0.0,10.68,4.06,1977.0,-6.62
+Chapa de Mota,Encino,8291.14,8137.53,0.25,35.19,5.74,8107.83,-29.7
+Chicoloapan,Otro,100.58,28.4,0.0,0.22,5.93,34.11,5.71
+Donato Guerra,Coníferas,10367.72,10184.8,18.26,74.28,22.2,10114.46,-70.34
+Donato Guerra,Encino,26.85,26.85,0.0,0.0,0.0,26.85,0.0
+Donato Guerra,Mesófilo de montaña,117.9,117.88,0.0,0.1,0.0,117.78,-0.1
+Ecatepec de Morelos,Encino,5.22,3.38,0.0,0.0,1.51,4.89,1.51
+Ecatepec de Morelos,Vegetación de zonas semiáridas,1183.99,146.21,0.0,1.57,543.32,687.96,541.75
+Ecatzingo,Coníferas,1170.48,1153.72,0.0,31.33,5.18,1127.57,-26.15
+Ecatzingo,Encino,245.57,221.24,0.0,15.64,1.7,207.3,-13.94
+Huehuetoca,Encino,664.03,519.21,3.7,1.43,2.71,516.79,-2.42
+Huehuetoca,Vegetación de zonas semiáridas,544.1,26.19,0.0,2.6,20.02,43.61,17.42
+Hueypoxtla,Coníferas,160.44,36.89,0.0,0.0,90.95,127.84,90.95
+Hueypoxtla,Encino,203.39,69.63,0.0,0.15,92.42,161.9,92.27
+Hueypoxtla,Vegetación de zonas semiáridas,1756.25,24.17,0.0,0.62,88.37,111.92,87.75
+Huixquilucan,Coníferas,1937.16,1869.17,0.0,17.82,10.49,1861.84,-7.33
+Huixquilucan,Encino,2924.46,2628.78,2.61,14.98,36.62,2647.81,19.03
+Isidro Fabela,Coníferas,2649.41,2564.3,0.0,21.55,4.51,2547.26,-17.04
+Isidro Fabela,Encino,1159.59,1066.14,0.0,9.18,7.85,1064.81,-1.33
+Isidro Fabela,Otro,1504.8,1457.51,7.11,7.5,0.68,1443.58,-13.93
+Ixtapaluca,Coníferas,14168.14,13591.17,14.14,51.92,75.21,13600.32,9.15
+Ixtapaluca,Encino,251.54,227.13,0.01,8.76,1.26,219.62,-7.51
+Ixtapaluca,Otro,1409.21,432.69,0.0,20.23,22.24,434.7,2.01
+Ixtapan de la Sal,Coníferas,466.3,419.77,0.01,25.05,1.23,395.94,-23.83
+Ixtapan de la Sal,Encino,350.17,343.18,0.0,2.36,0.99,341.81,-1.37
+Ixtapan del Oro,Coníferas,4241.94,4207.64,1.82,24.75,1.14,4182.21,-25.43
+Ixtapan del Oro,Encino,422.61,418.2,0.0,24.21,0.07,394.06,-24.14
+Ixtapan del Oro,Selva baja caducifolia,382.99,380.78,0.0,32.01,0.18,348.95,-31.83
+Ixtlahuaca,Coníferas,53.52,0.54,0.0,0.03,22.82,23.33,22.79
+Ixtlahuaca,Encino,129.71,120.24,0.0,0.27,0.49,120.46,0.22
+Xalatlaco,Coníferas,1280.91,1208.38,33.32,25.06,2.99,1152.99,-55.39
+Jilotepec,Coníferas,225.73,176.32,0.0,2.78,12.28,185.82,9.5
+Jilotepec,Encino,5262.43,4880.3,0.04,33.97,29.32,4875.61,-4.69
+Jilotzingo,Coníferas,1535.07,1485.06,3.13,10.73,3.56,1474.76,-10.3
+Jilotzingo,Encino,2471.67,2325.37,1.56,24.83,9.56,2308.54,-16.83
+Jilotzingo,Otro,1990.51,1948.9,60.91,8.77,1.29,1880.51,-68.39
+Jiquipilco,Coníferas,2481.64,2428.19,0.0,19.51,3.86,2412.54,-15.65
+Jiquipilco,Encino,1578.23,1535.01,0.0,7.06,5.04,1532.99,-2.02
+Jiquipilco,Otro,390.74,364.49,0.0,1.53,0.03,362.99,-1.5
+Jocotitlán,Coníferas,1927.48,1896.71,0.0,9.04,1.75,1889.42,-7.29
+Jocotitlán,Encino,711.06,693.72,1.32,3.24,1.84,691.0,-2.72
+Joquicingo,Coníferas,1235.39,1207.74,0.63,13.94,2.07,1195.24,-12.5
+Joquicingo,Encino,160.17,150.97,0.0,4.46,0.37,146.88,-4.09
+Juchitepec,Coníferas,1614.81,1552.92,0.05,19.18,26.47,1560.16,7.24
+Malinalco,Coníferas,592.79,581.38,0.0,5.99,1.75,577.14,-4.24
+Malinalco,Encino,1658.54,1645.96,0.68,29.06,2.97,1619.19,-26.77
+Malinalco,Mesófilo de montaña,66.64,66.51,0.0,0.22,0.01,66.3,-0.21
+Malinalco,Selva baja caducifolia,571.77,565.36,0.0,9.65,0.21,555.92,-9.44
+Morelos,Coníferas,1846.56,1760.53,0.0,56.76,10.35,1714.12,-46.41
+Morelos,Encino,3594.88,3462.47,0.0,63.89,8.28,3406.86,-55.61
+Naucalpan de Juárez,Coníferas,1184.99,1162.75,0.0,4.91,1.03,1158.87,-3.88
+Naucalpan de Juárez,Encino,1981.43,1309.31,0.2,14.61,89.22,1383.72,74.41
+Naucalpan de Juárez,Otro,189.93,109.66,0.0,5.37,4.89,109.18,-0.48
+Nezahualcóyotl,Otro,0.86,0.0,0.0,0.0,0.02,0.02,0.02
+Nicolás Romero,Coníferas,3006.41,2868.38,6.3,32.17,8.81,2838.72,-29.66
+Nicolás Romero,Encino,3418.18,2828.73,0.74,37.98,37.59,2827.6,-1.13
+Nicolás Romero,Otro,1532.51,1465.29,24.74,9.46,0.02,1431.11,-34.18
+Nopaltepec,Vegetación de zonas semiáridas,380.45,2.18,0.0,0.08,15.42,17.52,15.34
+Ocoyoacac,Coníferas,3818.28,3740.52,0.06,19.88,4.91,3725.49,-15.03
+Ocoyoacac,Encino,899.9,864.07,0.04,13.45,1.97,852.55,-11.52
+Ocuilan,Coníferas,14422.1,14225.97,19.73,193.24,25.25,14038.25,-187.72
+Ocuilan,Encino,3018.68,2989.57,18.08,224.47,0.32,2747.34,-242.23
+Ocuilan,Mesófilo de montaña,2287.03,2271.18,0.04,13.75,4.17,2261.56,-9.62
+Ocuilan,Selva baja caducifolia,1.32,1.32,0.0,0.05,0.0,1.27,-0.05
+El Oro,Coníferas,3448.38,3174.71,0.01,52.41,7.47,3129.76,-44.95
+Otumba,Coníferas,58.16,34.54,0.0,0.07,0.68,35.15,0.61
+Otumba,Encino,180.13,95.96,0.0,0.43,5.3,100.83,4.87
+Otumba,Vegetación de zonas semiáridas,934.45,43.45,0.0,0.87,105.27,147.85,104.4
+Otumba,Otro,5.14,0.2,0.0,0.0,0.15,0.35,0.15
+Otzoloapan,Coníferas,1794.42,1781.65,2.37,15.95,0.85,1764.18,-17.47
+Otzoloapan,Encino,51.97,51.71,0.0,4.29,0.04,47.46,-4.25
+Otzoloapan,Mesófilo de montaña,360.72,360.0,0.9,0.71,0.0,358.39,-1.61
+Otzoloapan,Selva baja caducifolia,2778.6,2568.31,0.0,290.88,8.62,2286.05,-282.26
+Otzolotepec,Coníferas,1585.98,1578.21,0.0,1.51,0.73,1577.43,-0.78
+Otzolotepec,Otro,981.91,978.23,0.0,0.42,0.05,977.86,-0.37
+Ozumba,Encino,159.01,139.16,0.0,15.86,3.17,126.47,-12.69
+La Paz,Coníferas,141.52,5.84,0.0,0.08,0.56,6.32,0.48
+La Paz,Otro,3.69,2.19,0.0,0.08,0.01,2.12,-0.07
+San Felipe del Progreso,Coníferas,1869.85,1742.48,0.0,41.26,3.73,1704.95,-37.53
+San Felipe del Progreso,Encino,191.37,182.92,0.0,1.62,0.31,181.61,-1.31
+San Martín de las Pirámides,Vegetación de zonas semiáridas,516.2,25.28,0.0,0.1,161.47,186.65,161.37
+San Martín de las Pirámides,Otro,20.23,0.14,0.0,0.0,1.67,1.81,1.67
+San Simón de Guerrero,Coníferas,5265.86,5113.75,0.23,222.41,11.62,4902.73,-211.02
+San Simón de Guerrero,Encino,781.29,607.46,0.0,11.02,89.86,686.3,78.84
+San Simón de Guerrero,Mesófilo de montaña,218.92,217.64,0.01,0.89,0.38,217.12,-0.52
+Santo Tomás,Coníferas,600.1,596.07,1.52,9.38,0.1,585.27,-10.8
+Santo Tomás,Encino,103.91,103.48,0.0,12.97,0.01,90.52,-12.96
+Santo Tomás,Mesófilo de montaña,70.66,70.44,0.16,0.57,0.0,69.71,-0.73
+Santo Tomás,Selva baja caducifolia,1684.99,1646.88,0.0,435.82,0.18,1211.24,-435.64
+Soyaniquilpan de Juárez,Coníferas,115.62,65.51,0.0,0.21,22.27,87.57,22.06
+Soyaniquilpan de Juárez,Encino,39.39,25.56,0.0,0.25,1.71,27.02,1.46
+Sultepec,Coníferas,4040.32,3932.45,0.0,70.43,16.33,3878.35,-54.1
+Sultepec,Encino,11629.64,10404.12,0.0,199.26,91.45,10296.31,-107.81
+Sultepec,Mesófilo de montaña,954.67,935.8,0.0,24.6,2.49,913.69,-22.11
+Tejupilco,Coníferas,2495.88,2383.48,0.02,19.6,10.37,2374.23,-9.25
+Tejupilco,Encino,8573.76,8046.8,92.61,169.68,46.99,7831.5,-215.3
+Tejupilco,Selva baja caducifolia,2149.11,2089.71,0.0,103.72,4.42,1990.41,-99.3
+Temascalapa,Vegetación de zonas semiáridas,351.2,5.03,0.0,0.54,1.41,5.9,0.87
+Temascalcingo,Coníferas,787.31,777.53,0.0,2.58,0.98,775.93,-1.6
+Temascalcingo,Encino,5129.21,4755.82,14.94,102.35,10.89,4649.42,-106.4
+Temascaltepec,Coníferas,28211.88,27565.09,18.39,385.36,120.22,27281.56,-283.53
+Temascaltepec,Encino,2958.26,2900.29,9.41,100.93,5.94,2795.89,-104.4
+Temascaltepec,Mesófilo de montaña,2309.88,2242.16,0.0,38.79,22.63,2226.0,-16.16
+Temoaya,Coníferas,1215.93,1202.91,0.0,1.37,2.0,1203.54,0.63
+Temoaya,Encino,201.23,167.01,0.0,10.16,2.32,159.17,-7.84
+Temoaya,Otro,831.77,808.31,2.97,1.23,0.09,804.2,-4.11
+Tenancingo,Coníferas,1621.61,1578.08,4.53,21.54,4.75,1556.76,-21.32
+Tenancingo,Encino,1351.97,1338.5,0.28,6.5,2.33,1334.05,-4.45
+Tenango del Aire,Encino,0.01,0.01,0.0,0.0,0.0,0.01,0.0
+Tenango del Valle,Coníferas,4439.32,4110.08,10.69,58.21,40.88,4082.06,-28.02
+Tenango del Valle,Encino,1337.27,1294.39,1.27,24.73,3.38,1271.77,-22.62
+Tenango del Valle,Mesófilo de montaña,113.86,108.29,0.0,1.67,0.14,106.76,-1.53
+Teotihuacán,Vegetación de zonas semiáridas,403.26,7.54,0.0,0.01,170.04,177.57,170.03
+Tepetlaoxtoc,Coníferas,2178.63,1637.7,0.44,1.49,62.68,1698.45,60.75
+Tepetlaoxtoc,Encino,31.72,16.2,0.0,0.04,1.81,17.97,1.77
+Tepetlaoxtoc,Vegetación de zonas semiáridas,1429.93,84.51,0.0,0.19,301.61,385.93,301.42
+Tepetlaoxtoc,Otro,553.72,15.16,0.0,0.46,78.64,93.34,78.18
+Tepetlixpa,Coníferas,135.45,130.42,0.0,4.73,0.53,126.22,-4.2
+Tepotzotlán,Encino,825.07,626.26,0.93,1.48,6.36,630.21,3.95
+Tepotzotlán,Vegetación de zonas semiáridas,807.14,63.09,0.0,0.07,141.58,204.6,141.51
+Tequixquiac,Vegetación de zonas semiáridas,1580.87,166.03,0.0,19.26,28.59,175.36,9.33
+Texcaltitlán,Coníferas,4687.07,4565.68,0.52,43.9,25.77,4547.03,-18.65
+Texcaltitlán,Encino,1122.83,1076.86,0.0,8.72,1.56,1069.7,-7.16
+Texcaltitlán,Mesófilo de montaña,104.43,104.3,0.0,0.08,0.06,104.28,-0.02
+Texcalyacac,Coníferas,269.51,268.29,0.0,0.12,0.94,269.11,0.82
+Texcalyacac,Encino,596.44,579.42,0.0,5.84,0.16,573.74,-5.68
+Texcoco,Coníferas,10239.22,9761.52,4.37,29.45,25.38,9753.08,-8.44
+Texcoco,Encino,607.09,497.45,7.99,0.67,53.52,542.31,44.86
+Texcoco,Vegetación de zonas semiáridas,199.04,18.51,0.0,0.4,2.0,20.11,1.6
+Texcoco,Otro,1039.93,256.75,0.38,7.02,53.45,302.8,46.05
+Timilpan,Coníferas,130.8,102.83,0.0,13.28,0.36,89.91,-12.92
+Timilpan,Encino,3041.42,2973.11,0.34,27.53,2.64,2947.88,-25.23
+Tlalmanalco,Coníferas,8185.95,7585.71,3.02,133.86,15.6,7464.43,-121.28
+Tlalmanalco,Encino,1970.94,1922.62,0.78,29.66,9.71,1901.89,-20.73
+Tlalnepantla de Baz,Vegetación de zonas semiáridas,279.14,39.96,0.0,0.01,105.19,145.14,105.18
+Tlalnepantla de Baz,Otro,26.81,0.0,0.0,0.0,0.01,0.01,0.01
+Tlatlaya,Coníferas,1481.32,1462.64,52.89,30.73,4.0,1383.02,-79.62
+Tlatlaya,Encino,4723.6,4632.0,0.0,68.25,7.52,4571.27,-60.73
+Tlatlaya,Selva baja caducifolia,20253.65,19668.48,6.42,640.32,88.3,19110.04,-558.44
+Toluca,Coníferas,4287.5,4089.93,3.1,74.23,13.4,4026.0,-63.93
+Tonatico,Coníferas,260.78,239.16,0.0,4.81,1.87,236.22,-2.94
+Tultitlán,Encino,7.94,6.0,0.0,0.0,1.12,7.12,1.12
+Tultitlán,Vegetación de zonas semiáridas,349.8,113.0,0.0,0.16,115.01,227.85,114.85
+Valle de Bravo,Coníferas,22089.09,21759.69,62.7,150.96,27.29,21573.32,-186.37
+Valle de Bravo,Encino,677.55,654.45,0.0,3.81,1.04,651.68,-2.77
+Valle de Bravo,Mesófilo de montaña,215.5,215.46,0.0,0.17,0.0,215.29,-0.17
+Villa de Allende,Coníferas,11922.28,11562.66,0.02,144.67,60.67,11478.64,-84.02
+Villa de Allende,Mesófilo de montaña,42.62,40.59,0.0,0.98,0.35,39.96,-0.63
+Villa de Allende,Otro,177.82,157.58,0.0,5.83,1.92,153.67,-3.91
+Villa Guerrero,Coníferas,8372.27,8027.22,32.75,75.24,80.38,7999.61,-27.61
+Villa Guerrero,Encino,7.75,7.75,0.0,0.02,0.0,7.73,-0.02
+Villa Guerrero,Mesófilo de montaña,425.86,423.63,0.0,1.34,0.05,422.34,-1.29
+Villa Victoria,Coníferas,3949.84,3682.21,0.03,189.66,18.09,3510.61,-171.6
+Villa Victoria,Encino,184.25,166.92,0.0,4.23,0.24,162.93,-3.99
+Xonacatlán,Coníferas,1170.69,1161.29,0.04,3.89,1.38,1158.74,-2.55
+Xonacatlán,Otro,133.94,133.8,0.27,0.29,0.0,133.24,-0.56
+Zacazonapan,Coníferas,509.79,500.89,0.0,3.28,0.37,497.98,-2.91
+Zacazonapan,Encino,823.32,798.84,0.0,22.9,0.48,776.42,-22.42
+Zacazonapan,Mesófilo de montaña,23.92,23.84,0.0,0.1,0.0,23.74,-0.1
+Zacualpan,Coníferas,429.92,417.41,0.0,2.52,0.92,415.81,-1.6
+Zacualpan,Encino,2967.95,2833.72,0.0,16.63,8.08,2825.17,-8.55
+Zacualpan,Mesófilo de montaña,966.69,951.65,0.0,1.77,0.55,950.43,-1.22
+Zinacantepec,Coníferas,10658.52,9509.19,9.96,169.96,122.66,9451.93,-57.26
+Zinacantepec,Otro,43.84,38.11,0.0,5.44,1.73,34.4,-3.71
+Zumpahuacán,Coníferas,278.82,271.18,0.0,7.73,1.54,264.99,-6.19
+Zumpahuacán,Encino,466.63,450.09,4.42,14.47,5.4,436.6,-13.49
+Zumpango,Vegetación de zonas semiáridas,429.66,110.15,0.0,10.13,0.72,100.74,-9.41
+Cuautitlán Izcalli,Otro,620.13,102.92,0.0,2.99,51.03,150.96,48.04
+Luvianos,Coníferas,3613.23,3513.55,28.98,62.56,11.78,3433.79,-79.76
+Luvianos,Encino,8149.44,7838.16,0.69,140.16,22.43,7719.74,-118.42
+Luvianos,Selva baja caducifolia,14048.27,12842.32,3.19,1627.9,66.11,11277.34,-1564.98
+San José del Rincón,Coníferas,14686.09,14314.52,0.02,158.17,31.57,14187.9,-126.62
+San José del Rincón,Encino,298.6,242.25,0.0,17.13,5.99,231.11,-11.14
+Lerma,Coníferas,3910.81,3814.63,3.81,17.21,13.19,3806.8,-7.83
+Lerma,Encino,977.94,927.86,0.89,15.6,6.49,917.86,-10.0
+Calimaya,Coníferas,1066.08,1034.68,0.1,7.69,1.04,1027.93,-6.75
+Calimaya,Encino,135.52,133.63,0.0,1.5,0.21,132.34,-1.29
+Tianguistenco,Coníferas,1124.97,1120.2,0.14,8.88,0.4,1111.58,-8.62
+Tianguistenco,Encino,709.22,676.11,0.02,19.04,3.03,660.08,-16.03
+Villa del Carbón,Coníferas,6505.06,6341.6,0.72,61.67,22.21,6301.42,-40.18
+Villa del Carbón,Encino,3143.07,2755.54,0.54,60.73,29.57,2723.84,-31.7
+Villa del Carbón,Otro,251.88,250.13,0.0,0.21,0.0,249.92,-0.21

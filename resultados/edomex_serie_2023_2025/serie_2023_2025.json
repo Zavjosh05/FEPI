@@ -1,0 +1,107 @@
+{
+ "anios": [
+  2023,
+  2024,
+  2025
+ ],
+ "ventana": [
+  "11-01",
+  "12-31"
+ ],
+ "umbral_ndvi": 0.51,
+ "umbral_pedido": "0.51",
+ "margen_cambio": 0.1,
+ "escenas": {
+  "2023": 115,
+  "2024": 213,
+  "2025": 202
+ },
+ "incendios_por_periodo": {
+  "2023_2024": 1085,
+  "2024_2025": 7
+ },
+ "nubes_max": 60,
+ "escenas_max": null,
+ "bloques": true,
+ "fecha": "2026-11-04T02:24:26",
+ "clases_forestales": "^(B|S|M|VSA/)",
+ "zona_forestal_ha": 512575.73,
+ "destino": {
+  "2023_2024": {
+   "muestras_disponibles": 275329,
+   "muestras_entrenamiento": 29495,
+   "muestras_prueba": 7500,
+   "regiones": 9,
+   "rasgos": [
+    "green",
+    "red",
+    "nir",
+    "nir08",
+    "swir16",
+    "swir22",
+    "ndvi",
+    "nbr",
+    "ndbi",
+    "mndwi"
+   ],
+   "importancia_rasgos": {
+    "green": 0.102,
+    "red": 0.103,
+    "nir": 0.074,
+    "nir08": 0.085,
+    "swir16": 0.105,
+    "swir22": 0.116,
+    "ndvi": 0.093,
+    "nbr": 0.087,
+    "ndbi": 0.077,
+    "mndwi": 0.158
+   },
+   "exactitud_global": 0.5493,
+   "kappa": 0.3899
+  },
+  "2024_2025": {
+   "muestras_disponibles": 275284,
+   "muestras_entrenamiento": 29524,
+   "muestras_prueba": 7471,
+   "regiones": 9,
+   "rasgos": [
+    "green",
+    "red",
+    "nir",
+    "nir08",
+    "swir16",
+    "swir22",
+    "ndvi",
+    "nbr",
+    "ndbi",
+    "mndwi"
+   ],
+   "importancia_rasgos": {
+    "green": 0.103,
+    "red": 0.105,
+    "nir": 0.074,
+    "nir08": 0.085,
+    "swir16": 0.106,
+    "swir22": 0.114,
+    "ndvi": 0.093,
+    "nbr": 0.087,
+    "ndbi": 0.078,
+    "mndwi": 0.155
+   },
+   "exactitud_global": 0.5458,
+   "kappa": 0.3857
+  }
+ },
+ "bosque_por_anio": {
+  "archivo": "bosque_por_anio.tif",
+  "bits": {
+   "0": 2023,
+   "1": 2024,
+   "2": 2025
+  }
+ },
+ "anio_perdida": {
+  "archivo": "anio_perdida.tif",
+  "valor": "año - 2000 del último año en que el píxel dejó de ser bosque; 0 sin pérdida"
+ }
+}

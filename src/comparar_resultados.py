@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-Compara dos carpetas de resultados de `correr`: balance, incendios y ráster de cambio y, si están
-en las dos, los desgloses por clave y tipo de bosque, el destino de las otras pérdidas y su ráster.
+Compara dos carpetas de resultados de `correr` o `serie`: balance, incendios y ráster de cambio y,
+si están en las dos, los desgloses por clave y tipo de bosque, el destino de las otras pérdidas y su
+ráster, y las salidas propias de la serie (serie_*.csv, tendencia_*.csv, bosque_por_anio.tif y
+anio_perdida.tif).
 
 Uso (desde la raíz del repositorio):
     python src/comparar_resultados.py resultados/piloto_2023_2024 C:/temp/piloto_bloques
+    python src/comparar_resultados.py resultados/edomex_serie_2023_2025 otra_carpeta --periodo 2024_2025
+
+Con --periodo se elige la comparación de una serie (cada par de años tiene sus archivos).
 
 Compara valor por valor, no los archivos byte a byte: las filas del balance por unidad y las de
 incendios por clave (columna `incendio` o, en el piloto, `CLAVEINC`), en las columnas que
@@ -22,9 +27,12 @@ COLUMNAS_INCENDIO = ["fecha_inicio", "poligono_ha", "quemado_dnbr_ha", "quemado_
                      "perdido_al_cierre_ha", "dnbr_mediana"]
 
 
-def _tablas(ruta_a, ruta_b, clave):
-    """clave: columna (o lista de columnas) que identifica cada fila."""
+def _tablas(ruta_a, ruta_b, clave, periodo=None):
+    """clave: columna (o lista de columnas) que identifica cada fila. Con periodo, las tablas que
+    traen la columna `periodo` (incendios_dnbr.csv desde 0.7.0) se quedan con ese periodo."""
     ta, tb = pd.read_csv(ruta_a), pd.read_csv(ruta_b)
+    if periodo:
+        ta, tb = [t[t["periodo"].astype(str) == periodo] if "periodo" in t.columns else t for t in (ta, tb)]
     if isinstance(clave, (list, tuple)):
         def indice(t):
             return t.set_index(t[list(clave)].astype(str).agg(" / ".join, axis=1))
@@ -35,8 +43,8 @@ def _tablas(ruta_a, ruta_b, clave):
     return ta, tb
 
 
-def comparar_tabla(ruta_a, ruta_b, clave, columnas=None) -> list[str]:
-    ta, tb = _tablas(ruta_a, ruta_b, clave)
+def comparar_tabla(ruta_a, ruta_b, clave, columnas=None, periodo=None) -> list[str]:
+    ta, tb = _tablas(ruta_a, ruta_b, clave, periodo)
     problemas = []
     solo_a, solo_b = sorted(set(ta.index) - set(tb.index)), sorted(set(tb.index) - set(ta.index))
     if solo_a or solo_b:
@@ -80,14 +88,20 @@ def main():
     # comparan si están en las dos carpetas: las corridas anteriores no los tienen.
     revisiones = [
         (f"balance_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "unidad"), True),
-        ("incendios_dnbr.csv", lambda x, y: comparar_tabla(x, y, "incendio", COLUMNAS_INCENDIO), True),
+        ("incendios_dnbr.csv", lambda x, y: comparar_tabla(x, y, "incendio", COLUMNAS_INCENDIO, args.periodo), True),
         (f"cambio_{args.periodo}.tif", comparar_raster, True),
         (f"vegetacion_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, ["unidad", "clave"]), False),
         (f"tipo_bosque_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, ["unidad", "tipo_bosque"]), False),
         (f"destino_perdidas_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "unidad"), False),
         (f"destino_exactitud_{args.periodo}.csv", lambda x, y: comparar_tabla(x, y, "clase"), False),
         (f"destino_{args.periodo}.tif", comparar_raster, False),
+        ("bosque_por_anio.tif", comparar_raster, False),
+        ("anio_perdida.tif", comparar_raster, False),
     ]
+    for ruta in sorted(a.glob("serie_*.csv")):  # serie_<a0>_<aN>.csv y tendencia_<a0>_<aN>.csv
+        cola = ruta.name.removeprefix("serie_")
+        revisiones += [(ruta.name, lambda x, y: comparar_tabla(x, y, ["unidad", "anio", "tipo_bosque"]), False),
+                       (f"tendencia_{cola}", lambda x, y: comparar_tabla(x, y, ["unidad", "tipo_bosque"]), False)]
     todo_igual = True
     for nombre, funcion, obligatorio in revisiones:
         en_a, en_b = (a / nombre).exists(), (b / nombre).exists()

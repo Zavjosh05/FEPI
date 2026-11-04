@@ -13,11 +13,10 @@ datos/edomex/
 # Resultados de corridas: solo se versionan el piloto y el estado completo (sin bitácoras)
 resultados/*
 !resultados/piloto_2023_2024/
-!resultados/edomex_2023_2024/
-!resultados/edomex_2024_2025/
-!resultados/edomex_2023_2025/
+!resultados/edomex_serie_2023_2025/
 !resultados/edomex_2025_2026_sepoct/
 !resultados/validacion_hansen/
+!resultados/anteriores_0.5/
 resultados/**/tiempo.txt
 resultados/**/*.log
 

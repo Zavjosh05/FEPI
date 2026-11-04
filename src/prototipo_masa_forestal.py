@@ -37,6 +37,11 @@ Uso:
     python prototipo_masa_forestal.py correr --aoi estado_mexico.gpkg ... --bloques \
         --salida resultados/edomex
 
+    # 5. Serie de varios años (CF-DEV-08): bosque encadenado año con año, todas las
+    #    comparaciones, tendencia, bosque por año y año de pérdida. Con dos años = correr
+    python prototipo_masa_forestal.py serie --aoi estado_mexico.gpkg --anios 2023 2024 2025 \
+        --umbral-ndvi 0.51 ... --bloques --salida resultados/edomex_serie_2023_2025
+
 Archivos de entrada:
     --aoi            Polígono de la zona piloto (GeoJSON, SHP o GPKG, cualquier CRS).
     --puntos         CSV con columnas lon, lat, clase (clase = 1 bosque, 0 no bosque).
@@ -62,6 +67,9 @@ Convenciones:
       clasifica según el uso al que pasó: agrícola, pecuario, urbano u otro (CF-DEV-07,
       opción A: clasificador entrenado con el compuesto del año actual y las zonas no
       forestales de la Serie VII).
+    - Con serie, el bosque de cada año parte del año anterior (un píxel solo cambia si cruza el
+      umbral y su NDVI cambió al menos 0.10), así que un año vale lo mismo en todas las
+      comparaciones. correr es la serie de dos años.
 """
 
 from __future__ import annotations
@@ -171,6 +179,38 @@ def mascaras_con_margen(ndvi_base, ndvi_act, umbral, margen, zona):
         ganancia = ~base & candidato & (delta >= margen)
     actual = (base & ~perdida) | ganancia
     return base, actual
+
+
+def mascaras_serie(ndvis, umbral, margen, zona):
+    """Bosque de cada año de una serie, encadenando la regla de mascaras_con_margen (CF-DEV-08).
+
+    El primer año: NDVI >= umbral dentro de la zona. Cada año siguiente parte del bosque del año
+    anterior (no del umbral de ese año): un píxel solo cambia de clase si cruza el umbral y además
+    su NDVI cambió al menos `margen` respecto del año anterior. Así el bosque de un año es el mismo
+    en todas las comparaciones. Con dos años da exactamente mascaras_con_margen.
+    """
+    bosques = [mascara_bosque(ndvis[0], umbral) & zona]
+    for t in range(1, len(ndvis)):
+        previo = bosques[-1]
+        candidato = mascara_bosque(ndvis[t], umbral) & zona
+        with np.errstate(invalid="ignore"):
+            delta = ndvis[t] - ndvis[t - 1]
+            perdida = previo & ~candidato & (delta <= -margen)
+            ganancia = ~previo & candidato & (delta >= margen)
+        bosques.append((previo & ~perdida) | ganancia)
+    return bosques
+
+
+def tendencia(anios, valores):
+    """Pendiente por mínimos cuadrados (unidades por año) y R². R² es None con menos de 3 años o
+    si los valores no cambian."""
+    x, y = np.asarray(anios, dtype=float), np.asarray(valores, dtype=float)
+    xm, ym = x.mean(), y.mean()
+    sxx = ((x - xm) ** 2).sum()
+    pendiente = float(((x - xm) * (y - ym)).sum() / sxx)
+    syy = ((y - ym) ** 2).sum()
+    r2 = None if len(x) < 3 or syy == 0 else float(1 - ((y - (ym + pendiente * (x - xm))) ** 2).sum() / syy)
+    return pendiente, r2
 
 
 def mapa_cambio(base: np.ndarray, actual: np.ndarray, quemado: np.ndarray) -> np.ndarray:
@@ -1027,10 +1067,13 @@ class Progreso:
 
     Vive en <salida>/progreso_<base>_<actual>/ y se borra al terminar:
       parametros.json   parámetros de la corrida (no se mezclan corridas distintas) y umbral
-      incendios.jsonl   una línea por incendio: sus cifras y su máscara de quemado comprimida
-      bloques.jsonl     una línea por bloque terminado: conteos por unidad y por incendio
-      cambio/<id>.npz   el ráster de cambio de cada bloque (uint8 comprimido); al final se
-                        juntan en cambio_<base>_<actual>.tif y pesan lo mismo que ese archivo
+      incendios.jsonl   una línea por incendio: sus cifras, su periodo y su máscara de quemado
+                        comprimida
+      bloques.jsonl     una línea por bloque terminado: conteos de cada comparación por unidad,
+                        por clave y por incendio
+      cambio/<id>.npz   el bosque de cada año (bits en uint8), el quemado de cada periodo (bits) y
+                        los rasgos del clasificador; de ahí salen al final los rásters de cambio,
+                        destino, bosque por año y año de pérdida
     Las líneas JSON pesan pocos KB. Cada línea se escribe completa o se ignora al reanudar.
     """
 
@@ -1112,18 +1155,15 @@ class Progreso:
             self._agregar("incendios.jsonl", reg)
         self.incendios[i] = r
 
-    def guardar_bloque(self, b: Bloque, cambio, conteos, parciales, info, vegetacion=None, extra=None):
-        """vegetacion: conteos por unidad y clave (conteos_vegetacion); extra: arreglos que van en la
-        pieza junto al ráster de cambio (los rasgos del clasificador de destino)."""
+    def guardar_bloque(self, b: Bloque, info, piezas):
+        """info: lo que va en bloques.jsonl (conteos por comparación, ya en listas); piezas: arreglos
+        del bloque (bosque de cada año en bits, quemado de cada periodo en bits y los rasgos del
+        clasificador de destino)."""
         tmp = self.carpeta / "cambio" / f"{b.id}.tmp"
         with open(tmp, "wb") as f:
-            np.savez_compressed(f, cambio=cambio, **(extra or {}))
+            np.savez_compressed(f, **piezas)
         os.replace(tmp, self.pieza(b.id))
-        reg = {"id": b.id, "ventana": [b.r0, b.r1, b.c0, b.c1], **info,
-               "conteos": {str(i): conteos[i].tolist() for i in np.flatnonzero(conteos[:, 0]) if i > 0},
-               "incendios": {str(i): list(v) for i, v in parciales.items()}}
-        if vegetacion is not None:
-            reg["vegetacion"] = {str(i): vegetacion[i].tolist() for i in np.flatnonzero(vegetacion[:, 0])}
+        reg = {"id": b.id, "ventana": [b.r0, b.r1, b.c0, b.c1], **info}
         self._agregar("bloques.jsonl", reg)  # al final: marca el bloque como terminado
         self.bloques[b.id] = reg
 
@@ -1132,12 +1172,12 @@ class Progreso:
 
 
 class Indices:
-    """Rásters opcionales de NDVI y dNBR (float32), escritos por ventanas (--guardar-indices)."""
+    """Rásters opcionales de NDVI de cada año y dNBR (float32), escritos por ventanas (--guardar-indices)."""
 
-    def __init__(self, salida, geobox, anio_base, anio, nuevo):
+    def __init__(self, salida, geobox, anios, nuevo):
         import rasterio
-        self.rutas = {anio_base: salida / f"ndvi_{anio_base}.tif", anio: salida / f"ndvi_{anio}.tif",
-                      "dnbr": salida / "dnbr.tif"}
+        self.rutas = {anio: salida / f"ndvi_{anio}.tif" for anio in anios}
+        self.rutas["dnbr"] = salida / "dnbr.tif"
         for ruta in self.rutas.values():
             if nuevo or not ruta.exists():
                 with rasterio.open(ruta, "w", **_perfil_tif(geobox, "float32", nodata=np.nan)):
@@ -1155,51 +1195,85 @@ class Indices:
 
 @dataclass
 class Resultado:
+    """Una comparación entre dos años de la corrida."""
     balance: pd.DataFrame
     incendios: pd.DataFrame
-    umbral: float
-    zona_ha: float
-    progreso: Progreso
     vegetacion: pd.DataFrame | None = None   # por unidad y clave de la Serie VII
     tipos: pd.DataFrame | None = None        # por unidad y tipo de bosque
     destino: pd.DataFrame | None = None      # otras pérdidas por unidad y uso al que pasaron
-    exactitud: pd.DataFrame | None = None    # del clasificador de destino, con datos reservados
+    exactitud: pd.DataFrame | None = None    # del clasificador de destino (solo años consecutivos)
     resumen_destino: dict | None = None
 
 
+@dataclass
+class ResultadoSerie:
+    anios: list
+    pares: dict                              # (i, j) índices de los años -> Resultado
+    umbral: float
+    zona_ha: float
+    progreso: Progreso
+    sin_encadenar: pd.DataFrame              # bosque de cada año con solo el umbral (sin encadenar)
+
+
+
+MAX_ANIOS = 8  # bosque_por_anio.tif guarda un bit por año en uint8
+
+
+def pares_de(n_anios):
+    """Todas las comparaciones (i, j), i < j, entre los años de la corrida."""
+    return [(i, j) for i in range(n_anios) for j in range(i + 1, n_anios)]
+
+
+def _llave(i, j):
+    return f"{i}_{j}"
+
+
 def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios, nombres, *,
-                         anio_base, anio, umbral, margen, umbral_dnbr, salida, firma,
+                         anios, umbral, margen, umbral_dnbr, salida, firma,
                          guardar_indices=False, reiniciar=False, hilos=1, log=print,
                          claves=None, descripciones=None, leer_rasgos=None,
-                         muestreo=Muestreo()) -> Resultado:
-    """Balance, incendios y ráster de cambio, bloque por bloque.
+                         muestreo=Muestreo(), capas_serie=False) -> ResultadoSerie:
+    """Bosque de cada año, balance de cada par de años, incendios y rásters, bloque por bloque.
 
-    Procesar de una sola vez es el caso de un solo bloque que cubre toda la malla.
+    `correr` es el caso de dos años; `serie`, el de varios (CF-DEV-08). Procesar de una sola vez es
+    el caso de un solo bloque que cubre toda la malla.
+      - Cada bloque lee una sola vez el compuesto de cada año y encadena el bosque año con año
+        (mascaras_serie). Con él arma todas las comparaciones (i, j): la de años consecutivos y las
+        más largas, que comparan el bosque del año i con el del año j. Así la cifra de un año es la
+        misma en todas.
       - Los bloques no se enciman, así que cada píxel se cuenta una vez.
-      - Cada incendio se calcula una sola vez en su propia ventana (igual que antes). Su
-        máscara de quemado se reparte entre los bloques que toca; lo que depende del bosque
-        (quemado en bosque, perdido al cierre) se suma bloque por bloque. Da una fila por
-        incendio aunque cruce varios bloques.
-      - Con umbral "auto" se leen primero los compuestos del año base de todos los bloques
-        y se guardan en memoria solo los valores dentro de la zona (~0.9 GB para el estado);
-        luego se calcula Otsu con todos y se sigue con el año actual.
+      - Cada incendio pertenece a un periodo (del inicio del compuesto de un año al del siguiente)
+        y se calcula una sola vez en su propia ventana. Su máscara de quemado se reparte entre los
+        bloques que toca; lo que depende del bosque se suma bloque por bloque. Cuenta en las
+        comparaciones que incluyen su periodo.
+      - Con umbral "auto" se leen primero los compuestos del primer año de todos los bloques y se
+        guardan en memoria solo los valores dentro de la zona (~0.9 GB para el estado); luego se
+        calcula Otsu con todos y se sigue.
     leer_ndvi(anio, bloque) -> (arreglo float32 del bloque, número de escenas)
     leer_dnbr(geom, fecha) -> ((filas, columnas) en la malla total, dNBR) o None
+    incendios: [(clave, fecha, geometría[, periodo])]; periodo p = 1..len(anios) - 1 (de anios[p - 1]
+    a anios[p]); sin él, 1.
     hilos: incendios que se leen a la vez. Se procesan y guardan en su orden, así que el
     resultado es idéntico al de leerlos uno por uno.
     claves: claves de la Serie VII con número 1..k en capas (columna "_clave"); con ellas se
     desglosa por clave y por tipo de bosque. None = sin desglose.
-    leer_rasgos(bloque, filas, cols) -> rasgos del año actual en esos píxeles del bloque. Con
-    él se clasifica el destino de las otras pérdidas: cada bloque guarda los rasgos de sus
-    otras pérdidas y de sus puntos de muestreo, y al final se entrena un solo clasificador con
-    todas las muestras (ordenadas por posición) y se predice. Así da lo mismo por bloques.
+    leer_rasgos(anio, bloque, filas, cols) -> rasgos de ese año en esos píxeles del bloque. Con él
+    se clasifica el destino de las otras pérdidas de cada periodo con un clasificador por año
+    (entrenado con el compuesto de ese año): cada bloque guarda los rasgos de sus otras pérdidas
+    y de sus puntos de muestreo, y al final se entrena cada clasificador con todas las muestras
+    (ordenadas por posición) y se predice. Así da lo mismo por bloques.
+    capas_serie: escribir también bosque_por_anio.tif y anio_perdida.tif.
     """
+    anios = list(anios)
+    if len(anios) < 2 or len(anios) > MAX_ANIOS or anios != sorted(set(anios)):
+        raise ValueError(f"Se necesitan de 2 a {MAX_ANIOS} años distintos y en orden: {anios}")
     salida = Path(salida)
-    sufijo = f"{anio_base}_{anio}"
+    sufijo = f"{anios[0]}_{anios[-1]}"
     prog = Progreso(salida / f"progreso_{sufijo}", firma, reiniciar, log)
-    indices = Indices(salida, geobox, anio_base, anio, prog.nuevo) if guardar_indices else None
+    indices = Indices(salida, geobox, anios, prog.nuevo) if guardar_indices else None
 
     # 1. Incendios: dNBR de cada uno en su ventana, una sola vez
+    incendios = [(*inc[:3], inc[3] if len(inc) > 3 else 1) for inc in incendios]
     quemas = {i: r for i, r in prog.incendios.items() if r is not None}
     faltan = [(i, inc) for i, inc in enumerate(incendios) if i not in prog.incendios]
     if incendios:
@@ -1209,26 +1283,26 @@ def calcular_por_bloques(geobox, bloques, capas, leer_ndvi, leer_dnbr, incendios
         # Las lecturas corren adelantadas en paralelo; el proceso y el guardado van en orden
         from concurrent.futures import ThreadPoolExecutor
         ejecutor = ThreadPoolExecutor(hilos)
-        futuros = {i: ejecutor.submit(leer_dnbr, geom, fecha) for i, (_, fecha, geom) in faltan}
+        futuros = {i: ejecutor.submit(leer_dnbr, geom, fecha) for i, (_, fecha, geom, _) in faltan}
         obtener = lambda i, geom, fecha: futuros[i].result()  # noqa: E731
     else:
         ejecutor = None
         obtener = lambda i, geom, fecha: leer_dnbr(geom, fecha)  # noqa: E731
     try:
-        for i, (clave, fecha, geom) in faltan:
-            _procesar_incendio(i, clave, fecha, geom, obtener(i, geom, fecha), geobox, umbral_dnbr,
-                               indices, prog, quemas, log)
+        for i, (clave, fecha, geom, periodo) in faltan:
+            _procesar_incendio(i, clave, fecha, geom, periodo, obtener(i, geom, fecha), geobox,
+                               umbral_dnbr, indices, prog, quemas, log)
     finally:
         if ejecutor:
             ejecutor.shutdown(wait=True, cancel_futures=True)
 
     return _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas,
-                             anio_base=anio_base, anio=anio, umbral=umbral, margen=margen,
-                             salida=salida, sufijo=sufijo, log=log, claves=claves,
-                             descripciones=descripciones, leer_rasgos=leer_rasgos, muestreo=muestreo)
+                             anios=anios, umbral=umbral, margen=margen, salida=salida, sufijo=sufijo,
+                             log=log, claves=claves, descripciones=descripciones,
+                             leer_rasgos=leer_rasgos, muestreo=muestreo, capas_serie=capas_serie)
 
 
-def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices, prog, quemas, log):
+def _procesar_incendio(i, clave, fecha, geom, periodo, res, geobox, umbral_dnbr, indices, prog, quemas, log):
     """Máscara de quemado y cifras de un incendio a partir de su dNBR; lo guarda en el avance."""
     if res is None:
         log(f"  incendio {clave}: sin imágenes antes/después, se omite")
@@ -1241,7 +1315,7 @@ def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices,
          "poligono_ha": round(poly.sum() * HA_PIXEL, 2),
          "quemado_dnbr_ha": round(q.sum() * HA_PIXEL, 2),
          "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3),
-         "ventana": (rs.start, rs.stop, cs.start, cs.stop), "q": q}
+         "periodo": int(periodo), "ventana": (rs.start, rs.stop, cs.start, cs.stop), "q": q}
     if indices:
         indices.escribir("dnbr", rs, cs, d, poly)
     prog.guardar_incendio(i, r)
@@ -1249,25 +1323,42 @@ def _procesar_incendio(i, clave, fecha, geom, res, geobox, umbral_dnbr, indices,
     log(f"  incendio {clave} ({fecha:%Y-%m-%d}): {q.sum() * HA_PIXEL:.1f} ha quemadas")
 
 
-def _rasgos_bloque(b, gbb, cambio, dentro, zona, r_uni, capas, leer_rasgos, muestreo):
-    """Rasgos de las otras pérdidas del bloque (en orden de filas, igual que cambio == PERD_OTRA)
-    y de sus puntos de muestreo, para guardarlos en la pieza del bloque."""
-    pf, pc = np.nonzero(cambio == PERD_OTRA)
+def _rasgos_bloque(b, gbb, cambios, anios, dentro, zona, r_uni, capas, leer_rasgos, muestreo):
+    """Rasgos de las otras pérdidas de cada periodo t (en orden de filas, igual que
+    cambio == PERD_OTRA, con el compuesto del año t) y de los puntos de muestreo del bloque
+    (los mismos puntos para todos los años), para guardarlos en la pieza del bloque."""
     mf, mc, my = puntos_muestra(b, dentro, zona, capas.etiquetas(gbb), muestreo.paso)
-    filas, cols = np.concatenate([pf, mf]), np.concatenate([pc, mc])
-    X = leer_rasgos(b, filas, cols) if len(filas) else np.empty((0, len(RASGOS)), dtype="float32")
-    X = np.asarray(X, dtype="float32")
-    return {"x_perdida": X[:len(pf)], "u_perdida": r_uni[pf, pc].astype(np.int32),
-            "x_muestra": X[len(pf):], "y_muestra": my.astype(np.uint8),
-            "f_muestra": (mf + b.r0).astype(np.int32), "c_muestra": (mc + b.c0).astype(np.int32)}
+    piezas = {"y_muestra": my.astype(np.uint8), "f_muestra": (mf + b.r0).astype(np.int32),
+              "c_muestra": (mc + b.c0).astype(np.int32)}
+    for t, cambio in sorted(cambios.items()):
+        pf, pc = np.nonzero(cambio == PERD_OTRA)
+        filas, cols = np.concatenate([pf, mf]), np.concatenate([pc, mc])
+        X = (leer_rasgos(anios[t], b, filas, cols) if len(filas)
+             else np.empty((0, len(RASGOS)), dtype="float32"))
+        X = np.asarray(X, dtype="float32")
+        piezas.update({f"x_perdida_{t}": X[:len(pf)], f"u_perdida_{t}": r_uni[pf, pc].astype(np.int32),
+                       f"x_muestra_{t}": X[len(pf):]})
+    return piezas
+
+
+def _de_bits(bits, n):
+    """Lista de n máscaras booleanas a partir de un arreglo de bits (bit t = máscara t)."""
+    return [((bits >> t) & 1).astype(bool) for t in range(n)]
+
+
+def _quemado_entre(quemados, i, j):
+    """Quemado en algún periodo de la comparación (i, j): los periodos i + 1 .. j."""
+    return quemados[i + 1] if j == i + 1 else np.logical_or.reduce(quemados[i + 1:j + 1])
 
 
 def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices, quemas, *,
-                      anio_base, anio, umbral, margen, salida, sufijo, log, claves=None,
-                      descripciones=None, leer_rasgos=None, muestreo=Muestreo()):
+                      anios, umbral, margen, salida, sufijo, log, claves=None,
+                      descripciones=None, leer_rasgos=None, muestreo=Muestreo(), capas_serie=False):
     """Pasos 2 a 5 de calcular_por_bloques, con los incendios ya calculados."""
     n = len(nombres)
+    N = len(anios)
     nk = len(claves) if claves is not None else 0  # número de claves de la Serie VII
+    pares = pares_de(N)
 
     # 2. Bloques que tocan la zona; de los demás solo importa qué unidades tocan
     pendientes, n_zona = [], 0
@@ -1291,12 +1382,12 @@ def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices,
     if prog.umbral is not None:
         umbral = prog.umbral
     elif str(umbral).lower() == "auto":
-        log(f"Compuesto {anio_base} de toda la zona para el umbral automático")
+        log(f"Compuesto {anios[0]} de toda la zona para el umbral automático")
         for k, b in enumerate(pendientes, 1):
             t0 = time.perf_counter()
-            ndvi_b, n_b = leer_ndvi(anio_base, b)
+            ndvi_b, n_b = leer_ndvi(anios[0], b)
             if indices:
-                indices.escribir(anio_base, *b.ventana, ndvi_b)
+                indices.escribir(anios[0], *b.ventana, ndvi_b)
             guardados[b.id] = (ndvi_b[capas.dentro(b.geobox(geobox))], n_b, time.perf_counter() - t0)
             if len(pendientes) > 1:
                 log(f"  [{k}/{len(pendientes)}] bloque {b.id} {b.malla}: {n_b} escenas, "
@@ -1308,121 +1399,213 @@ def _calcular_bloques(geobox, bloques, capas, leer_ndvi, nombres, prog, indices,
         umbral = float(umbral)
     prog.guardar_umbral(umbral)
 
-    # 4. Cada bloque: compuestos, máscaras, quemado, conteos y ráster de cambio
+    # 4. Cada bloque: compuestos, bosque de cada año, quemado, conteos de cada comparación
     for b in pendientes:
         t0 = time.perf_counter()
         gbb = b.geobox(geobox)
         dentro, zona, en_refo, r_uni, r_clave = capas.de_bloque(gbb)
-        if b.id in guardados:
-            vals, n_b, seg_b = guardados.pop(b.id)
-            ndvi_base = np.full(b.forma, np.nan, dtype=vals.dtype)
-            ndvi_base[dentro] = vals  # fuera de la zona no se usa
-        else:
-            ndvi_base, n_b = leer_ndvi(anio_base, b)
-            seg_b = 0.0
-            if indices:
-                indices.escribir(anio_base, *b.ventana, ndvi_base)
-        ndvi_act, n_a = leer_ndvi(anio, b)
-        if indices:
-            indices.escribir(anio, *b.ventana, ndvi_act)
-        base, actual = mascaras_con_margen(ndvi_base, ndvi_act, umbral, margen, zona)
-        del ndvi_base, ndvi_act
+        ndvis, escenas, seg_b = [], [], 0.0
+        for t, anio in enumerate(anios):
+            if t == 0 and b.id in guardados:
+                vals, n_t, seg_b = guardados.pop(b.id)
+                nd = np.full(b.forma, np.nan, dtype=vals.dtype)
+                nd[dentro] = vals  # fuera de la zona no se usa
+            else:
+                nd, n_t = leer_ndvi(anio, b)
+                if indices:
+                    indices.escribir(anio, *b.ventana, nd)
+            ndvis.append(nd)
+            escenas.append(n_t)
+        bosques = mascaras_serie(ndvis, umbral, margen, zona)
+        # Bosque de cada año con solo el umbral, como lo tomaría una comparación directa que
+        # empezara en ese año (sirve para documentar la diferencia con la serie)
+        sin_encadenar = np.stack([np.bincount(r_uni[mascara_bosque(nd, umbral) & zona], minlength=n + 1)
+                                  for nd in ndvis], axis=1)
+        del ndvis
 
-        quemado = np.zeros(b.forma, dtype=bool)
-        parciales = {}
+        quemados = [None] + [np.zeros(b.forma, dtype=bool) for _ in range(1, N)]
+        cruces = {}
         for i, r in quemas.items():
             cruce = _cruce(r["ventana"], b)
             if cruce is None:
                 continue
             en_b, en_q = cruce
             q = r["q"][en_q]
-            quemado[en_b] |= q
-            parciales[i] = [int((q & base[en_b]).sum()), int((q & base[en_b] & ~actual[en_b]).sum())]
-        cambio = mapa_cambio(base, actual, quemado)
-        conteos = conteos_unidades(cambio, base, actual, quemado, en_refo, r_uni, n)
-        veg = (conteos_vegetacion(cambio, base, actual, zona, r_uni, r_clave, n, nk)
-               if claves is not None else None)
-        extra = (_rasgos_bloque(b, gbb, cambio, dentro, zona, r_uni, capas, leer_rasgos, muestreo)
-                 if leer_rasgos is not None else None)
+            p = r.get("periodo", 1)
+            quemados[p][en_b] |= q
+            cruces[i] = (en_b, q, p)
+
+        info = {"conteos": {}, "incendios": {}, "vegetacion": {}}
+        consecutivos = {}
+        for i, j in pares:
+            base, actual = bosques[i], bosques[j]
+            quemado = _quemado_entre(quemados, i, j)
+            cambio = mapa_cambio(base, actual, quemado)
+            llave = _llave(i, j)
+            conteos = conteos_unidades(cambio, base, actual, quemado, en_refo, r_uni, n)
+            info["conteos"][llave] = {str(u): conteos[u].tolist() for u in np.flatnonzero(conteos[:, 0]) if u > 0}
+            info["incendios"][llave] = {str(k): [int((q & base[en_b]).sum()), int((q & base[en_b] & ~actual[en_b]).sum())]
+                                        for k, (en_b, q, p) in cruces.items() if i < p <= j}
+            if claves is not None:
+                veg = conteos_vegetacion(cambio, base, actual, zona, r_uni, r_clave, n, nk)
+                info["vegetacion"][llave] = {str(u): veg[u].tolist() for u in np.flatnonzero(veg[:, 0])}
+            if j == i + 1:
+                consecutivos[j] = cambio
+        info["sin_encadenar"] = {str(u): sin_encadenar[u].tolist() for u in np.flatnonzero(sin_encadenar.any(axis=1))}
+
+        bits = np.zeros(b.forma, dtype=np.uint8)
+        for t, m in enumerate(bosques):
+            bits |= m.astype(np.uint8) << t
+        qbits = np.zeros(b.forma, dtype=np.uint8)
+        for p in range(1, N):
+            qbits |= quemados[p].astype(np.uint8) << (p - 1)
+        piezas = {"bosque": bits, "quemado": qbits}
+        if leer_rasgos is not None:
+            piezas.update(_rasgos_bloque(b, gbb, consecutivos, anios, dentro, zona, r_uni, capas,
+                                         leer_rasgos, muestreo))
         seg = time.perf_counter() - t0 + seg_b
         ram = ram_pico_mb()
-        prog.guardar_bloque(b, cambio, conteos, parciales, {
-            "malla": b.malla, "zona_px": int(zona.sum()), "escenas_base": n_b, "escenas_actual": n_a,
-            "segundos": round(seg, 1), "ram_pico_mb": None if ram is None else round(ram)}, veg, extra)
+        info.update({"malla": b.malla, "zona_px": int(zona.sum()), "escenas": escenas,
+                     "segundos": round(seg, 1), "ram_pico_mb": None if ram is None else round(ram)})
+        prog.guardar_bloque(b, info, piezas)
         if len(bloques) > 1:
-            log(f"  [{len(prog.bloques)}/{n_zona}] bloque {b.id} {b.malla}: {n_b} + {n_a} escenas, "
-                f"{seg:.0f} s" + ("" if ram is None else f", RAM pico {ram / 1024:.1f} GB"))
+            log(f"  [{len(prog.bloques)}/{n_zona}] bloque {b.id} {b.malla}: {' + '.join(map(str, escenas))} "
+                f"escenas, {seg:.0f} s" + ("" if ram is None else f", RAM pico {ram / 1024:.1f} GB"))
 
     # 5. Sumar los bloques y armar las salidas
-    conteos = np.zeros((n + 1, len(COLUMNAS_BALANCE) + 1), dtype=np.int64)
-    conteos[:, 0] += presencia
-    parciales = defaultdict(lambda: [0, 0])
-    zona_px = 0
-    for reg in prog.bloques.values():
-        for i, fila in reg["conteos"].items():
-            conteos[int(i)] += np.asarray(fila, dtype=np.int64)
-        for i, (en_bosque, perdido) in reg["incendios"].items():
-            parciales[int(i)][0] += en_bosque
-            parciales[int(i)][1] += perdido
-        zona_px += reg["zona_px"]
-    tabla = balance_de_conteos(conteos, nombres)
-    filas_inc = [{"incendio": r["incendio"], "fecha_inicio": r["fecha_inicio"],
-                  "poligono_ha": r["poligono_ha"], "quemado_dnbr_ha": r["quemado_dnbr_ha"],
-                  "quemado_en_bosque_ha": round(np.int64(parciales[i][0]) * HA_PIXEL, 2),
-                  "perdido_al_cierre_ha": round(np.int64(parciales[i][1]) * HA_PIXEL, 2),
-                  "dnbr_mediana": r["dnbr_mediana"]} for i, r in sorted(quemas.items())]
-
-    vegetacion = tipos = None
-    if claves is not None:
-        cveg = np.zeros(((n + 1) * (nk + 1), len(COLUMNAS_VEG)), dtype=np.int64)
+    zona_px = sum(reg["zona_px"] for reg in prog.bloques.values())
+    resultados = {}
+    conteos_par = {}
+    for i, j in pares:
+        llave = _llave(i, j)
+        conteos = np.zeros((n + 1, len(COLUMNAS_BALANCE) + 1), dtype=np.int64)
+        conteos[:, 0] += presencia
+        parciales = defaultdict(lambda: [0, 0])
         for reg in prog.bloques.values():
-            for i, fila in reg.get("vegetacion", {}).items():
-                cveg[int(i)] += np.asarray(fila, dtype=np.int64)
-        vegetacion, tipos = tablas_vegetacion(cveg, nombres, claves, descripciones)
+            for u, fila in reg["conteos"][llave].items():
+                conteos[int(u)] += np.asarray(fila, dtype=np.int64)
+            for k, (en_bosque, perdido) in reg["incendios"][llave].items():
+                parciales[int(k)][0] += en_bosque
+                parciales[int(k)][1] += perdido
+        conteos_par[(i, j)] = conteos
+        filas_inc = [{"incendio": r["incendio"], "fecha_inicio": r["fecha_inicio"],
+                      "poligono_ha": r["poligono_ha"], "quemado_dnbr_ha": r["quemado_dnbr_ha"],
+                      "quemado_en_bosque_ha": round(np.int64(parciales[k][0]) * HA_PIXEL, 2),
+                      "perdido_al_cierre_ha": round(np.int64(parciales[k][1]) * HA_PIXEL, 2),
+                      "dnbr_mediana": r["dnbr_mediana"]}
+                     for k, r in sorted(quemas.items()) if i < r.get("periodo", 1) <= j]
+        vegetacion = tipos = None
+        if claves is not None:
+            cveg = np.zeros(((n + 1) * (nk + 1), len(COLUMNAS_VEG)), dtype=np.int64)
+            for reg in prog.bloques.values():
+                for u, fila in reg["vegetacion"][llave].items():
+                    cveg[int(u)] += np.asarray(fila, dtype=np.int64)
+            vegetacion, tipos = tablas_vegetacion(cveg, nombres, claves, descripciones)
+        cols_inc = ["incendio", "fecha_inicio", "poligono_ha", "quemado_dnbr_ha", "quemado_en_bosque_ha",
+                    "perdido_al_cierre_ha", "dnbr_mediana"]
+        resultados[(i, j)] = Resultado(balance_de_conteos(conteos, nombres),
+                                       pd.DataFrame(filas_inc, columns=cols_inc if not filas_inc else None),
+                                       vegetacion, tipos)
 
-    # Clasificador de destino: un solo modelo con las muestras de todos los bloques
-    modelo = destino = exactitud = resumen = None
+    # Bosque de cada año con solo el umbral
+    sin_enc = np.zeros((n + 1, N), dtype=np.int64)
+    for reg in prog.bloques.values():
+        for u, fila in reg["sin_encadenar"].items():
+            sin_enc[int(u)] += np.asarray(fila, dtype=np.int64)
+    presentes = conteos_par[pares[0]][:, 0] > 0
+    sin_encadenar = pd.DataFrame([{"unidad": nombres[u - 1], "anio": anio,
+                                   "bosque_sin_encadenar_ha": round(float(sin_enc[u, t]) * HA_PIXEL, 2)}
+                                  for u in range(1, n + 1) if presentes[u] for t, anio in enumerate(anios)],
+                                 columns=["unidad", "anio", "bosque_sin_encadenar_ha"])
+
+    # Clasificador de destino: un modelo por año, con las muestras de todos los bloques
+    modelos, cdest = {}, {}
     if leer_rasgos is not None:
-        partes = {"f_muestra": [np.zeros(0, np.int32)], "c_muestra": [np.zeros(0, np.int32)],
-                  "y_muestra": [np.zeros(0, np.uint8)], "x_muestra": [np.zeros((0, len(RASGOS)), "float32")]}
+        comunes = {"f_muestra": [np.zeros(0, np.int32)], "c_muestra": [np.zeros(0, np.int32)],
+                   "y_muestra": [np.zeros(0, np.uint8)]}
+        xs = {t: [np.zeros((0, len(RASGOS)), "float32")] for t in range(1, N)}
         for reg in prog.bloques.values():
             with np.load(prog.pieza(reg["id"])) as z:
-                for nombre, lista in partes.items():
-                    lista.append(z[nombre].reshape(-1, len(RASGOS)) if nombre == "x_muestra" else z[nombre])
-        modelo, exactitud, resumen = entrenar_destino(*(np.concatenate(v) for v in partes.values()),
-                                                      geobox.affine, muestreo)
-        if modelo is None:
-            log("  Aviso: no hay muestras de al menos dos clases de destino; las otras pérdidas quedan "
-                "como 'sin dato'")
-        cdest = np.zeros((n + 1, len(DESTINOS) + 1), dtype=np.int64)
+                for nombre, lista in comunes.items():
+                    lista.append(z[nombre])
+                for t in range(1, N):
+                    xs[t].append(z[f"x_muestra_{t}"].reshape(-1, len(RASGOS)))
+        f_m, c_m, y_m = (np.concatenate(v) for v in comunes.values())
+        for t in range(1, N):
+            modelo, exactitud, resumen = entrenar_destino(f_m, c_m, y_m, np.concatenate(xs[t]),
+                                                          geobox.affine, muestreo)
+            if modelo is None:
+                log(f"  Aviso: no hay muestras de al menos dos clases de destino en {anios[t]}; sus otras "
+                    "pérdidas quedan como 'sin dato'")
+            modelos[t] = modelo
+            resultados[(t - 1, t)].exactitud, resultados[(t - 1, t)].resumen_destino = exactitud, resumen
+        cdest = {par: np.zeros((n + 1, len(DESTINOS) + 1), dtype=np.int64) for par in pares}
 
     import rasterio
     from rasterio.windows import Window
-    ruta_destino = salida / f"destino_{sufijo}.tif"
-    with rasterio.open(salida / f"cambio_{sufijo}.tif", "w", **_perfil_tif(geobox, "uint8")) as dst, \
-            (rasterio.open(ruta_destino, "w", **_perfil_tif(geobox, "uint8")) if leer_rasgos is not None
-             else contextlib.nullcontext()) as dst_dest:
+    with contextlib.ExitStack() as pila:
+        def abrir(nombre):
+            return pila.enter_context(rasterio.open(salida / nombre, "w", **_perfil_tif(geobox, "uint8")))
+        dst_cambio = {(i, j): abrir(f"cambio_{anios[i]}_{anios[j]}.tif") for i, j in pares}
+        dst_destino = ({(i, j): abrir(f"destino_{anios[i]}_{anios[j]}.tif") for i, j in pares}
+                       if leer_rasgos is not None else {})
+        dst_bosque = abrir("bosque_por_anio.tif") if capas_serie else None
+        dst_anio = abrir("anio_perdida.tif") if capas_serie else None
         for reg in prog.bloques.values():
             r0, r1, c0, c1 = reg["ventana"]
             ventana = Window(c0, r0, c1 - c0, r1 - r0)
             with np.load(prog.pieza(reg["id"])) as z:
-                dst.write(z["cambio"], 1, window=ventana)
-                if leer_rasgos is not None:
-                    pred = predecir_destino(modelo, z["x_perdida"].reshape(-1, len(RASGOS)))
-                    pieza = np.zeros(z["cambio"].shape, dtype=np.uint8)
-                    pieza[z["cambio"] == PERD_OTRA] = pred  # mismo orden en que se guardaron los rasgos
-                    dst_dest.write(pieza, 1, window=ventana)
-                    np.add.at(cdest, (z["u_perdida"], pred), 1)
-    if leer_rasgos is not None:
-        destino = tabla_destino(cdest, nombres, conteos[:, 0] > 0)
+                bits = z["bosque"]
+                bos = _de_bits(bits, N)
+                quemados = [None] + _de_bits(z["quemado"], N - 1)
+                dest = {}
+                for t in modelos:
+                    cambio_t = mapa_cambio(bos[t - 1], bos[t], quemados[t])
+                    pred = predecir_destino(modelos[t], z[f"x_perdida_{t}"].reshape(-1, len(RASGOS)))
+                    d = np.zeros(bits.shape, dtype=np.uint8)
+                    d[cambio_t == PERD_OTRA] = pred  # mismo orden en que se guardaron los rasgos
+                    dest[t] = d
+                    np.add.at(cdest[(t - 1, t)], (z[f"u_perdida_{t}"], pred), 1)
+                r_uni = None
+                for i, j in pares:
+                    cambio = mapa_cambio(bos[i], bos[j], _quemado_entre(quemados, i, j))
+                    dst_cambio[(i, j)].write(cambio, 1, window=ventana)
+                    if not dest:
+                        continue
+                    if j == i + 1:
+                        d = dest[j]
+                    else:
+                        # Otra pérdida entre años no consecutivos: el uso que el clasificador le dio
+                        # en el último periodo en que el píxel dejó de ser bosque
+                        perdida = cambio == PERD_OTRA
+                        ultimo = np.zeros(bits.shape, dtype=np.uint8)
+                        for k in range(i + 1, j + 1):
+                            ultimo[bos[k - 1] & ~bos[k]] = k
+                        d = np.zeros(bits.shape, dtype=np.uint8)
+                        for k in range(i + 1, j + 1):
+                            m = perdida & (ultimo == k)
+                            d[m] = dest[k][m]
+                        if r_uni is None:
+                            gbb = geobox[r0:r1, c0:c1]
+                            r_uni = capas.unidades(gbb, capas.dentro(gbb))
+                        np.add.at(cdest[(i, j)], (r_uni[perdida], d[perdida]), 1)
+                    dst_destino[(i, j)].write(d, 1, window=ventana)
+                if capas_serie:
+                    dst_bosque.write(bits, 1, window=ventana)
+                    perdida_anio = np.zeros(bits.shape, dtype=np.uint8)
+                    for t in range(1, N):  # el último año en que el píxel dejó de ser bosque
+                        perdida_anio[bos[t - 1] & ~bos[t]] = anios[t] - 2000
+                    dst_anio.write(perdida_anio, 1, window=ventana)
+    for par, c in cdest.items():
+        resultados[par].destino = tabla_destino(c, nombres, conteos_par[par][:, 0] > 0)
+
+    cols_esc = ["escenas_base", "escenas_actual"] if N == 2 else [f"escenas_{a}" for a in anios]
     pd.DataFrame([{"bloque": reg["id"], "malla": reg["malla"], "fila0": reg["ventana"][0],
                    "fila1": reg["ventana"][1], "col0": reg["ventana"][2], "col1": reg["ventana"][3],
-                   "zona_ha": round(reg["zona_px"] * HA_PIXEL, 2), "escenas_base": reg["escenas_base"],
-                   "escenas_actual": reg["escenas_actual"], "segundos": reg["segundos"],
-                   "ram_pico_mb": reg["ram_pico_mb"]} for reg in prog.bloques.values()]
-                 ).to_csv(salida / f"bloques_{sufijo}.csv", index=False)
-    return Resultado(tabla, pd.DataFrame(filas_inc), umbral, zona_px * HA_PIXEL, prog,
-                     vegetacion, tipos, destino, exactitud, resumen)
+                   "zona_ha": round(reg["zona_px"] * HA_PIXEL, 2), **dict(zip(cols_esc, reg["escenas"])),
+                   "segundos": reg["segundos"], "ram_pico_mb": reg["ram_pico_mb"]}
+                  for reg in prog.bloques.values()]).to_csv(salida / f"bloques_{sufijo}.csv", index=False)
+    return ResultadoSerie(anios, resultados, umbral, zona_px * HA_PIXEL, prog, sin_encadenar)
 
 
 # ==========================================================================
@@ -1457,13 +1640,78 @@ def _huella_ids(items):
     return hashlib.sha1("\n".join(sorted(it.id for it in items)).encode()).hexdigest()[:16]
 
 
-def cmd_correr(a):
+TODOS = "Todos"  # fila de la unidad completa en serie_*.csv y tendencia_*.csv
+FLUJOS = ["perdida_incendio_ha", "otras_perdidas_ha", "ganancia_ha", "cambio_neto_ha"]
+
+
+def tabla_serie(res: ResultadoSerie) -> pd.DataFrame:
+    """Bosque de cada año por unidad y tipo de bosque (CF-DEV-08 y 10), con lo que cambió desde el
+    año anterior. tipo_bosque = "Todos" es la unidad completa (sale del balance y lleva además el
+    destino de las otras pérdidas y el bosque sin encadenar). El primer año no tiene cambios."""
+    filas = []
+    for t, anio in enumerate(res.anios):
+        par, col = ((0, 1), "bosque_base_ha") if t == 0 else ((t - 1, t), "bosque_actual_ha")
+        r = res.pares[par]
+        hay_flujo = t > 0
+        dest = r.destino.set_index("unidad") if hay_flujo and r.destino is not None else None
+        zona_u = (r.tipos.groupby("unidad")["zona_forestal_ha"].sum().round(2)
+                  if r.tipos is not None else pd.Series(dtype=float))
+        for _, f in r.balance.iterrows():
+            u = f["unidad"]
+            fila = {"unidad": u, "anio": anio, "tipo_bosque": TODOS,
+                    "zona_forestal_ha": zona_u.get(u, np.nan if r.tipos is None else 0.0), "bosque_ha": f[col]}
+            fila.update({c: f[c] if hay_flujo else np.nan for c in FLUJOS})
+            fila.update({f"{d}_ha": dest.loc[u, f"{d}_ha"] if dest is not None else np.nan for d in DESTINOS})
+            filas.append(fila)
+        if r.tipos is not None:
+            for _, f in r.tipos.iterrows():
+                filas.append({"unidad": f["unidad"], "anio": anio, "tipo_bosque": f["tipo_bosque"],
+                              "zona_forestal_ha": f["zona_forestal_ha"], "bosque_ha": f[col],
+                              **{c: f[c] if hay_flujo else np.nan for c in FLUJOS}})
+    df = pd.DataFrame(filas)
+    sin = res.sin_encadenar.assign(tipo_bosque=TODOS)
+    df = df.merge(sin, on=["unidad", "anio", "tipo_bosque"], how="left")
+    orden_u = {u: k for k, u in enumerate(res.pares[(0, 1)].balance["unidad"])}
+    orden_t = {t: k for k, t in enumerate([TODOS] + TIPOS_ORDEN)}
+    df = df.sort_values(["unidad", "anio", "tipo_bosque"],
+                        key=lambda s: s.map(orden_u) if s.name == "unidad" else
+                        s.map(orden_t) if s.name == "tipo_bosque" else s, kind="stable")
+    cols = ["unidad", "anio", "tipo_bosque", "zona_forestal_ha", "bosque_ha", *FLUJOS,
+            *[f"{d}_ha" for d in DESTINOS], "bosque_sin_encadenar_ha"]
+    return df[cols].reset_index(drop=True)
+
+
+def tabla_tendencia(serie: pd.DataFrame) -> pd.DataFrame:
+    """Tendencia del bosque por mínimos cuadrados, por unidad y tipo de bosque, más el total
+    ("Total"). tendencia_pct_anio = pendiente / bosque del primer año x 100. Con dos años es el
+    cambio neto; con tres, (último - primero) / 2: solo con más años la recta dice algo más."""
+    total = serie.groupby(["anio", "tipo_bosque"], as_index=False, sort=False)["bosque_ha"].sum()
+    filas = []
+    for (u, tipo), g in pd.concat([serie, total.assign(unidad="Total")]).groupby(
+            ["unidad", "tipo_bosque"], sort=False):
+        g = g.sort_values("anio")
+        y = g["bosque_ha"].to_numpy(dtype=float)
+        pendiente, r2 = tendencia(g["anio"].to_numpy(), y)
+        filas.append({"unidad": u, "tipo_bosque": tipo, "anio_inicial": int(g["anio"].iloc[0]),
+                      "anio_final": int(g["anio"].iloc[-1]), "n_anios": len(g),
+                      "bosque_inicial_ha": round(float(y[0]), 2), "bosque_final_ha": round(float(y[-1]), 2),
+                      "tendencia_ha_anio": round(pendiente, 2),
+                      "tendencia_pct_anio": round(pendiente / y[0] * 100, 3) if y[0] > 0 else np.nan,
+                      "r2": None if r2 is None else round(r2, 4)})
+    return pd.DataFrame(filas)
+
+
+def _ejecutar(a, anios, serie):
+    """Lo común a correr (dos años) y serie (varios): capas, escenas, el cálculo y las salidas."""
     import geopandas as gpd
     if a.tam_bloque <= 0 or a.tam_bloque % BLOQUE_COG:
         sys.exit(f"--tam-bloque debe ser múltiplo de {BLOQUE_COG} (la malla interna de los COG).")
+    if len(anios) < 2 or len(anios) > MAX_ANIOS or anios != sorted(set(anios)):
+        sys.exit(f"Se necesitan de 2 a {MAX_ANIOS} años distintos y en orden; se pidió {anios}")
     _configurar_lectura()
     out = Path(a.salida)
     out.mkdir(parents=True, exist_ok=True)
+    N = len(anios)
 
     aoi = gpd.read_file(a.aoi).to_crs(CRS)
     gb = geobox_de(aoi)
@@ -1500,27 +1748,33 @@ def cmd_correr(a):
         nombres = ["zona piloto"]
     capas = CapasVector(aoi, zf, refo, uni, etq)
 
+    # Incendios. Periodo p: del inicio del compuesto de anios[p - 1] al inicio del de anios[p]
     incendios = []
+    limites = [pd.Timestamp(f"{anio}-{a.ventana[0]}") for anio in anios]
     if a.incendios:
         inc = gpd.read_file(a.incendios).to_crs(CRS)
         inc = inc[inc.intersects(zona_aoi)].copy()
         inc["_fecha"] = leer_fechas(inc[a.campo_fecha])
-        # Periodo del balance: del inicio del compuesto base al inicio del compuesto actual
-        ini, fin = pd.Timestamp(f"{a.anio_base}-{a.ventana[0]}"), pd.Timestamp(f"{a.anio}-{a.ventana[0]}")
+        ini, fin = limites[0], limites[-1]
         fuera = inc[(inc["_fecha"] >= fin)]
         inc = inc[(inc["_fecha"] >= ini) & (inc["_fecha"] < fin)]
+        inc["_periodo"] = [1 + sum(f >= lim for lim in limites[1:-1]) for f in inc["_fecha"]]
         print(f"Incendios en el periodo {ini:%Y-%m-%d} a {fin - pd.Timedelta(days=1):%Y-%m-%d}: {len(inc)}")
+        if N > 2:
+            for p in range(1, N):
+                print(f"  {anios[p - 1]} → {anios[p]} ({limites[p - 1]:%Y-%m-%d} a "
+                      f"{limites[p] - pd.Timedelta(days=1):%Y-%m-%d}): {(inc['_periodo'] == p).sum()}")
         if len(fuera):
             print(f"  ({len(fuera)} incendio(s) posteriores al {fin:%Y-%m-%d} quedan para el siguiente periodo)")
         for i, (_, fila) in enumerate(inc.iterrows(), start=1):
             clave = fila.get(a.campo_id, i) if a.campo_id else i
-            incendios.append((clave, fila["_fecha"], fila.geometry))
+            incendios.append((clave, fila["_fecha"], fila.geometry, int(fila["_periodo"])))
 
-    print("Cobertura base y actual")
+    print("Cobertura base y actual" if N == 2 else "Cobertura de cada año")
     escenas = {anio: Escenas(items_anuales(gb, anio, a.nubes_max, a.escenas_max, tuple(a.ventana)), gb.crs)
-               for anio in (a.anio_base, a.anio)}
+               for anio in anios}
     if a.bloques:
-        origenes = origenes_teselas(escenas[a.anio_base].items + escenas[a.anio].items)
+        origenes = origenes_teselas([it for e in escenas.values() for it in e.items])
         bloques = bloques_alineados(gb, origenes, a.tam_bloque)
         print(f"Bloques de {a.tam_bloque} px ({a.tam_bloque * RES / 1000:.2f} km) alineados a la malla de "
               f"{len(origenes)} teselas: {', '.join(t for *_, t in origenes) or 'ninguna (malla de 100 km)'}")
@@ -1528,7 +1782,7 @@ def cmd_correr(a):
         bloques = [Bloque(0, ny, 0, nx)]
         if ny * nx > 100e6:
             print(f"Aviso: la zona mide {ny * nx / 1e6:.0f} millones de píxeles; de una sola vez necesita "
-                  f"unos {ny * nx * 4 * 3 / 2**30:.0f} GB de RAM o más. Para zonas así conviene --bloques.")
+                  f"unos {ny * nx * 4 * (N + 1) / 2**30:.0f} GB de RAM o más. Para zonas así conviene --bloques.")
 
     def leer_ndvi(anio, b):
         gbb = b.geobox(gb)
@@ -1539,7 +1793,7 @@ def cmd_correr(a):
 
     catalogo = None
     if len(incendios) > 1:
-        fechas = [f for _, f, _ in incendios]
+        fechas = [f for _, f, _, _ in incendios]
         catalogo = CatalogoLocal(gb, (min(fechas) - timedelta(days=75)).date(),
                                  (max(fechas) + timedelta(days=70)).date(), a.nubes_max)
         print(f"Escenas para el dNBR, buscadas una vez: {len(catalogo.items)}")
@@ -1547,9 +1801,9 @@ def cmd_correr(a):
     def leer_dnbr(geom, fecha):
         return dnbr_incendio(gb, geom, fecha, a.nubes_max, catalogo)
 
-    def leer_rasgos(b, filas, cols):
+    def leer_rasgos(anio, b, filas, cols):
         gbb = b.geobox(gb)
-        return rasgos_en_puntos(escenas[a.anio].en(gbb), gbb, filas, cols)
+        return rasgos_en_puntos(escenas[anio].en(gbb), gbb, filas, cols)
 
     guardar = a.guardar_indices if a.guardar_indices is not None else not a.bloques
     # Lo que no cambia el resultado no entra en la firma (se puede reanudar con otro valor)
@@ -1557,64 +1811,123 @@ def cmd_correr(a):
     firma["escenas"] = {str(anio): _huella_ids(e.items) for anio, e in escenas.items()}
     firma["malla_bloques"] = hashlib.sha1(",".join(b.id for b in bloques).encode()).hexdigest()[:16]
     res = calcular_por_bloques(gb, bloques, capas, leer_ndvi, leer_dnbr, incendios, nombres,
-                               anio_base=a.anio_base, anio=a.anio, umbral=a.umbral_ndvi,
+                               anios=anios, umbral=a.umbral_ndvi,
                                margen=a.margen_cambio, umbral_dnbr=a.umbral_dnbr, salida=out,
                                firma=firma, guardar_indices=guardar, reiniciar=a.reiniciar,
                                hilos=a.hilos_incendios, claves=claves, descripciones=descripciones,
-                               leer_rasgos=leer_rasgos if etq is not None else None)
+                               leer_rasgos=leer_rasgos if etq is not None else None, capas_serie=serie)
     if a.zona_forestal:
         print(f"  Zona forestal de referencia: {res.zona_ha:,.0f} ha")
 
-    sufijo = f"{a.anio_base}_{a.anio}"
-    tabla = res.balance
-    if refo is not None and uni is not None:
-        esp = recuperacion_esperada(refo, uni, a.campo_unidad, a.campo_anio, a.campo_sobrev,
-                                    a.anio_base, a.anio, a.sobrev_default)
-        tabla = tabla.merge(esp, on="unidad", how="left").fillna(0)
-    tabla.insert(1, "umbral_ndvi", res.umbral)
-    tabla.to_csv(out / f"balance_{sufijo}.csv", index=False)
-    if len(res.incendios):
-        res.incendios.to_csv(out / "incendios_dnbr.csv", index=False)
-    if res.vegetacion is not None:
-        res.vegetacion.to_csv(out / f"vegetacion_{sufijo}.csv", index=False)
-        res.tipos.to_csv(out / f"tipo_bosque_{sufijo}.csv", index=False)
-    if res.destino is not None:
-        res.destino.to_csv(out / f"destino_perdidas_{sufijo}.csv", index=False)
-        res.exactitud.to_csv(out / f"destino_exactitud_{sufijo}.csv", index=False)
-    # Cómo se hizo la corrida (lo lee src/mapa_interactivo.py)
+    # Salidas de cada comparación (las mismas de siempre, una vez por par de años)
     from datetime import datetime
-    (out / f"corrida_{sufijo}.json").write_text(json.dumps({
-        "anio_base": a.anio_base, "anio": a.anio, "ventana": list(a.ventana),
-        "umbral_ndvi": round(float(res.umbral), 4), "umbral_pedido": str(a.umbral_ndvi),
-        "escenas": {str(k): len(e.items) for k, e in escenas.items()},
-        "incendios": len(incendios), "nubes_max": a.nubes_max, "escenas_max": a.escenas_max,
-        "bloques": a.bloques, "fecha": datetime.now().isoformat(timespec="seconds"),
-        "clases_forestales": a.clases_forestales if a.zona_forestal else None,
-        "zona_forestal_ha": round(res.zona_ha, 2) if a.zona_forestal else None,
-        "destino": res.resumen_destino,
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    fecha = datetime.now().isoformat(timespec="seconds")
+    tablas = {}
+    for (i, j), r in res.pares.items():
+        sufijo = f"{anios[i]}_{anios[j]}"
+        tabla = r.balance
+        if refo is not None and uni is not None:
+            esp = recuperacion_esperada(refo, uni, a.campo_unidad, a.campo_anio, a.campo_sobrev,
+                                        anios[i], anios[j], a.sobrev_default)
+            tabla = tabla.merge(esp, on="unidad", how="left").fillna(0)
+        tabla.insert(1, "umbral_ndvi", res.umbral)
+        tabla.to_csv(out / f"balance_{sufijo}.csv", index=False)
+        tablas[(i, j)] = tabla
+        if r.vegetacion is not None:
+            r.vegetacion.to_csv(out / f"vegetacion_{sufijo}.csv", index=False)
+            r.tipos.to_csv(out / f"tipo_bosque_{sufijo}.csv", index=False)
+        if r.destino is not None:
+            r.destino.to_csv(out / f"destino_perdidas_{sufijo}.csv", index=False)
+        if r.exactitud is not None:
+            r.exactitud.to_csv(out / f"destino_exactitud_{sufijo}.csv", index=False)
+        if j > i + 1 and len(r.incendios):  # los de años consecutivos van en incendios_dnbr.csv
+            r.incendios.to_csv(out / f"incendios_dnbr_{sufijo}.csv", index=False)
+        # Cómo se hizo la corrida (lo lee src/mapa_interactivo.py)
+        (out / f"corrida_{sufijo}.json").write_text(json.dumps({
+            "anio_base": anios[i], "anio": anios[j], "ventana": list(a.ventana),
+            "umbral_ndvi": round(float(res.umbral), 4), "umbral_pedido": str(a.umbral_ndvi),
+            "escenas": {str(k): len(escenas[k].items) for k in (anios[i], anios[j])},
+            "incendios": sum(i < p <= j for *_, p in incendios), "nubes_max": a.nubes_max,
+            "escenas_max": a.escenas_max, "bloques": a.bloques, "fecha": fecha,
+            "clases_forestales": a.clases_forestales if a.zona_forestal else None,
+            "zona_forestal_ha": round(res.zona_ha, 2) if a.zona_forestal else None,
+            "destino": r.resumen_destino,
+            **({"serie": f"{anios[0]}_{anios[-1]}", "consecutivos": j == i + 1} if serie else {}),
+        }, ensure_ascii=False, indent=1), encoding="utf-8")
+    # Incendios de cada periodo, con sus cifras contra el bosque de su periodo
+    inc_tablas = [res.pares[(t - 1, t)].incendios.assign(periodo=f"{anios[t - 1]}_{anios[t]}")
+                  for t in range(1, N) if len(res.pares[(t - 1, t)].incendios)]
+    if inc_tablas:
+        pd.concat(inc_tablas, ignore_index=True).to_csv(out / "incendios_dnbr.csv", index=False)
+
+    if serie:
+        tserie = tabla_serie(res)
+        ttend = tabla_tendencia(tserie)
+        tserie.to_csv(out / f"serie_{anios[0]}_{anios[-1]}.csv", index=False)
+        ttend.to_csv(out / f"tendencia_{anios[0]}_{anios[-1]}.csv", index=False)
+        (out / f"serie_{anios[0]}_{anios[-1]}.json").write_text(json.dumps({
+            "anios": anios, "ventana": list(a.ventana), "umbral_ndvi": round(float(res.umbral), 4),
+            "umbral_pedido": str(a.umbral_ndvi), "margen_cambio": a.margen_cambio,
+            "escenas": {str(k): len(e.items) for k, e in escenas.items()},
+            "incendios_por_periodo": {f"{anios[p - 1]}_{anios[p]}": sum(q == p for *_, q in incendios)
+                                      for p in range(1, N)},
+            "nubes_max": a.nubes_max, "escenas_max": a.escenas_max, "bloques": a.bloques, "fecha": fecha,
+            "clases_forestales": a.clases_forestales if a.zona_forestal else None,
+            "zona_forestal_ha": round(res.zona_ha, 2) if a.zona_forestal else None,
+            "destino": {f"{anios[t - 1]}_{anios[t]}": res.pares[(t - 1, t)].resumen_destino for t in range(1, N)},
+            "bosque_por_anio": {"archivo": "bosque_por_anio.tif",
+                                "bits": {str(t): anio for t, anio in enumerate(anios)}},
+            "anio_perdida": {"archivo": "anio_perdida.tif", "valor": "año - 2000 del último año en que el "
+                             "píxel dejó de ser bosque; 0 sin pérdida"},
+        }, ensure_ascii=False, indent=1), encoding="utf-8")
     res.progreso.borrar()
-    print("\n" + tabla.to_string(index=False))
-    if res.tipos is not None:
-        tot = res.tipos.groupby("tipo_bosque", sort=False)[COLUMNAS_VEG[1:] + ["cambio_neto_ha"]].sum()
-        print("\nPor tipo de bosque (ha):\n" + tot.round(1).to_string())
-    if res.destino is not None:
-        tot = res.destino.drop(columns="unidad").sum()
-        print("\nUso al que pasaron las otras pérdidas (ha): "
+
+    if serie:
+        tot = tserie[tserie["tipo_bosque"] == TODOS].groupby("anio")[["bosque_ha", *FLUJOS]].sum(min_count=1)
+        print("\nBosque de cada año, toda la zona (ha):\n" + tot.round(1).to_string())
+        t = ttend[(ttend["unidad"] == "Total") & (ttend["tipo_bosque"] == TODOS)].iloc[0]
+        print(f"Tendencia {t['anio_inicial']}–{t['anio_final']}: {t['tendencia_ha_anio']:+,.1f} ha/año "
+              f"({t['tendencia_pct_anio']:+.3f} %/año)")
+        tt = ttend[(ttend["unidad"] == "Total") & (ttend["tipo_bosque"] != TODOS)]
+        print("Por tipo de bosque (ha/año): " + ", ".join(f"{r.tipo_bosque} {r.tendencia_ha_anio:+,.1f}"
+                                                          for r in tt.itertuples()))
+    else:
+        r = res.pares[(0, 1)]
+        print("\n" + tablas[(0, 1)].to_string(index=False))
+        if r.tipos is not None:
+            tot = r.tipos.groupby("tipo_bosque", sort=False)[COLUMNAS_VEG[1:] + ["cambio_neto_ha"]].sum()
+            print("\nPor tipo de bosque (ha):\n" + tot.round(1).to_string())
+    for t in range(1, N):
+        r = res.pares[(t - 1, t)]
+        if r.destino is None:
+            continue
+        tot = r.destino.drop(columns="unidad").sum()
+        print(f"\nUso al que pasaron las otras pérdidas {anios[t - 1]} → {anios[t]} (ha): "
               + ", ".join(f"{d} {tot[f'{d}_ha']:,.1f}" for d in DESTINOS))
-        r = res.resumen_destino
-        if r.get("exactitud_global") is not None:
-            print(f"  Clasificador: exactitud {r['exactitud_global']:.1%} (kappa {r['kappa']}) con "
-                  f"{r['muestras_prueba']:,} muestras reservadas y {r['muestras_entrenamiento']:,} de "
+        rd = r.resumen_destino
+        if rd.get("exactitud_global") is not None:
+            print(f"  Clasificador {anios[t]}: exactitud {rd['exactitud_global']:.1%} (kappa {rd['kappa']}) con "
+                  f"{rd['muestras_prueba']:,} muestras reservadas y {rd['muestras_entrenamiento']:,} de "
                   "entrenamiento. Mide el acuerdo con la Serie VII, anterior a 2023, no con el campo.")
     print(f"\nResultados en {out.resolve()}")
     print("Códigos del ráster de cambio: 0 sin bosque, 1 bosque estable, 2 pérdida por incendio, "
           "3 otra pérdida, 4 ganancia")
-    if res.destino is not None:
+    if etq is not None:
         print("Códigos del ráster de destino: 0 no aplica, 1 agrícola, 2 pecuario, 3 urbano, 4 otro, 5 sin dato")
+    if serie:
+        print("bosque_por_anio.tif: bit t = bosque en " + ", ".join(f"{t}: {x}" for t, x in enumerate(anios))
+              + ". anio_perdida.tif: año - 2000 de la última pérdida (0 = sin pérdida)")
     ram = ram_pico_mb()
     if ram is not None:
         print(f"RAM pico del proceso: {ram / 1024:.1f} GB")
+
+
+def cmd_correr(a):
+    _ejecutar(a, [a.anio_base, a.anio], serie=False)
+
+
+def cmd_serie(a):
+    _ejecutar(a, sorted(set(a.anios)), serie=True)
 
 
 def comprobar_bloques():
@@ -1622,7 +1935,9 @@ def comprobar_bloques():
 
     Compara contra el cálculo original sobre arreglos completos: balance, ráster de cambio e
     incendios, con umbral fijo y automático, saltando bloques fuera de la zona, con incendios
-    que cruzan bloques o se enciman, y con corridas interrumpidas y reanudadas.
+    que cruzan bloques o se enciman, y con corridas interrumpidas y reanudadas. Luego lo mismo con
+    una serie de tres años (CF-DEV-08): bosque encadenado, las tres comparaciones, el bosque por
+    año y el año de pérdida.
     """
     import tempfile
 
@@ -1646,11 +1961,26 @@ def comprobar_bloques():
     act[40:80, 200:280] = 0.66                                 # reforestación visible
     ndvi = {2023: base.astype("float32"), 2024: act.astype("float32")}
     ndvi[2023][150:155, 30:60] = np.nan                        # píxeles sin dato
+    # Tercer año: parte del incendio recupera copa, un desmonte nuevo, píxeles que oscilan en el
+    # umbral (cambian sin cruzar el margen) y píxeles sin dato en el año de en medio
+    nd25 = act + rng.normal(0, 0.06, (n, n))
+    nd25[20:50, 20:100] = 0.72
+    nd25[100:130, 40:80] = 0.22
+    nd25[250:280, 20:60] = 0.56 + rng.normal(0, 0.05, (30, 40))
+    ndvi[2025] = nd25.astype("float32")
+    # Cuarto año (solo para la prueba de 4 años): lo que recuperó copa en 2025 se vuelve a perder
+    nd26 = nd25 + rng.normal(0, 0.05, (n, n))
+    nd26[20:35, 20:100] = 0.20
+    ndvi[2026] = nd26.astype("float32")
+    ndvi[2024][160:170, 60:90] = np.nan
     dnbr = rng.normal(0.02, 0.03, (n, n)).astype("float32")
     dnbr[20:90, 20:100] += 0.45
     dnbr[60:110, 90:130] += rng.uniform(0, 0.6, (50, 40)).astype("float32")
     dnbr[165:200, 185:225] += 0.35
     dnbr[205:250, 130:170] += 0.30
+    dnbr2 = rng.normal(0.02, 0.03, (n, n)).astype("float32")  # incendios del segundo periodo
+    dnbr2[100:130, 40:70] += 0.5
+    dnbr2[0:30, 0:50] += 0.4
 
     aoi = gpd.GeoDataFrame(geometry=[caja(0, 0, n, n).difference(caja(200, 180, n, n))], crs=CRS)
     zf = gpd.GeoDataFrame({"CLAVE": ["BP", "VSA/BQ", "SBC", "BC"]},
@@ -1673,6 +2003,9 @@ def comprobar_bloques():
     rasgos[200:240, 140:160] = centros[3] + rng.normal(0, 0.15, (40, 20, len(RASGOS)))  # y hacia urbano
     rasgos[200:203, 120:160] = np.nan                                                  # sin dato
     rasgos[::11, ::13, 2] = np.nan                                                     # muestras sin dato
+    rasgos25 = (centros[lab] + rng.normal(0, 0.2, (n, n, len(RASGOS)))).astype("float32")
+    rasgos25[100:130, 40:80] = centros[2] + rng.normal(0, 0.15, (30, 40, len(RASGOS)))  # desmonte a pecuario
+    rasgos_anio = {2024: rasgos, 2025: rasgos25, 2026: rasgos25[::-1].copy()}
     muestreo = Muestreo(paso=7, max_por_grupo=40, region_m=1000, celda_prueba_m=300, arboles=30)
     # "Esquina" toca la zona solo con una astilla: no tiene píxeles dentro, pero sí fila (en ceros).
     # "Rincón" solo tiene píxeles en un bloque que se salta: también lleva su fila en ceros.
@@ -1686,85 +2019,134 @@ def comprobar_bloques():
                  ("C", pd.Timestamp("2024-04-02"), caja(185, 165, 225, 200)),  # sale de la zona
                  ("D", pd.Timestamp("2024-04-10"), sin_imagenes),             # sin imágenes
                  ("E", pd.Timestamp("2024-05-05"), caja(130, 205, 170, 250))]  # sobre la tala
+    # Serie de tres años: los de 2024 son del periodo 1; estos, del 2 (1-nov-2024 a 31-oct-2025)
+    incendios_serie = incendios[:2] + [("F", pd.Timestamp("2025-02-14"), caja(40, 100, 70, 130), 2)] \
+        + incendios[2:] + [("G", pd.Timestamp("2024-12-01"), caja(0, 0, 50, 30), 2)]
 
     def leer_dnbr(geom, fecha):
         w = None if geom.equals(sin_imagenes) else ventana_incendio(gb, geom)
         if w is None:
             return None
         r0, r1, c0, c1 = w
-        return (slice(r0, r1), slice(c0, c1)), dnbr[r0:r1, c0:c1].copy()
+        d = dnbr2 if fecha >= pd.Timestamp("2024-11-01") else dnbr
+        return (slice(r0, r1), slice(c0, c1)), d[r0:r1, c0:c1].copy()
 
     def leer_ndvi(anio, b):
         return ndvi[anio][b.r0:b.r1, b.c0:b.c1].copy(), 1
 
-    def leer_rasgos(b, filas, cols):
-        return rasgos[b.r0 + filas, b.c0 + cols].copy()
+    def leer_rasgos(anio, b, filas, cols):
+        return rasgos_anio[anio][b.r0 + filas, b.c0 + cols].copy()
 
-    def referencia(umbral):
-        """El cálculo original de `correr`, sobre arreglos completos."""
+    def referencia(umbral, anios=(2023, 2024), incs=incendios):
+        """El cálculo original de `correr`, sobre arreglos completos. Con más de dos años, la serie
+        encadenada escrita aparte, píxel por píxel con np.where."""
+        N = len(anios)
         dentro = rasterizar(aoi.geometry, [1], (n, n), gb.affine, dtype="uint8").astype(bool)
         en_refo = rasterizar(refo.geometry, [1] * len(refo), (n, n), gb.affine, dtype="uint8").astype(bool)
         zona = dentro & (rasterizar(zf.geometry, [1] * len(zf), (n, n), gb.affine, dtype="uint8").astype(bool)
                          | en_refo)
         if umbral == "auto":
-            umbral = umbral_otsu(ndvi[2023][dentro])
-        b, a = mascaras_con_margen(ndvi[2023], ndvi[2024], umbral, 0.10, zona)
-        quemado, filas = np.zeros((n, n), dtype=bool), []
-        for clave, fecha, geom in incendios:
+            umbral = umbral_otsu(ndvi[anios[0]][dentro])
+        if N == 2:
+            bos = list(mascaras_con_margen(ndvi[anios[0]], ndvi[anios[1]], umbral, 0.10, zona))
+        else:
+            bos = [zona & (np.nan_to_num(ndvi[anios[0]], nan=-9) >= umbral)]
+            for t in range(1, N):
+                v1, v0 = ndvi[anios[t]], ndvi[anios[t - 1]]
+                with np.errstate(invalid="ignore"):
+                    sube = zona & (v1 >= umbral) & (v1 - v0 >= 0.10)
+                    baja = ~(v1 >= umbral) & (v1 - v0 <= -0.10)
+                bos.append(np.where(bos[-1], ~baja, sube))
+        quemados, filas_q = [None] + [np.zeros((n, n), dtype=bool) for _ in range(1, N)], []
+        for inc in incs:
+            clave, fecha, geom = inc[:3]
+            p = inc[3] if len(inc) > 3 else 1
             res = leer_dnbr(geom, fecha)
             if res is None:
                 continue
             (rs, cs), d = res
             poly = rasterizar([geom], [1], d.shape, gb[rs, cs].affine, dtype="uint8").astype(bool)
             q = poly & (np.nan_to_num(d, nan=0) >= UMBRAL_DNBR)
-            quemado[rs, cs] |= q
-            filas.append({"incendio": clave, "fecha_inicio": f"{fecha:%Y-%m-%d}",
-                          "poligono_ha": round(poly.sum() * HA_PIXEL, 2),
-                          "quemado_dnbr_ha": round(q.sum() * HA_PIXEL, 2),
-                          "quemado_en_bosque_ha": round((q & b[rs, cs]).sum() * HA_PIXEL, 2),
-                          "perdido_al_cierre_ha": round((q & b[rs, cs] & ~a[rs, cs]).sum() * HA_PIXEL, 2),
-                          "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3)})
+            quemados[p][rs, cs] |= q
+            filas_q.append((clave, fecha, p, rs, cs, poly, q, d))
         r_uni = rasterizar(uni.geometry, range(1, len(uni) + 1), (n, n), gb.affine)
-        cambio = mapa_cambio(b, a, quemado)
-        bal = balance(b, a, quemado, en_refo, r_uni, nombres)
-
-        # Por clave y tipo de bosque, contando unidad por unidad y clave por clave
         r_clave = rasterizar(zf.geometry, zf["_clave"].tolist(), (n, n), gb.affine, dtype="int16")
         r_clave[~zona] = 0
         k = len(claves)
-        cveg = np.zeros(((len(nombres) + 1) * (k + 1), len(COLUMNAS_VEG)), dtype=np.int64)
-        for i in range(1, len(nombres) + 1):
-            for kk in range(k + 1):
-                m = (r_uni == i) & (r_clave == kk) & zona
-                cveg[i * (k + 1) + kk] = [m.sum(), (m & b).sum(), (m & (cambio == PERD_INCENDIO)).sum(),
-                                          (m & (cambio == PERD_OTRA)).sum(), (m & (cambio == GANANCIA)).sum(),
-                                          (m & a).sum()]
-        veg, tipos = tablas_vegetacion(cveg, nombres, claves)
 
-        # Destino: muestras en la retícula de toda la malla, un modelo, predicción de cada pérdida
+        # Destino: muestras en la retícula de toda la malla, un modelo por año, predicción de cada pérdida
         rr = np.arange(muestreo.paso // 2, n, muestreo.paso)
         mf, mc = (x.ravel() for x in np.meshgrid(rr, rr, indexing="ij"))
         ok = dentro[mf, mc] & ~zona[mf, mc] & (lab[mf, mc] > 0)
         mf, mc = mf[ok], mc[ok]
-        modelo, exactitud, _ = entrenar_destino(mf, mc, lab[mf, mc], rasgos[mf, mc], gb.affine, muestreo)
-        pf, pc = np.nonzero(cambio == PERD_OTRA)
-        pred = predecir_destino(modelo, rasgos[pf, pc])
-        destino_r = np.zeros((n, n), dtype=np.uint8)
-        destino_r[pf, pc] = pred
-        cdest = np.zeros((len(nombres) + 1, len(DESTINOS) + 1), dtype=np.int64)
-        np.add.at(cdest, (r_uni[pf, pc], pred), 1)
-        destino = tabla_destino(cdest, nombres, np.bincount(r_uni.ravel(), minlength=len(nombres) + 1) > 0)
+        modelos, exactitudes, dest_t = {}, {}, {}
+        for t in range(1, N):
+            ra = rasgos_anio[anios[t]]
+            modelos[t], exactitudes[t], _ = entrenar_destino(mf, mc, lab[mf, mc], ra[mf, mc], gb.affine, muestreo)
+            cambio_t = mapa_cambio(bos[t - 1], bos[t], quemados[t])
+            pf, pc = np.nonzero(cambio_t == PERD_OTRA)
+            dest_t[t] = np.zeros((n, n), dtype=np.uint8)
+            dest_t[t][pf, pc] = predecir_destino(modelos[t], ra[pf, pc])
 
-        # Los desgloses cuadran con el balance
-        suma = veg.groupby("unidad")[COLUMNAS_VEG[1:]].sum().reindex(bal["unidad"]).fillna(0)
-        assert np.allclose(suma.to_numpy(), bal.set_index("unidad")[COLUMNAS_VEG[1:]].to_numpy()), \
-            "El desglose por clave no cuadra con el balance"
-        assert np.allclose(destino["otras_perdidas_ha"], bal["otras_perdidas_ha"]), \
-            "El destino no cuadra con las otras pérdidas"
-        assert set(destino_r[pf, pc]) >= {1, 3, SIN_DATO_DESTINO}, "El demo debe tener destinos variados"
-        return {"balance": bal, "incendios": pd.DataFrame(filas), "cambio": cambio, "umbral": umbral,
-                "vegetacion": veg, "tipos": tipos, "destino": destino, "exactitud": exactitud,
-                "destino_r": destino_r}
+        salida = {"umbral": umbral, "pares": {}, "bosques": bos, "zona": zona}
+        for i, j in pares_de(N):
+            b, a = bos[i], bos[j]
+            quemado = np.logical_or.reduce(quemados[i + 1:j + 1])
+            filas = [{"incendio": clave, "fecha_inicio": f"{fecha:%Y-%m-%d}",
+                      "poligono_ha": round(poly.sum() * HA_PIXEL, 2),
+                      "quemado_dnbr_ha": round(q.sum() * HA_PIXEL, 2),
+                      "quemado_en_bosque_ha": round((q & b[rs, cs]).sum() * HA_PIXEL, 2),
+                      "perdido_al_cierre_ha": round((q & b[rs, cs] & ~a[rs, cs]).sum() * HA_PIXEL, 2),
+                      "dnbr_mediana": round(float(np.nanmedian(np.where(poly, d, np.nan))), 3)}
+                     for clave, fecha, p, rs, cs, poly, q, d in filas_q if i < p <= j]
+            cambio = mapa_cambio(b, a, quemado)
+            bal = balance(b, a, quemado, en_refo, r_uni, nombres)
+            # Por clave y tipo de bosque, contando unidad por unidad y clave por clave
+            cveg = np.zeros(((len(nombres) + 1) * (k + 1), len(COLUMNAS_VEG)), dtype=np.int64)
+            for u in range(1, len(nombres) + 1):
+                for kk in range(k + 1):
+                    m = (r_uni == u) & (r_clave == kk) & zona
+                    cveg[u * (k + 1) + kk] = [m.sum(), (m & b).sum(), (m & (cambio == PERD_INCENDIO)).sum(),
+                                              (m & (cambio == PERD_OTRA)).sum(), (m & (cambio == GANANCIA)).sum(),
+                                              (m & a).sum()]
+            veg, tipos = tablas_vegetacion(cveg, nombres, claves)
+            # Destino de cada otra pérdida: el que le dio el clasificador del año en que dejó de ser
+            # bosque por última vez dentro de la comparación
+            destino_r = np.zeros((n, n), dtype=np.uint8)
+            pf, pc = np.nonzero(cambio == PERD_OTRA)
+            for f, c in zip(pf, pc):
+                ultimo = max(t for t in range(i + 1, j + 1) if bos[t - 1][f, c] and not bos[t][f, c])
+                destino_r[f, c] = dest_t[ultimo][f, c]
+            cdest = np.zeros((len(nombres) + 1, len(DESTINOS) + 1), dtype=np.int64)
+            np.add.at(cdest, (r_uni[pf, pc], destino_r[pf, pc]), 1)
+            destino = tabla_destino(cdest, nombres, np.bincount(r_uni.ravel(), minlength=len(nombres) + 1) > 0)
+
+            # Los desgloses cuadran con el balance
+            suma = veg.groupby("unidad")[COLUMNAS_VEG[1:]].sum().reindex(bal["unidad"]).fillna(0)
+            assert np.allclose(suma.to_numpy(), bal.set_index("unidad")[COLUMNAS_VEG[1:]].to_numpy()), \
+                "El desglose por clave no cuadra con el balance"
+            assert np.allclose(destino["otras_perdidas_ha"], bal["otras_perdidas_ha"]), \
+                "El destino no cuadra con las otras pérdidas"
+            assert (destino_r[pf, pc] > 0).all(), "Otra pérdida sin destino"
+            cols_inc = ["incendio", "fecha_inicio", "poligono_ha", "quemado_dnbr_ha", "quemado_en_bosque_ha",
+                        "perdido_al_cierre_ha", "dnbr_mediana"]
+            salida["pares"][(i, j)] = {"balance": bal, "incendios": pd.DataFrame(filas, columns=cols_inc),
+                                       "cambio": cambio,
+                                       "vegetacion": veg, "tipos": tipos, "destino": destino,
+                                       "exactitud": exactitudes.get(j) if j == i + 1 else None,
+                                       "destino_r": destino_r}
+        assert set(salida["pares"][(0, 1)]["destino_r"][salida["pares"][(0, 1)]["cambio"] == PERD_OTRA]) \
+            >= {1, 3, SIN_DATO_DESTINO}, "El demo debe tener destinos variados"
+        bits = np.zeros((n, n), dtype=np.uint8)
+        anio_perd = np.zeros((n, n), dtype=np.uint8)
+        for t in range(N):
+            bits += bos[t].astype(np.uint8) * 2 ** t
+            if t:
+                anio_perd[bos[t - 1] & ~bos[t]] = anios[t] - 2000
+        salida.update(bits=bits, anio_perdida=anio_perd,
+                      sin_encadenar=[np.bincount(r_uni[zona & (np.nan_to_num(ndvi[x], nan=-9) >= umbral)],
+                                                 minlength=len(nombres) + 1) for x in anios])
+        return salida
 
     # Bloques alineados a tres "teselas" con mallas desfasadas (en cuadros de 1 km)
     origenes = [(x0 - 20, y0 + 20, "T1"), (x0 + 960, y0, "T2"), (x0 + 1980, y0 - 980, "T3")]
@@ -1787,6 +2169,12 @@ def comprobar_bloques():
     saltados = len(saltados)
     cruzan = sum(sum(_cruce(ventana_incendio(gb, g), b) is not None for b in bloques) > 1
                  for _, _, g in incendios if not g.equals(sin_imagenes))
+    # Con dos años, la serie encadenada es la regla de siempre
+    zona_toda = np.ones((n, n), dtype=bool)
+    for u in (0.55, 0.62):
+        assert all(np.array_equal(x, y) for x, y in zip(
+            mascaras_serie([ndvi[2023], ndvi[2024]], u, 0.10, zona_toda),
+            mascaras_con_margen(ndvi[2023], ndvi[2024], u, 0.10, zona_toda))), "Serie de 2 años distinta"
 
     class Corte(Exception):
         pass
@@ -1802,27 +2190,50 @@ def comprobar_bloques():
         return envuelta
 
     with tempfile.TemporaryDirectory() as tmp:
-        def calcular(nombre, bloques_, umbral, ndvi_=leer_ndvi, dnbr_=leer_dnbr, hilos=1):
+        def calcular(nombre, bloques_, umbral, ndvi_=leer_ndvi, dnbr_=leer_dnbr, hilos=1,
+                     anios=(2023, 2024), incs=incendios):
             salida = Path(tmp) / nombre
-            res = calcular_por_bloques(gb, bloques_, capas, ndvi_, dnbr_, incendios, nombres,
-                                       anio_base=2023, anio=2024, umbral=umbral, margen=0.10,
+            res = calcular_por_bloques(gb, bloques_, capas, ndvi_, dnbr_, incs, nombres,
+                                       anios=list(anios), umbral=umbral, margen=0.10,
                                        umbral_dnbr=UMBRAL_DNBR, salida=salida,
-                                       firma={"demo": umbral}, hilos=hilos, log=lambda *x: None,
-                                       claves=claves, leer_rasgos=leer_rasgos, muestreo=muestreo)
+                                       firma={"demo": umbral, "anios": list(anios)}, hilos=hilos,
+                                       log=lambda *x: None, claves=claves, leer_rasgos=leer_rasgos,
+                                       muestreo=muestreo, capas_serie=len(anios) > 2)
             res.progreso.borrar()
-            with rasterio.open(salida / "cambio_2023_2024.tif") as src, \
-                    rasterio.open(salida / "destino_2023_2024.tif") as src_d:
-                return res, src.read(1), src_d.read(1)
+            rasters = {}
+            for i, j in pares_de(len(anios)):
+                for capa in ("cambio", "destino"):
+                    with rasterio.open(salida / f"{capa}_{anios[i]}_{anios[j]}.tif") as src:
+                        rasters[(capa, i, j)] = src.read(1)
+            if len(anios) > 2:
+                for capa in ("bosque_por_anio", "anio_perdida"):
+                    with rasterio.open(salida / f"{capa}.tif") as src:
+                        rasters[capa] = src.read(1)
+            return res, rasters
 
-        def igual(nombre, umbral, res, cambio, destino_r):
-            ref = referencia(umbral)
+        def igual(nombre, umbral, res, rasters, anios=(2023, 2024), incs=incendios):
+            ref = referencia(umbral, anios, incs)
             assert res.umbral == ref["umbral"], f"{nombre}: umbral distinto"
-            for campo in ("balance", "incendios", "vegetacion", "tipos", "destino", "exactitud"):
-                pd.testing.assert_frame_equal(getattr(res, campo), ref[campo], check_exact=True,
-                                              obj=f"{nombre}: {campo}")
-            assert np.array_equal(cambio, ref["cambio"]), f"{nombre}: el ráster de cambio no coincide"
-            assert np.array_equal(destino_r, ref["destino_r"]), f"{nombre}: el ráster de destino no coincide"
-            assert res.incendios["incendio"].is_unique, f"{nombre}: incendio contado dos veces"
+            for (i, j), rp in ref["pares"].items():
+                r = res.pares[(i, j)]
+                for campo in ("balance", "incendios", "vegetacion", "tipos", "destino", "exactitud"):
+                    if rp[campo] is None:
+                        assert getattr(r, campo) is None, f"{nombre} {i}-{j}: {campo} sobra"
+                        continue
+                    pd.testing.assert_frame_equal(getattr(r, campo), rp[campo], check_exact=True,
+                                                  obj=f"{nombre} {i}-{j}: {campo}")
+                assert np.array_equal(rasters[("cambio", i, j)], rp["cambio"]), f"{nombre} {i}-{j}: cambio"
+                assert np.array_equal(rasters[("destino", i, j)], rp["destino_r"]), f"{nombre} {i}-{j}: destino"
+                assert r.incendios["incendio"].is_unique, f"{nombre}: incendio contado dos veces"
+            if len(anios) > 2:
+                assert np.array_equal(rasters["bosque_por_anio"], ref["bits"]), f"{nombre}: bosque por año"
+                assert np.array_equal(rasters["anio_perdida"], ref["anio_perdida"]), f"{nombre}: año de pérdida"
+            sin = res.sin_encadenar.pivot(index="unidad", columns="anio", values="bosque_sin_encadenar_ha")
+            for t, anio in enumerate(anios):
+                esperado = {nm: round(float(ref["sin_encadenar"][t][u]) * HA_PIXEL, 2)
+                            for u, nm in enumerate(nombres, 1) if nm in sin.index}
+                assert sin[anio].to_dict() == esperado, f"{nombre}: bosque sin encadenar"
+            return ref
 
         for umbral in (0.55, "auto"):
             igual("una sola vez", umbral, *calcular(f"una_{umbral}", [Bloque(0, n, 0, n)], umbral))
@@ -1847,11 +2258,61 @@ def comprobar_bloques():
             igual(f"{nombre} reanudada", umbral, *calcular(nombre, bloques, umbral, hilos=hilos))
             assert not (Path(tmp) / nombre / "progreso_2023_2024").exists()
 
+        # Serie de tres años: de una sola vez, por bloques, en paralelo e interrumpida
+        tres = (2023, 2024, 2025)
+        for umbral in (0.55, "auto"):
+            for nombre, bl, hilos in (("serie una", [Bloque(0, n, 0, n)], 1), ("serie bloques", bloques, 1),
+                                      ("serie hilos", bloques, 3)):
+                ref = igual(nombre, umbral, *calcular(f"{nombre}_{umbral}".replace(" ", "_"), bl, umbral,
+                                                      hilos=hilos, anios=tres, incs=incendios_serie),
+                            anios=tres, incs=incendios_serie)
+        try:
+            calcular("serie_corte", bloques, 0.55, ndvi_=cortar_tras(leer_ndvi, 20), anios=tres, incs=incendios_serie)
+            raise AssertionError("serie_corte: la corrida no se interrumpió")
+        except Corte:
+            pass
+        res, rasters = calcular("serie_corte", bloques, 0.55, anios=tres, incs=incendios_serie)
+        ref = igual("serie interrumpida y reanudada", 0.55, res, rasters, anios=tres, incs=incendios_serie)
+
+        # Cuatro años: hay píxeles que se pierden dos veces (2024 y 2026); anio_perdida guarda la última
+        for nombre, bl in (("cuatro una", [Bloque(0, n, 0, n)]), ("cuatro bloques", bloques)):
+            r4 = igual(nombre, 0.55, *calcular(nombre.replace(" ", "_"), bl, 0.55, anios=(2023, 2024, 2025, 2026),
+                                               incs=incendios_serie), anios=(2023, 2024, 2025, 2026),
+                       incs=incendios_serie)
+        b4 = r4["bosques"]
+        assert (b4[0] & ~b4[1] & b4[2] & ~b4[3]).any(), "El demo debe tener píxeles que se pierden dos veces"
+
+        # La serie se separa de las comparaciones directas: hay píxeles en que el bosque de 2024
+        # encadenado no es el del umbral de 2024, y el balance de cada comparación cuadra
+        assert not np.array_equal(ref["bosques"][1], mascaras_con_margen(
+            ndvi[2024], ndvi[2025], 0.55, 0.10, ref["zona"])[0]), \
+            "El demo debe tener píxeles en que la serie difiere de la comparación directa"
+        for r in res.pares.values():
+            b = r.balance
+            assert np.allclose(b.bosque_base_ha - b.perdida_incendio_ha - b.otras_perdidas_ha + b.ganancia_ha,
+                               b.bosque_actual_ha), "El balance de una comparación no cuadra"
+        assert res.pares[(0, 2)].balance["bosque_base_ha"].equals(res.pares[(0, 1)].balance["bosque_base_ha"])
+        assert res.pares[(0, 2)].balance["bosque_actual_ha"].equals(res.pares[(1, 2)].balance["bosque_actual_ha"])
+        assert res.pares[(1, 2)].balance["bosque_base_ha"].equals(res.pares[(0, 1)].balance["bosque_actual_ha"])
+        ts = tabla_serie(res)
+        tt = tabla_tendencia(ts)
+        todos = ts[ts.tipo_bosque == TODOS]
+        por_tipo = ts[ts.tipo_bosque != TODOS].groupby(["unidad", "anio"])["bosque_ha"].sum()
+        assert np.allclose(todos.set_index(["unidad", "anio"])["bosque_ha"].reindex(por_tipo.index), por_tipo), \
+            "La serie por tipo no cuadra con la de la unidad"
+        tot = todos.groupby("anio")["bosque_ha"].sum()
+        t_tot = tt[(tt.unidad == "Total") & (tt.tipo_bosque == TODOS)].iloc[0]
+        assert abs(t_tot.tendencia_ha_anio - round((tot[2025] - tot[2023]) / 2, 2)) < 0.011, "Tendencia"
+
     print(f"Por bloques = de una sola vez: {len(bloques)} bloques ({saltados} fuera de la zona, "
           f"saltados), {len(incendios)} incendios ({cruzan} cruzan bloques), umbral fijo y automático, "
           "incendios uno por uno y en paralelo, corridas interrumpidas y reanudadas: mismo balance, "
           "mismo ráster de cambio, una fila por incendio, mismo desglose por clave y tipo de bosque, "
           "mismo clasificador y mismo destino de las otras pérdidas")
+    print(f"Serie 2023-2025 (bosque encadenado): las 3 comparaciones, el bosque por año y el año de pérdida "
+          f"dan lo mismo por bloques y de una sola vez, con {len(incendios_serie)} incendios en 2 periodos; "
+          f"con dos años la serie es exactamente correr; también con 4 años. Tendencia del demo: "
+          f"{t_tot.tendencia_ha_anio:+.2f} ha/año")
 
 
 def cmd_demo(a):
@@ -1929,22 +2390,23 @@ def _mes_dia(texto):
     return texto
 
 
+def _opciones_lectura(sub):
+    sub.add_argument("--nubes-max", type=float, default=NUBES_MAX,
+                     help=f"%% máximo de nubes por escena (eo:cloud_cover); por defecto {NUBES_MAX}. "
+                          "En correr se aplica también a las escenas del dNBR")
+    sub.add_argument("--escenas-max", type=int, default=None,
+                     help="máximo de escenas por tesela para cada compuesto anual (las menos "
+                          "nubladas); por defecto todas")
+    sub.add_argument("--ventana", nargs=2, metavar=("INICIO", "FIN"), type=_mes_dia,
+                     default=list(VENTANA_COBERTURA),
+                     help="días del año del compuesto, MM-DD MM-DD (por defecto 11-01 12-31). Las dos "
+                          "fechas de un balance deben usar la misma ventana; otra temporada da otras "
+                          "hectáreas, que no se comparan con las de nov-dic")
+
+
 def main():
     p = argparse.ArgumentParser(description="Prototipo de la Calculadora de masa forestal (PROBOSQUE)")
     sp = p.add_subparsers(dest="cmd", required=True)
-
-    def lectura(sub):
-        sub.add_argument("--nubes-max", type=float, default=NUBES_MAX,
-                         help=f"%% máximo de nubes por escena (eo:cloud_cover); por defecto {NUBES_MAX}. "
-                              "En correr se aplica también a las escenas del dNBR")
-        sub.add_argument("--escenas-max", type=int, default=None,
-                         help="máximo de escenas por tesela para cada compuesto anual (las menos "
-                              "nubladas); por defecto todas")
-        sub.add_argument("--ventana", nargs=2, metavar=("INICIO", "FIN"), type=_mes_dia,
-                         default=list(VENTANA_COBERTURA),
-                         help="días del año del compuesto, MM-DD MM-DD (por defecto 11-01 12-31). Las dos "
-                              "fechas de un balance deben usar la misma ventana; otra temporada da otras "
-                              "hectáreas, que no se comparan con las de nov-dic")
 
     d = sp.add_parser("demo", help="probar la lógica con datos inventados")
     d.add_argument("--salida", default=None)
@@ -1954,12 +2416,29 @@ def main():
     c.add_argument("--anio", type=int, required=True)
     c.add_argument("--puntos", required=True)
     c.add_argument("--salida", default="resultados")
-    lectura(c)
+    _opciones_lectura(c)
 
-    r = sp.add_parser("correr", help="calcular el balance de masa forestal")
-    r.add_argument("--aoi", required=True)
+    def opciones_corrida(r):
+        """Opciones comunes de correr y serie."""
+        r.add_argument("--aoi", required=True)
+        _opciones_calculo(r)
+
+    r = sp.add_parser("correr", help="calcular el balance de masa forestal entre dos años")
     r.add_argument("--anio-base", type=int, required=True)
     r.add_argument("--anio", type=int, required=True)
+    opciones_corrida(r)
+    s = sp.add_parser("serie", help="bosque de varios años encadenado, sus comparaciones y la tendencia "
+                                    "(CF-DEV-08, 10 y 12)")
+    s.add_argument("--anios", type=int, nargs="+", required=True,
+                   help=f"años de la serie (de 2 a {MAX_ANIOS}), p. ej. 2023 2024 2025. Con dos da lo mismo "
+                        "que correr")
+    opciones_corrida(s)
+
+    a = p.parse_args()
+    {"demo": cmd_demo, "calibrar": cmd_calibrar, "correr": cmd_correr, "serie": cmd_serie}[a.cmd](a)
+
+
+def _opciones_calculo(r):
     r.add_argument("--umbral-ndvi", required=True,
                    help="número (p. ej. 0.55) o 'auto' para el umbral de Otsu provisional")
     r.add_argument("--umbral-dnbr", type=float, default=UMBRAL_DNBR)
@@ -1994,7 +2473,7 @@ def main():
     r.add_argument("--unidades")
     r.add_argument("--campo-unidad", default="NOMGEO")
     r.add_argument("--salida", default="resultados")
-    lectura(r)
+    _opciones_lectura(r)
     r.add_argument("--bloques", action="store_true",
                    help="procesar por bloques en memoria (para zonas grandes, como todo el estado)")
     r.add_argument("--tam-bloque", type=int, default=2 * BLOQUE_COG,
@@ -2008,9 +2487,6 @@ def main():
                         "el resultado; 1 = uno por uno")
     r.add_argument("--reiniciar", action="store_true",
                    help="descartar el avance de una corrida interrumpida y empezar de nuevo")
-
-    a = p.parse_args()
-    {"demo": cmd_demo, "calibrar": cmd_calibrar, "correr": cmd_correr}[a.cmd](a)
 
 
 if __name__ == "__main__":

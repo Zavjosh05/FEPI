@@ -1,9 +1,9 @@
 {
  "version_hansen": "GFC-2025-v1.13",
- "fecha": "2026-11-03T23:21:59",
+ "fecha": "2026-11-04T02:25:05",
  "comparaciones": [
   {
-   "ruta": "resultados/edomex_2023_2024/cambio_2023_2024.tif",
+   "ruta": "resultados/edomex_serie_2023_2025/cambio_2023_2024.tif",
    "periodo": "2023_2024",
    "anios_hansen": [
     24
@@ -12,7 +12,7 @@
    "texto_anios": "2024"
   },
   {
-   "ruta": "resultados/edomex_2024_2025/cambio_2024_2025.tif",
+   "ruta": "resultados/edomex_serie_2023_2025/cambio_2024_2025.tif",
    "periodo": "2024_2025",
    "anios_hansen": [
     25
@@ -22,12 +22,12 @@
   }
  ],
  "zona_forestal": "datos/edomex/usv_serie7_edomex.gpkg",
- "clases_forestales": "^(B|VSA/)",
+ "clases_forestales": "^(B|S|M|VSA/)",
  "tolerancia_m": 30,
  "cobertura_min": 30,
  "recortes": {
   "lossyear": "datos/edomex/hansen/Hansen_GFC-2025-v1.13_lossyear_edomex.tif",
   "treecover2000": "datos/edomex/hansen/Hansen_GFC-2025-v1.13_treecover2000_edomex.tif"
  },
- "segundos_comparacion": 31
+ "segundos_comparacion": 32
 }

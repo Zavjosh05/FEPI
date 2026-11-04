@@ -32,33 +32,43 @@ bosque_actual = bosque_base − pérdida_por_incendio − otras_pérdidas + gana
   (ver [Uso al que pasó el terreno](#uso-al-que-pasó-el-terreno-cf-dev-07-opción-a)).
 - **Reforestación:** recuperación **esperada** (polígonos de PS/RHF/CC × sobrevivencia) contra la
   **observada** por el satélite.
+- **Serie anual (CF-DEV-08):** con `serie`, el bosque de cada año se encadena: el primer año es el
+  que pasa el umbral y cada año siguiente parte del anterior con la misma regla del margen. Así un
+  año vale lo mismo en todas las comparaciones. Da además la tendencia (ha/año y %/año por mínimos
+  cuadrados), el bosque de cada año (`bosque_por_anio.tif`) y el año de pérdida (`anio_perdida.tif`,
+  CF-DEV-12). Ver [Serie anual](#serie-anual-cf-dev-08-10-y-12).
 
 ## Estructura
 
 ```
 FEPI/
 ├── src/
-│   ├── prototipo_masa_forestal.py   Calculadora (subcomandos demo, calibrar, correr)
+│   ├── prototipo_masa_forestal.py   Calculadora (subcomandos demo, calibrar, correr, serie)
 │   ├── descargar_capas.py           Descarga las capas del Estado de México desde IDEFOR
-│   ├── comparar_resultados.py       Compara dos corridas (balance, incendios, ráster de cambio)
+│   ├── comparar_resultados.py       Compara dos corridas (balance, incendios, rásters, serie)
 │   ├── mapa_cambio.py               Dibuja el mapa PNG de una corrida
 │   ├── mapa_interactivo.py          Arma la página HTML interactiva (con plantilla_mapa.html)
 │   ├── plantilla_mapa.html          Diseño y código de esa página
 │   ├── validar_hansen.py            Compara la pérdida con Hansen GFC v1.13 (CF-DEV-09)
 │   └── muestra_puntos.py            Puntos estratificados para fotointerpretar
 ├── docs/
-│   └── mapa_edomex.html             Página interactiva del estado (todos los periodos)
+│   └── mapa_edomex.html             Página interactiva del estado (serie, comparaciones, alcances)
 ├── datos/
 │   ├── piloto/                      Recortes usados en el piloto (versionados)
 │   └── edomex/                      Capas estatales descargadas (no se versionan)
-├── resultados/
-│   └── piloto_2023_2024/            Salidas del piloto, con su LEEME.md
+├── resultados/                      Cada carpeta con su LEEME.md
+│   ├── piloto_2023_2024/            Salidas del piloto
+│   ├── edomex_serie_2023_2025/      Serie estatal nov-dic 2023 → 2024 → 2025
+│   ├── edomex_2025_2026_sepoct/     Preliminar septiembre-octubre 2025 → 2026
+│   ├── validacion_hansen/           Comparación con Hansen GFC
+│   └── anteriores_0.5/              Corridas estatales con la zona anterior
 ├── requirements.txt
 ├── CHANGELOG.md                     Registro de cambios
 └── README.md
 ```
 
-Las corridas nuevas conviene guardarlas en `resultados/<nombre>/`. Git las ignora, salvo el piloto.
+Las corridas nuevas conviene guardarlas en `resultados/<nombre>/`. Git las ignora, salvo las que
+están en la lista de arriba (`.gitignore` las habilita una por una).
 
 ## Instalación
 
@@ -108,8 +118,9 @@ De dónde sale cada dato y en qué condiciones se puede usar: ver
 Todos los comandos se corren desde la raíz del repositorio, con el venv activado.
 
 ```bash
-# 1. Probar la lógica con datos inventados (no descarga nada; el balance debe dar 516 ha y
-#    procesar por bloques debe dar lo mismo que de una sola vez). Tarda unos segundos
+# 1. Probar la lógica con datos inventados (no descarga nada; el balance debe dar 516 ha,
+#    procesar por bloques debe dar lo mismo que de una sola vez y la serie de 2 años lo mismo
+#    que correr). Tarda unos 30 segundos
 python src/prototipo_masa_forestal.py demo
 
 # 2. Calibrar el umbral de NDVI con un CSV lon,lat,clase (1 bosque, 0 no bosque)
@@ -186,20 +197,64 @@ Salidas de `correr`, todas en EPSG:32614 (UTM 14N):
 | `bloques_<base>_<actual>.csv` | Cada bloque: escenas leídas, segundos y RAM pico del proceso |
 | `ndvi_<año>.tif`, `dnbr.tif` | Índices en float32. Se guardan por defecto solo de una sola vez; con `--bloques` hay que pedirlos con `--guardar-indices` (~1.5 GB cada uno para el estado) |
 
-Para comparar dos corridas (por ejemplo, con y sin `--bloques`):
+Desde 0.7.0, `incendios_dnbr.csv` trae además la columna `periodo` (`<base>_<actual>`).
+
+### Serie anual (CF-DEV-08, 10 y 12)
+
+`serie` lee una sola vez, en cada bloque, el compuesto de cada año y arma todas las comparaciones
+entre ellos. Para el estado:
+
+```bash
+python src/prototipo_masa_forestal.py serie --aoi datos/edomex/estado_mexico.gpkg   --anios 2023 2024 2025 --umbral-ndvi 0.51   --zona-forestal datos/edomex/usv_serie7_edomex.gpkg   --incendios datos/edomex/incendios_conafor_edomex.gpkg   --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN   --bloques --salida resultados/edomex_serie_2023_2025
+```
+
+- **Bosque encadenado:** el bosque del primer año es NDVI ≥ umbral dentro de la zona. En cada año
+  siguiente, un píxel solo cambia de clase si cruza el umbral y además su NDVI cambió al menos 0.10
+  respecto del año anterior. Con dos años es exactamente `correr` (el demo y el piloto lo
+  comprueban); `correr` es, de hecho, la serie de dos años.
+- **Incendios:** cada uno cuenta en su periodo, del 1-nov de un año al 31-oct del siguiente, y
+  en las comparaciones largas que lo incluyen.
+- **Comparaciones:** todas las de los años pedidos (con 2023, 2024 y 2025: 2023→2024, 2024→2025 y
+  2023→2025), cada una con las mismas salidas de `correr` (`balance_`, `cambio_`, `vegetacion_`,
+  `tipo_bosque_`, `destino_perdidas_`, `destino_`, `corrida_`). Una comparación larga compara el
+  bosque del primer año con el del último: su balance cuadra píxel por píxel y la cifra de cada
+  año es la misma en todas. Su pérdida es "por incendio" si el píxel se quemó en alguno de sus
+  periodos; el destino de una otra pérdida es el que le dio el clasificador del año en que el
+  píxel dejó de ser bosque por última vez.
+- **Clasificador de destino:** uno por año, entrenado con el compuesto de ese año
+  (`destino_exactitud_<año anterior>_<año>.csv`).
+- `--umbral-ndvi auto` usa Otsu sobre el primer año. Hasta 8 años (un bit por año).
+
+Salidas propias de `serie`:
+
+| Archivo | Contenido |
+|---|---|
+| `serie_<a0>_<aN>.csv` | Por unidad, año y tipo de bosque (`Todos` = la unidad completa): zona forestal, bosque, y desde el año anterior la pérdida por incendio, las otras pérdidas, la ganancia y el cambio neto. Las filas `Todos` traen además el destino de las otras pérdidas y `bosque_sin_encadenar_ha` (el bosque de ese año con solo el umbral, como lo tomaría una comparación directa que empezara ahí) |
+| `tendencia_<a0>_<aN>.csv` | Por unidad (y `Total`) y tipo: pendiente por mínimos cuadrados en ha/año y en % del bosque del primer año por año, y R² (desde 3 años) |
+| `bosque_por_anio.tif` | uint8: bit *t* = bosque en el año *t* (bit 0 = primer año) |
+| `anio_perdida.tif` | uint8: 0 sin pérdida; si no, año − 2000 del último año en que el píxel dejó de ser bosque (por incendio u otra causa) |
+| `serie_<a0>_<aN>.json` | Parámetros, escenas e incendios por año, y resumen de cada clasificador |
+| `incendios_dnbr_<a>_<b>.csv` | Incendios de una comparación de años no consecutivos, con sus cifras contra el bosque de esa comparación |
+
+Con tres años, la tendencia por mínimos cuadrados es (último − primero) / 2: solo con más años dice
+algo que el cambio total no diga.
+
+Para comparar dos corridas (por ejemplo, con y sin `--bloques`, o `serie` contra `correr`):
 
 ```bash
 python src/comparar_resultados.py resultados/piloto_2023_2024 resultados/otra_corrida
+python src/comparar_resultados.py resultados/edomex_serie_2023_2025 otra_serie --periodo 2024_2025
 ```
 
-Compara valor por valor el balance (por unidad), los incendios (por clave) y el ráster de cambio
-(píxeles distintos), y dice si todo es idéntico. Si las dos carpetas tienen los desgloses y el
-destino, también los compara; si solo una los tiene (las corridas anteriores a 0.6.0), los omite.
+Compara valor por valor el balance (por unidad), los incendios (por clave; con `periodo`, solo los
+de ese periodo) y el ráster de cambio (píxeles distintos), y dice si todo es idéntico. Si las dos
+carpetas tienen los desgloses, el destino o las salidas de la serie, también los compara; si solo
+una los tiene, los omite.
 
 Para dibujar el mapa de una corrida (`correr` no lo hace):
 
 ```bash
-python src/mapa_cambio.py resultados/edomex_2023_2024 \
+python src/mapa_cambio.py resultados/anteriores_0.5/edomex_2023_2024 \
   --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN --titulo "Estado de México"
 ```
 
@@ -215,35 +270,41 @@ No sobrescribe un mapa que ya exista, a menos que se use `--sobrescribir`.
 ### Página interactiva
 
 [`docs/mapa_edomex.html`](docs/mapa_edomex.html) se abre directo en el navegador, sin servidor.
-Solo necesita internet para cargar la librería D3. Permite:
+Solo necesita internet para cargar la librería D3. Tiene dos modos:
 
-- acercar y arrastrar el mapa, o buscar un municipio por nombre;
-- ver el ráster de cambio, con cada clase como capa que se prende y apaga, o el cambio neto por
-  municipio;
-- ver las cifras de un municipio al pasar el cursor, y su detalle en todos los periodos al
-  elegirlo;
-- ver el desglose por tipo de bosque del periodo elegido: del estado cuando no hay municipio
-  elegido y del municipio cuando sí. Solo aparece en las corridas que traen
-  `tipo_bosque_<base>_<actual>.csv` (desde 0.6.0);
-- comparar años con un selector **Desde → Hasta**: 2023 → 2024, 2024 → 2025, 2023 → 2025 o
-  2025 → 2026. El de 2026 es el preliminar de septiembre-octubre, va marcado así y avisa que es
-  otra temporada. Las combinaciones sin corrida dicen "sin datos"; si eliges una, el otro año se
-  ajusta al más cercano que sí tiene;
-- ordenar la tabla de municipios.
+- **Comparar años** (Desde → Hasta): 2023 → 2024, 2024 → 2025, 2023 → 2025 y el preliminar
+  2025 → 2026 de septiembre-octubre, marcado así porque es otra temporada. Las comparaciones
+  nov-dic salen de la serie, así que la cifra de cada año es la misma en todas. Las combinaciones
+  sin datos dicen "sin datos"; si eliges una, el otro año se ajusta al más cercano que sí tiene.
+- **Un año** (CF-DEV-10): el bosque de ese año en el mapa (cada celda según qué parte de ella tiene
+  bosque), sus cifras (bosque, % de la zona forestal, cambio desde el año anterior y sus partes,
+  tendencia), la tabla de municipios de ese año y, en el panel, el bosque por tipo con su
+  tendencia y el uso al que pasaron las otras pérdidas.
 
-Se adapta al tema claro u oscuro y a pantallas de teléfono. Para regenerarla con todas las
-corridas:
+En los dos:
+
+- **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
+  por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
+  años" muestra los años de la comparación elegida.
+- **Serie y tendencia** (CF-DEV-08) en el detalle: al elegir un municipio (o sin elegir, toda la
+  zona), una gráfica del bosque de cada año con la recta de tendencia.
+- Ráster de cambio con sus clases como capas, cambio neto por municipio o tendencia por municipio
+  (%/año); cifras al pasar el cursor; tabla ordenable; desglose por tipo de bosque.
+- **Alcances** (CF-DEV-14): qué mide, dónde, cuándo, con qué fuentes, cómo se arma la serie y qué
+  no puede afirmar todavía.
+
+Los colores nuevos (densidad de bosque y año de pérdida) son rampas de un solo tono validadas con
+el validador del skill dataviz (`--ordinal`, contra el fondo sin bosque) en el tema claro y en el
+oscuro. Se adapta al tema y a pantallas de teléfono. Para regenerarla:
 
 ```bash
-python src/mapa_interactivo.py resultados/edomex_2023_2024 resultados/edomex_2024_2025 \
-  resultados/edomex_2023_2025 resultados/edomex_2025_2026_sepoct \
-  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
-  --titulo "Estado de México" --salida docs/mapa_edomex.html
+python src/mapa_interactivo.py resultados/edomex_serie_2023_2025 resultados/edomex_2025_2026_sepoct   --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN   --titulo "Estado de México" --validacion resultados/validacion_hansen --salida docs/mapa_edomex.html
 ```
 
-Cada comparación es su propia corrida de `correr`; la página no las suma. Las corridas deben ser de
-la misma zona (mismo `--aoi`). Como está en `docs/`, se puede publicar
-con GitHub Pages si el repositorio es público.
+Cada carpeta puede ser de `correr` (una comparación) o de `serie` (varias, más el modo "Un año").
+Si dos carpetas traen el mismo par de años y temporada, gana la de la serie. Todas deben ser de la
+misma zona (mismo `--aoi`). `--validacion` agrega a "Alcances" la precisión contra Hansen. Como está
+en `docs/`, se puede publicar con GitHub Pages si el repositorio es público.
 
 ## Cobertura geográfica
 
@@ -367,72 +428,73 @@ estaban en bosque, y solo 54 ha seguían sin copa al cierre. Las "otras pérdida
 verificar (tala, plaga, nieve o ruido). Detalles en
 [`resultados/piloto_2023_2024/LEEME.md`](resultados/piloto_2023_2024/LEEME.md).
 
-## Resultados del estado (2023 → 2024)
+## Resultados del estado: serie 2023 → 2025
 
-Corrida con `--bloques` el 14–15 de octubre de 2026. Usó umbral NDVI 0.51 (Otsu sobre todo el
-estado, provisional), 115 y 213 escenas, 9 teselas y 1,085 incendios.
-
-| | Hectáreas |
-|---|---|
-| Bosque 2023 | 459,262 |
-| Pérdida por incendio | 708 |
-| Otras pérdidas (por verificar) | 7,788 |
-| Ganancia | 2,684 |
-| **Bosque 2024** | **453,450** (−5,812, −1.3 %) |
-
-- **Incendios:** CONAFOR reportó 52,325 ha de polígonos. De ellas, 16,214 ha tienen dNBR ≥ 0.27;
-  8,388 ha estaban en bosque, y solo 708 ha seguían sin copa al cierre. En 258 incendios el dNBR
-  no detectó nada quemado: probablemente fueron superficiales o pequeños.
-- **Mayor pérdida neta:** Tlatlaya (−633 ha), Luvianos (−590), Atlautla (−461), Ocuilan (−440),
-  Temascaltepec (−404) y Santo Tomás (−378, el 19 % de su bosque). Casi todo son "otras
-  pérdidas", que hay que verificar (tala, plaga, nieve o ruido).
-- **El umbral automático cambia con la zona que se corre** (0.50 en el piloto, 0.51 en el
-  estado). Por eso Amecameca da 7,051 ha de bosque en esta corrida y 7,123 ha en el piloto. Para
-  comparar corridas conviene fijar un umbral numérico.
-
-Mapa: [`resultados/edomex_2023_2024/mapa_cambio_2023_2024.png`](resultados/edomex_2023_2024/mapa_cambio_2023_2024.png).
-Detalles en [`resultados/edomex_2023_2024/LEEME.md`](resultados/edomex_2023_2024/LEEME.md).
-
-## Todas las comparaciones del estado
-
-Cada fila es su propia corrida con `--bloques`, del 21 al 22 de octubre de 2026. Se exploran en
-[`docs/mapa_edomex.html`](docs/mapa_edomex.html).
+Serie de noviembre-diciembre corrida con `serie --bloques` el 4 de noviembre de 2026 (versión
+0.7.0): zona forestal `^(B|S|M|VSA/)` (512,576 ha), umbral NDVI fijo 0.51, 115, 213 y 202 escenas,
+9 teselas y 1,092 incendios. Tardó 1 h 59 min con 4.8 GB de RAM pico. Se explora en
+[`docs/mapa_edomex.html`](docs/mapa_edomex.html); detalles en
+[`resultados/edomex_serie_2023_2025/LEEME.md`](resultados/edomex_serie_2023_2025/LEEME.md).
 
 | Comparación | Bosque inicial | Pérdida por incendio | Otras pérdidas | Ganancia | Bosque final | Cambio neto |
 |---|---|---|---|---|---|---|
-| 2023 → 2024 | 459,262 | 708 | 7,788 | 2,684 | 453,450 | −5,812 (−1.3 %) |
-| 2024 → 2025 | 450,768 | 0 ¹ | 3,336 | 4,519 | 451,950 | +1,182 (+0.3 %) |
-| 2023 → 2025 | 459,262 | 245 ¹ | 7,329 | 2,946 | 454,634 | −4,628 (−1.0 %) |
-| 2025 → 2026, sep-oct (preliminar) ² | 434,687 | 0 ¹ | 20,758 | 17,897 | 431,826 | −2,861 (−0.7 %) |
+| 2023 → 2024 | 473,148 | 711 | 9,436 | 4,954 | 467,955 | −5,194 (−1.1 %) |
+| 2024 → 2025 | 467,955 | 0 ¹ | 6,080 | 4,183 | 466,058 | −1,897 (−0.4 %) |
+| 2023 → 2025 | 473,148 | 361 ¹ | 11,475 | 4,745 | 466,058 | −7,091 (−1.5 %) |
+| 2025 → 2026, sep-oct (preliminar) ² | 458,667 | 0 ¹ | 22,475 | 18,143 | 454,334 | −4,332 (−0.9 %) |
 
-Hectáreas. Las tres primeras usan noviembre-diciembre y el umbral fijo 0.51.
+Hectáreas. ¹ Todavía no hay polígonos de incendios de 2025 ni de 2026, así que esa pérdida cae en
+"otras pérdidas". En 2023 → 2025 solo cuentan los incendios hasta octubre de 2024, y la pérdida
+por incendio es menor que en 2023 → 2024 porque parte de lo quemado ya recuperó copa.
 
-¹ Todavía no hay polígonos de incendios de 2025 ni de 2026, así que esa pérdida cae en "otras
-pérdidas". En 2023 → 2025 solo cuentan los incendios hasta octubre de 2024.
+² Corrida aparte (`correr --ventana 09-01 10-20 --umbral-ndvi auto`, umbral 0.51), en
+[`resultados/edomex_2025_2026_sepoct/`](resultados/edomex_2025_2026_sepoct/LEEME.md). Es el final
+de las lluvias, con más nubes y vegetación que cambia de verdor: sus pérdidas y ganancias son de 3
+a 5 veces las de noviembre-diciembre y en algunos municipios se ven exageradas (Valle de Bravo
+daría −13.6 %). Sirve para ver dónde revisar, no se compara con las otras filas.
 
-² Compara del 1 de septiembre al 20 de octubre de 2025 con lo mismo de 2026, las imágenes más
-recientes. Es el final de las lluvias, con más nubes y vegetación que cambia de verdor. Por eso
-sus pérdidas y ganancias son varias veces mayores que en noviembre-diciembre, y en algunos
-municipios se ven exageradas: en Valle de Bravo daría −13.6 %. Sirve para ver dónde revisar, no
-como cifra final, y no se compara con las otras filas.
+- **Tendencia:** −3,545 ha/año (−0.75 %/año). Con 3 años es casi el cambio total entre 2; todavía
+  no separa una tendencia de la variación de un año.
+- **Por tipo** (ha/año): selva baja caducifolia −2,645 (−6.5 %/año), coníferas −764, encino −749,
+  mesófilo −25, otro +26 y zonas semiáridas +612 (el matorral casi no llega al umbral y oscila).
+- **Municipios:** Luvianos −1,662 ha/año (−6.9 %), Otzoloapan −449 (−9.4 %), Santo Tomás −334
+  (−13.8 %), Tlatlaya −311 y Ocuilan −188. Los cuatro primeros son de selva baja.
+- **Incendios 2023 → 2024:** CONAFOR reportó 52,325 ha de polígonos; 16,214 ha tienen dNBR ≥ 0.27,
+  8,395 ha estaban en bosque y 711 seguían sin copa en nov-dic 2024.
+- **Destino de las otras pérdidas:** 2023 → 2024 agrícola 2,834 ha, pecuario 4,921, urbano 432 y
+  otro 1,250; 2024 → 2025 agrícola 1,195, pecuario 3,124, urbano 272 y otro 1,490. El
+  clasificador acierta 54.9 % y 54.6 % (kappa 0.39) contra la Serie VII: urbano separa bien
+  (68 %), pecuario mal (43–44 %). Es bajo; ver la opción B en
+  [Decisiones de diseño](#uso-al-que-pasó-el-terreno-cf-dev-07-opción-a).
+- **Selva baja caducifolia:** pierde 7.8 % de su bosque en 2023 → 2024 y 7.1 % en 2024 → 2025, y
+  casi no gana. Hansen casi no ve pérdida ahí (en Luvianos, precisión de 1 % y 0.1 %). Lo más
+  probable es la caída de hojas de nov-dic, que cambia de fecha cada año; falta decidir si se le
+  da otra ventana, su propio umbral o se saca de la zona.
 
-Las cifras son coherentes entre sí:
+### Contra las corridas directas anteriores
 
-- 2023 → 2025 parte del mismo bosque de 2023 que 2023 → 2024.
-- Sumar los dos periodos de un año (−5,812 + 1,182 = −4,630 ha) da casi lo mismo que la corrida
-  directa de dos años (−4,628 ha).
-- El bosque final de un balance no es igual al inicial del siguiente (453,450 contra 450,768 ha
-  en 2024). El final conserva el bosque de 2023 que bajó del umbral por menos de 0.10 de NDVI,
-  mientras que el balance siguiente mide 2024 desde cero.
+Las corridas de octubre de 2026 (zona `^(B|VSA/)`, cada par por separado) están en
+[`resultados/anteriores_0.5/`](resultados/anteriores_0.5/LEEME.md). Dentro de esa zona:
 
-Tiempos: 2024 → 2025 tardó 49 min, el preliminar 25 min y 2023 → 2025 43 min, con 1,092 incendios
-en paralelo. La RAM pico fue de 3.5 a 4.6 GB.
+| Zona anterior | Corrida directa | Serie encadenada |
+|---|---|---|
+| 2023 → 2024 | 459,262 → 453,450 (−5,812) | idéntico |
+| 2024 → 2025 | 450,768 → 451,950 (+1,182) | 453,450 → 454,276 (+826) |
+| 2023 → 2025 | 459,262 → 454,634 (−4,628) | 459,262 → 454,276 (−4,986) |
+
+Antes el 2024 tenía dos valores: 453,450 ha como año final de 2023 → 2024 (conserva el bosque que
+bajó del umbral por menos de 0.10 de NDVI) y 450,768 como año base de 2024 → 2025 (medido desde
+cero). Con la serie cada año tiene un solo valor y los cambios se suman exactamente. La diferencia
+con el bosque de solo el umbral es de 2,525 ha en 2024 y 2,345 en 2025 (0.5 %;
+`bosque_sin_encadenar_ha`). La zona ampliada agrega 13,886 ha de bosque en 2023: 12,748 de SBC,
+1,062 de MC y 76 de MDR.
 
 ## Validación contra Hansen GFC (CF-DEV-09)
 
 `src/validar_hansen.py` compara la pérdida del prototipo con la de Hansen Global Forest Change
-v1.13, la única versión que trae 2025. Sin argumentos compara 2023 → 2024 con la pérdida de
-Hansen 2024, y 2024 → 2025 con la de 2025. Tarda ~2 min.
+v1.13, la única versión que trae 2025. Sin argumentos compara 2023 → 2024 de la serie con la
+pérdida de Hansen 2024, y 2024 → 2025 con la de 2025, dentro de la zona `^(B|S|M|VSA/)`. Tarda
+~2 min la primera vez y menos de 1 min después.
 
 - **Lectura:** baja por ventanas solo la parte del estado (~100 MB de internet) y deja recortes de
   22 MB en `datos/edomex/hansen/`, que git ignora.
@@ -447,28 +509,30 @@ remoción de copa.
 
 | | 2023 → 2024 | 2024 → 2025 |
 |---|---|---|
-| Pérdida del prototipo | 8,496 ha | 3,336 ha |
-| Pérdida de Hansen (zona forestal) | 1,883 ha | 1,340 ha |
-| Coinciden | 580 ha | 156 ha |
-| Precisión (exacta / con 30 m de tolerancia) | 7 % / 10 % | 5 % / 8 % |
+| Pérdida del prototipo | 10,147 ha | 6,080 ha |
+| Pérdida de Hansen (zona forestal) | 1,890 ha | 1,342 ha |
+| Coinciden | 583 ha | 156 ha |
+| Precisión (exacta / con 30 m de tolerancia) | 6 % / 8 % | 3 % / 4 % |
 | Exhaustividad (exacta / con 30 m de tolerancia) | 31 % / 69 % | 12 % / 36 % |
 
-- Casi todo el desacuerdo está en las "otras pérdidas", que coinciden solo 4 %. La pérdida por
+- Casi todo el desacuerdo está en las "otras pérdidas", que coinciden solo 3 %. La pérdida por
   incendio coincide 40 %.
-- Hay municipios con desacuerdo casi total: Atlautla, Santo Tomás, Amecameca y Tlalmanalco. Son
-  los primeros lugares que conviene fotointerpretar.
+- Con la zona anterior la precisión era de 7 % y 5 %. Bajó porque la selva baja y el matorral
+  agregan pérdida que Hansen no marca; Hansen solo agrega 9 ha.
+- Desacuerdo casi total en la selva baja (Luvianos, Otzoloapan, Santo Tomás) y en las laderas de
+  los volcanes (Atlautla, Amecameca, Tlalmanalco). Son los primeros lugares que conviene
+  fotointerpretar.
 - Donde hay un evento grande, como en San Simón de Guerrero en 2024, las dos fuentes lo ven.
 
 `src/muestra_puntos.py` arma una muestra estratificada de 105 puntos (15 en cada uno de 7
-estratos de cambio y Hansen) para fotointerpretar. Su CSV,
-`resultados/validacion_hansen/muestra_puntos_2023_2024.csv`, es compatible con `calibrar --puntos`
-y trae la columna `clase` vacía.
+estratos de cambio y Hansen) para fotointerpretar. La muestra se sorteó con la zona anterior y
+está en `resultados/anteriores_0.5/validacion_hansen/muestra_puntos_2023_2024.csv`. Es compatible
+con `calibrar --puntos` y trae la columna `clase` vacía. No cubre la selva baja ni el matorral.
 
 ## Decisiones de diseño
 
 Tomadas el 3 de noviembre de 2026 para cubrir las necesidades CF-DEV-03, 04 y 07 del Módulo 13
-de la propuesta. **Programadas en la versión 0.6.0.** Los resultados del estado que aparecen
-arriba siguen siendo de la zona anterior hasta que se vuelvan a correr los balances.
+de la propuesta. **Programadas en la versión 0.6.0** y usadas en la serie estatal de 0.7.0.
 
 ### Zona forestal ampliada
 
@@ -486,7 +550,8 @@ vegetación de zonas semiáridas.
   semiárida.
 - **Qué sigue fuera:** la vegetación secundaria arbustiva (`VSa/*`) y herbácea (`VSh/*`), porque
   no es cobertura arbórea.
-- **Efecto:** cambian los totales de todos los balances, así que hay que volver a correrlos.
+- **Efecto:** cambian los totales de todos los balances. En la serie estatal agrega 13,886 ha de
+  bosque en 2023.
 - **Cautela:** la selva baja caducifolia empieza a tirar hojas en noviembre-diciembre, y el
   matorral casi nunca llega al umbral de NDVI. El umbral único de 0.51 sigue siendo provisional y
   quizá necesite valores por tipo (CF-DEV-09).
@@ -615,7 +680,10 @@ hecho, como fuente nueva:
   Google Earth Engine, que el proyecto no usa en operación.
 
 Convendría cambiar a B si la exactitud de A resulta baja, o si PROBOSQUE pide una clasificación
-reconocida externamente en lugar de una propia.
+reconocida externamente en lugar de una propia. **En el estado, A acierta 55 % (kappa 0.39)
+en 2024 y 2025, y 52 % (kappa 0.35) en el preliminar sep-oct**: más que en la prueba de Otzoloapan
+y Tequixquiac (48 %), pero bajo. Pecuario es la clase más confundida (con agrícola y con otro).
+Antes de pasar a B se pueden probar rasgos de otra temporada.
 
 ## Pendientes
 
@@ -623,24 +691,23 @@ reconocida externamente en lugar de una propia.
    la zona que se corre, así que conviene fijar un umbral numérico para comparar corridas.
 2. Conseguir los polígonos de reforestación de PS, RHF y CC, con año de plantación, sobrevivencia
    y programa. Con el programa se completa la ganancia por programa (CF-DEV-05).
-3. Volver a correr los balances del estado con la zona ampliada (0.6.0), para tener los desgloses
-   por clave y tipo, el destino de las otras pérdidas y la página con el desglose por tipo.
-   Revisar la exactitud del clasificador de destino a escala estatal.
-4. Verificar las "otras pérdidas" del estado (7,788 ha), empezando por Tlatlaya, Luvianos,
-   Atlautla, Ocuilan, Temascaltepec y Santo Tomás. El destino de las otras pérdidas (0.6.0) ayuda
-   a elegir qué revisar, pero sus etiquetas son del INEGI, anteriores a 2023.
-5. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
-   más lenta y no cambió con los bloques.
-6. Validación (CF-DEV-09): la comparación con Hansen ya está hecha. Falta:
-   - fotointerpretar los 105 puntos de `resultados/validacion_hansen/muestra_puntos_2023_2024.csv`;
+3. Decidir cómo tratar la selva baja caducifolia, que pierde ~7 % al año en nov-dic y casi no
+   coincide con Hansen: otra ventana, su propio umbral o dejarla fuera de la zona.
+4. Mejorar el clasificador del destino (55 %, kappa 0.39 en el estado): probar rasgos de otra
+   temporada o pasar a la opción B.
+5. Verificar las "otras pérdidas" del estado (9,436 ha en 2023 → 2024 y 6,080 en 2024 → 2025),
+   empezando por Luvianos, Tlatlaya, Temascaltepec, Atlautla, Ocuilan y Santo Tomás.
+6. Bajar el tiempo de los incendios. Es la parte más lenta y no cambió con los bloques.
+7. Validación (CF-DEV-09): la comparación con Hansen ya está hecha con la zona ampliada. Falta:
+   - fotointerpretar los 105 puntos de
+     `resultados/anteriores_0.5/validacion_hansen/muestra_puntos_2023_2024.csv` y sortear puntos
+     en la selva baja y el matorral;
    - hacer que `calibrar` lea el NDVI por bloques o solo en los puntos, porque hoy arma el
      compuesto de toda la `--aoi` de una vez y con el estado no cabe en memoria;
-   - repetir la validación cuando se vuelvan a correr los balances con la zona ampliada;
    - comparar con las verificaciones de campo de los programas, cuando existan.
-7. Agregar los incendios de 2025 al balance 2024 → 2025 cuando CONAFOR publique su capa, y correr
-   el balance 2025 → 2026 en enero de 2027, cuando exista el compuesto de noviembre-diciembre
-   de 2026.
-8. Escenarios de recuperación y ampliar la página interactiva como tablero para la Dirección
+8. Agregar los incendios de 2025 a la serie cuando CONAFOR publique su capa, y agregar 2026 a la
+   serie en enero de 2027, cuando exista el compuesto de noviembre-diciembre de 2026.
+9. Escenarios de recuperación y ampliar la página interactiva como tablero para la Dirección
    General y las áreas responsables.
 
 ## Fuentes de datos y licencias

@@ -1,0 +1,6 @@
+clase,entrenamiento,prueba,exactitud_productor,exactitud_usuario,pred_agricola,pred_pecuario,pred_urbano,pred_otro,exactitud_global,kappa
+agricola,9267,2593,0.5476,0.6007,1420,524,266,383,,
+pecuario,7893,1776,0.4336,0.4297,441,770,98,467,,
+urbano,4049,1311,0.6827,0.6523,253,76,895,87,,
+otro,8286,1820,0.5687,0.5248,250,422,113,1035,,
+global,29495,7500,,,,,,,0.5493,0.3899

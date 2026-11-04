@@ -1,0 +1,55 @@
+{
+ "anio_base": 2024,
+ "anio": 2025,
+ "ventana": [
+  "11-01",
+  "12-31"
+ ],
+ "umbral_ndvi": 0.51,
+ "umbral_pedido": "0.51",
+ "escenas": {
+  "2024": 213,
+  "2025": 202
+ },
+ "incendios": 7,
+ "nubes_max": 60,
+ "escenas_max": null,
+ "bloques": true,
+ "fecha": "2026-11-04T02:24:26",
+ "clases_forestales": "^(B|S|M|VSA/)",
+ "zona_forestal_ha": 512575.73,
+ "destino": {
+  "muestras_disponibles": 275284,
+  "muestras_entrenamiento": 29524,
+  "muestras_prueba": 7471,
+  "regiones": 9,
+  "rasgos": [
+   "green",
+   "red",
+   "nir",
+   "nir08",
+   "swir16",
+   "swir22",
+   "ndvi",
+   "nbr",
+   "ndbi",
+   "mndwi"
+  ],
+  "importancia_rasgos": {
+   "green": 0.103,
+   "red": 0.105,
+   "nir": 0.074,
+   "nir08": 0.085,
+   "swir16": 0.106,
+   "swir22": 0.114,
+   "ndvi": 0.093,
+   "nbr": 0.087,
+   "ndbi": 0.078,
+   "mndwi": 0.155
+  },
+  "exactitud_global": 0.5458,
+  "kappa": 0.3857
+ },
+ "serie": "2023_2025",
+ "consecutivos": true
+}

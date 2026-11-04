@@ -4,6 +4,68 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.7.0] - 2026-11-04
+
+Serie anual y tendencia (CF-DEV-08), consulta de un año (CF-DEV-10), capa de pérdida por año
+(CF-DEV-12) y documentación de alcances (CF-DEV-14).
+
+### Agregado
+
+- **Subcomando `serie --anios 2023 2024 2025 ...`** (mismas opciones que `correr`).
+  - En cada bloque lee una sola vez el compuesto de cada año y encadena el bosque: el primer año es
+    NDVI ≥ umbral dentro de la zona; en cada año siguiente un píxel solo cambia si cruza el umbral
+    y su NDVI cambió al menos 0.10 respecto del año anterior (`mascaras_serie`).
+  - Cada incendio cuenta en su periodo (1-nov a 31-oct) con el dNBR en paralelo de siempre.
+  - Arma todas las comparaciones entre los años pedidos, cada una con las salidas de `correr`; la
+    de años no consecutivos compara el bosque del primer año con el del último, así que la cifra
+    de cada año es la misma en todas.
+  - Un clasificador de destino por año, entrenado con el compuesto de ese año.
+  - Salidas nuevas: `serie_<a0>_<aN>.csv` (por unidad, año y tipo de bosque, con el destino y el
+    bosque sin encadenar), `tendencia_<a0>_<aN>.csv` (ha/año y %/año por mínimos cuadrados, y R²),
+    `bosque_por_anio.tif` (bit *t* = bosque en el año *t*), `anio_perdida.tif` (año − 2000 de la
+    última pérdida), `serie_<a0>_<aN>.json` e `incendios_dnbr_<a>_<b>.csv` de las comparaciones
+    largas.
+- **Página:** modo "Un año" (mapa del bosque de ese año por densidad, cifras, tabla por municipio
+  y por tipo de bosque, destino de las otras pérdidas), capa "Año de pérdida", vista de tendencia
+  por municipio, gráfica de la serie con su recta de tendencia en el detalle y sección "Alcances".
+  Los colores nuevos son rampas ordinales de un solo tono validadas en los dos temas.
+  `mapa_interactivo.py` acepta carpetas con varias comparaciones y `--validacion`.
+- `demo` comprueba también la serie: de 3 y de 4 años, de una sola vez, por bloques, con incendios
+  en paralelo e interrumpida y reanudada, contra una referencia escrita aparte; y que con dos años
+  `mascaras_serie` es la regla de `correr`. Se probó que detecta cuatro fallas inyectadas.
+
+### Cambiado
+
+- `correr` usa el mismo motor que `serie` (es la serie de dos años). Sus salidas no cambian: en el
+  piloto da IDÉNTICO a la corrida 0.6.0 en todos los archivos, y `serie --anios 2023 2024` da
+  IDÉNTICO a `correr`. El avance guardado (`progreso_*`) tiene otro formato: una corrida 0.6.0
+  interrumpida no se reanuda con 0.7.0.
+- `incendios_dnbr.csv` trae la columna `periodo`. `bloques_*.csv` de una serie trae
+  `escenas_<año>` en lugar de `escenas_base` y `escenas_actual`.
+- `comparar_resultados.py` compara también `serie_*.csv`, `tendencia_*.csv`, `bosque_por_anio.tif`
+  y `anio_perdida.tif`, y con `--periodo` filtra los incendios por su columna `periodo`.
+- `validar_hansen.py`: por defecto usa la zona `^(B|S|M|VSA/)` y las comparaciones de un año de
+  `resultados/edomex_serie_2023_2025`.
+- Las comparaciones nov-dic de la página salen de la serie y ya no de corridas directas. Las
+  corridas estatales de la zona anterior pasaron a `resultados/anteriores_0.5/`.
+
+### Resultados (corridas estatales del 4-nov-2026, zona `^(B|S|M|VSA/)`)
+
+- **Serie 2023 → 2025** (`resultados/edomex_serie_2023_2025/`, umbral 0.51, 1 h 59 min, 4.8 GB):
+  bosque 473,148 → 467,955 → 466,058 ha; −3,545 ha/año (−0.75 %/año). Dentro de la zona anterior,
+  2023 → 2024 da IDÉNTICO a la corrida de octubre; 2024 vale 453,450 ha en todas las comparaciones
+  (antes 453,450 y 450,768), así que 2024 → 2025 pasa de +1,182 a +826 y 2023 → 2025 de −4,628 a
+  −4,986.
+- **Selva baja caducifolia:** pierde 7.8 % y 7.1 % al año en nov-dic, casi sin ganancia, y Hansen
+  casi no lo ve (Luvianos: precisión 1 % y 0.1 %). Probable caída de hojas; pendiente de decidir.
+- **Destino:** el clasificador acierta 54.9 % y 54.6 % (kappa 0.39) contra la Serie VII; pecuario
+  es la clase más confundida.
+- **Preliminar sep-oct 2025 → 2026** (`resultados/edomex_2025_2026_sepoct/`, umbral auto 0.51):
+  458,667 → 454,334 ha (−4,332). Clasificador 52.3 % (kappa 0.35).
+- **Hansen** (`resultados/validacion_hansen/`): precisión 6 % y 3 %, exhaustividad 31 % y 12 %
+  (antes 7 % y 5 %, 31 % y 12 %). La muestra de 105 puntos sigue en
+  `resultados/anteriores_0.5/validacion_hansen/`.
+
 ## [0.6.0] - 2026-11-03
 
 Programa las decisiones de diseño del 3 de noviembre (CF-DEV-03, CF-DEV-04 y CF-DEV-07, opción A).

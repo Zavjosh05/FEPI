@@ -1,0 +1,24 @@
+{
+ "anio_base": 2023,
+ "anio": 2025,
+ "ventana": [
+  "11-01",
+  "12-31"
+ ],
+ "umbral_ndvi": 0.51,
+ "umbral_pedido": "0.51",
+ "escenas": {
+  "2023": 115,
+  "2025": 202
+ },
+ "incendios": 1092,
+ "nubes_max": 60,
+ "escenas_max": null,
+ "bloques": true,
+ "fecha": "2026-11-04T02:24:26",
+ "clases_forestales": "^(B|S|M|VSA/)",
+ "zona_forestal_ha": 512575.73,
+ "destino": null,
+ "serie": "2023_2025",
+ "consecutivos": false
+}

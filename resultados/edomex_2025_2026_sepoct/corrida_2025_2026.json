@@ -15,5 +15,39 @@
  "nubes_max": 60,
  "escenas_max": null,
  "bloques": true,
- "fecha": "2026-10-22T00:09:10"
+ "fecha": "2026-11-04T00:58:11",
+ "clases_forestales": "^(B|S|M|VSA/)",
+ "zona_forestal_ha": 512575.73,
+ "destino": {
+  "muestras_disponibles": 274782,
+  "muestras_entrenamiento": 29470,
+  "muestras_prueba": 7507,
+  "regiones": 9,
+  "rasgos": [
+   "green",
+   "red",
+   "nir",
+   "nir08",
+   "swir16",
+   "swir22",
+   "ndvi",
+   "nbr",
+   "ndbi",
+   "mndwi"
+  ],
+  "importancia_rasgos": {
+   "green": 0.101,
+   "red": 0.128,
+   "nir": 0.076,
+   "nir08": 0.083,
+   "swir16": 0.095,
+   "swir22": 0.138,
+   "ndvi": 0.097,
+   "nbr": 0.095,
+   "ndbi": 0.089,
+   "mndwi": 0.097
+  },
+  "exactitud_global": 0.5227,
+  "kappa": 0.3521
+ }
 }
