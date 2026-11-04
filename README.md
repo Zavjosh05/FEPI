@@ -36,7 +36,9 @@ FEPI/
 │   ├── comparar_resultados.py       Compara dos corridas (balance, incendios, ráster de cambio)
 │   ├── mapa_cambio.py               Dibuja el mapa PNG de una corrida
 │   ├── mapa_interactivo.py          Arma la página HTML interactiva (con plantilla_mapa.html)
-│   └── plantilla_mapa.html          Diseño y código de esa página
+│   ├── plantilla_mapa.html          Diseño y código de esa página
+│   ├── validar_hansen.py            Compara la pérdida con Hansen GFC v1.13 (CF-DEV-09)
+│   └── muestra_puntos.py            Puntos estratificados para fotointerpretar
 ├── docs/
 │   └── mapa_edomex.html             Página interactiva del estado (todos los periodos)
 ├── datos/
@@ -409,6 +411,92 @@ Las cifras son coherentes entre sí:
 Tiempos: 2024 → 2025 tardó 49 min, el preliminar 25 min y 2023 → 2025 43 min, con 1,092 incendios
 en paralelo. La RAM pico fue de 3.5 a 4.6 GB.
 
+## Validación contra Hansen GFC (CF-DEV-09)
+
+`src/validar_hansen.py` compara la pérdida del prototipo con la de Hansen Global Forest Change
+v1.13, la única versión que trae 2025. Sin argumentos compara 2023 → 2024 con la pérdida de
+Hansen 2024, y 2024 → 2025 con la de 2025. Tarda ~2 min.
+
+- **Lectura:** baja por ventanas solo la parte del estado (~100 MB de internet) y deja recortes de
+  22 MB en `datos/edomex/hansen/`, que git ignora.
+- **Mallas:** lleva Hansen a la malla de 10 m del prototipo por vecino más cercano, para que las
+  hectáreas del prototipo no cambien.
+- **Salidas:** en `resultados/validacion_hansen/` quedan dos CSV (municipios y estatal), los
+  rásters de coincidencia, `mapa_coincidencia.png` y un
+  [LEEME](resultados/validacion_hansen/LEEME.md) con el método, la licencia (CC BY 4.0) y la cita.
+
+Hansen no es la verdad de campo: es otro mapa satelital, de Landsat a 30 m, que solo marca
+remoción de copa.
+
+| | 2023 → 2024 | 2024 → 2025 |
+|---|---|---|
+| Pérdida del prototipo | 8,496 ha | 3,336 ha |
+| Pérdida de Hansen (zona forestal) | 1,883 ha | 1,340 ha |
+| Coinciden | 580 ha | 156 ha |
+| Precisión (exacta / con 30 m de tolerancia) | 7 % / 10 % | 5 % / 8 % |
+| Exhaustividad (exacta / con 30 m de tolerancia) | 31 % / 69 % | 12 % / 36 % |
+
+- Casi todo el desacuerdo está en las "otras pérdidas", que coinciden solo 4 %. La pérdida por
+  incendio coincide 40 %.
+- Hay municipios con desacuerdo casi total: Atlautla, Santo Tomás, Amecameca y Tlalmanalco. Son
+  los primeros lugares que conviene fotointerpretar.
+- Donde hay un evento grande, como en San Simón de Guerrero en 2024, las dos fuentes lo ven.
+
+`src/muestra_puntos.py` arma una muestra estratificada de 105 puntos (15 en cada uno de 7
+estratos de cambio y Hansen) para fotointerpretar. Su CSV,
+`resultados/validacion_hansen/muestra_puntos_2023_2024.csv`, es compatible con `calibrar --puntos`
+y trae la columna `clase` vacía.
+
+## Decisiones de diseño
+
+Tomadas el 3 de noviembre de 2026 para cubrir las necesidades CF-DEV-03, 04 y 07 del Módulo 13
+de la propuesta. **Todavía no están programadas:** el código y los resultados siguen con la zona
+anterior hasta que se implementen y se vuelvan a correr los balances.
+
+### Zona forestal ampliada
+
+Las claves de la zona forestal pasan de `^(B|VSA/)` a `^(B|S|M|VSA/)`, para incluir los cinco
+tipos que pide CF-DEV-04: coníferas, encino, mesófilo de montaña, selva baja caducifolia y
+vegetación de zonas semiáridas.
+
+| | Claves de la Serie VII en el Estado de México | Hectáreas |
+|---|---|---|
+| Antes | Bosques (`B*`) y vegetación secundaria arbórea (`VSA/*`) | 484,695 |
+| Ahora | Lo anterior más selva baja caducifolia (`SBC`) y matorrales (`MC`, `MDR`) | 512,577 |
+
+- **Por qué:** antes quedaba fuera la selva baja caducifolia primaria (13,818 ha), aunque su
+  vegetación secundaria arbórea (28,751 ha) sí entraba. También quedaba fuera la vegetación
+  semiárida.
+- **Qué sigue fuera:** la vegetación secundaria arbustiva (`VSa/*`) y herbácea (`VSh/*`), porque
+  no es cobertura arbórea.
+- **Efecto:** cambian los totales de todos los balances, así que hay que volver a correrlos.
+- **Cautela:** la selva baja caducifolia empieza a tirar hojas en noviembre-diciembre, y el
+  matorral casi nunca llega al umbral de NDVI. El umbral único de 0.51 sigue siendo provisional y
+  quizá necesite valores por tipo (CF-DEV-09).
+
+### Uso al que pasó el terreno (CF-DEV-07): opción A
+
+La Serie VII es un mapa fijo anterior a 2023. Dentro de la zona forestal todos sus píxeles son
+vegetación, así que por sí sola no dice en qué se convirtió un píxel que perdió bosque.
+
+**Opción elegida (A):** clasificar el terreno perdido con Sentinel-2, el mismo año en que se
+perdió. El clasificador se entrena con las zonas que la Serie VII marca fuera del bosque:
+agricultura (`TA*`, `TR*`) para agrícola, pastizales (`PI`, `PC`) para pecuario y asentamientos
+(`AH`) para urbano. Usa solo las fuentes que ya tiene el proyecto. Sus limitaciones: las
+etiquetas del INEGI son de antes de 2023, y el resultado es una estimación con su propia
+exactitud, que hay que reportar.
+
+**Opción guardada (B), por si se llega a requerir:** usar un mapa de cobertura del suelo ya
+hecho, como fuente nueva:
+
+- **ESA WorldCover:** 10 m, años 2020 y 2021, licencia CC BY 4.0. Solo sirve para el estado
+  previo, no para 2024 o 2025.
+- **Dynamic World:** 10 m, casi en tiempo real, licencia CC BY 4.0. Se distribuye sobre todo por
+  Google Earth Engine, que el proyecto no usa en operación.
+
+Convendría cambiar a B si la exactitud de A resulta baja, o si PROBOSQUE pide una clasificación
+reconocida externamente en lugar de una propia.
+
 ## Pendientes
 
 1. Calibrar el umbral de NDVI con ~100 puntos de referencia. Mientras tanto, `auto` cambia según
@@ -418,7 +506,12 @@ en paralelo. La RAM pico fue de 3.5 a 4.6 GB.
    Atlautla, Ocuilan, Temascaltepec y Santo Tomás.
 4. Bajar el tiempo de los incendios (~1.7–2.6 h para el estado, según la conexión). Es la parte
    más lenta y no cambió con los bloques.
-5. Validar contra Hansen GFC y visitas de campo.
+5. Validación (CF-DEV-09): la comparación con Hansen ya está hecha. Falta:
+   - fotointerpretar los 105 puntos de `resultados/validacion_hansen/muestra_puntos_2023_2024.csv`;
+   - hacer que `calibrar` lea el NDVI por bloques o solo en los puntos, porque hoy arma el
+     compuesto de toda la `--aoi` de una vez y con el estado no cabe en memoria;
+   - repetir la validación cuando se vuelvan a correr los balances con la zona ampliada;
+   - comparar con las verificaciones de campo de los programas, cuando existan.
 6. Agregar los incendios de 2025 al balance 2024 → 2025 cuando CONAFOR publique su capa, y correr
    el balance 2025 → 2026 en enero de 2027, cuando exista el compuesto de noviembre-diciembre
    de 2026.

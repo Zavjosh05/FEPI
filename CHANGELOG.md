@@ -4,6 +4,31 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.5.0] - 2026-11-03
+
+### Agregado
+
+- `src/validar_hansen.py`: compara la pérdida de bosque del prototipo con Hansen Global Forest
+  Change v1.13 (CF-DEV-09). Lee por ventanas solo la parte del estado de `lossyear` y
+  `treecover2000` (~100 MB de internet; recortes de 22 MB en `datos/edomex/hansen/`).
+  - Lleva Hansen a la malla de 10 m por vecino más cercano.
+  - Calcula, por municipio y para el estado: coincidencias, lo que solo marca cada fuente,
+    precisión y exhaustividad (exactas y con 30 m de tolerancia) y la pérdida que Hansen pone un
+    año antes o después.
+  - Salidas en `resultados/validacion_hansen/`. Tarda ~2 min.
+- `src/muestra_puntos.py`: muestra estratificada de puntos (7 estratos de cambio y Hansen) para
+  fotointerpretar. Su CSV es compatible con `calibrar --puntos`; la columna `clase` sale vacía.
+- README: sección de validación con los resultados.
+  - 2023 → 2024: el prototipo marca 8,496 ha, Hansen 1,883 ha y coinciden 580 ha (precisión 7 %,
+    exhaustividad 31 %). La pérdida por incendio coincide 40 % y las "otras pérdidas" solo 4 %.
+  - 2024 → 2025: precisión 5 % y exhaustividad 12 %.
+- README: sección "Decisiones de diseño".
+  - La zona forestal se amplía a `^(B|S|M|VSA/)`, de 484,695 a 512,577 ha.
+  - El uso al que pasó el terreno (CF-DEV-07) se resolverá con la opción A: clasificar con
+    Sentinel-2, entrenando con las clases no forestales del INEGI.
+  - La opción B, ESA WorldCover o Dynamic World, queda como nota.
+  - Las dos decisiones están documentadas, pero todavía no programadas.
+
 ## [0.4.1] - 2026-10-22
 
 ### Cambiado
