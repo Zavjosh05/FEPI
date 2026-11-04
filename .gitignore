@@ -17,6 +17,7 @@ resultados/*
 !resultados/edomex_2024_2025/
 !resultados/edomex_2023_2025/
 !resultados/edomex_2025_2026_sepoct/
+!resultados/validacion_hansen/
 resultados/**/tiempo.txt
 resultados/**/*.log
 
