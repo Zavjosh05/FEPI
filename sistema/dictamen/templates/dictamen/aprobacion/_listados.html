@@ -1,0 +1,66 @@
+<div class="tarjeta" data-prueba="listados">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-2">
+    <div>
+      <div class="titulo-seccion mb-1">Listados para aprobación</div>
+      <div class="small text-secondary">Propuesta: factibles en orden de priorización (reforestaciones y refrendos primero; desempate por fecha de registro) hasta donde alcance el recurso{% if monto_ha %} (${{ monto_ha|floatformat:2 }} por ha){% endif %}; el resto a la lista de espera. El Comité puede ajustar el orden dejando constancia.</div>
+    </div>
+    {% if es_st and sesion.estado != "celebrada" %}
+    <form method="post" action="{% url 'dictamen:sesion_proponer' sesion.pk %}" class="d-flex gap-2 align-items-end">
+      {% csrf_token %}
+      <div><label class="form-label small mb-0" for="id_presupuesto">{{ form_propuesta.presupuesto.label }}</label>{{ form_propuesta.presupuesto }}</div>
+      <button class="btn btn-outline-primary text-nowrap" type="submit">{% if hay_resoluciones %}Rehacer propuesta{% else %}Generar propuesta{% endif %}</button>
+    </form>
+    {% endif %}
+  </div>
+  {% if sesion.presupuesto %}<div class="small mb-2">Recurso disponible: <strong>${{ sesion.presupuesto|floatformat:2 }}</strong></div>{% endif %}
+  {% for valor, etiqueta, filas in listados %}
+  <div class="mt-3 fw-semibold">{{ etiqueta }} <span class="badge text-bg-light border">{{ filas|length }}</span></div>
+  <div class="table-responsive">
+  <table class="table table-sm small align-middle mb-1" data-listado="{{ valor }}">
+    <thead class="table-light"><tr><th>Lugar</th><th>Folio</th><th>Persona solicitante · predio</th><th>Superficie y monto</th><th>Criterios</th>{% if es_st and sesion.estado != "celebrada" %}<th>Ajuste del Comité</th>{% endif %}</tr></thead>
+    <tbody>
+    {% for r in filas %}
+    <tr data-folio="{{ r.expediente.folio }}">
+      <td class="fw-semibold">{{ r.orden|default:"—" }}{% if r.ajustada %} <span class="badge text-bg-warning">ajustado</span>{% endif %}</td>
+      <td class="text-nowrap"><a href="{% url 'recepcion:expediente' r.expediente.folio %}?pestana=dictamenes">{{ r.expediente.folio }}</a></td>
+      <td>{{ r.expediente.solicitante.nombre }}<div class="text-secondary">{{ r.expediente.predio.nombre }}</div>
+        {% if r.motivo_ajuste %}<div class="text-warning-emphasis">Constancia: {{ r.motivo_ajuste }} (propuesta: {{ r.get_resultado_propuesto_display }}{% if r.orden_propuesto %}, lugar {{ r.orden_propuesto }}{% endif %})</div>{% endif %}</td>
+      <td>{{ r.expediente.dictamen_tecnico.superficie_factible_ha|default:"—" }} ha{% if r.monto %}<div>${{ r.monto|floatformat:2 }}</div>{% endif %}</td>
+      <td>{% for c in r.criterios %}<div class="text-secondary">{{ c|truncatechars:50 }}</div>{% empty %}—{% endfor %}</td>
+      {% if es_st and sesion.estado != "celebrada" %}
+      <td>{% if valor != "no_factible" %}
+        <form method="post" action="{% url 'dictamen:sesion_ajustar' sesion.pk r.pk %}" class="d-flex flex-wrap gap-1">
+          {% csrf_token %}
+          <select name="resultado" class="form-select form-select-sm w-auto" aria-label="Listado">
+            {% for v, t in resultados_listado %}{% if v != "no_factible" %}<option value="{{ v }}" {% if v == r.resultado %}selected{% endif %}>{% if v == "beneficiaria" %}Beneficiarias{% else %}Lista de espera{% endif %}</option>{% endif %}{% endfor %}
+          </select>
+          <input type="number" min="1" name="orden" class="form-control form-control-sm" style="width: 4.5rem" value="{{ r.orden }}" aria-label="Lugar">
+          <input name="motivo" class="form-control form-control-sm" style="width: 11rem" placeholder="Motivo" required aria-label="Motivo del ajuste">
+          <button class="btn btn-sm btn-outline-primary" type="submit">Ajustar</button>
+        </form>{% endif %}</td>
+      {% endif %}
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-secondary">—</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="tarjeta" data-prueba="acta">
+  <div class="titulo-seccion">Acta de la sesión</div>
+  {% if sesion.estado == "celebrada" %}
+  <div class="alert alert-success small mb-0">Acta registrada el <strong>{{ sesion.acta_fecha|date:"d/m/Y H:i:s" }} h</strong> · acuse
+    <a href="{% url 'nucleo:acuse' sesion.acuse_acta.folio %}" target="_blank">{{ sesion.acuse_acta.folio }}</a>.
+    Autorización de publicación: <strong>{{ sesion.autoriza_publicacion|yesno:"Sí,No" }}</strong>{% if sesion.autoriza_publicacion %} (Delegaciones Regionales Forestales y página de PROBOSQUE, 9.4.3 fr. III){% endif %}.
+    {% if sesion.observaciones_acta %}<div>{{ sesion.observaciones_acta }}</div>{% endif %}</div>
+  {% elif es_st %}
+  <form method="post" action="{% url 'dictamen:sesion_acta' sesion.pk %}">
+    {% csrf_token %}
+    <div class="form-check mb-2">{{ form_acta.autoriza_publicacion }} <label class="form-check-label" for="{{ form_acta.autoriza_publicacion.id_for_label }}">{{ form_acta.autoriza_publicacion.label }}</label></div>
+    {% include "recepcion/_campo.html" with campo=form_acta.observaciones %}
+    <button class="btn btn-primary" type="submit" {% if not sesion.convocatoria_enviada or not hay_resoluciones %}disabled{% endif %}>Registrar acta con los listados aprobados</button>
+    {% if not sesion.convocatoria_enviada %}<span class="small text-secondary ms-2">Primero se envía la convocatoria.</span>{% endif %}
+  </form>
+  {% else %}<div class="small text-secondary">Pendiente.</div>{% endif %}
+</div>
