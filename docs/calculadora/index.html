@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masa forestal del Estado de México</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Cabecera con el modo (comparar años o un año) y su resumen; mapa (2/3) y panel de detalle (1/3);
+   tabla completa; alcances. En teléfono todo se apila. Colores del mapa validados para daltonismo
+   en los dos temas: las clases de cambio (categórico), la densidad de bosque y el año de pérdida
+   (ordinales de un solo tono, validados con --ordinal contra el fondo sin bosque). */
+:root {
+  --bg: #f2f3ee; --surface: #fcfcfa; --ink: #13170f; --ink-2: #4a4f45; --ink-3: #767b6f;
+  --line: #d9dbd1; --accent: #1d6b4f; --accent-ink: #ffffff; --hover: rgba(29, 107, 79, .08);
+  --sin-bosque: #e4e3dc; --c-estable: #1baf7a; --c-incendio: #a3221d; --c-otra: #eb6834; --c-ganancia: #2a78d6;
+  --div-0: #a8201a; --div-1: #e34948; --div-2: #f09a96; --div-3: #e9e8e2; --div-4: #86b6ef; --div-5: #2a78d6;
+  --den-1: #24ab7e; --den-2: #088963; --den-3: #02684a; --den-4: #034933;
+  --per-1: #a278e4; --per-2: #8c61cb; --per-3: #764ab2; --per-4: #61339a; --per-5: #4c1b82; --per-6: #380068;
+  --linea: #088963; --tendencia: #767b6f;
+  --rayado: #bdbcb3; --contorno: #3f443a; --limites: #8a8d83; --sel: #13170f; --aviso-bg: #fbf1dc; --aviso-ink: #5c4300;
+  --falla-bg: #fbe3e1; --falla-ink: #7a1712;
+  --f-titulo: "Barlow Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  --f-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111310; --surface: #1a1c18; --ink: #eef0ea; --ink-2: #c0c4b8; --ink-3: #8b8f84;
+    --line: #2f322c; --accent: #57c497; --accent-ink: #0d1a14; --hover: rgba(87, 196, 151, .12);
+    --sin-bosque: #30322d; --c-estable: #199e70; --c-incendio: #b8336a; --c-otra: #c98500; --c-ganancia: #3987e5;
+    --div-0: #f08380; --div-1: #d24a48; --div-2: #8f3a37; --div-3: #3a3b36; --div-4: #2f5f9e; --div-5: #5aa0f0;
+    --den-1: #047554; --den-2: #19966e; --den-3: #46b68c; --den-4: #69d6aa;
+    --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
+    --linea: #46b68c; --tendencia: #8b8f84;
+    --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+    --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111310; --surface: #1a1c18; --ink: #eef0ea; --ink-2: #c0c4b8; --ink-3: #8b8f84;
+  --line: #2f322c; --accent: #57c497; --accent-ink: #0d1a14; --hover: rgba(87, 196, 151, .12);
+  --sin-bosque: #30322d; --c-estable: #199e70; --c-incendio: #b8336a; --c-otra: #c98500; --c-ganancia: #3987e5;
+  --div-0: #f08380; --div-1: #d24a48; --div-2: #8f3a37; --div-3: #3a3b36; --div-4: #2f5f9e; --div-5: #5aa0f0;
+  --den-1: #047554; --den-2: #19966e; --den-3: #46b68c; --den-4: #69d6aa;
+  --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
+  --linea: #46b68c; --tendencia: #8b8f84;
+  --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+  --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-texto); }
+.pagina {
+  max-width: 1320px; margin: 0 auto; display: grid; gap: 20px;
+  padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-titulo); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: .01em; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.05; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+.etiqueta { font-family: var(--f-titulo); font-weight: 500; font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.cabecera { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+.cabecera p { margin: 4px 0 0; color: var(--ink-2); max-width: 62ch; }
+.controles { display: grid; gap: 10px; justify-items: start; }
+.segmentos { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 3px; gap: 3px; flex-wrap: wrap; }
+.segmentos button {
+  font: 600 .95rem var(--f-texto); color: var(--ink-2); background: transparent; border: 0; border-radius: 6px;
+  padding: 6px 14px; cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.segmentos button[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); }
+.comparar { display: grid; gap: 6px; justify-items: start; }
+.selector-anios { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.selector-anios label { display: grid; gap: 3px; }
+.selector-anios .flecha { font: 600 1.3rem var(--f-titulo); color: var(--ink-3); padding-bottom: 6px; }
+.selector-anios select {
+  font: 600 1.05rem var(--f-texto); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 34px 7px 12px; min-width: 9.5rem;
+  font-variant-numeric: tabular-nums; cursor: pointer; appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%);
+  background-position: calc(100% - 17px) 55%, calc(100% - 12px) 55%; background-size: 5px 5px; background-repeat: no-repeat;
+}
+.selector-anios select:hover { border-color: var(--ink-3); }
+.selector-anios select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.comparar .pista { font-size: .85rem; color: var(--ink-3); margin: 0; max-width: 44ch; }
+.comparar .pista.preliminar { color: var(--aviso-ink); background: var(--aviso-bg); padding: 4px 8px; border-radius: 6px; }
+.aviso p { margin: 0; } .aviso p + p { margin-top: 6px; }
+.detalle .tabla-detalle { overflow-x: auto; }
+.segmentos button:hover:not([aria-checked="true"]) { background: var(--hover); color: var(--ink); }
+button:focus-visible, input:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.u:focus { outline: none; } /* el municipio elegido ya se marca con su contorno */
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cifra { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; align-content: start; }
+.cifra b { font-family: var(--f-titulo); font-weight: 600; font-size: 1.7rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cifra small { color: var(--ink-3); font-size: .82rem; }
+.cifra .muestra { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.aviso { background: var(--aviso-bg); color: var(--aviso-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; }
+.principal { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 880px) { .principal { grid-template-columns: minmax(0, 1fr); } }
+.tarjeta { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.mapa-tarjeta { display: grid; min-width: 0; }
+.barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--line); }
+.buscar { display: flex; align-items: center; gap: 8px; }
+.buscar input {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 10px; width: min(240px, 60vw);
+}
+.lienzo { position: relative; min-width: 0; }
+#mapa { display: block; width: 100%; height: clamp(360px, 64vh, 660px); touch-action: none; cursor: grab; }
+#mapa:active { cursor: grabbing; }
+.raster { image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
+.fondo path { fill: var(--sin-bosque); stroke: none; pointer-events: none; }
+.u { stroke: var(--limites); stroke-width: .6; vector-effect: non-scaling-stroke; fill: transparent; cursor: pointer; }
+.vista-coropleta .fondo, .vista-coropleta .raster { display: none; }
+.vista-coropleta .u { stroke: var(--surface); stroke-width: .8; }
+.vista-coropleta .u.k0 { fill: var(--div-0); } .vista-coropleta .u.k1 { fill: var(--div-1); } .vista-coropleta .u.k2 { fill: var(--div-2); }
+.vista-coropleta .u.k3 { fill: var(--div-3); } .vista-coropleta .u.k4 { fill: var(--div-4); } .vista-coropleta .u.k5 { fill: var(--div-5); }
+.vista-coropleta .u.poco { fill: url(#rayas); }
+.u.encima { stroke: var(--sel); stroke-width: 1.6; }
+.contorno { fill: none; stroke: var(--contorno); stroke-width: 1.4; vector-effect: non-scaling-stroke; pointer-events: none; }
+.seleccion { fill: none; stroke: var(--sel); stroke-width: 2.6; vector-effect: non-scaling-stroke; pointer-events: none; }
+.zoom-botones { position: absolute; top: 12px; right: 12px; display: grid; gap: 4px; }
+.zoom-botones button {
+  width: 34px; height: 34px; font: 600 1.1rem var(--f-texto); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+}
+.zoom-botones button:hover { background: var(--hover); }
+.escala { position: absolute; left: 14px; bottom: 12px; font-size: .78rem; color: var(--ink-2); pointer-events: none; }
+.escala span { display: block; height: 4px; background: var(--ink); margin-top: 2px; }
+.globo {
+  position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; font-size: .88rem; box-shadow: 0 6px 20px rgba(0, 0, 0, .12); min-width: 180px; z-index: 2;
+}
+.globo b { font-family: var(--f-titulo); font-size: 1.05rem; font-weight: 600; display: block; }
+.globo dl, .detalle dl { display: grid; grid-template-columns: 1fr auto; gap: 1px 14px; margin: 4px 0 0; }
+.globo dt, .detalle dt { color: var(--ink-2); }
+.globo dd, .detalle dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.lado { display: grid; gap: 16px; min-width: 0; }
+.lado section { padding: 16px; display: grid; gap: 10px; }
+.detalle table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.detalle th, .detalle td { padding: 4px 0; text-align: right; border-bottom: 1px solid var(--line); }
+.detalle th:first-child, .detalle td:first-child { text-align: left; color: var(--ink-2); font-weight: 400; }
+.detalle thead th { font-family: var(--f-titulo); font-weight: 600; color: var(--ink); }
+.detalle .vacio { color: var(--ink-2); margin: 0; }
+.detalle h4 { font-family: var(--f-titulo); font-weight: 600; font-size: 1.02rem; margin: 6px 0 0; letter-spacing: .01em; }
+.detalle .tipos td + td, .detalle .tipos th + th { padding-left: 10px; white-space: nowrap; }
+.detalle .tipos tfoot td { font-weight: 600; border-bottom: 0; }
+.detalle .tipos tfoot td:first-child { color: var(--ink); }
+.serie-graf { position: relative; }
+.serie-graf svg { display: block; width: 100%; height: 150px; overflow: visible; }
+.serie-graf .eje text { fill: var(--ink-3); font: .75rem var(--f-texto); font-variant-numeric: tabular-nums; }
+.serie-graf .eje line { stroke: var(--line); }
+.serie-graf .rotulo { fill: var(--ink-2); font: 600 .78rem var(--f-texto); font-variant-numeric: tabular-nums; }
+.serie-graf .linea { fill: none; stroke: var(--linea); stroke-width: 2; }
+.serie-graf .recta { fill: none; stroke: var(--tendencia); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.serie-graf .punto { fill: var(--linea); stroke: var(--surface); stroke-width: 2; }
+.serie-graf .punto.activo { stroke: var(--ink); }
+.serie-graf .blanco { fill: transparent; cursor: default; }
+.serie-graf .dato { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: .82rem; white-space: nowrap; font-variant-numeric: tabular-nums; box-shadow: 0 4px 12px rgba(0, 0, 0, .1); }
+.serie-graf .pie-graf { font-size: .82rem; color: var(--ink-2); margin: 2px 0 0; }
+.leyenda { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.leyenda label, .leyenda li { display: flex; align-items: center; gap: 8px; font-size: .92rem; }
+.leyenda input { margin: 0; accent-color: var(--accent); }
+.leyenda .muestra { width: 16px; height: 12px; border-radius: 3px; flex: none; }
+.leyenda .cifra-ha { margin-left: auto; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.leyenda .apagada { opacity: .45; }
+.nota-mapa { font-size: .82rem; color: var(--ink-3); margin: 0; }
+.tabla-tarjeta { display: grid; min-width: 0; }
+.tabla-barra { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.tabla-barra label { display: flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: .92rem; }
+.desliza { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; min-width: 760px; }
+.municipios th { position: sticky; top: 0; background: var(--surface); z-index: 1; text-align: right; padding: 0; border-bottom: 1px solid var(--line); }
+.municipios th:first-child, .municipios td:first-child { text-align: left; }
+.municipios th button {
+  width: 100%; font: 600 .82rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2);
+  background: none; border: 0; padding: 10px 12px; text-align: inherit; cursor: pointer; white-space: nowrap;
+}
+.municipios th[aria-sort] button { color: var(--ink); }
+.municipios td { padding: 7px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.municipios tbody tr { cursor: pointer; }
+.municipios tbody tr:hover { background: var(--hover); }
+.municipios tbody tr[aria-selected="true"] { background: var(--hover); box-shadow: inset 3px 0 0 var(--accent); }
+.municipios .chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.alcances { padding: 20px; display: grid; gap: 14px; }
+.alcances .rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px 24px; }
+.alcances h3 { margin-bottom: 4px; }
+.alcances .ancho { grid-column: 1 / -1; }
+.alcances .ancho p { max-width: 100ch; }
+.alcances p, .alcances li { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.alcances ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.alcances .no-afirma { border-top: 1px solid var(--line); padding-top: 14px; }
+.alcances .no-afirma ul { columns: 2 320px; column-gap: 28px; display: block; }
+.alcances .no-afirma li { break-inside: avoid; margin-bottom: 6px; }
+.fondo path, .u { fill-rule: evenodd; }
+/* Evolución del bosque año con año (Estado), siempre a la vista */
+.evolucion { padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr); gap: 8px 32px; align-items: start; }
+.evolucion > header { grid-column: 1 / -1; display: grid; gap: 2px; }
+.evolucion > header p { margin: 0; color: var(--ink-2); font-size: .92rem; max-width: 90ch; }
+@media (max-width: 760px) { .evolucion { grid-template-columns: minmax(0, 1fr); } }
+.serie-graf.ancha svg { height: auto; max-height: 180px; }
+.evolucion table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.evolucion th, .evolucion td { padding: 5px 0 5px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.evolucion th:first-child, .evolucion td:first-child { text-align: left; padding-left: 0; }
+.evolucion thead th { font: 600 .82rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.evolucion tbody tr[aria-current="true"] { background: var(--hover); box-shadow: inset 3px 0 0 var(--accent); }
+.evolucion td button { font: 600 .95rem var(--f-texto); color: var(--accent); background: none; border: 0; padding: 0 0 0 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.evolucion .pie-graf { margin: 6px 0 0; font-size: .82rem; color: var(--ink-3); }
+/* Carga diferida: aviso de "cargando" sobre el mapa y mensaje si un archivo falla */
+.cargando { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: .88rem; box-shadow: 0 4px 12px rgba(0, 0, 0, .1); z-index: 3; }
+.falla { background: var(--falla-bg); color: var(--falla-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.falla p { margin: 0; flex: 1 1 40ch; }
+.falla button { font: 600 .92rem var(--f-texto); color: var(--falla-ink); background: transparent; border: 1px solid currentColor; border-radius: 6px; padding: 4px 12px; cursor: pointer; }
+.pie { color: var(--ink-3); font-size: .85rem; display: grid; gap: 6px; max-width: 90ch; }
+.pie p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="cabecera">
+    <div>
+      <div class="etiqueta">Calculadora forestal · PROBOSQUE · prototipo</div>
+      <h1 id="titulo">Masa forestal</h1>
+      <p id="subtitulo"></p>
+    </div>
+    <div class="controles">
+      <div class="segmentos" role="radiogroup" aria-label="Qué consultar" id="modos" hidden>
+        <button type="button" role="radio" data-modo="comparar" aria-checked="true">Comparar años</button>
+        <button type="button" role="radio" data-modo="anio" aria-checked="false">Un año</button>
+      </div>
+      <div class="comparar" id="comparar">
+        <div class="selector-anios">
+          <label><span class="etiqueta">Desde</span><select id="desde"></select></label>
+          <span class="flecha" aria-hidden="true">→</span>
+          <label><span class="etiqueta">Hasta</span><select id="hasta"></select></label>
+        </div>
+        <p class="pista" id="pista"></p>
+      </div>
+      <div class="comparar" id="un-anio" hidden>
+        <div class="selector-anios">
+          <label><span class="etiqueta">Año</span><select id="anio"></select></label>
+        </div>
+        <p class="pista" id="pista-anio"></p>
+      </div>
+    </div>
+  </header>
+
+  <div class="falla" id="falla" role="alert" hidden></div>
+  <section class="cifras" id="cifras" aria-label="Resumen"></section>
+  <div class="aviso" id="aviso" role="note" hidden></div>
+
+  <section class="tarjeta evolucion" id="evolucion" aria-labelledby="evolucion-titulo" hidden></section>
+
+  <div class="principal">
+    <div class="tarjeta mapa-tarjeta">
+      <div class="barra">
+        <div class="segmentos" role="radiogroup" aria-label="Qué mostrar en el mapa" id="vistas"></div>
+        <div class="buscar">
+          <label for="buscar" class="etiqueta">Buscar</label>
+          <input id="buscar" list="lista-unidades" placeholder="Municipio" autocomplete="off">
+          <datalist id="lista-unidades"></datalist>
+        </div>
+      </div>
+      <div class="lienzo" id="lienzo">
+        <svg id="mapa" role="img" aria-label="Mapa de la masa forestal por municipio"></svg>
+        <div class="zoom-botones">
+          <button type="button" id="acercar" aria-label="Acercar">+</button>
+          <button type="button" id="alejar" aria-label="Alejar">−</button>
+          <button type="button" id="restablecer" aria-label="Ver todo">⤢</button>
+        </div>
+        <div class="escala" id="escala"></div>
+        <div class="cargando" id="cargando" role="status" aria-live="polite">Cargando datos…</div>
+        <div class="globo" id="globo" hidden></div>
+      </div>
+    </div>
+
+    <aside class="lado">
+      <section class="tarjeta detalle" id="detalle" aria-live="polite"></section>
+      <section class="tarjeta">
+        <h3 id="leyenda-titulo">Capas</h3>
+        <ul class="leyenda" id="leyenda"></ul>
+        <p class="nota-mapa" id="nota-mapa"></p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="tarjeta tabla-tarjeta" aria-labelledby="tabla-titulo">
+    <div class="tabla-barra">
+      <h2 id="tabla-titulo">Municipios</h2>
+      <label><input type="checkbox" id="solo-bosque" checked> Solo municipios con bosque</label>
+    </div>
+    <div class="desliza">
+      <table class="municipios">
+        <thead><tr id="encabezados"></tr></thead>
+        <tbody id="filas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="tarjeta alcances" id="alcances" aria-labelledby="alcances-titulo">
+    <h2 id="alcances-titulo">Alcances</h2>
+    <div class="rejilla" id="alcances-rejilla"></div>
+    <div class="no-afirma">
+      <h3>Qué no puede afirmar todavía</h3>
+      <ul id="no-afirma"></ul>
+    </div>
+  </section>
+
+  <footer class="pie" id="pie"></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(async () => {
+  // ---------- Datos ----------
+  // Los mismos archivos en los dos modos: dentro de la página (archivo único) o en datos/ (sitio
+  // estático, pedidos con fetch solo cuando se consultan). Rutas relativas a datos/.
+  const nodoDatos = document.getElementById("datos");
+  const EMB = nodoDatos ? JSON.parse(nodoDatos.textContent).archivos : null;
+  const BASE = "datos/";
+  const pedidos = {};
+  function leer(ruta) {
+    if (!pedidos[ruta]) {
+      pedidos[ruta] = EMB
+        ? (ruta in EMB ? Promise.resolve(EMB[ruta]) : Promise.reject(new Error(`falta ${ruta} en la página`)))
+        : fetch(BASE + ruta).then(r => {
+            if (!r.ok) throw new Error(`${BASE + ruta} respondió ${r.status}${r.statusText ? " " + r.statusText : ""}`);
+            return r.json();
+          }, e => { throw new Error(`${BASE + ruta}: ${e.message}`); });
+      pedidos[ruta].catch(() => { delete pedidos[ruta]; });  // para poder reintentar
+    }
+    return pedidos[ruta];
+  }
+  const urlCuadricula = nombre => EMB ? EMB["cuadriculas/" + nombre] : BASE + "cuadriculas/" + nombre;
+
+  // "Cargando…" sobre el mapa mientras haya algo pendiente, y mensaje claro si algo falla
+  const elCargando = document.getElementById("cargando"), elFalla = document.getElementById("falla");
+  let pendientes = 0, temporizador = null;
+  function carga(delta) {
+    pendientes += delta;
+    clearTimeout(temporizador);
+    if (pendientes > 0) temporizador = setTimeout(() => { elCargando.hidden = false; }, 150);
+    else elCargando.hidden = true;
+  }
+  function mostrarFalla(e, reintentar) {
+    const local = location.protocol === "file:" ? " La página se abrió como archivo: el navegador no deja leer datos/ así. Sírvela con un servidor (por ejemplo, python -m http.server dentro de su carpeta) o usa la versión de un solo archivo." : "";
+    elFalla.innerHTML = `<p><strong>No se pudieron cargar los datos.</strong> ${String(e && e.message || e).replace(/</g, "&lt;")}.${local}</p>` + (reintentar ? `<button type="button">Reintentar</button>` : "");
+    if (reintentar) elFalla.querySelector("button").addEventListener("click", reintentar);
+    elFalla.hidden = false;
+  }
+  const ocultarFalla = () => { elFalla.hidden = true; elFalla.innerHTML = ""; };
+
+  let IDX, TOPO;
+  carga(+1);
+  try { [IDX, TOPO] = await Promise.all([leer("indice.json"), leer("municipios.topojson")]); }
+  catch (e) { carga(-1); elCargando.textContent = "Sin datos"; elCargando.hidden = false; mostrarFalla(e, () => location.reload()); return; }
+  carga(-1);
+  elCargando.textContent = "Cargando…";
+
+  // Municipios y contorno: TopoJSON en metros (EPSG:32614), llevados a los píxeles de la cuadrícula
+  // con la misma transformación que el ráster, así que coinciden exactamente
+  const M = IDX.malla;
+  const proy = d3.geoIdentity().reflectY(true).scale(1 / M.tam).translate([-M.izq / M.tam, M.arriba / M.tam]);
+  const camino = d3.geoPath(proy);
+  const unidadesGeo = topojson.feature(TOPO, TOPO.objects.municipios).features.map(ft => {
+    const b = camino.bounds(ft);
+    return { nombre: ft.properties.nombre, d: camino(ft), bbox: [b[0][0], b[0][1], b[1][0], b[1][1]] };
+  });
+  const contorno = camino(TOPO.objects.estado ? topojson.feature(TOPO, TOPO.objects.estado)
+    : topojson.merge(TOPO, TOPO.objects.municipios.geometries));
+
+  const D = { ...IDX, unidades: unidadesGeo, contorno, periodos: IDX.comparaciones.map(p => ({ ...p, cargado: false })) };
+  // Serie de varios años (null si no hay): los totales estatales vienen en el índice; las cifras por
+  // municipio se llenan al cargar cada anios/AAAA.json y la tendencia al cargar tendencias.json
+  const S = IDX.serie ? { ...IDX.serie, filas: {}, destino: {}, tend: { Total: IDX.serie.tend_total } } : null;
+  const I = Object.fromEntries(D.campos.map((c, i) => [c, i]));
+  const IS = S ? Object.fromEntries(S.campos.map((c, i) => [c, i])) : {};
+  const nf = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 });
+  const nf1 = new Intl.NumberFormat("es-MX", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const nf2 = new Intl.NumberFormat("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const ha = v => nf.format(Math.round(v)) + " ha";
+  const signo = v => (v > 0 ? "+" : v < 0 ? "−" : "") + nf.format(Math.abs(Math.round(v)));
+  const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + nf1.format(Math.abs(v)) + " %";
+  const pct2Txt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + nf2.format(Math.abs(v)) + " %";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+  const CORTES = [-5, -2, -0.5, 0.5, 2];
+  const ETQ_NETO = ["Pierde más de 5 %", "Pierde 2–5 %", "Pierde 0.5–2 %", "Casi igual (±0.5 %)", "Gana 0.5–2 %", "Gana más de 2 %"];
+  const CORTES_TEND = [-2.5, -1, -0.25, 0.25, 1];
+  const ETQ_TEND = ["Pierde más de 2.5 %/año", "Pierde 1–2.5 %/año", "Pierde 0.25–1 %/año", "Casi estable (±0.25 %/año)", "Gana 0.25–1 %/año", "Gana más de 1 %/año"];
+  const CLASES = [
+    { k: 1, nombre: "Bosque estable", token: "--c-estable" },
+    { k: 2, nombre: "Pérdida por incendio", token: "--c-incendio", campo: "inc" },
+    { k: 3, nombre: "Otra pérdida, por verificar", token: "--c-otra", campo: "otras" },
+    { k: 4, nombre: "Ganancia", token: "--c-ganancia", campo: "gan" },
+  ];
+  const DENSIDAD = [
+    { k: 1, nombre: "Menos de 25 % de la celda", token: "--den-1" },
+    { k: 2, nombre: "25–50 %", token: "--den-2" },
+    { k: 3, nombre: "50–75 %", token: "--den-3" },
+    { k: 4, nombre: "75 % o más", token: "--den-4" },
+  ];
+  // Año de pérdida: tono violeta de claro (antiguo) a oscuro (reciente); con pocos años se usan pasos separados
+  const N = S ? S.anios.length : 0;
+  const tokenPerdida = t => `--per-${N <= 2 ? 6 : 1 + Math.round((t - 1) * 5 / (N - 2))}`;
+
+  // Por defecto, el balance anual más reciente de un año
+  const anuales = D.periodos.map((p, i) => [p, i]).filter(([p]) => !p.preliminar);
+  const inicial = anuales.length
+    ? anuales.sort((a, b) => (b[0].actual - a[0].actual) || ((a[0].actual - a[0].base) - (b[0].actual - b[0].base)))[0][1]
+    : 0;
+  const st = { modo: "comparar", p: inicial, t: N ? N - 1 : 0, vista: "cobertura", sel: null,
+               capas: { 1: true, 2: true, 3: true, 4: true }, perd: {},
+               orden: { col: "neto", asc: true }, soloBosque: true };
+  const P = () => D.periodos[st.p];
+  const enAnio = () => st.modo === "anio";
+  const fila = (nombre, p = P()) => p.filas[nombre];
+  const pct = f => (!f || f[I.base] < D.minimo) ? null : f[I.neto] / f[I.base] * 100;
+  const claseCortes = (v, cortes) => { let k = 0; while (k < cortes.length && v >= cortes[k]) k++; return "k" + k; };
+  const clase = f => (!f || f[I.base] < D.minimo) ? "poco" : claseCortes(pct(f), CORTES);
+
+  // ---------- Serie: acceso ----------
+  // S.filas[unidad][tipo][t] = [zona, bosque, inc, otras, gan, neto]; S.tend[unidad][tipo] = [ha/año, %/año]
+  const serieDe = (nombre, tipo = "Todos") => S && (nombre ? (S.filas[nombre] || {})[tipo] : S.tot[tipo]);
+  const tendDe = (nombre, tipo = "Todos") => S && ((S.tend[nombre || "Total"] || {})[tipo]);
+  const pctZona = r => r && r[IS.zona] > 0 ? r[IS.bosque] / r[IS.zona] * 100 : null;
+  const pctAnt = r => r && r[IS.neto] != null && r[IS.bosque] - r[IS.neto] >= D.minimo ? r[IS.neto] / (r[IS.bosque] - r[IS.neto]) * 100 : null;
+  const claseTend = nombre => {
+    const s = serieDe(nombre), tn = tendDe(nombre);
+    if (!s || !tn || s[0][IS.bosque] < D.minimo || tn[1] == null) return "poco";
+    return claseCortes(tn[1], CORTES_TEND);
+  };
+  // La comparación de años consecutivos de la serie que termina en el año t (sus notas e incendios)
+  const indicePeriodoDeAnio = t => t > 0 ? D.periodos.findIndex(p => !p.preliminar && p.base === S.anios[t - 1] && p.actual === S.anios[t]) : -1;
+  const periodoDeAnio = t => D.periodos[indicePeriodoDeAnio(t)] || null;
+
+  // ---------- Carga diferida ----------
+  async function cargarComparacion(i) {
+    const p = D.periodos[i];
+    if (p.cargado) return;
+    const c = await leer(`comparaciones/${p.id}.json`);
+    for (const k of ["tot", "filas", "incendios", "notas", "tipos"]) p[k] = c[k];
+    p.cargado = true;
+  }
+  const aniosCargados = new Set();
+  async function cargarAnio(t) {
+    if (aniosCargados.has(t)) return;
+    const d = await leer(`anios/${S.anios[t]}.json`);
+    if (aniosCargados.has(t)) return;
+    for (const [u, porTipo] of Object.entries(d.filas)) {
+      const f = S.filas[u] || (S.filas[u] = {});
+      for (const [tp, r] of Object.entries(porTipo)) (f[tp] || (f[tp] = new Array(N)))[t] = r;
+    }
+    for (const [u, v] of Object.entries(d.destino)) (S.destino[u] || (S.destino[u] = new Array(N)))[t] = v;
+    aniosCargados.add(t);
+  }
+  let tendenciasCargadas = false;
+  async function cargarTendencias() {
+    if (tendenciasCargadas) return;
+    Object.assign(S.tend, (await leer("tendencias.json")).tendencias);
+    tendenciasCargadas = true;
+  }
+  // Lo que necesita la vista actual: la comparación elegida, o el año (y el primero, para saber
+  // qué municipios tienen poco bosque) con su tendencia; con un municipio elegido, toda su serie y
+  // todas las comparaciones de su detalle. Las cuadrículas las pide pintarRaster.
+  function necesidades(e) {
+    const tareas = [];
+    const todosLosAnios = () => { if (S) { S.anios.forEach((a, t) => tareas.push(cargarAnio(t))); tareas.push(cargarTendencias()); } };
+    if (e.modo === "anio") {
+      tareas.push(cargarAnio(e.t), cargarAnio(0), cargarTendencias());
+      const i = indicePeriodoDeAnio(e.t);
+      if (i >= 0) tareas.push(cargarComparacion(i));
+      if (e.sel) todosLosAnios();
+    } else {
+      tareas.push(cargarComparacion(e.p));
+      if (e.sel) { D.periodos.forEach((p, i) => tareas.push(cargarComparacion(i))); todosLosAnios(); }
+    }
+    return tareas;
+  }
+  // Aplica un cambio de estado solo cuando ya llegó lo que necesita, así la página nunca muestra
+  // un estado a medias. Si algo falla, se queda como estaba y ofrece reintentar.
+  let turno = 0;
+  async function actualizar(cambio, soloDetalle = false) {
+    const nuevo = JSON.parse(JSON.stringify(st));
+    if (cambio) cambio(nuevo);
+    const yo = ++turno;
+    carga(+1);
+    try { await Promise.all(necesidades(nuevo)); }
+    catch (e) {
+      carga(-1);
+      if (yo !== turno) return;
+      if (pintado) pintarCabecera();  // los selectores vuelven a lo que se está mostrando
+      mostrarFalla(e, () => actualizar(cambio, soloDetalle));
+      return;
+    }
+    carga(-1);
+    if (yo !== turno) return;
+    ocultarFalla();
+    Object.assign(st, nuevo);
+    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); } else pintarTodo();
+  }
+
+  // ---------- Cabecera ----------
+  document.getElementById("titulo").textContent = "Masa forestal · " + D.titulo;
+
+  // Modo
+  const btnModos = [...document.querySelectorAll("#modos button")];
+  if (S) document.getElementById("modos").hidden = false;
+  btnModos.forEach(b => b.addEventListener("click", () => actualizar(e => cambiarModo(e, b.dataset.modo))));
+
+  // Selector Desde → Hasta. Cada par de años con datos es una comparación. Si hay un balance anual
+  // (nov-dic) y uno preliminar del mismo par, se usa el anual.
+  const par = (b, a) => `${b}-${a}`;
+  const porPar = {};
+  D.periodos.forEach((p, i) => {
+    const k = par(p.base, p.actual);
+    if (!(k in porPar) || (D.periodos[porPar[k]].preliminar && !p.preliminar)) porPar[k] = i;
+  });
+  const valido = (b, a) => par(b, a) in porPar;
+  const aniosDesde = [...new Set(D.periodos.map(p => p.base))].sort();
+  const aniosHasta = [...new Set(D.periodos.map(p => p.actual))].sort();
+  const selDesde = document.getElementById("desde"), selHasta = document.getElementById("hasta");
+  // Un año "Hasta" que solo existe como preliminar (p. ej. 2026, que aún no tiene nov-dic) lo dice en su nombre
+  const soloPreliminar = a => D.periodos.filter(p => p.actual === a).every(p => p.preliminar);
+  const nombreHasta = a => {
+    const p = D.periodos.find(x => x.actual === a && x.preliminar);
+    return soloPreliminar(a) && p ? `${a} · ${p.sufijo.replace(/[()]/g, "").trim()} (preliminar)` : String(a);
+  };
+  selDesde.innerHTML = aniosDesde.map(a => `<option value="${a}">${a}</option>`).join("");
+  selHasta.innerHTML = aniosHasta.map(a => `<option value="${a}">${nombreHasta(a)}</option>`).join("");
+  const cercano = (lista, objetivo, ok) => lista.filter(ok).sort((x, y) => Math.abs(x - objetivo) - Math.abs(y - objetivo) || x - y)[0];
+  selDesde.addEventListener("change", () => {
+    const b = Number(selDesde.value), a0 = Number(selHasta.value);
+    const a = valido(b, a0) ? a0 : cercano(aniosHasta, a0, a => valido(b, a));
+    if (a != null) cambiarPeriodo(porPar[par(b, a)]);
+  });
+  selHasta.addEventListener("change", () => {
+    const a = Number(selHasta.value), b0 = Number(selDesde.value);
+    const b = valido(b0, a) ? b0 : cercano(aniosDesde, b0, b => valido(b, a));
+    if (b != null) cambiarPeriodo(porPar[par(b, a)]);
+  });
+  function pintarSelector() {
+    const p = P();
+    selDesde.value = String(p.base); selHasta.value = String(p.actual);
+    [...selDesde.options].forEach(o => { o.textContent = o.value + (valido(Number(o.value), p.actual) ? "" : " · sin datos"); });
+    [...selHasta.options].forEach(o => { o.textContent = nombreHasta(Number(o.value)) + (valido(p.base, Number(o.value)) ? "" : " · sin datos"); });
+    const pista = document.getElementById("pista");
+    pista.classList.toggle("preliminar", p.preliminar);
+    pista.textContent = p.preliminar
+      ? `Preliminar: compara las imágenes ${p.meses} de ${p.base} y de ${p.actual}, otra temporada que la de los balances anuales.`
+      : `Compara el bosque ${p.meses} de ${p.base} con el de ${p.actual}${p.serie ? ", de la serie: cada año vale lo mismo en todas las comparaciones" : ""}.`;
+  }
+  if (D.periodos.length < 2) document.getElementById("comparar").querySelector(".selector-anios").hidden = true;
+
+  // Selector de un año
+  const selAnio = document.getElementById("anio");
+  if (S) {
+    selAnio.innerHTML = S.anios.map((a, t) => `<option value="${t}">${a}</option>`).join("");
+    selAnio.addEventListener("change", () => { const t = Number(selAnio.value); actualizar(e => { e.t = t; }); });
+  }
+
+  const tile = (etq, valor, nota, token) =>
+    `<div class="cifra"><span class="etiqueta">${token ? `<span class="muestra" style="background:var(${token})"></span>` : ""}${etq}</span><b>${valor}</b><small>${nota}</small></div>`;
+
+  function pintarCabecera() {
+    document.getElementById("comparar").hidden = enAnio();
+    document.getElementById("un-anio").hidden = !enAnio();
+    btnModos.forEach(b => b.setAttribute("aria-checked", String(b.dataset.modo === st.modo)));
+    const aviso = document.getElementById("aviso");
+    let notas;
+    if (enAnio()) {
+      const t = st.t, a = S.anios[t], r = S.tot.Todos[t], tn = tendDe(null);
+      selAnio.value = String(t);
+      document.getElementById("pista-anio").textContent = `Bosque ${a}: compuesto Sentinel-2 de noviembre-diciembre de ${a}${t ? `; los cambios son desde noviembre-diciembre de ${S.anios[t - 1]}` : "; es el primer año de la serie"}.`;
+      document.getElementById("subtitulo").textContent =
+        `Superficie con cobertura arbórea dentro de la zona forestal en ${a}, de la serie ${S.anios[0]}–${S.anios[N - 1]} medida con imágenes Sentinel-2 de noviembre-diciembre.`;
+      const hayFlujo = t > 0;
+      const p = periodoDeAnio(t);
+      document.getElementById("cifras").innerHTML = [
+        tile(`Bosque ${a}`, nf.format(r[IS.bosque]), `ha · ${pctZona(r) == null ? "—" : nf1.format(pctZona(r)) + " %"} de la zona forestal`),
+        tile(hayFlujo ? `Cambio desde ${S.anios[t - 1]}` : "Cambio", hayFlujo ? signo(r[IS.neto]) : "—", hayFlujo ? `ha · ${pctTxt(pctAnt(r))}` : "primer año de la serie"),
+        tile("Pérdida por incendio", hayFlujo ? nf.format(r[IS.inc]) : "—", hayFlujo ? (p && p.fuego_incompleto ? "ha · incompleta (ver aviso)" : "ha") : "—", "--c-incendio"),
+        tile("Otras pérdidas", hayFlujo ? nf.format(r[IS.otras]) : "—", hayFlujo ? "ha · por verificar" : "—", "--c-otra"),
+        tile("Ganancia", hayFlujo ? nf.format(r[IS.gan]) : "—", hayFlujo ? "ha" : "—", "--c-ganancia"),
+        tile(`Tendencia ${S.anios[0]}–${S.anios[N - 1]}`, tn ? signo(tn[0]) : "—", tn ? `ha/año · ${pct2Txt(tn[1])}/año, ${N} años` : ""),
+      ].join("");
+      notas = (p && p.notas ? p.notas : []).slice();
+      if (N < 5) notas.push(`La tendencia es la pendiente por mínimos cuadrados de ${N} años: con tan pocos años equivale casi al cambio total dividido entre ${N - 1}; todavía no distingue una tendencia de la variación de un año.`);
+    } else {
+      const p = P(), tt = p.tot, neto = tt.actual - tt.base;
+      pintarSelector();
+      document.getElementById("subtitulo").textContent =
+        `Superficie con cobertura arbórea dentro de la zona forestal, medida con imágenes Sentinel-2 ${p.meses} de ${p.base} y de ${p.actual}.`;
+      document.getElementById("cifras").innerHTML = [
+        tile(`Bosque ${p.base_txt}`, nf.format(tt.base), "hectáreas"),
+        tile(`Bosque ${p.actual_txt}`, nf.format(tt.actual), "hectáreas"),
+        tile("Cambio neto", signo(neto), `ha · ${pctTxt(neto / tt.base * 100)}`),
+        tile("Pérdida por incendio", nf.format(tt.inc), p.fuego_incompleto ? "ha · incompleta (ver aviso)" : "ha", "--c-incendio"),
+        tile("Otras pérdidas", nf.format(tt.otras), "ha · por verificar", "--c-otra"),
+        tile("Ganancia", nf.format(tt.gan), "ha", "--c-ganancia"),
+      ].join("");
+      notas = p.notas;
+    }
+    aviso.hidden = !notas.length;
+    aviso.innerHTML = notas.map(n => `<p>${n}</p>`).join("");
+  }
+
+  // ---------- Mapa ----------
+  const W = D.ancho, H = D.alto;
+  const svg = d3.select("#mapa").attr("viewBox", `0 0 ${W} ${H}`).attr("preserveAspectRatio", "xMidYMid meet");
+  const defs = svg.append("defs");
+  const patron = defs.append("pattern").attr("id", "rayas").attr("patternUnits", "userSpaceOnUse")
+    .attr("width", 7).attr("height", 7).attr("patternTransform", "rotate(45)");
+  patron.append("rect").attr("width", 7).attr("height", 7).style("fill", "var(--surface)");
+  patron.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 7).style("stroke", "var(--rayado)").attr("stroke-width", 2.5);
+  const g = svg.append("g");
+  g.append("g").attr("class", "fondo").selectAll("path").data(D.unidades).join("path").attr("d", u => u.d);
+  const raster = g.append("image").attr("class", "raster").attr("width", W).attr("height", H).attr("x", 0).attr("y", 0);
+  const unidades = g.append("g").selectAll("path").data(D.unidades).join("path")
+    .attr("class", "u").attr("d", u => u.d).attr("tabindex", -1)
+    .on("pointerenter", (e, u) => { d3.select(e.currentTarget).classed("encima", true).raise(); mostrarGlobo(e, u); })
+    .on("pointermove", (e, u) => mostrarGlobo(e, u))
+    .on("pointerleave", e => { d3.select(e.currentTarget).classed("encima", false); ocultarGlobo(); })
+    .on("click", (e, u) => seleccionar(u.nombre, false));
+  g.append("path").attr("class", "contorno").attr("d", D.contorno);
+  const selPath = g.append("path").attr("class", "seleccion");
+
+  const zoom = d3.zoom().scaleExtent([1, 40])
+    .translateExtent([[-W * 0.05, -H * 0.05], [W * 1.05, H * 1.05]])
+    .on("zoom", e => { g.attr("transform", e.transform); pintarEscala(e.transform.k); ocultarGlobo(); });
+  svg.call(zoom).on("dblclick.zoom", null);
+  const dur = reduceMotion ? 0 : 500;
+  document.getElementById("acercar").onclick = () => svg.transition().duration(dur).call(zoom.scaleBy, 1.8);
+  document.getElementById("alejar").onclick = () => svg.transition().duration(dur).call(zoom.scaleBy, 1 / 1.8);
+  document.getElementById("restablecer").onclick = () => svg.transition().duration(dur).call(zoom.transform, d3.zoomIdentity);
+  function zoomA(bbox) {
+    const [x0, y0, x1, y1] = bbox;
+    const k = Math.min(40, 0.75 / Math.max((x1 - x0) / W, (y1 - y0) / H));
+    const t = d3.zoomIdentity.translate(W / 2 - k * (x0 + x1) / 2, H / 2 - k * (y0 + y1) / 2).scale(k);
+    svg.transition().duration(reduceMotion ? 0 : 700).call(zoom.transform, t);
+  }
+  function pintarEscala(k) {
+    const rect = document.getElementById("mapa").getBoundingClientRect();
+    const pxPorUnidad = Math.min(rect.width / W, rect.height / H) * k;
+    const metrosPorPx = D.celda / pxPorUnidad;
+    const objetivo = metrosPorPx * 110, n = 10 ** Math.floor(Math.log10(objetivo));
+    const largo = [5, 2, 1].map(m => m * n).find(v => v <= objetivo) || n;
+    document.getElementById("escala").innerHTML = `${largo >= 1000 ? nf.format(largo / 1000) + " km" : nf.format(largo) + " m"}<span style="width:${largo / metrosPorPx}px"></span>`;
+  }
+  let anchoEvolucion = null;
+  window.addEventListener("resize", () => {
+    pintarEscala(d3.zoomTransform(svg.node()).k);
+    const angosta = document.getElementById("evolucion").clientWidth < 700;
+    if (pintado && angosta !== anchoEvolucion) pintarEvolucion();
+    anchoEvolucion = angosta;
+  });
+
+  // Vistas del mapa según el modo
+  const VISTAS = {
+    comparar: [["cobertura", "Cambio de cobertura"], ["neto", "Cambio neto por municipio"]],
+    anio: [["bosque", "Bosque"], ["tendencia", "Tendencia por municipio"]],
+  };
+  if (S) { VISTAS.comparar.push(["perdida", "Año de pérdida"]); VISTAS.anio.push(["perdida", "Año de pérdida"]); }
+  const coropleta = () => st.vista === "neto" || st.vista === "tendencia";
+  function pintarVistas() {
+    const el = document.getElementById("vistas");
+    el.innerHTML = VISTAS[st.modo].map(([v, t]) => `<button type="button" role="radio" data-vista="${v}" aria-checked="${v === st.vista}">${t}</button>`).join("");
+    el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { st.vista = b.dataset.vista; pintarVistas(); pintarCoropletas(); pintarLeyenda(); pintarRaster(); }));
+  }
+
+  // Rásters: vienen como PNG gris (clase x paso); se colorean con los tokens del tema
+  const clasesCache = {}, imagenCache = {};
+  function leerClases(clave, src, paso) {
+    if (clasesCache[clave]) return clasesCache[clave];
+    clasesCache[clave] = new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas"); c.width = W; c.height = H;
+        const ctx = c.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, W, H).data, out = new Uint8Array(W * H);
+        for (let j = 0; j < out.length; j++) out[j] = Math.round(px[j * 4] / paso);
+        res(out);
+      };
+      img.onerror = () => { delete clasesCache[clave]; rej(new Error(`no se pudo leer la cuadrícula ${EMB ? clave : src}`)); };
+      img.src = src;
+    });
+    return clasesCache[clave];
+  }
+  const hex = s => { s = s.trim().replace("#", ""); return [0, 2, 4].map(o => parseInt(s.slice(o, o + 2), 16)); };
+  const temaOscuro = () => getComputedStyle(document.documentElement).colorScheme.includes("dark");
+  function capaRaster() {
+    // {clave, src, paso, colores: {valor: token o null}}
+    if (st.vista === "cobertura") return { clave: `cambio_${P().id}.png`, src: urlCuadricula(`cambio_${P().id}.png`), paso: D.pasos.clases,
+      colores: Object.fromEntries(CLASES.map(c => [c.k, st.capas[c.k] ? c.token : null])) };
+    if (st.vista === "bosque") return { clave: `bosque_${S.anios[st.t]}.png`, src: urlCuadricula(`bosque_${S.anios[st.t]}.png`), paso: D.pasos.clases,
+      colores: Object.fromEntries(DENSIDAD.map(c => [c.k, c.token])) };
+    if (st.vista === "perdida") return { clave: "anio_perdida.png", src: urlCuadricula("anio_perdida.png"), paso: S.paso_perdida,
+      colores: Object.fromEntries(S.anios.slice(1).map((a, i) => [i + 1, st.perd[i + 1] ? tokenPerdida(i + 1) : null])) };
+    return null;
+  }
+  let pintando = 0;
+  async function pintarRaster() {
+    const capa = capaRaster();
+    if (!capa) return;
+    const yo = ++pintando;
+    const css = getComputedStyle(document.documentElement);
+    const colores = Object.fromEntries(Object.entries(capa.colores).map(([k, tok]) => [k, tok ? hex(css.getPropertyValue(tok)) : null]));
+    const clave = [capa.clave, temaOscuro(), ...Object.values(capa.colores)].join("|");
+    if (!imagenCache[clave]) {
+      let cls;
+      if (!clasesCache[capa.clave]) raster.attr("href", null);  // no dejar otra capa mientras llega
+      carga(+1);
+      try { cls = await leerClases(capa.clave, capa.src, capa.paso); }
+      catch (e) { if (yo === pintando) { raster.attr("href", null); mostrarFalla(e, () => { ocultarFalla(); pintarRaster(); }); } return; }
+      finally { carga(-1); }
+      if (yo !== pintando) return;
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const ctx = c.getContext("2d"), img = ctx.createImageData(W, H), d = img.data;
+      for (let j = 0; j < cls.length; j++) {
+        const col = colores[cls[j]];
+        if (col) { const o = j * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255; }
+      }
+      ctx.putImageData(img, 0, 0);
+      imagenCache[clave] = c.toDataURL("image/png");
+    }
+    if (yo === pintando) raster.attr("href", imagenCache[clave]).attr("data-capa", capa.clave);
+  }
+
+  function pintarCoropletas() {
+    unidades.attr("class", u => "u " + (st.vista === "tendencia" ? claseTend(u.nombre) : clase(fila(u.nombre))));
+    d3.select("#mapa").classed("vista-coropleta", coropleta());
+  }
+
+  // ---------- Globo (al pasar el cursor) ----------
+  const globo = document.getElementById("globo"), lienzo = document.getElementById("lienzo");
+  function mostrarGlobo(e, u) {
+    let cuerpo;
+    if (enAnio()) {
+      const s = serieDe(u.nombre), r = s && s[st.t], tn = tendDe(u.nombre), a = S.anios[st.t];
+      cuerpo = r ? `<dl>
+        <dt>Bosque ${a}</dt><dd>${ha(r[IS.bosque])}</dd>
+        <dt>De la zona forestal</dt><dd>${pctZona(r) == null ? "—" : nf1.format(pctZona(r)) + " %"}</dd>
+        ${st.t ? `<dt>Cambio desde ${S.anios[st.t - 1]}</dt><dd>${signo(r[IS.neto])} ha</dd>` : ""}
+        <dt>Tendencia</dt><dd>${tn ? signo(tn[0]) + " ha/año" : "—"}</dd></dl>` : "<div>Sin datos</div>";
+    } else {
+      const f = fila(u.nombre);
+      cuerpo = f ? `<dl>
+        <dt>Bosque ${P().base_txt}</dt><dd>${ha(f[I.base])}</dd>
+        <dt>Bosque ${P().actual_txt}</dt><dd>${ha(f[I.actual])}</dd>
+        <dt>Cambio neto</dt><dd>${signo(f[I.neto])} ha</dd>
+        <dt></dt><dd>${f[I.base] < D.minimo ? "poco bosque" : pctTxt(pct(f))}</dd></dl>` : "<div>Sin datos</div>";
+    }
+    globo.innerHTML = `<b>${esc(u.nombre)}</b>` + cuerpo;
+    globo.hidden = false;
+    const r = lienzo.getBoundingClientRect(), gw = globo.offsetWidth, gh = globo.offsetHeight;
+    let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+    if (x + gw > r.width - 8) x = e.clientX - r.left - gw - 14;
+    if (y + gh > r.height - 8) y = e.clientY - r.top - gh - 14;
+    globo.style.left = Math.max(8, x) + "px"; globo.style.top = Math.max(8, y) + "px";
+  }
+  const ocultarGlobo = () => { globo.hidden = true; };
+
+  // ---------- Serie: gráfica pequeña (una línea, sin leyenda: el título la nombra) ----------
+  // Con pocos años se rotulan todos los puntos; con muchos, el primero y el último.
+  function graficaSerie(nombre, { ancho = 300, alto = 150, titulo = true } = {}) {
+    const s = serieDe(nombre), tn = tendDe(nombre);
+    if (!s) return "";
+    const anios = S.anios, ys = s.map(r => r[IS.bosque]);
+    const w = ancho, h = alto, m = { l: 8, r: 8, t: 22, b: 22 };
+    const x = d3.scalePoint().domain(anios).range([m.l + 30, w - m.r - 30]);
+    const lo = d3.min(ys), hi = d3.max(ys), pad = Math.max((hi - lo) * 0.35, hi * 0.004, 1);
+    const y = d3.scaleLinear().domain([lo - pad, hi + pad]).range([h - m.b, m.t]);
+    const xm = d3.mean(anios), ym = d3.mean(ys);
+    const recta = tn ? anios.map(a => [x(a), y(ym + tn[0] * (a - xm))]) : null;
+    const pts = anios.map((a, t) => ({ a, t, v: ys[t], cx: x(a), cy: y(ys[t]) }));
+    const rotulo = (p, ancla) => `<text class="rotulo" x="${p.cx}" y="${p.cy - 10}" text-anchor="${ancla}">${nf.format(Math.round(p.v))}</text>`;
+    const activo = enAnio() ? st.t : -1;
+    const rotulados = pts.length <= 8 ? pts : [pts[0], pts[pts.length - 1]];
+    return `${titulo ? `<h4>Bosque por año · ${esc(nombre || D.titulo)}</h4>` : ""}<div class="serie-graf${ancho > 300 ? " ancha" : ""}" data-nombre="${esc(nombre || "")}">
+      <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Bosque por año de ${esc(nombre || D.titulo)}: ${pts.map(p => `${p.a}, ${nf.format(Math.round(p.v))} hectáreas`).join("; ")}">
+        <g class="eje">${anios.map(a => `<text x="${x(a)}" y="${h - 4}" text-anchor="middle">${a}</text>`).join("")}
+          <line x1="${m.l}" x2="${w - m.r}" y1="${h - m.b}" y2="${h - m.b}"></line></g>
+        ${recta ? `<path class="recta" d="M${recta.map(p => p.join(" ")).join("L")}"></path>` : ""}
+        <path class="linea" d="M${pts.map(p => `${p.cx} ${p.cy}`).join("L")}"></path>
+        ${pts.map(p => `<circle class="punto${p.t === activo ? " activo" : ""}" data-anio="${p.a}" cx="${p.cx}" cy="${p.cy}" r="${p.t === activo ? 6 : 4.5}"></circle>`).join("")}
+        ${rotulados.map(p => rotulo(p, "middle")).join("")}
+        ${pts.map(p => `<rect class="blanco" data-t="${p.t}" x="${p.cx - 24}" y="${m.t - 10}" width="48" height="${h - m.t - m.b + 10}"></rect>`).join("")}
+      </svg><div class="dato" hidden></div>
+      <p class="pie-graf">${tn ? `Tendencia ${signo(tn[0])} ha/año (${pct2Txt(tn[1])}/año), línea punteada. ` : ""}El eje no empieza en cero: los cambios son pequeños frente al total.</p></div>`;
+  }
+  function activarGraficas(el) {
+    el.querySelectorAll(".serie-graf").forEach(gr => {
+      const dato = gr.querySelector(".dato"), nombre = gr.dataset.nombre || null, s = serieDe(nombre);
+      gr.querySelectorAll(".blanco").forEach(b => {
+        b.addEventListener("pointerenter", () => {
+          const t = Number(b.dataset.t), r = s[t];
+          dato.innerHTML = `<b>${S.anios[t]}</b> · ${ha(r[IS.bosque])}${t ? ` · ${signo(r[IS.neto])} ha desde ${S.anios[t - 1]}` : ""}`;
+          dato.hidden = false;
+          const caja = gr.getBoundingClientRect(), bb = b.getBoundingClientRect();
+          dato.style.left = Math.min(Math.max(0, bb.left - caja.left + bb.width / 2 - dato.offsetWidth / 2), caja.width - dato.offsetWidth) + "px";
+          dato.style.top = "-6px";
+        });
+        b.addEventListener("pointerleave", () => { dato.hidden = true; });
+      });
+    });
+  }
+
+  // ---------- Panel de detalle ----------
+  const IT = Object.fromEntries((D.campos_tipo || []).map((c, i) => [c, i]));
+  const hayTipos = D.periodos.some(p => p.tiene_tipos);
+  const n0 = v => nf.format(Math.round(v));
+  function tablaTipos(porTipo) {
+    const tipos = (D.tipos || []).filter(t => porTipo && porTipo[t] && (porTipo[t][IT.base] > 0 || porTipo[t][IT.actual] > 0));
+    if (!tipos.length) return `<p class="vacio">Sin bosque en la zona forestal en esta comparación.</p>`;
+    const suma = k => tipos.reduce((s, t) => s + porTipo[t][IT[k]], 0);
+    const renglon = (etq, base, perd, gan, neto) => `<tr><td>${etq}</td><td>${n0(base)}</td><td>${n0(perd)}</td><td>${n0(gan)}</td><td>${signo(neto)}</td></tr>`;
+    return `<div class="tabla-detalle"><table class="tipos"><thead><tr><th>Hectáreas</th><th>Inicial</th><th>Pérdida</th><th>Ganancia</th><th>Neto</th></tr></thead>
+      <tbody>${tipos.map(t => { const f = porTipo[t]; return renglon(t, f[IT.base], f[IT.inc] + f[IT.otras], f[IT.gan], f[IT.neto]); }).join("")}</tbody>
+      ${tipos.length > 1 ? `<tfoot>${renglon("Total", suma("base"), suma("inc") + suma("otras"), suma("gan"), suma("neto"))}</tfoot>` : ""}</table></div>`;
+  }
+  function seccionTipos(porTipo, quien) {
+    if (!hayTipos) return "";
+    const p = P();
+    const titulo = `<h4>Por tipo de bosque · ${p.etiqueta}${p.preliminar ? " (preliminar)" : ""}</h4>`;
+    if (!p.tipos) return titulo + `<p class="vacio">Esta comparación se corrió antes del desglose por tipo de bosque.</p>`;
+    return titulo + `<p class="vacio">${esc(quien)}. Pérdida = por incendio + otras.</p>` + tablaTipos(porTipo);
+  }
+  // Un año: por tipo de bosque con su tendencia
+  function tiposAnio(nombre) {
+    const t = st.t, filas = D.tipos.map(tp => [tp, serieDe(nombre, tp)]).filter(([, s]) => s && s.some(r => r[IS.bosque] > 0));
+    if (!filas.length) return `<p class="vacio">Sin bosque en la zona forestal.</p>`;
+    return `<h4>Por tipo de bosque · ${S.anios[t]}</h4><div class="tabla-detalle"><table class="tipos"><thead><tr><th>Hectáreas</th><th>Bosque</th><th>% zona</th>${t ? `<th>Cambio</th>` : ""}<th>Tend./año</th></tr></thead>
+      <tbody>${filas.map(([tp, s]) => { const r = s[t], tn = tendDe(nombre, tp); return `<tr><td>${tp}</td><td>${n0(r[IS.bosque])}</td><td>${pctZona(r) == null ? "—" : nf.format(pctZona(r))}</td>${t ? `<td>${signo(r[IS.neto])}</td>` : ""}<td>${tn ? signo(tn[0]) : "—"}</td></tr>`; }).join("")}</tbody></table></div>
+      ${t && destinoTxt(nombre) ? `<p class="vacio">${destinoTxt(nombre)}</p>` : ""}`;
+  }
+  const NOMBRE_DESTINO = { agricola: "agrícola", pecuario: "pecuario", urbano: "urbano", otro: "otro uso", sin_dato: "sin dato" };
+  function destinoTxt(nombre) {
+    const d = nombre ? (S.destino[nombre] || [])[st.t] : S.destino_tot[st.t];
+    if (!d || d.every(v => v == null)) return "";
+    const tot = d.reduce((s, v) => s + (v || 0), 0);
+    if (tot < 1) return "";
+    const ex = S.exactitud[`${S.anios[st.t - 1]}_${S.anios[st.t]}`];
+    return `Las otras pérdidas (${ha(tot)}) parecen haber pasado a: ` + S.destinos.map((k, i) => [k, d[i]]).filter(([, v]) => v >= 0.5)
+      .map(([k, v]) => `${NOMBRE_DESTINO[k]} ${nf.format(Math.round(v / tot * 100))} %`).join(", ")
+      + `. Es un clasificador${ex && ex.global != null ? ` con ${nf.format(ex.global * 100)} % de acuerdo con la Serie VII (kappa ${nf2.format(ex.kappa)})` : ""}, no una verificación.`;
+  }
+
+  function pintarDetalle() {
+    const el = document.getElementById("detalle");
+    if (enAnio()) {
+      el.innerHTML = (st.sel ? `<h3>${esc(st.sel)}</h3>` + graficaSerie(st.sel) : `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver su serie y su bosque por tipo. Abajo, toda la zona.</p>`)
+        + tiposAnio(st.sel);
+      activarGraficas(el);
+      return;
+    }
+    if (!st.sel) {
+      const p = P();
+      el.innerHTML = `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver sus cifras en cada comparación${S ? ", su serie" : ""}${hayTipos ? " y su desglose por tipo de bosque" : ""}.</p>`
+        + seccionTipos(p.tipos && p.tipos.tot, `${D.titulo}, total`);
+      activarGraficas(el);
+      return;
+    }
+    const filas = [["Bosque inicial", "base"], ["Pérdida por incendio", "inc"], ["Otras pérdidas", "otras"],
+                   ["Ganancia", "gan"], ["Bosque final", "actual"], ["Cambio neto", "neto"]];
+    const cols = D.periodos.map(p => ({ p, f: p.filas[st.sel] }));
+    el.innerHTML = `<h3>${esc(st.sel)}</h3>` + (S ? graficaSerie(st.sel) : "") + `
+      <h4>Comparaciones</h4>
+      <div class="tabla-detalle"><table><thead><tr><th>Hectáreas</th>${cols.map(c => `<th title="${c.p.etiqueta}${c.p.preliminar ? " · preliminar" : ""}">${c.p.corto}</th>`).join("")}</tr></thead>
+      <tbody>${filas.map(([etq, campo]) => `<tr><td>${etq}</td>${cols.map(c => `<td>${c.f ? (campo === "neto" ? signo(c.f[I.neto]) : n0(c.f[I[campo]])) : "—"}</td>`).join("")}</tr>`).join("")}
+      <tr><td>Cambio neto (%)</td>${cols.map(c => `<td>${c.f && c.f[I.base] >= D.minimo ? pctTxt(pct(c.f)) : "—"}</td>`).join("")}</tr></tbody></table></div>
+      ${cols.some(c => c.p.preliminar) ? `<p class="vacio">* Preliminar, otra temporada: no se compara con las demás columnas.</p>` : ""}
+      ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}
+      ${seccionTipos(P().tipos && P().tipos.filas[st.sel], st.sel)}`;
+    activarGraficas(el);
+  }
+
+  // ---------- Evolución del Estado año con año (siempre a la vista; sale del índice) ----------
+  function pintarEvolucion() {
+    const el = document.getElementById("evolucion");
+    if (!S) { el.hidden = true; return; }
+    el.hidden = false;
+    const s = S.tot.Todos, tn = tendDe(null), activo = enAnio() ? st.t : -1;
+    const angosta = el.clientWidth < 700;  // en teléfono, gráfica más angosta para que el texto no se achique
+    const filas = S.anios.map((a, t) => {
+      const r = s[t];
+      return `<tr data-anio="${a}" aria-current="${t === activo}"><td>${a}<button type="button" data-t="${t}" aria-label="Ver el bosque de ${a}">ver</button></td>
+        <td>${n0(r[IS.bosque])}</td><td>${pctZona(r) == null ? "—" : nf1.format(pctZona(r)) + " %"}</td>
+        <td>${t ? signo(r[IS.neto]) : "—"}</td><td>${t ? pctTxt(pctAnt(r)) : "—"}</td></tr>`;
+    }).join("");
+    el.innerHTML = `<header><h2 id="evolucion-titulo">Evolución del bosque · ${esc(D.titulo)}, ${S.anios[0]}–${S.anios[N - 1]}</h2>
+        <p>Superficie con bosque de cada año (noviembre-diciembre, serie encadenada) y su cambio respecto del año anterior.${tn ? ` Tendencia: ${signo(tn[0])} ha/año (${pct2Txt(tn[1])}/año).` : ""}${D.periodos.some(p => p.preliminar) ? " Los preliminares de otra temporada no entran en la serie." : ""}</p></header>
+      <div>${graficaSerie(null, angosta ? { ancho: 320, alto: 150, titulo: false } : { ancho: 520, alto: 160, titulo: false })}</div>
+      <div class="tabla-detalle"><table><thead><tr><th>Año</th><th>Bosque (ha)</th><th>De la zona</th><th>Cambio (ha)</th><th>Cambio (%)</th></tr></thead>
+        <tbody>${filas}</tbody></table>
+        <p class="pie-graf">Cada municipio tiene su serie en su detalle. «ver» abre ese año en el mapa.</p></div>`;
+    el.hidden = false;
+    activarGraficas(el);
+    el.querySelectorAll("button[data-t]").forEach(b => b.addEventListener("click", () => {
+      const t = Number(b.dataset.t);
+      actualizar(e => { if (e.modo !== "anio") cambiarModo(e, "anio"); e.t = t; });
+    }));
+  }
+
+  // ---------- Leyenda ----------
+  function pintarLeyenda() {
+    const ul = document.getElementById("leyenda"), nota = document.getElementById("nota-mapa"), titulo = document.getElementById("leyenda-titulo");
+    const cuenta = f => { const c = {}; D.unidades.forEach(u => { const k = f(u.nombre); c[k] = (c[k] || 0) + 1; }); return c; };
+    const choro = (etiquetas, c, texto) => {
+      ul.innerHTML = etiquetas.map((etq, k) => `<li><span class="muestra" style="background:var(--div-${k})"></span>${etq}<span class="cifra-ha">${c["k" + k] || 0}</span></li>`).join("") +
+        `<li><svg class="muestra" viewBox="0 0 16 12" aria-hidden="true"><rect width="16" height="12" fill="url(#rayas)"></rect></svg>Menos de ${nf.format(D.minimo)} ha de bosque<span class="cifra-ha">${c.poco || 0}</span></li>`;
+      nota.textContent = texto;
+    };
+    const celdas = `Cada celda de ${nf.format(D.celda)} m`;
+    if (st.vista === "cobertura") {
+      const t = P().tot;
+      titulo.textContent = "Capas";
+      const haClase = { 1: t.base - t.inc - t.otras, 2: t.inc, 3: t.otras, 4: t.gan };
+      ul.innerHTML = CLASES.map(c => `<li><label class="${st.capas[c.k] ? "" : "apagada"}">
+          <input type="checkbox" data-k="${c.k}" ${st.capas[c.k] ? "checked" : ""}>
+          <span class="muestra" style="background:var(${c.token})"></span>${c.nombre}
+          <span class="cifra-ha">${ha(haClase[c.k])}</span></label></li>`).join("") +
+        `<li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin bosque o fuera de la zona forestal</li>`;
+      ul.querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+        st.capas[inp.dataset.k] = inp.checked; pintarLeyenda(); pintarRaster();
+      }));
+      nota.textContent = `${celdas} muestra la pérdida o ganancia si la hay, así que se ven más grandes de lo que son; las hectáreas reales están arriba. Apaga capas para ver una sola clase.`;
+    } else if (st.vista === "bosque") {
+      titulo.textContent = `Bosque ${S.anios[st.t]}`;
+      ul.innerHTML = DENSIDAD.map(c => `<li><span class="muestra" style="background:var(${c.token})"></span>${c.nombre}</li>`).join("") +
+        `<li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin bosque o fuera de la zona forestal</li>`;
+      nota.textContent = `${celdas} se pinta según qué parte de ella tenía bosque en ${S.anios[st.t]}. Total: ${ha(S.tot.Todos[st.t][IS.bosque])}.`;
+    } else if (st.vista === "perdida") {
+      titulo.textContent = "Año de pérdida";
+      const perdidas = t => { const r = S.tot.Todos[t]; return (r[IS.inc] || 0) + (r[IS.otras] || 0); };
+      ul.innerHTML = S.anios.slice(1).map((a, i) => { const t = i + 1; return `<li><label class="${st.perd[t] ? "" : "apagada"}">
+          <input type="checkbox" data-t="${t}" ${st.perd[t] ? "checked" : ""}>
+          <span class="muestra" style="background:var(${tokenPerdida(t)})"></span>Perdido en ${a}
+          <span class="cifra-ha">${ha(perdidas(t))}</span></label></li>`; }).join("") +
+        `<li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin pérdida, sin bosque o fuera de la zona</li>`;
+      ul.querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+        st.perd[inp.dataset.t] = inp.checked; pintarLeyenda(); pintarRaster();
+      }));
+      nota.textContent = `“Perdido en ${S.anios[1]}” = era bosque en noviembre-diciembre de ${S.anios[0]} y ya no en el de ${S.anios[1]} (por incendio u otra causa). ${celdas} toma el año más reciente de pérdida que tenga, así que se ven más grandes de lo que son; las hectáreas son las del periodo. Sale de la serie nov-dic.`;
+    } else if (st.vista === "neto") {
+      titulo.textContent = "Cambio neto";
+      choro(ETQ_NETO, cuenta(n => clase(fila(n))), "Cambio neto de cada municipio como porcentaje de su bosque inicial. El número a la derecha es cuántos municipios hay en cada clase.");
+    } else {
+      titulo.textContent = `Tendencia ${S.anios[0]}–${S.anios[N - 1]}`;
+      choro(ETQ_TEND, cuenta(claseTend), `Pendiente por mínimos cuadrados del bosque de cada municipio, como porcentaje de su bosque de ${S.anios[0]} por año. El número a la derecha es cuántos municipios hay en cada clase.`);
+    }
+  }
+
+  // ---------- Tabla ----------
+  const COLS = {
+    comparar: [
+      { c: "nombre", t: "Municipio" }, { c: "base", t: "Bosque inicial" }, { c: "inc", t: "Incendio" },
+      { c: "otras", t: "Otras pérdidas" }, { c: "gan", t: "Ganancia" }, { c: "actual", t: "Bosque final" },
+      { c: "neto", t: "Neto (ha)" }, { c: "pct", t: "Neto (%)" }],
+    anio: [
+      { c: "nombre", t: "Municipio" }, { c: "zona", t: "Zona forestal" }, { c: "bosque", t: "Bosque" },
+      { c: "pzona", t: "% de la zona" }, { c: "neto", t: "Cambio (ha)" }, { c: "pant", t: "Cambio (%)" },
+      { c: "tend", t: "Tendencia (ha/año)" }, { c: "ptend", t: "Tendencia (%/año)" }],
+  };
+  const enc = document.getElementById("encabezados");
+  function pintarEncabezados() {
+    enc.innerHTML = COLS[st.modo].map(col => `<th scope="col" data-c="${col.c}"><button type="button">${col.t}${col.c === "bosque" ? " " + S.anios[st.t] : ""}</button></th>`).join("");
+    enc.querySelectorAll("th").forEach(th => th.querySelector("button").addEventListener("click", () => {
+      const c = th.dataset.c;
+      st.orden = { col: c, asc: st.orden.col === c ? !st.orden.asc : ["nombre", "neto", "pct", "pant", "tend", "ptend"].includes(c) };
+      pintarTabla();
+    }));
+  }
+  document.getElementById("solo-bosque").addEventListener("change", e => { st.soloBosque = e.target.checked; pintarTabla(); });
+
+  function pintarTabla() {
+    let lista;
+    if (enAnio()) {
+      const t = st.t;
+      lista = Object.keys(S.filas).map(nombre => {
+        const r = serieDe(nombre)[t], tn = tendDe(nombre) || [null, null], poco = serieDe(nombre)[0][IS.bosque] < D.minimo;
+        return { nombre, v: { zona: r[IS.zona], bosque: r[IS.bosque], pzona: pctZona(r), neto: t ? r[IS.neto] : null,
+          pant: t ? pctAnt(r) : null, tend: tn[0], ptend: poco ? null : tn[1] }, conBosque: r[IS.bosque] > 0 || serieDe(nombre)[0][IS.bosque] > 0 };
+      });
+    } else {
+      lista = Object.entries(P().filas).map(([nombre, f]) => ({ nombre, f, conBosque: f[I.base] > 0,
+        v: { base: f[I.base], inc: f[I.inc], otras: f[I.otras], gan: f[I.gan], actual: f[I.actual], neto: f[I.neto], pct: pct(f) } }));
+    }
+    if (st.soloBosque) lista = lista.filter(x => x.conBosque);
+    if (!COLS[st.modo].some(c => c.c === st.orden.col)) st.orden = { col: "neto", asc: true };
+    const val = x => st.orden.col === "nombre" ? x.nombre : (x.v[st.orden.col] ?? Infinity);
+    lista.sort((a, b) => {
+      const va = val(a), vb = val(b);
+      const r = typeof va === "string" ? va.localeCompare(vb, "es") : (va === vb ? 0 : va - vb);
+      return st.orden.asc ? r : -r;
+    });
+    enc.querySelectorAll("th").forEach(th => {
+      if (th.dataset.c === st.orden.col) th.setAttribute("aria-sort", st.orden.asc ? "ascending" : "descending");
+      else th.removeAttribute("aria-sort");
+    });
+    const num = v => v == null ? "—" : n0(v);
+    const celdas = enAnio()
+      ? x => `<td>${num(x.v.zona)}</td><td>${num(x.v.bosque)}</td><td>${x.v.pzona == null ? "—" : nf1.format(x.v.pzona) + " %"}</td>
+          <td>${x.v.neto == null ? "—" : signo(x.v.neto)}</td><td>${pctTxt(x.v.pant)}</td><td>${x.v.tend == null ? "—" : signo(x.v.tend)}</td>
+          <td>${x.v.ptend == null ? "—" : `<span class="chip" style="background:var(--div-${claseTend(x.nombre).slice(1)})"></span>${pct2Txt(x.v.ptend)}`}</td>`
+      : x => `<td>${n0(x.v.base)}</td><td>${n0(x.v.inc)}</td><td>${n0(x.v.otras)}</td><td>${n0(x.v.gan)}</td>
+          <td>${n0(x.v.actual)}</td><td>${signo(x.v.neto)}</td>
+          <td>${x.v.pct == null ? "—" : `<span class="chip" style="background:var(--div-${clase(x.f).slice(1)})"></span>${pctTxt(x.v.pct)}`}</td>`;
+    const tb = document.getElementById("filas");
+    tb.innerHTML = lista.map(x => `<tr tabindex="0" data-n="${esc(x.nombre)}" aria-selected="${x.nombre === st.sel}"><td>${esc(x.nombre)}</td>${celdas(x)}</tr>`).join("");
+    tb.querySelectorAll("tr").forEach(tr => {
+      tr.addEventListener("click", () => seleccionar(tr.dataset.n, true));
+      tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); seleccionar(tr.dataset.n, true); } });
+    });
+    document.getElementById("tabla-titulo").textContent = enAnio() ? `Municipios · ${S.anios[st.t]}` : `Municipios · ${P().etiqueta}${P().preliminar ? " (preliminar)" : ""}`;
+  }
+
+  // ---------- Selección, búsqueda, modos, periodos ----------
+  const porNombre = Object.fromEntries(D.unidades.map(u => [u.nombre, u]));
+  document.getElementById("lista-unidades").innerHTML = D.unidades.map(u => `<option value="${esc(u.nombre)}"></option>`).join("");
+  document.getElementById("buscar").addEventListener("change", e => {
+    const q = e.target.value.trim().toLowerCase();
+    const u = D.unidades.find(x => x.nombre.toLowerCase() === q) || D.unidades.find(x => x.nombre.toLowerCase().includes(q));
+    if (u) seleccionar(u.nombre, true);
+  });
+  function seleccionar(nombre, acercar) {
+    const u = porNombre[nombre];
+    if (u && acercar) zoomA(u.bbox);
+    const tr = [...document.querySelectorAll("#filas tr")].find(t => t.dataset.n === nombre);
+    if (tr && !acercar) tr.scrollIntoView({ block: "nearest" });
+    actualizar(e => { e.sel = nombre; }, true);
+  }
+  function marcarSeleccion() {
+    const u = porNombre[st.sel];
+    selPath.attr("d", u ? u.d : null);
+    document.querySelectorAll("#filas tr").forEach(tr => tr.setAttribute("aria-selected", String(tr.dataset.n === st.sel)));
+  }
+  // En "Comparar años", la capa del año de pérdida muestra los años de la comparación elegida.
+  // Estas funciones cambian el estado `e` que se va a aplicar (ver actualizar).
+  function perdidaDelPeriodo(e) {
+    if (!S) return;
+    const p = D.periodos[e.p];
+    S.anios.forEach((a, t) => { if (t) e.perd[t] = p.preliminar ? true : (a > p.base && a <= p.actual); });
+  }
+  function cambiarModo(e, modo) {
+    e.modo = modo;
+    e.vista = VISTAS[modo].some(([v]) => v === e.vista) ? e.vista : VISTAS[modo][0][0];
+    if (modo === "anio") S.anios.forEach((a, t) => { if (t) e.perd[t] = true; }); else perdidaDelPeriodo(e);
+    e.orden = { col: modo === "anio" ? "bosque" : "neto", asc: modo !== "anio" };
+  }
+  function cambiarPeriodo(i) {
+    actualizar(e => { e.p = i; perdidaDelPeriodo(e); });
+  }
+  let pintado = false;
+  function pintarTodo() {
+    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
+    marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPie();
+    pintado = true;
+  }
+
+  // ---------- Alcances (CF-DEV-14) y pie ----------
+  function pintarAlcances() {
+    const anual = D.periodos.filter(p => !p.preliminar), pre = D.periodos.filter(p => p.preliminar);
+    const anios = S ? S.anios : [...new Set(anual.flatMap(p => [p.base, p.actual]))].sort();
+    const zona = S && S.zona_ha ? ` (${ha(S.zona_ha)})` : "";
+    const umbral = S ? S.umbral : (anual[0] || D.periodos[0]).umbral;
+    const exact = S ? Object.entries(S.exactitud).filter(([, v]) => v && v.global != null) : [];
+    const val = D.validacion || [];
+    const bloques = [
+      ["Qué mide", `<p>La superficie con cobertura arbórea (hectáreas) dentro de la zona forestal: un píxel de 10 m cuenta como bosque si su NDVI es de ${nf2.format(umbral)} o más. De un año a otro separa la pérdida por incendio (dentro de un polígono de CONAFOR con dNBR ≥ 0.27), las otras pérdidas y la ganancia. No mide biomasa, carbono, densidad del arbolado ni especies.</p>`],
+      ["Dónde", `<p>${esc(D.titulo)}, por municipio, dentro de la zona forestal de INEGI Serie VII${zona}: bosques, selva baja caducifolia, matorrales y vegetación secundaria arbórea${S && S.clases ? ` (claves ${esc(S.clases)})` : ""}. Fuera de esa zona no se cuenta bosque.</p>`],
+      ["Cuándo", `<p>Un compuesto de noviembre-diciembre por año (${anios.join(", ")}): sin lluvias, con las parcelas secas y antes de la temporada de incendios. Los incendios de cada periodo van del 1 de noviembre al 31 de octubre.${pre.length ? ` Además, un preliminar ${pre.map(p => `${p.meses} ${p.base} → ${p.actual}`).join("; ")}, de otra temporada, que no se compara con los anteriores.` : ""}</p>`],
+      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta 2024.</li><li>Uso de suelo y vegetación Serie VII de INEGI y límites municipales (IDEFOR).</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
+    ];
+    if (S) {
+      const sin = S.sin_encadenar;
+      const ej = sin && N > 2 ? ` Por ejemplo, ${S.anios[1]} vale ${ha(S.tot.Todos[1][IS.bosque])} en la serie; medido solo con el umbral, como lo tomaría una comparación directa que empezara en ${S.anios[1]}, daría ${ha(sin[1])}.` : "";
+      bloques.push(["Cómo se arma la serie", `<p>El bosque del primer año es el que pasa el umbral. Cada año siguiente parte del anterior: un píxel solo cambia si cruza el umbral y además su NDVI cambió al menos 0.10. Así la cifra de cada año es la misma en todas las comparaciones.${ej} Antes (hasta la versión 0.6.0) cada comparación se corría por separado, así que un mismo año podía valer distinto en dos comparaciones.</p>`, "ancho"]);
+    }
+    document.getElementById("alcances-rejilla").innerHTML = bloques.map(([t, c, k]) => `<div class="${k || ""}"><h3>${t}</h3>${c}</div>`).join("");
+    const no = [
+      `Que el umbral de NDVI (${nf2.format(umbral)}) sea el correcto: es provisional (método de Otsu) y aún no se calibra con puntos de referencia de campo o fotointerpretados.`,
+      `La causa de las “otras pérdidas”: pueden ser tala, plaga, sequía, cambio de uso, caída de hojas o ruido. Ninguna se ha verificado en campo.${val.length ? ` Contra Hansen GFC coinciden poco (precisión ${val.map(v => `${v.periodo.replace("_", "→")}: ${nf.format(v.precision * 100)} %`).join(", ")}, tomando Hansen como referencia).` : ""}`,
+      `Que la selva baja caducifolia haya perdido cobertura: en noviembre-diciembre ya empieza a tirar las hojas, así que parte de sus “otras pérdidas” puede ser solo la temporada.`,
+      `El uso al que pasó el terreno perdido (agrícola, pecuario, urbano u otro) con certeza: lo estima un clasificador entrenado con la Serie VII, que es anterior a 2023${exact.length ? `; su acuerdo con datos reservados de la misma Serie VII es de ${exact.map(([k, v]) => `${nf.format(v.global * 100)} % (kappa ${nf2.format(v.kappa)}) en ${k.slice(-4)}`).join(" y ")}` : ""}.`,
+      `La pérdida por incendio de 2025: CONAFOR todavía no publica sus polígonos, así que lo quemado en 2025 aparece como “otras pérdidas”.`,
+      `La recuperación por reforestación de los programas (PS, RHF, CC): faltan sus polígonos con año de plantación y sobrevivencia. Una plantación tarda años en verse desde el satélite.`,
+      S ? `Una tendencia firme: con ${N} años, la pendiente es casi el cambio total entre ${N - 1}; hacen falta más años para separarla de la variación de un año a otro.` : null,
+      `Cambios menores a una fracción de hectárea, ni la degradación bajo el dosel: el píxel es de 10 m y el NDVI ve sobre todo la copa.`,
+      `Una cifra oficial: es un prototipo con fuentes públicas; no sustituye al Inventario Nacional Forestal y de Suelos ni a las cifras de CONAFOR o INEGI.`,
+    ].filter(Boolean);
+    document.getElementById("no-afirma").innerHTML = no.map(t => `<li>${t}</li>`).join("");
+  }
+
+  function pintarPie() {
+    let metodo, anios;
+    if (enAnio()) {
+      anios = `${S.anios[0]}–${S.anios[N - 1]}`;
+      metodo = `Bosque = NDVI ≥ ${S.umbral.toFixed(2)} (umbral provisional) dentro de la zona forestal de INEGI Serie VII, con compuestos Sentinel-2 L2A de noviembre-diciembre de cada año (${S.escenas.map((e, t) => `${S.anios[t]}: ${e} escenas`).join(", ")}). Cada año parte del bosque del anterior y un píxel cambia de clase solo si su NDVI cambió al menos 0.10. Quemado = dNBR ≥ 0.27 dentro de los polígonos de incendio de CONAFOR. Las “otras pérdidas” están por verificar.`;
+    } else {
+      const p = P();
+      anios = `${p.base}–${p.actual}`;
+      const escn = p.escenas && p.escenas[0] ? ` (${p.escenas[0]} y ${p.escenas[1]} escenas)` : "";
+      const inc = p.incendios && p.incendios.n ? ` Incendios del periodo: ${nf.format(p.incendios.n)}; de ${ha(p.incendios.poligono)} reportadas por CONAFOR, ${ha(p.incendios.quemado)} tienen dNBR ≥ 0.27 y ${ha(p.incendios.perdido)} quedaron sin copa.` : "";
+      metodo = `Bosque = NDVI ≥ ${p.umbral.toFixed(2)} (umbral provisional) dentro de la zona forestal de INEGI Serie VII, con compuestos Sentinel-2 L2A ${p.meses} de cada año${escn}. Un píxel cambia de clase solo si su NDVI cambió al menos 0.10${p.serie ? "; las comparaciones nov-dic salen de la serie encadenada" : ""}. Quemado = dNBR ≥ 0.27 dentro de los polígonos de incendio de CONAFOR.${inc} Las “otras pérdidas” están por verificar: pueden ser tala, plaga, nieve o ruido.`;
+    }
+    document.getElementById("pie").innerHTML = `
+      <p><strong>Método.</strong> ${metodo}</p>
+      <p><strong>Fuentes.</strong> Contiene datos modificados de Copernicus Sentinel ${anios} (ESA, vía Earth Search en AWS). Fuente: INEGI, Conjunto de datos vectoriales de uso del suelo y vegetación, escala 1:250 000, serie VII. Fuente: CONAFOR, Concentrado Nacional de Polígonos de Incendios Forestales, vía IDEFOR.${D.validacion ? " Hansen/UMD/Google/USGS/NASA, Global Forest Change 2000–2025 v1.13 (CC BY 4.0)." : ""} Análisis propio; no es una postura oficial del INEGI ni de CONAFOR.</p>`;
+  }
+
+  // Volver a colorear el ráster si cambia el tema
+  const alCambiarTema = () => { if (pintado) pintarRaster(); };
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", alCambiarTema);
+  new MutationObserver(alCambiarTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  perdidaDelPeriodo(st);
+  pintarAlcances();
+  pintarEscala(1);
+  await actualizar();
+})();
+</script>
+
+</body>
+</html>

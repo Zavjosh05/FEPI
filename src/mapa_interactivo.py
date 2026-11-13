@@ -3,8 +3,25 @@
 Página HTML interactiva con los resultados de una o varias corridas
 ===================================================================
 
-Arma un solo archivo HTML (sin servidor) para explorar el balance de masa forestal:
+Arma la página para explorar el balance de masa forestal, de dos formas que comparten la misma
+plantilla, el mismo código de la página y los mismos datos:
 
+  - `--salida ARCHIVO.html`: un solo archivo (sin servidor) con todos los datos dentro;
+  - `--sitio CARPETA` (desde 0.8.0): un sitio estático, listo para GitHub Pages, con la página sin
+    datos (`index.html`) y los datos en archivos separados que la página pide con `fetch` solo al
+    consultarlos:
+
+        datos/indice.json                  lo mínimo para arrancar (años, comparaciones, totales
+                                           estatales por año, umbral, validación)
+        datos/municipios.topojson          municipios y contorno estatal, EPSG:32614
+        datos/anios/AAAA.json              cifras del año por municipio y tipo de bosque
+        datos/tendencias.json              tendencia de la serie por municipio y tipo
+        datos/comparaciones/<id>.json      una comparación entre dos años
+        datos/cuadriculas/*.png            cuadrícula de 90 m (clase x paso en gris)
+
+La página tiene:
+
+  - la evolución del bosque del Estado año con año (CF-DEV-01 de las Tablas v12), siempre a la vista;
   - modo "Comparar años" (Desde → Hasta): el ráster de cambio (con capas que se prenden y apagan),
     el cambio neto por unidad en porcentaje o el año de pérdida; cifras, detalle y tabla de la
     comparación elegida;
@@ -17,15 +34,16 @@ Arma un solo archivo HTML (sin servidor) para explorar el balance de masa forest
 Cada carpeta puede traer una comparación (`correr`) o varias (`serie`: una por par de años, más
 serie_*.csv, tendencia_*.csv, bosque_por_anio.tif y anio_perdida.tif). Si dos carpetas traen el mismo
 par de años y la misma temporada, se usa la de la serie. Todas deben ser de la misma zona (mismo
---aoi), para que sus rásters coincidan. Los datos van dentro del archivo; solo la librería D3 se
-carga de internet (cdnjs).
+--aoi), para que sus rásters coincidan. Solo las librerías D3 y TopoJSON se cargan de internet
+(cdnjs).
 
 Uso (desde la raíz del repositorio):
     python src/mapa_interactivo.py resultados/edomex_serie_2023_2025 resultados/edomex_2025_2026_sepoct \
         --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
-        --titulo "Estado de México" --validacion resultados/validacion_hansen --salida docs/mapa_edomex.html
+        --titulo "Estado de México" --validacion resultados/validacion_hansen \
+        --salida docs/mapa_edomex.html --sitio docs/calculadora
 
-Con --fragmento escribe la página sin <html>/<head>/<body>, para publicarla como Artifact.
+Con --fragmento escribe el archivo único sin <html>/<head>/<body>, para publicarlo como Artifact.
 """
 
 from __future__ import annotations
@@ -36,7 +54,9 @@ import io
 import json
 import math
 import re
+import shutil
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -46,6 +66,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mapa_cambio import leer_cambio_agregado  # noqa: E402
 from prototipo_masa_forestal import DESTINOS, TIPOS_ORDEN  # noqa: E402
 
+VERSION_DATOS = 1  # forma de los archivos de datos/ (subirla si cambia)
 BOSQUE_MINIMO_HA = 500
 CAMPOS = {"bosque_base_ha": "base", "perdida_incendio_ha": "inc", "otras_perdidas_ha": "otras",
           "ganancia_ha": "gan", "bosque_afectado_por_fuego_ha": "afect", "bosque_actual_ha": "actual",
@@ -57,8 +78,10 @@ CAMPOS_TIPO = {"bosque_base_ha": "base", "perdida_incendio_ha": "inc", "otras_pe
 CAMPOS_SERIE = {"zona_forestal_ha": "zona", "bosque_ha": "bosque", "perdida_incendio_ha": "inc",
                 "otras_perdidas_ha": "otras", "ganancia_ha": "gan", "cambio_neto_ha": "neto"}
 TODOS = "Todos"
+TOTAL = "Total"  # unidad del total estatal en tendencia_*.csv
 # Clases del bosque de un año en la malla reducida: parte de la celda con bosque
 CORTES_DENSIDAD = [0.25, 0.5, 0.75]
+PASO_CLASES, PASO_PERDIDA = 50, 25
 
 
 def _tipos(carpeta, clave):
@@ -75,12 +98,12 @@ def _tipos(carpeta, clave):
     return {"filas": filas, "tot": tot}
 
 
-def _png_clases(arr, paso=50) -> str:
-    """Ráster de clases como PNG en escala de grises (valor x paso), en data URI."""
+def _png_clases(arr, paso=PASO_CLASES) -> bytes:
+    """Ráster de clases como PNG en escala de grises (valor x paso)."""
     from PIL import Image
     buf = io.BytesIO()
     Image.fromarray((arr * paso).astype(np.uint8), mode="L").save(buf, "PNG", optimize=True)
-    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+    return buf.getvalue()
 
 
 def _escenas(carpeta, anio):
@@ -119,6 +142,7 @@ def _incendios(carpeta, clave):
 
 
 def preparar_periodo(carpeta, clave, ancho_px):
+    """Una comparación entre dos años. Las claves que empiezan con "_" no van a la página."""
     carpeta = Path(carpeta)
     base, actual = (int(x) for x in clave.split("_"))
     bal = pd.read_csv(carpeta / f"balance_{clave}.csv")
@@ -156,16 +180,26 @@ def preparar_periodo(carpeta, clave, ancho_px):
         notas.append("No hay polígonos de incendios de CONAFOR para este periodo (aún no se publican), así "
                      "que toda la pérdida aparece como “otras pérdidas”.")
     sufijo = f" ({meses_corto})" if preliminar else ""
-    return {"clave": clave, "base": base, "actual": actual, "preliminar": preliminar,
+    # Identificador de archivo: el par de años, y la ventana si no es la de nov-dic (para que un
+    # preliminar no choque con el balance anual del mismo par)
+    ident = clave if not preliminar else f"{clave}_{ventana[0].replace('-', '')}_{ventana[1].replace('-', '')}"
+    tipos = _tipos(carpeta, clave)
+    return {"id": ident, "clave": clave, "base": base, "actual": actual, "preliminar": preliminar,
             "serie": bool(corrida.get("serie")),
             "etiqueta": f"{base} → {actual}", "meses": meses,
             "base_txt": f"{meses_corto} {base}" if preliminar else str(base),
             "actual_txt": f"{meses_corto} {actual}" if preliminar else str(actual),
             "corto": f"{str(base)[2:]}→{str(actual)[2:]}{'*' if preliminar else ''}", "sufijo": sufijo,
             "umbral": round(float(bal["umbral_ndvi"].iloc[0]), 2), "escenas": escenas,
-            "tot": tot, "filas": filas, "incendios": inc, "notas": notas, "tipos": _tipos(carpeta, clave),
-            "fuego_incompleto": any("incendios" in n for n in notas),
-            "img": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs), "_ventana": ventana}
+            "fuego_incompleto": any("incendios" in n for n in notas), "tiene_tipos": tipos is not None,
+            "tot": tot, "filas": filas, "incendios": inc, "notas": notas, "tipos": tipos,
+            "_png": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs), "_ventana": ventana}
+
+
+# Campos de una comparación que van en el índice (los demás van en su archivo)
+LIGEROS = ["id", "clave", "base", "actual", "preliminar", "serie", "etiqueta", "meses", "base_txt",
+           "actual_txt", "corto", "sufijo", "umbral", "escenas", "fuego_incompleto", "tiene_tipos"]
+PESADOS = ["tot", "filas", "incendios", "notas", "tipos"]
 
 
 def leer_por_celdas(ruta, f, funcion, capas=1):
@@ -193,7 +227,10 @@ def _num(v, nd=2):
 
 
 def preparar_serie(carpeta, f):
-    """Datos del modo "Un año", de la serie y de la capa del año de pérdida."""
+    """Datos del modo "Un año", de la evolución y de la capa del año de pérdida.
+
+    Regresa (ligero, anios, tendencias, pngs): `ligero` va en el índice (totales estatales por año);
+    `anios[t]` es el archivo de cada año; `pngs` las cuadrículas {nombre: bytes}."""
     carpeta = Path(carpeta)
     ruta = sorted(carpeta.glob("serie_*.csv"))[0]
     cola = ruta.stem.removeprefix("serie_")
@@ -202,36 +239,45 @@ def preparar_serie(carpeta, f):
     tend = pd.read_csv(carpeta / f"tendencia_{cola}.csv")
     anios = [int(x) for x in meta["anios"]]
     N = len(anios)
+    escenas = [meta["escenas"].get(str(a)) for a in anios]
+    hay_sin_enc = "bosque_sin_encadenar_ha" in s.columns
 
-    def lista(g):
-        g = g.set_index("anio").reindex(anios)
-        return [[_num(r[c]) for c in CAMPOS_SERIE] for _, r in g.iterrows()]
-
-    filas, destino = {}, {}
+    # Un archivo por año. Cada uno trae las mismas unidades y tipos (con None si el tipo no tiene
+    # cifras ese año), para que la página pueda armar la serie de cualquier unidad.
+    por_anio = [{"anio": a, "t": t, "campos": list(CAMPOS_SERIE.values()), "destinos": DESTINOS,
+                 "escenas": escenas[t], "filas": {}, "destino": {}, "sin_encadenar": {}} for t, a in enumerate(anios)]
     for (u, tipo), g in s.groupby(["unidad", "tipo_bosque"], sort=False):
-        filas.setdefault(str(u), {})[tipo] = lista(g)
-        if tipo == TODOS:
-            gd = g.set_index("anio").reindex(anios)
-            destino[str(u)] = [[_num(r[f"{d}_ha"]) for d in DESTINOS] for _, r in gd.iterrows()]
+        g = g.set_index("anio").reindex(anios)
+        for t, (_, r) in enumerate(g.iterrows()):
+            por_anio[t]["filas"].setdefault(str(u), {})[tipo] = [_num(r[c]) for c in CAMPOS_SERIE]
+            if tipo == TODOS:
+                por_anio[t]["destino"][str(u)] = [_num(r[f"{d}_ha"]) for d in DESTINOS]
+                if hay_sin_enc:
+                    por_anio[t]["sin_encadenar"][str(u)] = _num(r["bosque_sin_encadenar_ha"])
     tot = {}
     for tipo, g in s.groupby("tipo_bosque", sort=False):
         suma = g.groupby("anio")[list(CAMPOS_SERIE)].sum(min_count=1).reindex(anios)
-        tot[tipo] = [[_num(r[c], 1) for c in CAMPOS_SERIE] for _, r in suma.iterrows()]
+        tot[tipo] = [[_num(r[c], 2) for c in CAMPOS_SERIE] for _, r in suma.iterrows()]
     sd = s[s["tipo_bosque"] == TODOS].groupby("anio")[[f"{d}_ha" for d in DESTINOS]].sum(min_count=1).reindex(anios)
-    destino_tot = [[_num(v, 1) for v in r] for _, r in sd.iterrows()]
+    destino_tot = [[_num(v, 2) for v in r] for _, r in sd.iterrows()]
+    sin_enc = (s[s["tipo_bosque"] == TODOS].groupby("anio")["bosque_sin_encadenar_ha"].sum()
+               .reindex(anios).round(1).tolist() if hay_sin_enc else None)
+    for t in range(N):
+        por_anio[t]["estado"] = {tipo: filas[t] for tipo, filas in tot.items()}
+        por_anio[t]["destino_estado"] = destino_tot[t]
+        por_anio[t]["sin_encadenar_estado"] = sin_enc[t] if sin_enc else None
     tendencias = {}
     for _, r in tend.iterrows():
         tendencias.setdefault(str(r["unidad"]), {})[r["tipo_bosque"]] = [_num(r["tendencia_ha_anio"]),
                                                                          _num(r["tendencia_pct_anio"], 3)]
-    sin_enc = (s[s["tipo_bosque"] == TODOS].groupby("anio")["bosque_sin_encadenar_ha"].sum()
-               .reindex(anios).round(1).tolist() if "bosque_sin_encadenar_ha" in s.columns else None)
 
     # Bosque de cada año: parte de la celda con bosque, en 5 clases (0 nada, 1 <25 %, ... 4 >=75 %)
     def densidad(c):
         for t in range(N):
             frac = ((c >> t) & 1).mean(axis=(1, 3))
             yield np.where(frac == 0, 0, 1 + np.searchsorted(CORTES_DENSIDAD, frac, side="right")).astype(np.uint8)
-    imgs_bosque = [_png_clases(a) for a in leer_por_celdas(carpeta / "bosque_por_anio.tif", f, densidad, N)]
+    pngs = {f"bosque_{a}.png": _png_clases(arr)
+            for a, arr in zip(anios, leer_por_celdas(carpeta / "bosque_por_anio.tif", f, densidad, N))}
 
     # Año de pérdida: el más reciente de la celda, como índice t del año (1..N-1)
     codigos = np.zeros(256, dtype=np.uint8)
@@ -240,53 +286,40 @@ def preparar_serie(carpeta, f):
 
     def ultimo(c):
         yield codigos[c.max(axis=(1, 3))]
-    img_perdida = _png_clases(leer_por_celdas(carpeta / "anio_perdida.tif", f, ultimo)[0], paso=25)
+    pngs["anio_perdida.png"] = _png_clases(leer_por_celdas(carpeta / "anio_perdida.tif", f, ultimo)[0],
+                                           paso=PASO_PERDIDA)
     exactitud = {k: ({"global": v.get("exactitud_global"), "kappa": v.get("kappa"),
                       "prueba": v.get("muestras_prueba")} if v else None)
                  for k, v in (meta.get("destino") or {}).items()}
-    return {"anios": anios, "clave": cola, "umbral": round(float(meta["umbral_ndvi"]), 2),
-            "escenas": [meta["escenas"].get(str(a)) for a in anios],
-            "incendios": meta.get("incendios_por_periodo"), "zona_ha": meta.get("zona_forestal_ha"),
-            "clases": meta.get("clases_forestales"), "campos": list(CAMPOS_SERIE.values()),
-            "filas": filas, "tot": tot, "destino": destino, "destino_tot": destino_tot,
-            "destinos": DESTINOS, "tend": tendencias, "sin_encadenar": sin_enc, "exactitud": exactitud,
-            "img_bosque": imgs_bosque, "img_perdida": img_perdida, "paso_perdida": 25,
-            "fecha": meta.get("fecha")}
+    ligero = {"anios": anios, "clave": cola, "umbral": round(float(meta["umbral_ndvi"]), 2),
+              "escenas": escenas, "incendios": meta.get("incendios_por_periodo"),
+              "zona_ha": meta.get("zona_forestal_ha"), "clases": meta.get("clases_forestales"),
+              "campos": list(CAMPOS_SERIE.values()), "tot": tot, "destino_tot": destino_tot,
+              "destinos": DESTINOS, "tend_total": tendencias.get(TOTAL, {}), "sin_encadenar": sin_enc,
+              "exactitud": exactitud, "paso_perdida": PASO_PERDIDA, "fecha": meta.get("fecha")}
+    return ligero, por_anio, tendencias, pngs
 
 
 def preparar_unidades(ruta, campo, nombres, malla):
+    """Municipios y contorno estatal como TopoJSON en EPSG:32614 (metros), simplificados a media
+    celda sobre los arcos compartidos (sin huecos entre municipios). La página los proyecta a los
+    píxeles de la cuadrícula con d3.geoIdentity, con los datos de `malla` del índice."""
     import geopandas as gpd
-    from shapely.geometry import MultiPolygon, Polygon
+    import topojson as tp
     (alto, ancho), f, (izq, abajo, der, arriba), crs = malla
     tam = 10 * f  # metros por píxel de la malla reducida
     uni = gpd.read_file(ruta).to_crs(crs)
     uni = uni[uni[campo].astype(str).isin(nombres)].reset_index(drop=True)
-    uni["geometry"] = uni.geometry.simplify(tam * 0.5, preserve_topology=True)
-
-    def a_px(x, y):
-        return (x - izq) / tam, (arriba - y) / tam
-
-    def ruta_svg(geom):
-        partes = []
-        polis = geom.geoms if isinstance(geom, MultiPolygon) else [geom] if isinstance(geom, Polygon) else []
-        for p in polis:
-            for anillo in [p.exterior, *p.interiors]:
-                pts = [a_px(x, y) for x, y in anillo.coords]
-                partes.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + "Z")
-        return "".join(partes)
-
-    salida = []
-    for _, r in uni.iterrows():
-        g = r.geometry
-        x0, y0, x1, y1 = g.bounds
-        pt = g.representative_point()
-        cx, cy = a_px(pt.x, pt.y)
-        bx0, by1 = a_px(x0, y0)
-        bx1, by0 = a_px(x1, y1)
-        salida.append({"nombre": str(r[campo]), "d": ruta_svg(g), "c": [round(cx, 1), round(cy, 1)],
-                       "bbox": [round(bx0, 1), round(by0, 1), round(bx1, 1), round(by1, 1)]})
-    contorno = ruta_svg(uni.dissolve().geometry.iloc[0])
-    return salida, contorno
+    uni = gpd.GeoDataFrame({"nombre": uni[campo].astype(str)}, geometry=uni.geometry, crs=crs)
+    estado = gpd.GeoDataFrame({"nombre": ["Estado"]}, geometry=[uni.union_all()], crs=crs)
+    topo = tp.Topology([uni, estado], object_name=["municipios", "estado"], prequantize=1e5,
+                       toposimplify=tam * 0.5, topology=True)
+    datos = json.loads(topo.to_json())
+    for obj in datos["objects"].values():
+        for g in obj["geometries"]:
+            g.pop("id", None)
+    epsg = crs.to_epsg()
+    return datos, {"crs": f"EPSG:{epsg}" if epsg else str(crs), "izq": izq, "arriba": arriba, "tam": tam}
 
 
 def _validacion(carpeta):
@@ -298,21 +331,11 @@ def _validacion(carpeta):
              "exhaustividad": _num(r.get("exhaustividad"), 3)} for _, r in v.iterrows()]
 
 
-def main():
-    p = argparse.ArgumentParser(description="Página HTML interactiva de una o varias corridas")
-    p.add_argument("carpetas", nargs="+", help="carpetas de resultados (de correr o de serie)")
-    p.add_argument("--unidades", required=True)
-    p.add_argument("--campo-unidad", default="NOM_MUN")
-    p.add_argument("--titulo", default="Estado de México")
-    p.add_argument("--ancho-px", type=int, default=2400, help="resolución del ráster en la página")
-    p.add_argument("--validacion", help="carpeta de src/validar_hansen.py, para citar sus cifras en Alcances")
-    p.add_argument("--salida", required=True)
-    p.add_argument("--fragmento", action="store_true",
-                   help="sin <html>/<head>/<body> (para publicarla como Artifact)")
-    a = p.parse_args()
-
+def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion):
+    """Todos los archivos de datos de la página: {ruta relativa a datos/: dict (JSON) o bytes (PNG)}.
+    Los dos modos de salida usan exactamente estos archivos."""
     periodos, carpeta_serie = {}, None
-    for c in a.carpetas:
+    for c in carpetas:
         claves = sorted(x.stem.removeprefix("balance_") for x in Path(c).glob("balance_*.csv"))
         if not claves:
             sys.exit(f"No hay balance_*.csv en {c}.")
@@ -321,7 +344,7 @@ def main():
                 sys.exit("Solo puede haber una carpeta de serie.")
             carpeta_serie = c
         for clave in claves:
-            pp = preparar_periodo(c, clave, a.ancho_px)
+            pp = preparar_periodo(c, clave, ancho_px)
             llave = (clave, tuple(pp["_ventana"]))
             # La comparación de la serie gana sobre una corrida directa del mismo par y temporada
             if llave not in periodos or (pp["serie"] and not periodos[llave]["serie"]):
@@ -333,33 +356,125 @@ def main():
     if len(mallas) > 1:
         sys.exit("Las corridas no tienen la misma malla (¿distinto --aoi?).")
     malla = periodos[0]["_malla"]
-    serie = preparar_serie(carpeta_serie, malla[1]) if carpeta_serie else None
-    nombres = sorted({n for pp in periodos for n in pp["filas"]})
-    unidades, contorno = preparar_unidades(a.unidades, a.campo_unidad, nombres, malla)
-    for pp in periodos:
-        del pp["_malla"], pp["_ventana"]
     (alto, ancho), f = malla[0], malla[1]
-    datos = {"titulo": a.titulo, "ancho": ancho, "alto": alto, "celda": 10 * f,
-             "minimo": BOSQUE_MINIMO_HA, "campos": list(CAMPOS.values()),
-             "campos_tipo": list(CAMPOS_TIPO.values()), "tipos": TIPOS_ORDEN,
-             "unidades": unidades, "contorno": contorno, "periodos": periodos, "serie": serie,
-             "validacion": _validacion(a.validacion)}
+    nombres = sorted({n for pp in periodos for n in pp["filas"]})
+    topo, georef = preparar_unidades(unidades, campo_unidad, nombres, malla)
 
-    plantilla = (Path(__file__).resolve().parent / "plantilla_mapa.html").read_text(encoding="utf-8")
-    articulo = "del" if a.titulo.lower().startswith("estado") else "de"
-    html = (plantilla.replace("__NOMBRE__", f"Masa forestal {articulo} {a.titulo}")
-            .replace("__TITULO__", a.titulo)
-            .replace("__DATOS__", json.dumps(datos, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
-    if not a.fragmento:
-        html = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+    archivos = {"municipios.topojson": topo}
+    for pp in periodos:
+        archivos[f"comparaciones/{pp['id']}.json"] = {
+            "id": pp["id"], "clave": pp["clave"], "etiqueta": pp["etiqueta"], "preliminar": pp["preliminar"],
+            "campos": list(CAMPOS.values()), "campos_tipo": list(CAMPOS_TIPO.values()),
+            **{k: pp[k] for k in PESADOS}}
+        archivos[f"cuadriculas/cambio_{pp['id']}.png"] = pp["_png"]
+
+    serie = None
+    if carpeta_serie:
+        serie, por_anio, tendencias, pngs = preparar_serie(carpeta_serie, f)
+        for d in por_anio:
+            archivos[f"anios/{d['anio']}.json"] = d
+        archivos["tendencias.json"] = {"anios": serie["anios"], "tendencias": tendencias}
+        for nombre, png in pngs.items():
+            archivos[f"cuadriculas/{nombre}"] = png
+        anios = serie["anios"]
+        IS = {c: i for i, c in enumerate(serie["campos"])}
+        evolucion = [{"anio": a, "zona_ha": r[IS["zona"]], "bosque_ha": r[IS["bosque"]],
+                      "cambio_neto_ha": r[IS["neto"]]} for a, r in zip(anios, serie["tot"][TODOS])]
+    else:
+        anios = sorted({a for pp in periodos if not pp["preliminar"] for a in (pp["base"], pp["actual"])})
+        evolucion = None
+    articulo = "del" if titulo.lower().startswith("estado") else "de"
+    archivos["indice.json"] = {
+        "version_datos": VERSION_DATOS, "generado": datetime.now().isoformat(timespec="seconds"),
+        "titulo": titulo, "nombre": f"Masa forestal {articulo} {titulo}",
+        "ancho": ancho, "alto": alto, "celda": 10 * f, "malla": georef,
+        "minimo": BOSQUE_MINIMO_HA, "campos": list(CAMPOS.values()),
+        "campos_tipo": list(CAMPOS_TIPO.values()), "tipos": TIPOS_ORDEN,
+        "anios": anios, "evolucion_estatal": evolucion,
+        "comparaciones": [{k: pp[k] for k in LIGEROS} for pp in periodos],
+        "serie": serie, "validacion": _validacion(validacion),
+        "pasos": {"clases": PASO_CLASES, "perdida": PASO_PERDIDA},
+        "archivos": sorted(k for k in archivos if k != "indice.json")}
+    return archivos
+
+
+def _json(obj):
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+
+def _pagina(plantilla, nombre, titulo, datos_embebidos, fragmento):
+    """La plantilla con o sin los datos dentro. Sin datos, la página los pide a datos/."""
+    html = plantilla.replace("__NOMBRE__", nombre).replace("__TITULO__", titulo)
+    if datos_embebidos is None:
+        html = re.sub(r'<script type="application/json" id="datos">__DATOS__</script>\n?', "", html)
+    else:
+        html = html.replace("__DATOS__", datos_embebidos.replace("</", "<\\/"))
+    if not fragmento:
+        return ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
                 '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
                 + html.replace("<!--FIN_HEAD-->", "</head>\n<body>") + "\n</body>\n</html>\n")
-    else:
-        html = html.replace("<!--FIN_HEAD-->", "")
-    Path(a.salida).parent.mkdir(parents=True, exist_ok=True)
-    Path(a.salida).write_text(html, encoding="utf-8")
-    print(f"Página en {Path(a.salida).resolve()} ({len(html.encode()) / 1e6:.1f} MB, {len(periodos)} "
-          f"comparación(es){', con serie ' + serie['clave'] if serie else ''})")
+    return html.replace("<!--FIN_HEAD-->", "")
+
+
+def escribir_archivo_unico(archivos, plantilla, salida, fragmento):
+    embebidos = {k: ("data:image/png;base64," + base64.b64encode(v).decode("ascii")) if isinstance(v, bytes) else v
+                 for k, v in archivos.items()}
+    idx = archivos["indice.json"]
+    html = _pagina(plantilla, idx["nombre"], idx["titulo"], _json({"archivos": embebidos}), fragmento)
+    Path(salida).parent.mkdir(parents=True, exist_ok=True)
+    Path(salida).write_text(html, encoding="utf-8")
+    return len(html.encode())
+
+
+def escribir_sitio(archivos, plantilla, carpeta):
+    """index.html + datos/. Borra antes la carpeta datos/ del sitio (solo la genera este script)."""
+    carpeta = Path(carpeta)
+    datos = carpeta / "datos"
+    if datos.exists():
+        shutil.rmtree(datos)
+    tam = {}
+    for ruta, v in archivos.items():
+        destino = datos / ruta
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        contenido = v if isinstance(v, bytes) else _json(v).encode("utf-8")
+        destino.write_bytes(contenido)
+        tam[ruta] = len(contenido)
+    idx = archivos["indice.json"]
+    html = _pagina(plantilla, idx["nombre"], idx["titulo"], None, False)
+    (carpeta / "index.html").write_text(html, encoding="utf-8")
+    tam["index.html"] = len(html.encode())
+    return tam
+
+
+def main():
+    p = argparse.ArgumentParser(description="Página HTML interactiva de una o varias corridas")
+    p.add_argument("carpetas", nargs="+", help="carpetas de resultados (de correr o de serie)")
+    p.add_argument("--unidades", required=True)
+    p.add_argument("--campo-unidad", default="NOM_MUN")
+    p.add_argument("--titulo", default="Estado de México")
+    p.add_argument("--ancho-px", type=int, default=2400, help="resolución del ráster en la página")
+    p.add_argument("--validacion", help="carpeta de src/validar_hansen.py, para citar sus cifras en Alcances")
+    p.add_argument("--salida", help="archivo HTML único, con los datos dentro")
+    p.add_argument("--fragmento", action="store_true",
+                   help="con --salida: sin <html>/<head>/<body> (para publicarla como Artifact)")
+    p.add_argument("--sitio", help="carpeta del sitio estático (index.html + datos/), p. ej. docs/calculadora")
+    a = p.parse_args()
+    if not a.salida and not a.sitio:
+        p.error("falta --salida, --sitio o los dos")
+
+    archivos = armar_datos(a.carpetas, a.unidades, a.campo_unidad, a.titulo, a.ancho_px, a.validacion)
+    idx = archivos["indice.json"]
+    plantilla = (Path(__file__).resolve().parent / "plantilla_mapa.html").read_text(encoding="utf-8")
+    resumen = (f"{len(idx['comparaciones'])} comparación(es)"
+               f"{', con serie ' + idx['serie']['clave'] if idx['serie'] else ''}")
+    if a.salida:
+        n = escribir_archivo_unico(archivos, plantilla, a.salida, a.fragmento)
+        print(f"Página en {Path(a.salida).resolve()} ({n / 1e6:.1f} MB, {resumen})")
+    if a.sitio:
+        tam = escribir_sitio(archivos, plantilla, a.sitio)
+        inicial = tam["index.html"] + tam["indice.json"] + tam["municipios.topojson"]
+        print(f"Sitio en {Path(a.sitio).resolve()} ({len(tam)} archivos, {sum(tam.values()) / 1e6:.1f} MB en total; "
+              f"index + índice + municipios = {inicial / 1e3:.0f} kB; {resumen})")
 
 
 if __name__ == "__main__":

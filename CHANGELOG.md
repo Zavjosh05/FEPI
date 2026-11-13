@@ -4,6 +4,49 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.8.0] - 2026-11-13
+
+Masa forestal por año (HU-7.1, necesidad CF-DEV-01 de las Tablas de necesidades v12, M7.1): la
+página como sitio estático que carga sus datos al consultarlos, y la evolución del Estado a la
+vista. Las Tablas v12 renumeraron la Calculadora a CF-DEV-01…05 (01 masa forestal por año, 02
+balance entre dos años, 03 incendios, 04 cambio de uso del suelo, 05 especies); las entradas
+anteriores de este registro usan la numeración vieja (ver «Identificadores» en el README).
+
+### Agregado
+
+- **`mapa_interactivo.py --sitio CARPETA`**: escribe la página sin datos (`index.html`) y los
+  datos en archivos separados en `datos/`: `indice.json`, `municipios.topojson`, `anios/AAAA.json`,
+  `tendencias.json`, `comparaciones/<id>.json` y `cuadriculas/*.png` (bosque de cada año, cambio de
+  cada comparación y año de pérdida, ya no en base64). Sitio en `docs/calculadora/`, listo para
+  GitHub Pages. Al abrir pide solo el índice, los municipios, la comparación inicial y su
+  cuadrícula (~0.45 MB contra 2.7 MB del archivo único); lo demás, al consultarlo, con "Cargando…"
+  y un mensaje con "Reintentar" si un archivo falla. Un cambio de vista se aplica solo cuando ya
+  llegó lo que necesita.
+- Municipios y contorno estatal como **TopoJSON** en EPSG:32614 (arcos compartidos, simplificados a
+  45 m: ya no quedan huecos entre municipios), dibujados con `d3.geoIdentity` con la malla del
+  índice para que coincidan con la cuadrícula. Dependencia nueva: `topojson` (PyPI) para
+  escribirlo y `topojson` 3.0.2 de cdnjs para leerlo.
+- **Evolución del bosque** del Estado año con año, arriba del mapa y siempre a la vista: gráfica
+  con un punto y su cifra por año y la recta de tendencia, y tabla con bosque, % de la zona y cambio
+  respecto del año anterior; «ver» abre ese año. El índice trae `evolucion_estatal`.
+- **Pruebas** (`pruebas/calculadora/`, pytest + Playwright con Chromium sin interfaz) y
+  `requirements-dev.txt`. Capturas en `entregas/sprint_1/capturas/`.
+
+### Cambiado
+
+- El archivo único (`--salida`, `--fragmento`) usa la misma plantilla, el mismo código y los mismos
+  archivos de datos que el sitio, embebidos; sus cifras y cuadrículas son idénticas a las de 0.7.0.
+  `--salida` y `--sitio` se pueden pedir juntos.
+- La gráfica de la serie rotula todos los años (si son 8 o menos). Sin municipio elegido, el detalle
+  ya no repite la gráfica del Estado (está en la evolución).
+
+### Corregido
+
+- Los totales estatales de la serie se guardaban con un decimal y la página los volvía a redondear:
+  2023 aparecía como 473,149 ha cuando la suma es 473,148.48. Ahora se guardan con dos decimales y
+  la página muestra 473,148, igual que los CSV y este registro. Es la única cifra que cambia
+  respecto de 0.7.0.
+
 ## [0.7.0] - 2026-11-04
 
 Serie anual y tendencia (CF-DEV-08), consulta de un año (CF-DEV-10), capa de pérdida por año

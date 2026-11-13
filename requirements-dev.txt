@@ -1,0 +1,6 @@
+# Solo para las pruebas (pruebas/). Probado con Python 3.13 en Windows (noviembre de 2026).
+# Después de instalar: python -m playwright install chromium
+-r requirements.txt
+pytest==8.4.2
+playwright==1.55.0
+pytest-playwright==0.7.1

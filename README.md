@@ -52,7 +52,10 @@ FEPI/
 │   ├── validar_hansen.py            Compara la pérdida con Hansen GFC v1.13 (CF-DEV-09)
 │   └── muestra_puntos.py            Puntos estratificados para fotointerpretar
 ├── docs/
-│   └── mapa_edomex.html             Página interactiva del estado (serie, comparaciones, alcances)
+│   ├── mapa_edomex.html             Página interactiva del estado, en un solo archivo
+│   └── calculadora/                 La misma página como sitio estático (index.html + datos/)
+├── pruebas/calculadora/             Pruebas de la página (pytest + Playwright)
+├── entregas/sprint_1/capturas/      Capturas de las pruebas de HU-7.1
 ├── datos/
 │   ├── piloto/                      Recortes usados en el piloto (versionados)
 │   └── edomex/                      Capas estatales descargadas (no se versionan)
@@ -63,6 +66,7 @@ FEPI/
 │   ├── validacion_hansen/           Comparación con Hansen GFC
 │   └── anteriores_0.5/              Corridas estatales con la zona anterior
 ├── requirements.txt
+├── requirements-dev.txt             pytest y Playwright, solo para las pruebas
 ├── CHANGELOG.md                     Registro de cambios
 └── README.md
 ```
@@ -269,8 +273,19 @@ No sobrescribe un mapa que ya exista, a menos que se use `--sobrescribir`.
 
 ### Página interactiva
 
-[`docs/mapa_edomex.html`](docs/mapa_edomex.html) se abre directo en el navegador, sin servidor.
-Solo necesita internet para cargar la librería D3. Tiene dos modos:
+La misma página sale de dos formas, con la misma plantilla (`src/plantilla_mapa.html`), el mismo
+código y los mismos archivos de datos:
+
+- **Archivo único** ([`docs/mapa_edomex.html`](docs/mapa_edomex.html), `--salida`): trae todos los
+  datos dentro (~2.6 MB) y se abre directo en el navegador, sin servidor. Con `--fragmento` sale
+  sin `<html>/<head>/<body>`, para publicarla como Artifact.
+- **Sitio estático** ([`docs/calculadora/`](docs/calculadora/), `--sitio`, desde 0.8.0): la página
+  sin datos (`index.html`) y los datos en archivos separados que pide con `fetch` solo cuando se
+  consultan. Al abrirla baja ~0.45 MB (la página, el índice, los municipios, la comparación
+  inicial y su cuadrícula) en vez de 2.6 MB. Necesita servirse por HTTP (GitHub Pages sirve
+  `docs/`); abierta como archivo, avisa que no puede leer `datos/`.
+
+Las dos necesitan internet para cargar D3 y TopoJSON (cdnjs). Tiene dos modos:
 
 - **Comparar años** (Desde → Hasta): 2023 → 2024, 2024 → 2025, 2023 → 2025 y el preliminar
   2025 → 2026 de septiembre-octubre, marcado así porque es otra temporada. Las comparaciones
@@ -283,11 +298,15 @@ Solo necesita internet para cargar la librería D3. Tiene dos modos:
 
 En los dos:
 
+- **Evolución del bosque** (CF-DEV-01 de las Tablas v12, M7.1): arriba del mapa, siempre a la
+  vista, la gráfica del bosque del Estado de cada año de la serie (un punto y su cifra por año, con
+  la recta de tendencia) y una tabla con el bosque, el % de la zona forestal y el cambio respecto
+  del año anterior. «ver» abre ese año en el modo "Un año". La de cada municipio está en su detalle.
 - **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
   por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
   años" muestra los años de la comparación elegida.
-- **Serie y tendencia** (CF-DEV-08) en el detalle: al elegir un municipio (o sin elegir, toda la
-  zona), una gráfica del bosque de cada año con la recta de tendencia.
+- **Serie y tendencia** (CF-DEV-08) en el detalle: al elegir un municipio, una gráfica de su
+  bosque de cada año con la recta de tendencia.
 - Ráster de cambio con sus clases como capas, cambio neto por municipio o tendencia por municipio
   (%/año); cifras al pasar el cursor; tabla ordenable; desglose por tipo de bosque.
 - **Alcances** (CF-DEV-14): qué mide, dónde, cuándo, con qué fuentes, cómo se arma la serie y qué
@@ -295,16 +314,87 @@ En los dos:
 
 Los colores nuevos (densidad de bosque y año de pérdida) son rampas de un solo tono validadas con
 el validador del skill dataviz (`--ordinal`, contra el fondo sin bosque) en el tema claro y en el
-oscuro. Se adapta al tema y a pantallas de teléfono. Para regenerarla:
+oscuro. Se adapta al tema y a pantallas de teléfono. Para regenerar las dos (unos 30 s; lee
+`resultados/` y `datos/edomex/municipios_edomex.gpkg`, no descarga nada):
 
 ```bash
-python src/mapa_interactivo.py resultados/edomex_serie_2023_2025 resultados/edomex_2025_2026_sepoct   --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN   --titulo "Estado de México" --validacion resultados/validacion_hansen --salida docs/mapa_edomex.html
+python src/mapa_interactivo.py resultados/edomex_serie_2023_2025 resultados/edomex_2025_2026_sepoct \
+  --unidades datos/edomex/municipios_edomex.gpkg --campo-unidad NOM_MUN \
+  --titulo "Estado de México" --validacion resultados/validacion_hansen \
+  --salida docs/mapa_edomex.html --sitio docs/calculadora
 ```
 
-Cada carpeta puede ser de `correr` (una comparación) o de `serie` (varias, más el modo "Un año").
-Si dos carpetas traen el mismo par de años y temporada, gana la de la serie. Todas deben ser de la
-misma zona (mismo `--aoi`). `--validacion` agrega a "Alcances" la precisión contra Hansen. Como está
-en `docs/`, se puede publicar con GitHub Pages si el repositorio es público.
+Se puede pedir solo una de las dos (`--salida` o `--sitio`). Cada carpeta puede ser de `correr`
+(una comparación) o de `serie` (varias, más el modo "Un año" y la evolución). Si dos carpetas traen
+el mismo par de años y temporada, gana la de la serie. Todas deben ser de la misma zona (mismo
+`--aoi`). `--validacion` agrega a "Alcances" la precisión contra Hansen. `--sitio` borra y vuelve a
+escribir la carpeta `datos/` del sitio.
+
+**Probarla en local.** El sitio no abre como archivo (el navegador no deja leer `datos/` desde
+`file://`); hay que servirlo:
+
+```bash
+python -m http.server 8766 --bind 127.0.0.1 --directory docs/calculadora
+# y abrir http://127.0.0.1:8766/
+```
+
+
+**Archivos del sitio** (todo JSON compacto en UTF-8; las hectáreas, con 2 decimales por municipio y
+1 en el Estado):
+
+```
+docs/calculadora/
+├── index.html                       La página, sin datos (~80 kB)
+└── datos/
+    ├── indice.json                  Lo mínimo para arrancar: título, malla (CRS, origen, tamaño de
+    │                                celda), tipos, campos, años, comparaciones (metadatos y banderas
+    │                                preliminar / fuego_incompleto), umbral, totales del Estado por
+    │                                año y tipo (`serie.tot`), evolucion_estatal, tendencia del
+    │                                Estado, validación y la lista de archivos
+    ├── municipios.topojson          125 municipios (`municipios`) y el contorno (`estado`), en
+    │                                EPSG:32614, con arcos compartidos y simplificados a 45 m
+    ├── anios/AAAA.json              Un año: por municipio y tipo de bosque [zona, bosque, incendio,
+    │                                otras pérdidas, ganancia, neto] (los cambios, respecto del año
+    │                                anterior; None en el primero), destino de las otras pérdidas,
+    │                                bosque sin encadenar, escenas, y lo mismo para el Estado
+    ├── tendencias.json              Tendencia de la serie (ha/año, %/año) por municipio y tipo
+    ├── comparaciones/<id>.json      Una comparación: filas por municipio, totales, incendios, notas
+    │                                y desglose por tipo. <id> = <base>_<actual>; los preliminares
+    │                                llevan además su ventana (2025_2026_0901_1020)
+    └── cuadriculas/                 Cuadrícula de 90 m como PNG en gris (clase × paso):
+                                     bosque_AAAA.png, cambio_<id>.png, anio_perdida.png
+```
+
+La página pide al abrir solo `indice.json`, `municipios.topojson`, la comparación inicial y su
+cuadrícula; un año, la tendencia, otra comparación o una cuadrícula se piden al consultarlos (con
+"Cargando…" sobre el mapa y, si un archivo falla, un mensaje con "Reintentar"). Los municipios se
+dibujan con `d3.geoIdentity` usando la malla del índice, la misma transformación de la cuadrícula,
+así que quedan alineados con ella. Las cuadrículas son PNG y no COG porque el navegador no lee COG
+sin otra librería; los GeoTIFF para QGIS siguen en `resultados/`. La estructura deja lugar para el
+histograma del balance, los incendios, el uso del suelo y las especies (M7.2–M7.5) como archivos
+nuevos en `datos/` listados en el índice.
+
+**Pruebas de la página** (HU-7.1, en `pruebas/calculadora/`): necesitan las dependencias de
+desarrollo y Chromium de Playwright, y prueban lo que ya está en `docs/` (no lo regeneran):
+
+```bash
+pip install -r requirements-dev.txt
+python -m playwright install chromium
+python -m pytest pruebas/calculadora -q
+```
+
+Revisan que cada año del índice tenga su archivo con los 125 municipios y el Estado, que sus
+hectáreas coincidan con `serie_2023_2025.csv` (y la suma de los municipios con el Estado), que la
+página abra sin errores con la evolución a la vista (un punto por año), que la carga sea diferida,
+que el contorno y la cuadrícula estén alineados y que el archivo único traiga los mismos datos que
+el sitio. Dejan capturas en `entregas/sprint_1/capturas/`.
+
+**Identificadores.** Las Tablas de necesidades v12 renumeraron las necesidades de la Calculadora a
+CF-DEV-01…05: 01 masa forestal por año (M7.1), 02 balance entre dos años con histograma (M7.2),
+03 incendios (M7.3), 04 cambio de uso del suelo (M7.4) y 05 especies (M7.5). El resto de este README
+y el CHANGELOG hasta 0.7.0 usan la numeración anterior: CF-DEV-03 vegetación (clave de la Serie
+VII), 04 tipo de bosque, 07 destino de las pérdidas, 08 serie, 09 validación con Hansen, 10 consulta
+de un año, 12 año de pérdida y 14 alcances.
 
 ## Cobertura geográfica
 

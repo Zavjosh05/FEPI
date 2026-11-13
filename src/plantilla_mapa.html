@@ -17,6 +17,7 @@
   --per-1: #a278e4; --per-2: #8c61cb; --per-3: #764ab2; --per-4: #61339a; --per-5: #4c1b82; --per-6: #380068;
   --linea: #088963; --tendencia: #767b6f;
   --rayado: #bdbcb3; --contorno: #3f443a; --limites: #8a8d83; --sel: #13170f; --aviso-bg: #fbf1dc; --aviso-ink: #5c4300;
+  --falla-bg: #fbe3e1; --falla-ink: #7a1712;
   --f-titulo: "Barlow Condensed", "Arial Narrow", "Segoe UI", sans-serif;
   --f-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
 }
@@ -30,6 +31,7 @@
     --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
     --linea: #46b68c; --tendencia: #8b8f84;
     --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+    --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
     color-scheme: dark;
   }
 }
@@ -42,6 +44,7 @@
   --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
   --linea: #46b68c; --tendencia: #8b8f84;
   --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
+  --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -191,6 +194,25 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 .alcances .no-afirma { border-top: 1px solid var(--line); padding-top: 14px; }
 .alcances .no-afirma ul { columns: 2 320px; column-gap: 28px; display: block; }
 .alcances .no-afirma li { break-inside: avoid; margin-bottom: 6px; }
+.fondo path, .u { fill-rule: evenodd; }
+/* Evolución del bosque año con año (Estado), siempre a la vista */
+.evolucion { padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr); gap: 8px 32px; align-items: start; }
+.evolucion > header { grid-column: 1 / -1; display: grid; gap: 2px; }
+.evolucion > header p { margin: 0; color: var(--ink-2); font-size: .92rem; max-width: 90ch; }
+@media (max-width: 760px) { .evolucion { grid-template-columns: minmax(0, 1fr); } }
+.serie-graf.ancha svg { height: auto; max-height: 180px; }
+.evolucion table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.evolucion th, .evolucion td { padding: 5px 0 5px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.evolucion th:first-child, .evolucion td:first-child { text-align: left; padding-left: 0; }
+.evolucion thead th { font: 600 .82rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.evolucion tbody tr[aria-current="true"] { background: var(--hover); box-shadow: inset 3px 0 0 var(--accent); }
+.evolucion td button { font: 600 .95rem var(--f-texto); color: var(--accent); background: none; border: 0; padding: 0 0 0 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.evolucion .pie-graf { margin: 6px 0 0; font-size: .82rem; color: var(--ink-3); }
+/* Carga diferida: aviso de "cargando" sobre el mapa y mensaje si un archivo falla */
+.cargando { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: .88rem; box-shadow: 0 4px 12px rgba(0, 0, 0, .1); z-index: 3; }
+.falla { background: var(--falla-bg); color: var(--falla-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.falla p { margin: 0; flex: 1 1 40ch; }
+.falla button { font: 600 .92rem var(--f-texto); color: var(--falla-ink); background: transparent; border: 1px solid currentColor; border-radius: 6px; padding: 4px 12px; cursor: pointer; }
 .pie { color: var(--ink-3); font-size: .85rem; display: grid; gap: 6px; max-width: 90ch; }
 .pie p { margin: 0; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -225,8 +247,11 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     </div>
   </header>
 
+  <div class="falla" id="falla" role="alert" hidden></div>
   <section class="cifras" id="cifras" aria-label="Resumen"></section>
   <div class="aviso" id="aviso" role="note" hidden></div>
+
+  <section class="tarjeta evolucion" id="evolucion" aria-labelledby="evolucion-titulo" hidden></section>
 
   <div class="principal">
     <div class="tarjeta mapa-tarjeta">
@@ -246,6 +271,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
           <button type="button" id="restablecer" aria-label="Ver todo">⤢</button>
         </div>
         <div class="escala" id="escala"></div>
+        <div class="cargando" id="cargando" role="status" aria-live="polite">Cargando datos…</div>
         <div class="globo" id="globo" hidden></div>
       </div>
     </div>
@@ -286,11 +312,71 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script type="application/json" id="datos">__DATOS__</script>
 <script>
-(() => {
-  const D = JSON.parse(document.getElementById("datos").textContent);
-  const S = D.serie;                      // serie de varios años (null si no hay)
+(async () => {
+  // ---------- Datos ----------
+  // Los mismos archivos en los dos modos: dentro de la página (archivo único) o en datos/ (sitio
+  // estático, pedidos con fetch solo cuando se consultan). Rutas relativas a datos/.
+  const nodoDatos = document.getElementById("datos");
+  const EMB = nodoDatos ? JSON.parse(nodoDatos.textContent).archivos : null;
+  const BASE = "datos/";
+  const pedidos = {};
+  function leer(ruta) {
+    if (!pedidos[ruta]) {
+      pedidos[ruta] = EMB
+        ? (ruta in EMB ? Promise.resolve(EMB[ruta]) : Promise.reject(new Error(`falta ${ruta} en la página`)))
+        : fetch(BASE + ruta).then(r => {
+            if (!r.ok) throw new Error(`${BASE + ruta} respondió ${r.status}${r.statusText ? " " + r.statusText : ""}`);
+            return r.json();
+          }, e => { throw new Error(`${BASE + ruta}: ${e.message}`); });
+      pedidos[ruta].catch(() => { delete pedidos[ruta]; });  // para poder reintentar
+    }
+    return pedidos[ruta];
+  }
+  const urlCuadricula = nombre => EMB ? EMB["cuadriculas/" + nombre] : BASE + "cuadriculas/" + nombre;
+
+  // "Cargando…" sobre el mapa mientras haya algo pendiente, y mensaje claro si algo falla
+  const elCargando = document.getElementById("cargando"), elFalla = document.getElementById("falla");
+  let pendientes = 0, temporizador = null;
+  function carga(delta) {
+    pendientes += delta;
+    clearTimeout(temporizador);
+    if (pendientes > 0) temporizador = setTimeout(() => { elCargando.hidden = false; }, 150);
+    else elCargando.hidden = true;
+  }
+  function mostrarFalla(e, reintentar) {
+    const local = location.protocol === "file:" ? " La página se abrió como archivo: el navegador no deja leer datos/ así. Sírvela con un servidor (por ejemplo, python -m http.server dentro de su carpeta) o usa la versión de un solo archivo." : "";
+    elFalla.innerHTML = `<p><strong>No se pudieron cargar los datos.</strong> ${String(e && e.message || e).replace(/</g, "&lt;")}.${local}</p>` + (reintentar ? `<button type="button">Reintentar</button>` : "");
+    if (reintentar) elFalla.querySelector("button").addEventListener("click", reintentar);
+    elFalla.hidden = false;
+  }
+  const ocultarFalla = () => { elFalla.hidden = true; elFalla.innerHTML = ""; };
+
+  let IDX, TOPO;
+  carga(+1);
+  try { [IDX, TOPO] = await Promise.all([leer("indice.json"), leer("municipios.topojson")]); }
+  catch (e) { carga(-1); elCargando.textContent = "Sin datos"; elCargando.hidden = false; mostrarFalla(e, () => location.reload()); return; }
+  carga(-1);
+  elCargando.textContent = "Cargando…";
+
+  // Municipios y contorno: TopoJSON en metros (EPSG:32614), llevados a los píxeles de la cuadrícula
+  // con la misma transformación que el ráster, así que coinciden exactamente
+  const M = IDX.malla;
+  const proy = d3.geoIdentity().reflectY(true).scale(1 / M.tam).translate([-M.izq / M.tam, M.arriba / M.tam]);
+  const camino = d3.geoPath(proy);
+  const unidadesGeo = topojson.feature(TOPO, TOPO.objects.municipios).features.map(ft => {
+    const b = camino.bounds(ft);
+    return { nombre: ft.properties.nombre, d: camino(ft), bbox: [b[0][0], b[0][1], b[1][0], b[1][1]] };
+  });
+  const contorno = camino(TOPO.objects.estado ? topojson.feature(TOPO, TOPO.objects.estado)
+    : topojson.merge(TOPO, TOPO.objects.municipios.geometries));
+
+  const D = { ...IDX, unidades: unidadesGeo, contorno, periodos: IDX.comparaciones.map(p => ({ ...p, cargado: false })) };
+  // Serie de varios años (null si no hay): los totales estatales vienen en el índice; las cifras por
+  // municipio se llenan al cargar cada anios/AAAA.json y la tendencia al cargar tendencias.json
+  const S = IDX.serie ? { ...IDX.serie, filas: {}, destino: {}, tend: { Total: IDX.serie.tend_total } } : null;
   const I = Object.fromEntries(D.campos.map((c, i) => [c, i]));
   const IS = S ? Object.fromEntries(S.campos.map((c, i) => [c, i])) : {};
   const nf = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 });
@@ -350,7 +436,74 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     return claseCortes(tn[1], CORTES_TEND);
   };
   // La comparación de años consecutivos de la serie que termina en el año t (sus notas e incendios)
-  const periodoDeAnio = t => t > 0 ? D.periodos.find(p => !p.preliminar && p.base === S.anios[t - 1] && p.actual === S.anios[t]) : null;
+  const indicePeriodoDeAnio = t => t > 0 ? D.periodos.findIndex(p => !p.preliminar && p.base === S.anios[t - 1] && p.actual === S.anios[t]) : -1;
+  const periodoDeAnio = t => D.periodos[indicePeriodoDeAnio(t)] || null;
+
+  // ---------- Carga diferida ----------
+  async function cargarComparacion(i) {
+    const p = D.periodos[i];
+    if (p.cargado) return;
+    const c = await leer(`comparaciones/${p.id}.json`);
+    for (const k of ["tot", "filas", "incendios", "notas", "tipos"]) p[k] = c[k];
+    p.cargado = true;
+  }
+  const aniosCargados = new Set();
+  async function cargarAnio(t) {
+    if (aniosCargados.has(t)) return;
+    const d = await leer(`anios/${S.anios[t]}.json`);
+    if (aniosCargados.has(t)) return;
+    for (const [u, porTipo] of Object.entries(d.filas)) {
+      const f = S.filas[u] || (S.filas[u] = {});
+      for (const [tp, r] of Object.entries(porTipo)) (f[tp] || (f[tp] = new Array(N)))[t] = r;
+    }
+    for (const [u, v] of Object.entries(d.destino)) (S.destino[u] || (S.destino[u] = new Array(N)))[t] = v;
+    aniosCargados.add(t);
+  }
+  let tendenciasCargadas = false;
+  async function cargarTendencias() {
+    if (tendenciasCargadas) return;
+    Object.assign(S.tend, (await leer("tendencias.json")).tendencias);
+    tendenciasCargadas = true;
+  }
+  // Lo que necesita la vista actual: la comparación elegida, o el año (y el primero, para saber
+  // qué municipios tienen poco bosque) con su tendencia; con un municipio elegido, toda su serie y
+  // todas las comparaciones de su detalle. Las cuadrículas las pide pintarRaster.
+  function necesidades(e) {
+    const tareas = [];
+    const todosLosAnios = () => { if (S) { S.anios.forEach((a, t) => tareas.push(cargarAnio(t))); tareas.push(cargarTendencias()); } };
+    if (e.modo === "anio") {
+      tareas.push(cargarAnio(e.t), cargarAnio(0), cargarTendencias());
+      const i = indicePeriodoDeAnio(e.t);
+      if (i >= 0) tareas.push(cargarComparacion(i));
+      if (e.sel) todosLosAnios();
+    } else {
+      tareas.push(cargarComparacion(e.p));
+      if (e.sel) { D.periodos.forEach((p, i) => tareas.push(cargarComparacion(i))); todosLosAnios(); }
+    }
+    return tareas;
+  }
+  // Aplica un cambio de estado solo cuando ya llegó lo que necesita, así la página nunca muestra
+  // un estado a medias. Si algo falla, se queda como estaba y ofrece reintentar.
+  let turno = 0;
+  async function actualizar(cambio, soloDetalle = false) {
+    const nuevo = JSON.parse(JSON.stringify(st));
+    if (cambio) cambio(nuevo);
+    const yo = ++turno;
+    carga(+1);
+    try { await Promise.all(necesidades(nuevo)); }
+    catch (e) {
+      carga(-1);
+      if (yo !== turno) return;
+      if (pintado) pintarCabecera();  // los selectores vuelven a lo que se está mostrando
+      mostrarFalla(e, () => actualizar(cambio, soloDetalle));
+      return;
+    }
+    carga(-1);
+    if (yo !== turno) return;
+    ocultarFalla();
+    Object.assign(st, nuevo);
+    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); } else pintarTodo();
+  }
 
   // ---------- Cabecera ----------
   document.getElementById("titulo").textContent = "Masa forestal · " + D.titulo;
@@ -358,7 +511,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   // Modo
   const btnModos = [...document.querySelectorAll("#modos button")];
   if (S) document.getElementById("modos").hidden = false;
-  btnModos.forEach(b => b.addEventListener("click", () => cambiarModo(b.dataset.modo)));
+  btnModos.forEach(b => b.addEventListener("click", () => actualizar(e => cambiarModo(e, b.dataset.modo))));
 
   // Selector Desde → Hasta. Cada par de años con datos es una comparación. Si hay un balance anual
   // (nov-dic) y uno preliminar del mismo par, se usa el anual.
@@ -408,7 +561,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const selAnio = document.getElementById("anio");
   if (S) {
     selAnio.innerHTML = S.anios.map((a, t) => `<option value="${t}">${a}</option>`).join("");
-    selAnio.addEventListener("change", () => { st.t = Number(selAnio.value); pintarTodo(); });
+    selAnio.addEventListener("change", () => { const t = Number(selAnio.value); actualizar(e => { e.t = t; }); });
   }
 
   const tile = (etq, valor, nota, token) =>
@@ -436,7 +589,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         tile("Ganancia", hayFlujo ? nf.format(r[IS.gan]) : "—", hayFlujo ? "ha" : "—", "--c-ganancia"),
         tile(`Tendencia ${S.anios[0]}–${S.anios[N - 1]}`, tn ? signo(tn[0]) : "—", tn ? `ha/año · ${pct2Txt(tn[1])}/año, ${N} años` : ""),
       ].join("");
-      notas = (p ? p.notas : []).slice();
+      notas = (p && p.notas ? p.notas : []).slice();
       if (N < 5) notas.push(`La tendencia es la pendiente por mínimos cuadrados de ${N} años: con tan pocos años equivale casi al cambio total dividido entre ${N - 1}; todavía no distingue una tendencia de la variación de un año.`);
     } else {
       const p = P(), tt = p.tot, neto = tt.actual - tt.base;
@@ -499,7 +652,13 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const largo = [5, 2, 1].map(m => m * n).find(v => v <= objetivo) || n;
     document.getElementById("escala").innerHTML = `${largo >= 1000 ? nf.format(largo / 1000) + " km" : nf.format(largo) + " m"}<span style="width:${largo / metrosPorPx}px"></span>`;
   }
-  window.addEventListener("resize", () => { pintarEscala(d3.zoomTransform(svg.node()).k); });
+  let anchoEvolucion = null;
+  window.addEventListener("resize", () => {
+    pintarEscala(d3.zoomTransform(svg.node()).k);
+    const angosta = document.getElementById("evolucion").clientWidth < 700;
+    if (pintado && angosta !== anchoEvolucion) pintarEvolucion();
+    anchoEvolucion = angosta;
+  });
 
   // Vistas del mapa según el modo
   const VISTAS = {
@@ -518,7 +677,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const clasesCache = {}, imagenCache = {};
   function leerClases(clave, src, paso) {
     if (clasesCache[clave]) return clasesCache[clave];
-    clasesCache[clave] = new Promise(res => {
+    clasesCache[clave] = new Promise((res, rej) => {
       const img = new Image();
       img.onload = () => {
         const c = document.createElement("canvas"); c.width = W; c.height = H;
@@ -528,6 +687,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         for (let j = 0; j < out.length; j++) out[j] = Math.round(px[j * 4] / paso);
         res(out);
       };
+      img.onerror = () => { delete clasesCache[clave]; rej(new Error(`no se pudo leer la cuadrícula ${EMB ? clave : src}`)); };
       img.src = src;
     });
     return clasesCache[clave];
@@ -536,11 +696,11 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const temaOscuro = () => getComputedStyle(document.documentElement).colorScheme.includes("dark");
   function capaRaster() {
     // {clave, src, paso, colores: {valor: token o null}}
-    if (st.vista === "cobertura") return { clave: "c" + st.p, src: P().img, paso: 50,
+    if (st.vista === "cobertura") return { clave: `cambio_${P().id}.png`, src: urlCuadricula(`cambio_${P().id}.png`), paso: D.pasos.clases,
       colores: Object.fromEntries(CLASES.map(c => [c.k, st.capas[c.k] ? c.token : null])) };
-    if (st.vista === "bosque") return { clave: "b" + st.t, src: S.img_bosque[st.t], paso: 50,
+    if (st.vista === "bosque") return { clave: `bosque_${S.anios[st.t]}.png`, src: urlCuadricula(`bosque_${S.anios[st.t]}.png`), paso: D.pasos.clases,
       colores: Object.fromEntries(DENSIDAD.map(c => [c.k, c.token])) };
-    if (st.vista === "perdida") return { clave: "p", src: S.img_perdida, paso: S.paso_perdida,
+    if (st.vista === "perdida") return { clave: "anio_perdida.png", src: urlCuadricula("anio_perdida.png"), paso: S.paso_perdida,
       colores: Object.fromEntries(S.anios.slice(1).map((a, i) => [i + 1, st.perd[i + 1] ? tokenPerdida(i + 1) : null])) };
     return null;
   }
@@ -553,7 +713,13 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const colores = Object.fromEntries(Object.entries(capa.colores).map(([k, tok]) => [k, tok ? hex(css.getPropertyValue(tok)) : null]));
     const clave = [capa.clave, temaOscuro(), ...Object.values(capa.colores)].join("|");
     if (!imagenCache[clave]) {
-      const cls = await leerClases(capa.clave, capa.src, capa.paso);
+      let cls;
+      if (!clasesCache[capa.clave]) raster.attr("href", null);  // no dejar otra capa mientras llega
+      carga(+1);
+      try { cls = await leerClases(capa.clave, capa.src, capa.paso); }
+      catch (e) { if (yo === pintando) { raster.attr("href", null); mostrarFalla(e, () => { ocultarFalla(); pintarRaster(); }); } return; }
+      finally { carga(-1); }
+      if (yo !== pintando) return;
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"), img = ctx.createImageData(W, H), d = img.data;
       for (let j = 0; j < cls.length; j++) {
@@ -563,7 +729,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       ctx.putImageData(img, 0, 0);
       imagenCache[clave] = c.toDataURL("image/png");
     }
-    if (yo === pintando) raster.attr("href", imagenCache[clave]);
+    if (yo === pintando) raster.attr("href", imagenCache[clave]).attr("data-capa", capa.clave);
   }
 
   function pintarCoropletas() {
@@ -601,11 +767,12 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const ocultarGlobo = () => { globo.hidden = true; };
 
   // ---------- Serie: gráfica pequeña (una línea, sin leyenda: el título la nombra) ----------
-  function graficaSerie(nombre) {
+  // Con pocos años se rotulan todos los puntos; con muchos, el primero y el último.
+  function graficaSerie(nombre, { ancho = 300, alto = 150, titulo = true } = {}) {
     const s = serieDe(nombre), tn = tendDe(nombre);
     if (!s) return "";
     const anios = S.anios, ys = s.map(r => r[IS.bosque]);
-    const w = 300, h = 150, m = { l: 8, r: 8, t: 22, b: 22 };
+    const w = ancho, h = alto, m = { l: 8, r: 8, t: 22, b: 22 };
     const x = d3.scalePoint().domain(anios).range([m.l + 30, w - m.r - 30]);
     const lo = d3.min(ys), hi = d3.max(ys), pad = Math.max((hi - lo) * 0.35, hi * 0.004, 1);
     const y = d3.scaleLinear().domain([lo - pad, hi + pad]).range([h - m.b, m.t]);
@@ -614,14 +781,15 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const pts = anios.map((a, t) => ({ a, t, v: ys[t], cx: x(a), cy: y(ys[t]) }));
     const rotulo = (p, ancla) => `<text class="rotulo" x="${p.cx}" y="${p.cy - 10}" text-anchor="${ancla}">${nf.format(Math.round(p.v))}</text>`;
     const activo = enAnio() ? st.t : -1;
-    return `<h4>Bosque por año · ${esc(nombre || D.titulo)}</h4><div class="serie-graf" data-nombre="${esc(nombre || "")}">
+    const rotulados = pts.length <= 8 ? pts : [pts[0], pts[pts.length - 1]];
+    return `${titulo ? `<h4>Bosque por año · ${esc(nombre || D.titulo)}</h4>` : ""}<div class="serie-graf${ancho > 300 ? " ancha" : ""}" data-nombre="${esc(nombre || "")}">
       <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Bosque por año de ${esc(nombre || D.titulo)}: ${pts.map(p => `${p.a}, ${nf.format(Math.round(p.v))} hectáreas`).join("; ")}">
         <g class="eje">${anios.map(a => `<text x="${x(a)}" y="${h - 4}" text-anchor="middle">${a}</text>`).join("")}
           <line x1="${m.l}" x2="${w - m.r}" y1="${h - m.b}" y2="${h - m.b}"></line></g>
         ${recta ? `<path class="recta" d="M${recta.map(p => p.join(" ")).join("L")}"></path>` : ""}
         <path class="linea" d="M${pts.map(p => `${p.cx} ${p.cy}`).join("L")}"></path>
-        ${pts.map(p => `<circle class="punto${p.t === activo ? " activo" : ""}" cx="${p.cx}" cy="${p.cy}" r="${p.t === activo ? 6 : 4.5}"></circle>`).join("")}
-        ${rotulo(pts[0], "middle")}${rotulo(pts[pts.length - 1], "middle")}
+        ${pts.map(p => `<circle class="punto${p.t === activo ? " activo" : ""}" data-anio="${p.a}" cx="${p.cx}" cy="${p.cy}" r="${p.t === activo ? 6 : 4.5}"></circle>`).join("")}
+        ${rotulados.map(p => rotulo(p, "middle")).join("")}
         ${pts.map(p => `<rect class="blanco" data-t="${p.t}" x="${p.cx - 24}" y="${m.t - 10}" width="48" height="${h - m.t - m.b + 10}"></rect>`).join("")}
       </svg><div class="dato" hidden></div>
       <p class="pie-graf">${tn ? `Tendencia ${signo(tn[0])} ha/año (${pct2Txt(tn[1])}/año), línea punteada. ` : ""}El eje no empieza en cero: los cambios son pequeños frente al total.</p></div>`;
@@ -645,7 +813,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 
   // ---------- Panel de detalle ----------
   const IT = Object.fromEntries((D.campos_tipo || []).map((c, i) => [c, i]));
-  const hayTipos = D.periodos.some(p => p.tipos);
+  const hayTipos = D.periodos.some(p => p.tiene_tipos);
   const n0 = v => nf.format(Math.round(v));
   function tablaTipos(porTipo) {
     const tipos = (D.tipos || []).filter(t => porTipo && porTipo[t] && (porTipo[t][IT.base] > 0 || porTipo[t][IT.actual] > 0));
@@ -686,15 +854,15 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   function pintarDetalle() {
     const el = document.getElementById("detalle");
     if (enAnio()) {
-      el.innerHTML = (st.sel ? `<h3>${esc(st.sel)}</h3>` : `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver su serie y su bosque por tipo. Abajo, toda la zona.</p>`)
-        + graficaSerie(st.sel) + tiposAnio(st.sel);
+      el.innerHTML = (st.sel ? `<h3>${esc(st.sel)}</h3>` + graficaSerie(st.sel) : `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver su serie y su bosque por tipo. Abajo, toda la zona.</p>`)
+        + tiposAnio(st.sel);
       activarGraficas(el);
       return;
     }
     if (!st.sel) {
       const p = P();
       el.innerHTML = `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver sus cifras en cada comparación${S ? ", su serie" : ""}${hayTipos ? " y su desglose por tipo de bosque" : ""}.</p>`
-        + seccionTipos(p.tipos && p.tipos.tot, `${D.titulo}, total`) + (S ? graficaSerie(null) : "");
+        + seccionTipos(p.tipos && p.tipos.tot, `${D.titulo}, total`);
       activarGraficas(el);
       return;
     }
@@ -710,6 +878,33 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}
       ${seccionTipos(P().tipos && P().tipos.filas[st.sel], st.sel)}`;
     activarGraficas(el);
+  }
+
+  // ---------- Evolución del Estado año con año (siempre a la vista; sale del índice) ----------
+  function pintarEvolucion() {
+    const el = document.getElementById("evolucion");
+    if (!S) { el.hidden = true; return; }
+    el.hidden = false;
+    const s = S.tot.Todos, tn = tendDe(null), activo = enAnio() ? st.t : -1;
+    const angosta = el.clientWidth < 700;  // en teléfono, gráfica más angosta para que el texto no se achique
+    const filas = S.anios.map((a, t) => {
+      const r = s[t];
+      return `<tr data-anio="${a}" aria-current="${t === activo}"><td>${a}<button type="button" data-t="${t}" aria-label="Ver el bosque de ${a}">ver</button></td>
+        <td>${n0(r[IS.bosque])}</td><td>${pctZona(r) == null ? "—" : nf1.format(pctZona(r)) + " %"}</td>
+        <td>${t ? signo(r[IS.neto]) : "—"}</td><td>${t ? pctTxt(pctAnt(r)) : "—"}</td></tr>`;
+    }).join("");
+    el.innerHTML = `<header><h2 id="evolucion-titulo">Evolución del bosque · ${esc(D.titulo)}, ${S.anios[0]}–${S.anios[N - 1]}</h2>
+        <p>Superficie con bosque de cada año (noviembre-diciembre, serie encadenada) y su cambio respecto del año anterior.${tn ? ` Tendencia: ${signo(tn[0])} ha/año (${pct2Txt(tn[1])}/año).` : ""}${D.periodos.some(p => p.preliminar) ? " Los preliminares de otra temporada no entran en la serie." : ""}</p></header>
+      <div>${graficaSerie(null, angosta ? { ancho: 320, alto: 150, titulo: false } : { ancho: 520, alto: 160, titulo: false })}</div>
+      <div class="tabla-detalle"><table><thead><tr><th>Año</th><th>Bosque (ha)</th><th>De la zona</th><th>Cambio (ha)</th><th>Cambio (%)</th></tr></thead>
+        <tbody>${filas}</tbody></table>
+        <p class="pie-graf">Cada municipio tiene su serie en su detalle. «ver» abre ese año en el mapa.</p></div>`;
+    el.hidden = false;
+    activarGraficas(el);
+    el.querySelectorAll("button[data-t]").forEach(b => b.addEventListener("click", () => {
+      const t = Number(b.dataset.t);
+      actualizar(e => { if (e.modo !== "anio") cambiarModo(e, "anio"); e.t = t; });
+    }));
   }
 
   // ---------- Leyenda ----------
@@ -834,36 +1029,38 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     if (u) seleccionar(u.nombre, true);
   });
   function seleccionar(nombre, acercar) {
-    st.sel = nombre;
     const u = porNombre[nombre];
-    selPath.attr("d", u ? u.d : null);
     if (u && acercar) zoomA(u.bbox);
-    document.querySelectorAll("#filas tr").forEach(tr => tr.setAttribute("aria-selected", String(tr.dataset.n === nombre)));
     const tr = [...document.querySelectorAll("#filas tr")].find(t => t.dataset.n === nombre);
     if (tr && !acercar) tr.scrollIntoView({ block: "nearest" });
-    pintarDetalle();
+    actualizar(e => { e.sel = nombre; }, true);
   }
-  // En "Comparar años", la capa del año de pérdida muestra los años de la comparación elegida
-  function perdidaDelPeriodo() {
+  function marcarSeleccion() {
+    const u = porNombre[st.sel];
+    selPath.attr("d", u ? u.d : null);
+    document.querySelectorAll("#filas tr").forEach(tr => tr.setAttribute("aria-selected", String(tr.dataset.n === st.sel)));
+  }
+  // En "Comparar años", la capa del año de pérdida muestra los años de la comparación elegida.
+  // Estas funciones cambian el estado `e` que se va a aplicar (ver actualizar).
+  function perdidaDelPeriodo(e) {
     if (!S) return;
-    const p = P();
-    S.anios.forEach((a, t) => { if (t) st.perd[t] = p.preliminar ? true : (a > p.base && a <= p.actual); });
+    const p = D.periodos[e.p];
+    S.anios.forEach((a, t) => { if (t) e.perd[t] = p.preliminar ? true : (a > p.base && a <= p.actual); });
   }
-  function cambiarModo(modo) {
-    st.modo = modo;
-    st.vista = VISTAS[modo].some(([v]) => v === st.vista) ? st.vista : VISTAS[modo][0][0];
-    if (modo === "anio") S.anios.forEach((a, t) => { if (t) st.perd[t] = true; }); else perdidaDelPeriodo();
-    st.orden = { col: modo === "anio" ? "bosque" : "neto", asc: modo !== "anio" };
-    pintarTodo();
+  function cambiarModo(e, modo) {
+    e.modo = modo;
+    e.vista = VISTAS[modo].some(([v]) => v === e.vista) ? e.vista : VISTAS[modo][0][0];
+    if (modo === "anio") S.anios.forEach((a, t) => { if (t) e.perd[t] = true; }); else perdidaDelPeriodo(e);
+    e.orden = { col: modo === "anio" ? "bosque" : "neto", asc: modo !== "anio" };
   }
   function cambiarPeriodo(i) {
-    st.p = i;
-    perdidaDelPeriodo();
-    pintarTodo();
+    actualizar(e => { e.p = i; perdidaDelPeriodo(e); });
   }
+  let pintado = false;
   function pintarTodo() {
-    pintarVistas(); pintarCabecera(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
-    pintarDetalle(); pintarRaster(); pintarPie();
+    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
+    marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPie();
+    pintado = true;
   }
 
   // ---------- Alcances (CF-DEV-14) y pie ----------
@@ -918,13 +1115,13 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   }
 
   // Volver a colorear el ráster si cambia el tema
-  const alCambiarTema = () => pintarRaster();
+  const alCambiarTema = () => { if (pintado) pintarRaster(); };
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", alCambiarTema);
   new MutationObserver(alCambiarTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-  perdidaDelPeriodo();
+  perdidaDelPeriodo(st);
   pintarAlcances();
-  pintarTodo();
   pintarEscala(1);
+  await actualizar();
 })();
 </script>
