@@ -1,0 +1,47 @@
+{% if aviso %}
+<div class="tarjeta border-warning mb-3" data-prueba="aviso-faltantes">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div>
+      <div class="titulo-seccion mb-1">Aviso de faltantes vigente</div>
+      <div>Fecha límite para entregar: <strong data-prueba="fecha-limite">{{ aviso.fecha_limite|date:"d/m/Y" }}</strong></div>
+      <div class="small text-secondary">Plazo aplicado: {{ aviso.plazo_aplicado }} · emitido el {{ aviso.fecha_hora|date:"d/m/Y H:i:s" }} h por {{ aviso.usuario }}</div>
+      {% if aviso.notificado_en %}
+      <div class="small text-success mt-1">Notificado a la persona solicitante por conducto de la Delegación el {{ aviso.notificado_en|date:"d/m/Y H:i:s" }} h ({{ aviso.notificado_por }}).</div>
+      {% else %}
+      <div class="small text-danger mt-1">Pendiente de notificar a la persona solicitante por conducto de {{ exp.delegacion.nombre }}.</div>
+      {% endif %}
+    </div>
+    {% if es_delegacion and not aviso.notificado_en %}
+    <form method="post" action="{% url 'recepcion:notificar' exp.folio %}">{% csrf_token %}
+      <button class="btn btn-primary" type="submit">Registrar notificación a la persona solicitante</button>
+    </form>
+    {% endif %}
+  </div>
+  <ul class="small mt-2 mb-0">{% for r in aviso.faltantes.all %}<li><strong>{{ r.requisito.clave }}</strong> {{ r.requisito.titulo }}</li>{% endfor %}</ul>
+  {% if es_delegacion %}<div class="small text-secondary mt-2">Cuando reciba la documentación, márquela como entregada en la pestaña Requisitos y reenvíe el expediente.</div>{% endif %}
+</div>
+{% endif %}
+{% if puede_validar %}
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+  <span>El expediente está en revisión de su Dirección.</span>
+  <a class="btn btn-primary btn-sm" href="{% url 'recepcion:validar' exp.folio %}">Abrir pantalla de validación</a>
+</div>
+{% endif %}
+<div class="titulo-seccion">Historial de validaciones</div>
+<div class="table-responsive">
+<table class="table table-sm">
+  <thead class="table-light"><tr><th>Fecha y hora</th><th>Resultado</th><th>Fecha límite</th><th>Faltantes</th><th>Por</th><th>Acuse</th></tr></thead>
+  <tbody>
+  {% for v in validaciones %}
+  <tr>
+    <td>{{ v.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+    <td>{% if v.resultado == "validado" %}<span class="badge text-bg-success">Validado</span>{% else %}<span class="badge text-bg-warning">Aviso de faltantes</span>{% endif %}</td>
+    <td>{{ v.fecha_limite|date:"d/m/Y"|default:"—" }}</td>
+    <td class="small">{% for r in v.faltantes.all %}{{ r.requisito.clave }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+    <td>{{ v.usuario }}</td>
+    <td>{% if v.acuse %}<a href="{% url 'nucleo:acuse' v.acuse.folio %}" target="_blank">{{ v.acuse.folio }}</a>{% endif %}</td>
+  </tr>
+  {% empty %}<tr><td colspan="6" class="text-secondary">Aún no hay validaciones de la Dirección.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>

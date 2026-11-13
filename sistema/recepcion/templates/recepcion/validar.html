@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %}Validación {{ exp.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">Validación del expediente {{ exp.folio }}</h1>
+    <div class="small">{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }} · {{ exp.tipo_persona.nombre }}{% if exp.es_refrendo %} · <strong>Refrendo</strong>{% endif %}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=requisitos">Ver expediente</a>
+</div>
+<form method="post" class="tarjeta">
+  {% csrf_token %}
+  <p class="small text-secondary mb-2">Revise cada requisito que envió {{ exp.delegacion.nombre }}. Marque como faltante lo que no cumpla (ilegible, incompleto, no vigente). Los que no pasan la revisión automática de las reglas ya vienen marcados.
+  {% if vigencia_refrendo %}En refrendo, la documentación que obra en PROBOSQUE vale si no tiene más de <strong>{{ vigencia_refrendo.texto_plazo }}</strong> ({{ vigencia_refrendo.fundamento }}).{% endif %}</p>
+  <div class="table-responsive">
+  <table class="table table-sm align-middle" id="tabla-validacion">
+    <thead class="table-light"><tr><th>Faltante</th><th>Clave</th><th>Requisito</th><th>Revisión de la Delegación</th><th>Revisión con las reglas</th></tr></thead>
+    <tbody>
+    {% for e in evaluacion %}
+    <tr class="{% if not e.valida %}table-warning{% endif %}" data-clave="{{ e.revision.requisito.clave }}">
+      <td><input class="form-check-input" type="checkbox" name="faltante" value="{{ e.revision.pk }}" aria-label="Faltante {{ e.revision.requisito.clave }}" {% if not e.valida %}checked onclick="return false"{% endif %}></td>
+      <td class="small fw-semibold text-nowrap">{{ e.revision.requisito.clave }}</td>
+      <td class="req-texto small">{{ e.revision.requisito.titulo }}{% if e.revision.requisito.es_documento_legal %} <span class="badge text-bg-light border">Documento legal</span>{% endif %}</td>
+      <td class="small">{{ e.revision.get_estado_display }}{% if e.revision.documento %} · <a href="{% url 'nucleo:documento' e.revision.documento.pk %}" target="_blank">ver archivo</a>{% endif %}{% if e.revision.en_archivo_probosque %} · obra en PROBOSQUE{% endif %}</td>
+      <td class="small {% if e.valida %}text-success{% else %}text-danger fw-semibold{% endif %}">{{ e.motivo }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="observaciones">Observaciones</label>
+    <textarea class="form-control" name="observaciones" id="observaciones" rows="2"></textarea>
+  </div>
+  <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <div class="small text-secondary">
+      {% if plazo_faltantes %}Si emite aviso hoy, la fecha límite será el <strong>{{ limite_si_hoy|date:"d/m/Y" }}</strong> ({{ plazo_faltantes.texto_plazo }}, {{ plazo_faltantes.fundamento }}). El aviso se notifica por conducto de la Delegación.{% endif %}
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-warning" type="submit" name="accion" value="faltantes">Emitir aviso de faltantes</button>
+      <button class="btn btn-primary" type="submit" name="accion" value="validar">Validar expediente</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
