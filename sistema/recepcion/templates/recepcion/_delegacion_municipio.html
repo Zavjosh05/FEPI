@@ -1,0 +1,12 @@
+{% if municipio %}
+  {% if municipio.delegacion == delegacion %}
+  <span class="text-success">{{ municipio.nombre }} lo atiende esta Delegación.</span>
+  {% elif municipio.delegacion %}
+  <span class="text-danger fw-semibold">{{ municipio.nombre }} lo atiende {{ municipio.delegacion.nombre }}: la solicitud debe presentarse allá.</span>
+  {% else %}
+  <span class="text-danger">{{ municipio.nombre }} no tiene Delegación asignada.</span>
+  {% endif %}
+  {% if municipio.delegacion and not municipio.delegacion.asignacion_confirmada %}
+  <span class="badge text-bg-warning etiqueta-provisional ms-1">Según la Convocatoria 2026, por confirmar con el cliente</span>
+  {% endif %}
+{% endif %}

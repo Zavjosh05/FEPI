@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar solicitud{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Registro de la solicitud en ventanilla</h1>
+  <div class="text-secondary small">{{ delegacion.nombre }} · la solicitud queda a nombre del predio y se genera el acuse de recepción con fecha y hora.</div>
+</div>
+<form method="post" novalidate id="formulario-registro">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger" data-prueba="error-registro">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>
+  {% endif %}
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="tarjeta h-100">
+        <div class="titulo-seccion">Programa y solicitud</div>
+        {% include "recepcion/_campo.html" with campo=form.ejercicio %}
+        {% include "recepcion/_campo.html" with campo=form.tipo_persona %}
+        {% if form.modalidad.field.queryset.exists %}{% include "recepcion/_campo.html" with campo=form.modalidad %}{% endif %}
+        <div class="form-check mb-2">{{ form.es_refrendo }} <label class="form-check-label" for="{{ form.es_refrendo.id_for_label }}">{{ form.es_refrendo.label }}</label></div>
+        <div class="form-check mb-3">{{ form.con_representante_legal }} <label class="form-check-label" for="{{ form.con_representante_legal.id_for_label }}">{{ form.con_representante_legal.label }}</label></div>
+        {% include "recepcion/_campo.html" with campo=form.observaciones %}
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="tarjeta">
+        <div class="titulo-seccion">Predio</div>
+        {% include "recepcion/_campo.html" with campo=form.folio_predio %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.municipio.id_for_label }}">{{ form.municipio.label }}</label>
+          <select name="municipio" id="{{ form.municipio.id_for_label }}" class="form-select {% if form.municipio.errors %}is-invalid{% endif %}"
+                  hx-get="{% url 'recepcion:delegacion_municipio' %}" hx-target="#delegacion-municipio" hx-trigger="change">
+            <option value="">— Elija el municipio —</option>
+            {% for valor, texto in form.municipio.field.choices %}{% if valor %}
+            <option value="{{ valor }}" {% if form.municipio.value|stringformat:"s" == valor|stringformat:"s" %}selected{% endif %}>{{ texto }}</option>
+            {% endif %}{% endfor %}
+          </select>
+          {% for e in form.municipio.errors %}<div class="invalid-feedback d-block" data-prueba="error-municipio">{{ e }}</div>{% endfor %}
+          <div id="delegacion-municipio" class="form-text"></div>
+        </div>
+        <div class="row g-2">
+          <div class="col-sm-7">{% include "recepcion/_campo.html" with campo=form.nombre_predio %}</div>
+          <div class="col-sm-5">{% include "recepcion/_campo.html" with campo=form.superficie_solicitada_ha %}</div>
+        </div>
+        {% include "recepcion/_campo.html" with campo=form.localidad %}
+      </div>
+      <div class="tarjeta">
+        <div class="titulo-seccion">Persona solicitante</div>
+        {% include "recepcion/_campo.html" with campo=form.solicitante_nombre %}
+        <div class="row g-2">
+          <div class="col-sm-6">{% include "recepcion/_campo.html" with campo=form.curp %}</div>
+          <div class="col-sm-6">{% include "recepcion/_campo.html" with campo=form.rfc %}</div>
+          <div class="col-sm-6">{% include "recepcion/_campo.html" with campo=form.telefono %}</div>
+          <div class="col-sm-6">{% include "recepcion/_campo.html" with campo=form.correo %}</div>
+        </div>
+        {% include "recepcion/_campo.html" with campo=form.representante %}
+      </div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 justify-content-end mt-3">
+    <a class="btn btn-outline-secondary" href="{% url 'nucleo:bandeja' %}">Cancelar</a>
+    <button class="btn btn-primary" type="submit">Registrar y generar acuse</button>
+  </div>
+</form>
+{% endblock %}

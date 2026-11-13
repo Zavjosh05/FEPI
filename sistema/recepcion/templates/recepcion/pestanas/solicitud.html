@@ -1,0 +1,47 @@
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="titulo-seccion">Solicitud</div>
+    <table class="table table-sm">
+      <tr><th class="w-50 fw-normal text-secondary">Folio de la solicitud</th><td data-prueba="folio">{{ exp.folio }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Fecha y hora de recepción</th><td>{{ exp.fecha_recepcion|date:"d/m/Y H:i:s" }} h</td></tr>
+      <tr><th class="fw-normal text-secondary">Registró</th><td>{{ exp.registrado_por }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Tipo de persona</th><td>{{ exp.tipo_persona.nombre }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Modalidad</th><td>{{ exp.modalidad.nombre|default:"—" }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Refrendo</th><td>{{ exp.es_refrendo|yesno:"Sí,No" }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Con representante legal</th><td>{{ exp.con_representante_legal|yesno:"Sí,No" }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Superficie solicitada</th><td>{% if exp.superficie_solicitada_ha %}{{ exp.superficie_solicitada_ha }} ha{% else %}—{% endif %}</td></tr>
+      {% if exp.enviado_direccion %}<tr><th class="fw-normal text-secondary">Enviado a la Dirección</th><td>{{ exp.enviado_direccion|date:"d/m/Y H:i:s" }} h</td></tr>{% endif %}
+      {% if exp.observaciones %}<tr><th class="fw-normal text-secondary">Observaciones</th><td>{{ exp.observaciones }}</td></tr>{% endif %}
+    </table>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="titulo-seccion">Predio y persona solicitante</div>
+    <table class="table table-sm">
+      <tr><th class="w-50 fw-normal text-secondary">Folio del predio</th><td>{{ exp.predio.folio }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Predio</th><td>{{ exp.predio.nombre }}{% if exp.predio.localidad %}, {{ exp.predio.localidad }}{% endif %}</td></tr>
+      <tr><th class="fw-normal text-secondary">Municipio</th><td>{{ exp.predio.municipio.nombre }}</td></tr>
+      <tr><th class="fw-normal text-secondary">Delegación que atiende</th><td>{{ exp.delegacion.nombre }}
+        {% if not exp.delegacion.asignacion_confirmada %}<div><span class="badge text-bg-warning etiqueta-provisional">Asignación según la Convocatoria 2026, por confirmar con el cliente</span></div>{% endif %}</td></tr>
+      <tr><th class="fw-normal text-secondary">Persona solicitante</th><td>{{ exp.solicitante.nombre }}</td></tr>
+      {% if exp.solicitante.curp %}<tr><th class="fw-normal text-secondary">CURP</th><td>{{ exp.solicitante.curp }}</td></tr>{% endif %}
+      {% if exp.solicitante.representante %}<tr><th class="fw-normal text-secondary">Representante</th><td>{{ exp.solicitante.representante }}</td></tr>{% endif %}
+      {% if exp.solicitante.telefono %}<tr><th class="fw-normal text-secondary">Teléfono</th><td>{{ exp.solicitante.telefono }}</td></tr>{% endif %}
+    </table>
+    {% with otros=exp.predio.expedientes.all %}{% if otros|length > 1 %}
+    <div class="small text-secondary">Otras solicitudes del mismo predio:
+      {% for o in otros %}{% if o != exp %}<span class="badge text-bg-light border">{{ o.folio }} · {{ o.estado.nombre }}</span> {% endif %}{% endfor %}</div>
+    {% endif %}{% endwith %}
+  </div>
+</div>
+<div class="d-flex flex-wrap gap-2 mt-2">
+  {% for a in exp.acuses.all %}{% if a.tipo == "recepcion" %}
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'nucleo:acuse' a.folio %}" target="_blank" data-prueba="acuse-recepcion">Acuse de recepción {{ a.folio }} (PDF)</a>
+  {% endif %}{% endfor %}
+  {% for t in transiciones_motivo %}
+  <form method="post" action="{% url 'recepcion:cambiar_estado' exp.folio %}" class="d-flex gap-2 align-items-center" onsubmit="return confirm('¿Confirma: {{ t.accion }}?')">
+    {% csrf_token %}<input type="hidden" name="destino" value="{{ t.destino.clave }}">
+    <input class="form-control form-control-sm" name="motivo" placeholder="Motivo" required style="max-width: 18rem">
+    <button class="btn btn-outline-danger btn-sm text-nowrap" type="submit">{{ t.accion }}</button>
+  </form>
+  {% endfor %}
+</div>
