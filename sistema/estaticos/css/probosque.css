@@ -1,0 +1,36 @@
+/* Estilo sobrio del sistema; colores institucionales aproximados (verde forestal). */
+:root {
+  --pb-verde: #1f5130;
+  --pb-verde-claro: #e8f1ea;
+  --bs-link-color: #1f5130;
+  --bs-link-color-rgb: 31, 81, 48;
+  --bs-link-hover-color: #14361f;
+}
+body { background: #f5f6f4; }
+.contenedor { max-width: 1320px; margin: 0 auto; }
+.barra-probosque { background: var(--pb-verde); }
+.barra-probosque .marca { font-weight: 700; letter-spacing: .06em; }
+.tarjeta { background: #fff; border: 1px solid #dde2dc; border-radius: .5rem; padding: 1rem 1.25rem; }
+.tarjeta + .tarjeta { margin-top: 1rem; }
+.titulo-seccion { font-size: 1.05rem; font-weight: 600; margin-bottom: .75rem; }
+.encabezado-exp h1 { font-size: 1.35rem; margin: 0; }
+.encabezado-exp .dato { font-size: .85rem; color: #555; }
+.nav-tabs .nav-link { color: #333; }
+.nav-tabs .nav-link.active { font-weight: 600; color: var(--pb-verde); }
+.btn-primary { --bs-btn-bg: #1f5130; --bs-btn-border-color: #1f5130; --bs-btn-hover-bg: #173f25; --bs-btn-hover-border-color: #173f25; --bs-btn-active-bg: #12321d; --bs-btn-disabled-bg: #5f7f69; --bs-btn-disabled-border-color: #5f7f69; }
+.btn-outline-primary { --bs-btn-color: #1f5130; --bs-btn-border-color: #1f5130; --bs-btn-hover-bg: #1f5130; --bs-btn-hover-border-color: #1f5130; --bs-btn-active-bg: #1f5130; }
+.table-sm td, .table-sm th { vertical-align: middle; }
+.tabla-bandeja td { font-size: .9rem; }
+.req-texto { font-size: .85rem; max-width: 46rem; }
+.req-fila.htmx-request { opacity: .5; }
+#mapa { height: 460px; border-radius: .5rem; border: 1px solid #cfd6ce; }
+.leyenda-mapa span { display: inline-block; width: 1.2rem; height: .7rem; margin-right: .3rem; vertical-align: middle; border: 2px solid; }
+.pantalla-entrar { max-width: 420px; margin: 3rem auto; }
+.etiqueta-provisional { font-size: .75rem; }
+.htmx-indicator { opacity: 0; transition: opacity .2s; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+@media (max-width: 576px) {
+  #mapa { height: 320px; }
+  .encabezado-exp h1 { font-size: 1.1rem; }
+  .usuario-barra { justify-content: space-between; padding: .5rem 0; }
+}

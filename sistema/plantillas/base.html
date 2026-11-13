@@ -1,0 +1,61 @@
+{% load static %}<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Sistema de programas{% endblock %} · PROBOSQUE</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  {% block estilos %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/probosque.css' %}">
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<nav class="navbar navbar-expand-lg navbar-dark barra-probosque">
+  <div class="container-fluid contenedor">
+    <a class="navbar-brand" href="{% url 'nucleo:bandeja' %}">
+      <span class="marca">PROBOSQUE</span> <span class="d-none d-sm-inline">Sistema de programas</span>
+    </a>
+    {% if user.is_authenticated %}
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Menú">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'bandeja' %}active{% endif %}" href="{% url 'nucleo:bandeja' %}">Bandeja</a></li>
+        {% if unidad_actual.es_delegacion %}
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'registrar' %}active{% endif %}" href="{% url 'recepcion:registrar' %}">Registrar solicitud</a></li>
+        {% endif %}
+        {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Catálogos</a></li>{% endif %}
+      </ul>
+      <div class="d-flex align-items-center gap-3 text-white small usuario-barra">
+        <div class="text-end lh-sm">
+          <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
+          <div class="opacity-75" data-prueba="unidad">{{ unidad_actual.nombre|default:"Sin unidad" }}</div>
+        </div>
+        <form method="post" action="{% url 'nucleo:salir' %}">{% csrf_token %}
+          <button class="btn btn-sm btn-outline-light" type="submit">Salir</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+<main class="contenedor py-3 px-3">
+  {% if messages %}
+  <div id="mensajes">
+    {% for m in messages %}
+    <div class="alert alert-{% if m.tags == 'error' %}danger{% else %}{{ m.tags }}{% endif %} alert-dismissible fade show" role="alert">
+      {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% block contenido %}{% endblock %}
+</main>
+<footer class="contenedor px-3 pb-4 text-secondary small">
+  Prototipo del Sistema de programas de PROBOSQUE · Reglas de Operación 2026 · Hora del centro de México
+</footer>
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

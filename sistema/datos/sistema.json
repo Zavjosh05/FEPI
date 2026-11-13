@@ -1,0 +1,33 @@
+{
+  "nota": "Datos propios del sistema que no vienen de las ROP: tipo de cada unidad de reglas/catalogos.json, unidades extra que hacen falta para los roles, catálogo de programas y ajustes a la lectura de las reglas. Todo editable después en el admin.",
+  "programas": [
+    {"clave": "CC", "nombre": "Capturando Carbono", "usa_poligono": true, "archivo_reglas": "CC.json"},
+    {"clave": "MFS", "nombre": "Manejo Forestal Sustentable", "usa_poligono": true, "archivo_reglas": "MFS.json"},
+    {"clave": "PS", "nombre": "Plantaciones Sustentables", "usa_poligono": true, "archivo_reglas": "PS.json"},
+    {"clave": "RHF", "nombre": "Restauración Hidrológico-Forestal", "usa_poligono": true, "archivo_reglas": "RHF.json"},
+    {"clave": "PSA", "nombre": "Pago por Servicios Ambientales Hidrológicos del Estado de México (PSAHEM)", "usa_poligono": true, "archivo_reglas": "PSA.json"},
+    {"clave": "PEG", "nombre": "Programa Estatal de Guardabosques", "usa_poligono": false, "archivo_reglas": "PEG.json"}
+  ],
+  "ejercicio_vigente": 2026,
+  "tipos_de_unidad": {
+    "DRFF": {"tipo": "direccion", "programas": ["CC", "MFS", "PS", "RHF", "PSA"]},
+    "DPF": {"tipo": "direccion", "programas": ["PEG"]},
+    "UJ": {"tipo": "juridica"},
+    "DAFGD": {"tipo": "admin_finanzas"},
+    "FIDUCIARIA": {"tipo": "fiduciaria"}
+  },
+  "unidades_extra": [
+    {"clave": "STC", "nombre": "Secretaría Técnica del Comité", "tipo": "secretaria_comite", "nota": "Las ROP asignan la Secretaría Técnica de cada Comité a la persona titular de PROBOSQUE; se modela como unidad para la bandeja del Comité."},
+    {"clave": "VIVERO-DEMO", "nombre": "Vivero (demostración)", "tipo": "vivero", "nota": "Los viveros de PROBOSQUE no están en el catálogo; unidad de demostración para el sprint 2."}
+  ],
+  "ajustes_reglas": {
+    "CC": {
+      "modalidades_no_seleccionables": ["pago_unico_hasta_5_ha", "dos_ministraciones_mas_de_5_ha", "refrendo"],
+      "nota": "En CC las «modalidades» del archivo de reglas incluyen regímenes de pago (dependen de la superficie aprobada) y el refrendo, que el sistema maneja como casilla del expediente. Al registrar solo se eligen los tipos de superficie."
+    }
+  },
+  "plazos_del_sistema": {
+    "faltantes": "complemento_documentacion_faltante",
+    "vigencia_refrendo": "vigencia_documentacion_legal_refrendo"
+  }
+}

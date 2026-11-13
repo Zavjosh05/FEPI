@@ -1,0 +1,24 @@
+<div class="titulo-seccion">Bitácora del expediente</div>
+<div class="table-responsive">
+<table class="table table-sm" id="tabla-bitacora">
+  <thead class="table-light"><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Estado</th><th>Acuse</th></tr></thead>
+  <tbody>
+  {% for e in eventos %}
+  <tr>
+    <td class="text-nowrap">{{ e.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+    <td class="small">{{ e.usuario|default:"Sistema (revisión de plazos)" }}<div class="text-secondary">{{ e.unidad|default:"" }}</div></td>
+    <td>{{ e.descripcion }}{% if e.motivo %}<div class="small text-secondary">Motivo: {{ e.motivo }}</div>{% endif %}</td>
+    <td class="small">{% if e.estado_destino %}{% if e.estado_origen %}{{ e.estado_origen }} → {% endif %}{{ e.estado_destino }}{% endif %}</td>
+    <td>{% if e.acuse %}<a href="{% url 'nucleo:acuse' e.acuse.folio %}" target="_blank">{{ e.acuse.folio }}</a>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<details class="mt-3">
+  <summary class="small text-secondary">Historial de cambios del registro (django-simple-history)</summary>
+  <table class="table table-sm small mt-2">
+    <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Cambio</th><th>Estado</th></tr></thead>
+    <tbody>{% for h in historial %}<tr><td>{{ h.history_date|date:"d/m/Y H:i:s" }}</td><td>{{ h.history_user|default:"—" }}</td><td>{{ h.get_history_type_display }} {{ h.history_change_reason|default:"" }}</td><td>{{ h.estado }}</td></tr>{% endfor %}</tbody>
+  </table>
+</details>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ acuse.folio }}</title>
+<style>
+  @page { size: letter; margin: 2cm 2cm 2.2cm 2cm;
+    @bottom-center { content: "Acuse {{ acuse.folio }} · página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; color: #1d1d1d; }
+  .encabezado { border-bottom: 2px solid #1f5130; padding-bottom: 6px; margin-bottom: 14px; }
+  .encabezado .org { font-size: 9pt; color: #1f5130; font-weight: bold; letter-spacing: .5px; }
+  .encabezado h1 { font-size: 15pt; margin: 4px 0 0 0; }
+  .folio { float: right; text-align: right; font-size: 9pt; }
+  .folio strong { font-size: 12pt; display: block; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { text-align: left; vertical-align: top; padding: 4px 6px; border-bottom: 1px solid #ddd; }
+  th { width: 34%; color: #444; font-weight: normal; }
+  .detalle th, .detalle td { font-size: 8.5pt; }
+  .detalle thead th { background: #eef3ef; font-weight: bold; width: auto; }
+  .nota { margin-top: 14px; font-size: 9pt; background: #f6f6f6; padding: 8px; }
+  .firmas { margin-top: 48px; width: 100%; }
+  .firmas td { border: none; width: 50%; text-align: center; padding-top: 34px; }
+  .firmas span { border-top: 1px solid #333; display: inline-block; width: 80%; padding-top: 3px; font-size: 8.5pt; }
+  .huella { margin-top: 18px; font-size: 7pt; color: #777; }
+</style>
+</head>
+<body>
+  <div class="encabezado">
+    <div class="folio">Folio del acuse<strong>{{ acuse.folio }}</strong>{{ fecha_local|date:"d/m/Y H:i:s" }} h</div>
+    <div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+    <h1>{{ acuse.titulo }}</h1>
+  </div>
+  <table>
+    <tr><th>Programa y ejercicio</th><td>{{ expediente.ejercicio.programa.nombre }} {{ expediente.ejercicio.anio }}</td></tr>
+    <tr><th>Folio de la solicitud</th><td>{{ expediente.folio }}</td></tr>
+    <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
+    <tr><th>Persona solicitante</th><td>{{ expediente.solicitante.nombre }}</td></tr>
+    <tr><th>Fecha y hora</th><td>{{ fecha_local|date:"l j \d\e F \d\e Y, H:i:s" }} h (hora del centro de México)</td></tr>
+    <tr><th>Emite</th><td>{{ acuse.emitido_por }}{% if acuse.unidad %} · {{ acuse.unidad.nombre }}{% endif %}</td></tr>
+    {% if acuse.destinatario %}<tr><th>Destinatario</th><td>{{ acuse.destinatario }}</td></tr>{% endif %}
+    {% for etiqueta, valor in renglones %}<tr><th>{{ etiqueta }}</th><td>{{ valor }}</td></tr>{% endfor %}
+  </table>
+  {% if detalle %}
+  <table class="detalle">
+    <thead><tr><th>Clave</th><th>Requisito o concepto</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for d in detalle %}<tr><td>{{ d.clave }}</td><td>{{ d.texto }}</td><td>{{ d.estado }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% if nota %}<div class="nota">{{ nota }}</div>{% endif %}
+  <table class="firmas"><tr>
+    <td><span>Nombre y firma de quien entrega o recibe</span></td>
+    <td><span>Nombre y firma del personal de PROBOSQUE</span></td>
+  </tr></table>
+  <div class="huella">Documento generado por el Sistema de programas de PROBOSQUE (prototipo). El folio y la fecha y hora quedan registrados en la bitácora del expediente.</div>
+</body>
+</html>

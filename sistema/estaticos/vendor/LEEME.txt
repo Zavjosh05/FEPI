@@ -1,0 +1,6 @@
+Bibliotecas copiadas sin modificar (solo se quitó la línea sourceMappingURL), para no depender de CDN:
+- Bootstrap 5.3.9 (MIT)           bootstrap/
+- htmx 2.0.11 (0BSD)              htmx/
+- Leaflet 1.9.4 (BSD-2-Clause)    leaflet/
+- Leaflet-Geoman Free 2.20.6 (MIT) leaflet-geoman/
+Origen: paquetes de npm servidos por cdn.jsdelivr.net (noviembre de 2026).

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titulo %}Bandeja{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Bandeja{% if unidad_actual %} de {{ unidad_actual.nombre }}{% endif %}</h1>
+    <div class="text-secondary small">Expedientes cuyo estado le toca atender a su unidad.</div>
+  </div>
+  {% if unidad_actual.es_delegacion %}
+  <a class="btn btn-primary" href="{% url 'recepcion:registrar' %}">Registrar solicitud</a>
+  {% endif %}
+</div>
+<form class="tarjeta mb-3" hx-get="{% url 'nucleo:bandeja' %}" hx-target="#tabla-bandeja" hx-push-url="true"
+      hx-trigger="change, input changed delay:350ms from:#filtro-q" hx-indicator="#cargando">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-4">
+      <label class="form-label small mb-1" for="filtro-q">Buscar</label>
+      <input class="form-control" type="search" name="q" id="filtro-q" value="{{ filtros.q }}" placeholder="Folio, predio, solicitante o municipio">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small mb-1" for="filtro-programa">Programa</label>
+      <select class="form-select" name="programa" id="filtro-programa">
+        <option value="">Todos</option>
+        {% for p in programas %}<option value="{{ p.clave }}" {% if filtros.programa == p.clave %}selected{% endif %}>{{ p.clave }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label small mb-1" for="filtro-estado">Estado</label>
+      <select class="form-select" name="estado" id="filtro-estado">
+        <option value="">Todos</option>
+        {% for e in estados %}<option value="{{ e.clave }}" {% if filtros.estado == e.clave %}selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="btn-group w-100" role="group" aria-label="Alcance">
+        <input type="radio" class="btn-check" name="alcance" id="alcance-bandeja" value="bandeja" {% if filtros.alcance == "bandeja" %}checked{% endif %}>
+        <label class="btn btn-outline-primary" for="alcance-bandeja">Por atender</label>
+        <input type="radio" class="btn-check" name="alcance" id="alcance-todos" value="todos" {% if filtros.alcance == "todos" %}checked{% endif %}>
+        <label class="btn btn-outline-primary" for="alcance-todos">Todos los míos</label>
+      </div>
+    </div>
+  </div>
+</form>
+<div class="position-relative">
+  <div id="cargando" class="htmx-indicator position-absolute top-0 end-0 small text-secondary">Actualizando…</div>
+  <div id="tabla-bandeja">{% include "nucleo/_tabla_bandeja.html" %}</div>
+</div>
+{% endblock %}

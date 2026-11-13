@@ -1,0 +1,17 @@
+{
+  "nota": "Calendario DE DEMOSTRACIÓN: las ROP y la Convocatoria no traen días inhábiles. Son los descansos obligatorios de la Ley Federal del Trabajo (art. 74) más días que suelen ser inhábiles en el Gobierno del Estado de México. Debe reemplazarse por el calendario oficial que publique la Gaceta del Gobierno; se edita en el admin (Días inhábiles).",
+  "fuente": "Demostración: LFT art. 74 y calendario habitual del Gobierno del Estado de México (por confirmar)",
+  "dias": [
+    {"fecha": "2026-01-01", "descripcion": "Año Nuevo"},
+    {"fecha": "2026-02-02", "descripcion": "Día de la Constitución (primer lunes de febrero)"},
+    {"fecha": "2026-03-02", "descripcion": "Aniversario de la erección del Estado de México (por confirmar)"},
+    {"fecha": "2026-03-16", "descripcion": "Natalicio de Benito Juárez (tercer lunes de marzo)"},
+    {"fecha": "2026-04-02", "descripcion": "Jueves Santo (por confirmar)"},
+    {"fecha": "2026-04-03", "descripcion": "Viernes Santo (por confirmar)"},
+    {"fecha": "2026-05-01", "descripcion": "Día del Trabajo"},
+    {"fecha": "2026-09-16", "descripcion": "Día de la Independencia"},
+    {"fecha": "2026-11-02", "descripcion": "Día de Muertos (por confirmar)"},
+    {"fecha": "2026-11-16", "descripcion": "Revolución Mexicana (tercer lunes de noviembre)"},
+    {"fecha": "2026-12-25", "descripcion": "Navidad"}
+  ]
+}

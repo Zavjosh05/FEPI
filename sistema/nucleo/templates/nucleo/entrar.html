@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar sesión{% endblock %}
+{% block contenido %}
+<div class="pantalla-entrar">
+  <div class="tarjeta p-4">
+    <h1 class="h4 mb-1">Iniciar sesión</h1>
+    <p class="text-secondary small">Sistema de programas de PROBOSQUE · personal de Delegaciones, Direcciones y unidades.</p>
+    {% if form.errors %}
+    <div class="alert alert-danger py-2">El usuario o la contraseña no son correctos.</div>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label" for="id_username">Usuario</label>
+        <input class="form-control" type="text" name="username" id="id_username" autocomplete="username" required autofocus value="{{ form.username.value|default:'' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="id_password">Contraseña</label>
+        <input class="form-control" type="password" name="password" id="id_password" autocomplete="current-password" required>
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-primary w-100" type="submit">Entrar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

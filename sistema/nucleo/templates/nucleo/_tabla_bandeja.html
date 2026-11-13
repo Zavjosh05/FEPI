@@ -1,0 +1,29 @@
+<div class="tarjeta p-0">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0 tabla-bandeja">
+      <thead class="table-light">
+        <tr>
+          <th class="ps-3">Folio</th><th>Predio</th><th class="d-none d-md-table-cell">Municipio</th>
+          <th class="d-none d-lg-table-cell">Persona solicitante</th><th class="d-none d-sm-table-cell">Programa</th><th>Estado</th>
+          <th class="d-none d-md-table-cell">Recepción</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for e in expedientes %}
+        <tr>
+          <td class="ps-3"><a href="{% url 'recepcion:expediente' e.folio %}" class="fw-semibold text-nowrap">{{ e.folio }}</a>{% if e.es_refrendo %} <span class="badge text-bg-light border">Refrendo</span>{% endif %}</td>
+          <td>{{ e.predio.nombre }}</td>
+          <td class="d-none d-md-table-cell">{{ e.predio.municipio.nombre }}</td>
+          <td class="d-none d-lg-table-cell">{{ e.solicitante.nombre }}</td>
+          <td class="d-none d-sm-table-cell">{{ e.ejercicio.programa.clave }} {{ e.ejercicio.anio }}</td>
+          <td><span class="badge text-bg-{{ e.estado.color }}">{{ e.estado.nombre }}</span></td>
+          <td class="d-none d-md-table-cell">{{ e.fecha_recepcion|date:"d/m/Y H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-center text-secondary py-4">No hay expedientes con estos filtros.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="px-3 py-2 small text-secondary border-top" data-prueba="total">{{ total }} expediente{{ total|pluralize }}</div>
+</div>

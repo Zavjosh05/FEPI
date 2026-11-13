@@ -1,0 +1,119 @@
+{
+  "fuente": {
+    "documento": "Convocatoria 2026 (Gaceta, 27-ene-2026), base cuarta; ROP 2026 de cada programa (tabla «Oficina / Dirección / Municipios que atiende / Teléfono»); Manual General de Organización de PROBOSQUE (Gaceta, 16-dic-2025)",
+    "archivo": "sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt"
+  },
+  "delegaciones_nota": "Las ROP y la Convocatoria SÍ incluyen los municipios que atiende cada Delegación (la misma tabla se repite en la Convocatoria y en las ROP de cada programa: líneas 646-758, 1878, 3120, 4466-4592, 5781, 7636, 8607-8700, 9393). La asignación está pendiente de confirmar con el cliente; por eso cada registro lleva confirmada_con_cliente: false. Horario de atención: 9:00 a 17:00 horas, de lunes a viernes (línea 644). Solo se pueden recibir solicitudes en la Delegación que corresponde al municipio del predio.",
+  "delegaciones": [
+    {
+      "clave": "TOLUCA", "nombre": "Delegación Regional Forestal Toluca", "clave_manual": "225C0201050100T", "sede": "Metepec",
+      "domicilio": "Rancho Guadalupe S/N, Conjunto SEDAGRO, Código Postal 52140, Metepec, Edo de México.", "telefono": "722 878 9907",
+      "municipios": ["Almoloya de Juárez", "Almoloya del Río", "Atizapán", "Calimaya", "Capulhuac", "Chapultepec", "Huixquilucan", "Joquicingo", "Lerma", "Metepec", "Mexicaltzingo", "Ocoyoacac", "Otzolotepec", "Rayón", "San Antonio la Isla", "San Mateo Atenco", "Temoaya", "Tenango del Valle", "Texcalyacac", "Tianguistenco", "Toluca", "Xalatlaco", "Xonacatlán", "Zinacantepec"],
+      "confirmada_con_cliente": false, "lineas": [647, 659]
+    },
+    {
+      "clave": "NAUCALPAN", "nombre": "Delegación Regional Forestal Naucalpan", "clave_manual": "225C0201050200T", "sede": "Naucalpan de Juárez",
+      "domicilio": "Avenida de la Santa Cruz S/N, Parque Naucalli, Col. Boulevares, Código Postal 53140, Naucalpan de Juárez, Estado de México.", "telefono": "722 878 9908",
+      "municipios": ["Apaxco", "Atizapán de Zaragoza", "Coacalco de Berriozábal", "Coyotepec", "Cuautitlán", "Cuautitlán Izcalli", "Ecatepec de Morelos", "Huehuetoca", "Hueypoxtla", "Isidro Fabela", "Jaltenco", "Jilotzingo", "Melchor Ocampo", "Naucalpan de Juárez", "Nextlalpan", "Nicolás Romero", "Teoloyucan", "Tepotzotlán", "Tequixquiac", "Tlalnepantla de Baz", "Tultepec", "Tultitlan", "Zumpango"],
+      "confirmada_con_cliente": false, "lineas": [660, 675]
+    },
+    {
+      "clave": "TEXCOCO", "nombre": "Delegación Regional Forestal Texcoco", "clave_manual": "225C0201050300T", "sede": "Texcoco",
+      "domicilio": "Emiliano Zapata S/N, Col. Barrio Santa Úrsula, Código Postal 56190, Texcoco, Estado de México.", "telefono": "722 878 9909",
+      "municipios": ["Acolman", "Axapusco", "Chiautla", "Chicoloapan", "Chiconcuac", "Chimalhuacán", "La Paz", "Nezahualcóyotl", "Nopaltepec", "Otumba", "Papalotla", "San Martín de las Pirámides", "Atenco", "Tecámac", "Temascalapa", "Teotihuacan", "Tepetlaoxtoc", "Texcoco", "Tezoyuca", "Tonanitla"],
+      "confirmada_con_cliente": false, "lineas": [676, 688]
+    },
+    {
+      "clave": "TEJUPILCO", "nombre": "Delegación Regional Forestal Tejupilco", "clave_manual": "225C0201050400T", "sede": "Tejupilco",
+      "domicilio": "Patriotismo S/N, Col. Independencia, Zacatepec, Código Postal 51412, Tejupilco, Estado de México.", "telefono": "722 878 9910",
+      "municipios": ["Amatepec", "Luvianos", "San Simón de Guerrero", "Sultepec", "Tejupilco", "Temascaltepec", "Tlatlaya"],
+      "confirmada_con_cliente": false, "lineas": [698, 705]
+    },
+    {
+      "clave": "ATLACOMULCO", "nombre": "Delegación Regional Forestal Atlacomulco", "clave_manual": "225C0201050500T", "sede": "Atlacomulco",
+      "domicilio": "Circuito Vial Jorge Jiménez Cantú S/N, Col. Las Fuentes, Atlacomulco, Estado de México", "telefono": "722 878 9911",
+      "municipios": ["Acambay", "Atlacomulco", "El Oro", "Ixtlahuaca", "Jiquipilco", "Jocotitlán", "Morelos", "San Felipe del Progreso", "San José del Rincón", "Temascalcingo"],
+      "confirmada_con_cliente": false, "lineas": [706, 714]
+    },
+    {
+      "clave": "COATEPEC_HARINAS", "nombre": "Delegación Regional Forestal Coatepec Harinas", "clave_manual": "225C0201050600T", "sede": "Coatepec Harinas",
+      "domicilio": "Km. 1, de la Carretera Coatepec Harinas - Ixtapan de la Sal, Primera de San Miguel, Código Postal 51700, Coatepec Harinas, Estado de México.", "telefono": "722 878 9912",
+      "municipios": ["Almoloya de Alquisiras", "Coatepec Harinas", "Ixtapan de la Sal", "Malinalco", "Ocuilan", "Tenancingo", "Texcaltitlán", "Tonatico", "Villa Guerrero", "Zacualpan", "Zumpahuacan"],
+      "confirmada_con_cliente": false, "lineas": [715, 727]
+    },
+    {
+      "clave": "VALLE_DE_BRAVO", "nombre": "Delegación Regional Forestal Valle de Bravo", "clave_manual": "225C0201050700T", "sede": "Valle de Bravo",
+      "domicilio": "Boulevard Juan Herrera y Piña S/N, Centro de Servicios Administrativos, Edificio E, Interior 101, Col. El Calvario, Código Postal 51200, Valle de Bravo, Estado de México.", "telefono": "722 878 9913",
+      "municipios": ["Amanalco", "Donato Guerra", "Ixtapan del Oro", "Otzoloapan", "Santo Tomás", "Valle de Bravo", "Villa de Allende", "Villa Victoria", "Zacazonapan"],
+      "confirmada_con_cliente": false, "lineas": [728, 739]
+    },
+    {
+      "clave": "AMECAMECA", "nombre": "Delegación Regional Forestal Amecameca", "clave_manual": "225C0201050800T", "sede": "Amecameca",
+      "domicilio": "Calle Plaza de la Constitución S/N, Col. Centro, Código Postal 56900, Amecameca, Estado de México.", "telefono": "722 878 9914",
+      "municipios": ["Amecameca", "Atlautla", "Ayapango", "Chalco", "Cocotitlán", "Ecatzingo", "Ixtapaluca", "Juchitepec", "Ozumba", "Temamatla", "Tenango del Aire", "Tepetlixpa", "Tlalmanalco", "Valle de Chalco"],
+      "confirmada_con_cliente": false, "lineas": [740, 750]
+    },
+    {
+      "clave": "JILOTEPEC", "nombre": "Delegación Regional Forestal Jilotepec", "clave_manual": "225C0201050900T", "sede": "Jilotepec",
+      "domicilio": "Avenida Guerrero, esquina Justo Sierra, Unidad campesina José Martínez, Col. El Deni. Jilotepec, Méx. C.P. 54240.", "telefono": null,
+      "nota_telefono": "En la tabla aparece «S/N» en la columna de teléfono (línea 758).",
+      "municipios": ["Aculco", "Chapa de Mota", "Jilotepec", "Polotitlán", "Soyaniquilpan de Juárez", "Timilpan", "Villa del Carbón"],
+      "confirmada_con_cliente": false, "lineas": [751, 758]
+    }
+  ],
+  "delegaciones_resumen": {
+    "total_delegaciones": 9,
+    "total_municipios_en_tabla": 125,
+    "coordinacion": "Coordinación de Delegaciones Regionales (clave 225C0201050000L), que coordina a las 9 Delegaciones (organigrama, líneas 10375-10473)",
+    "comprobar_en_sistema": "El total de municipios en la tabla debe cotejarse con la capa geonode:municipios de IDEFOR (125 municipios del Estado): nombres como «Tultitlan», «Teotihuacan» y «Atenco» tal como aparecen en el texto. Puede haber diferencias de ortografía o municipios faltantes que se verifican al cargar el catálogo."
+  },
+  "unidades": [
+    {"clave": "DG", "clave_manual": "225C02010000000", "nombre": "Dirección General", "titular_cargo": "Director General de PROBOSQUE", "linea": 10475},
+    {"clave": "UJ", "clave_manual": "225C0201001000S", "nombre": "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia", "roles_en_programas": "Dictamen jurídico, validación del modelo de contrato, requerimiento de devolución, revisión del Listado de Personas Beneficiarias Incumplidas (CC 10.1 fr. II y X)", "linea": 10574},
+    {"clave": "UIPPE", "clave_manual": "225C0201000800S", "nombre": "Unidad de Información, Planeación, Programación y Evaluación", "linea": 10640},
+    {"clave": "OIC", "clave_manual": "225C0201000300S", "nombre": "Órgano Interno de Control", "roles_en_programas": "Invitado del Comité; recibe quejas y denuncias", "linea": 10725},
+    {"clave": "UVI", "clave_manual": "225C0201000600S", "nombre": "Unidad de Vinculación Interinstitucional", "linea": 10894},
+    {"clave": "UCSTI", "clave_manual": "225C0201000500S", "nombre": "Unidad de Comunicación Social y Tecnologías de la Información", "linea": 10941},
+    {"clave": "SP", "clave_manual": "225C0201000900S", "nombre": "Secretaría Particular", "linea": 10529},
+    {"clave": "DPF", "clave_manual": "225C0201010000L", "nombre": "Dirección de Protección Forestal", "roles_en_programas": "Instancia Ejecutora del PEG (8230+: numeral 9.2, línea 8897)", "linea": 10994,
+     "subunidades": ["Subdirección de Incendios Forestales", "Subdirección de Sanidad Forestal", "Subdirección de Atención a Zonas Críticas"]},
+    {"clave": "DRFF", "clave_manual": "225C0201020000L", "nombre": "Dirección de Restauración y Fomento Forestal", "roles_en_programas": "Instancia Ejecutora de PSAHEM, RHF, CC, PS y MFS", "linea": 11166,
+     "subunidades": ["Subdirección de Restauración y Producción de Planta", "Subdirección de Apoyo a las Plantaciones Comerciales y Asistencia Técnica", "Subdirección de Servicios Ambientales y Manejo Integral Forestal", "Subdirección de Conservación de Suelos Forestales"]},
+    {"clave": "DAFGD", "clave_manual": "225C0201040000L", "nombre": "Dirección de Administración, Finanzas y de Gestión Documental", "roles_en_programas": "Gestiona recursos, emite los pagos (transferencia electrónica y cheques) y proporciona la cuenta de PROBOSQUE para reintegros", "linea": 10332,
+     "subunidades": ["Subdirección de Personal", "Subdirección de Recursos Materiales", "Departamento de Adquisiciones", "Subdirección de Recursos Financieros", "Departamento de Gestión Documental y Administración de Archivos"]},
+    {"clave": "CDR", "clave_manual": "225C0201050000L", "nombre": "Coordinación de Delegaciones Regionales", "roles_en_programas": "Coordina a las 9 Delegaciones Regionales Forestales; invitada de los Comités", "linea": 10338},
+    {"clave": "FIDUCIARIA", "nombre": "Fiduciaria (institución financiera que administra los recursos del FIPASAHEM)", "nota": "El nombre de la institución no aparece en las ROP (línea 1212).", "linea": 1212},
+    {"clave": "SECAMPO", "nombre": "Secretaría del Campo", "nota": "Preside los Comités (titular de la Secretaría a la que está adscrito PROBOSQUE); en el PEG se escribe «SECAMPO» (línea 8906)."}
+  ],
+  "unidades_nota": "Los nombres de Direcciones, Unidades y Delegaciones son los del catálogo del Manual General de Organización (líneas 10312-10347).",
+  "comites": [
+    {
+      "programa": "PSAHEM", "nombre": "Comité Técnico del FIPASAHEM (Fideicomiso Público de Administración e Inversión F/663, «Fideicomiso Pago por Servicios Ambientales Hidrológicos del Estado de México»)", "rol": "Instancia Normativa; aprueba las solicitudes y canaliza los apoyos",
+      "composicion": "Se integra conforme al art. 216-K del Código Financiero del Estado de México y Municipios y su Reglamento Interno (9.4.1, línea 2195); la lista de integrantes no está en las ROP", "lineas": [1185, 1237, 2194, 2203]
+    },
+    {
+      "programa": "RHF", "nombre": "Comité de Admisión y Seguimiento del Programa Restauración Hidrológico-Forestal", "rol": "Instancia Normativa",
+      "composicion": "Presidencia: titular de la Secretaría a la que está adscrita PROBOSQUE; Secretaría Técnica: titular de PROBOSQUE; vocales: CONAFOR, SEMARNAT, Universidad Autónoma Chapingo, Universidad Autónoma del Estado de México, Ejidos Comunes y Productores Forestales del Estado de México A.C.; invitados especiales: Dirección de Administración, Finanzas y de Gestión Documental, Unidad Jurídica, Órgano Interno de Control, Coordinación de Delegaciones Regionales, Área Responsable del Programa", "lineas": [2580, 3436, 3438, 3482]
+    },
+    {
+      "programa": "CC", "nombre": "Comité de Admisión y Seguimiento del Programa Capturando Carbono", "rol": "Instancia Normativa",
+      "composicion": "Ver CC.json, instancias.comite", "lineas": [3919, 4771, 4773, 4819]
+    },
+    {
+      "programa": "PS", "nombre": "Comité de Admisión y Seguimiento del Programa Plantaciones Sustentables", "rol": "Instancia Normativa",
+      "composicion": "No extraída (ver líneas 6084-6150)", "lineas": [5189, 5235, 6081, 6084, 6120]
+    },
+    {
+      "programa": "MFS", "nombre": "Comité de Admisión y Seguimiento del Programa Manejo Forestal Sustentable", "rol": "Instancia Normativa",
+      "composicion": "No extraída (ver líneas 7968-8039)", "lineas": [6528, 6608, 7965, 7968]
+    },
+    {
+      "programa": "PEG", "nombre": "Comité de Admisión y Seguimiento del Programa Estatal de Guardabosques (CASPEG)", "rol": "Instancia Normativa; emite opiniones consensadas y resuelve lo no previsto",
+      "composicion": "Presidencia: titular de la SECAMPO; Secretaría Técnica: titular de PROBOSQUE; vocales: Dirección de Protección Forestal, Dirección de Administración, Finanzas y Gestión Documental, Unidad de Información, Planeación, Programación y Evaluación, Unidad Jurídica, Subdirección de Atención a Zonas Críticas, Coordinación de Delegaciones Regionales; invitados permanentes (solo voz): Órgano Interno de Control y representante del organismo que ejecuta el programa; invitados especiales (solo voz). Voz y voto: Presidencia y vocales; voto de calidad de la Presidencia", "lineas": [8902, 8903, 8930]
+    }
+  ],
+  "dias_inhabiles_2026": {
+    "dias": [],
+    "nota": "Ni la Convocatoria ni las ROP mencionan días inhábiles de 2026 ni un calendario; solo hablan de «días hábiles» y de horario de lunes a viernes de 9:00 a 17:00 (línea 644). Hay que cargar el calendario oficial de días inhábiles del Gobierno del Estado de México con el cliente."
+  }
+}

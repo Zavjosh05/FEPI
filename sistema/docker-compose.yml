@@ -1,0 +1,114 @@
+# Sistema de programas de PROBOSQUE — entorno completo.
+#   docker compose up                                  -> sitio en http://localhost:8080
+#   docker compose --profile pruebas run --rm pruebas  -> pytest + Playwright (capturas en entregas/sprint_1/capturas)
+# Las variables se leen de .env (copiar .env.ejemplo); sin .env se usan los valores de desarrollo de abajo.
+
+name: probosque
+
+x-entorno: &entorno
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-desarrollo-no-usar-en-produccion}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,web}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
+  BD_NOMBRE: ${BD_NOMBRE:-probosque}
+  BD_USUARIO: ${BD_USUARIO:-probosque}
+  BD_CONTRASENA: ${BD_CONTRASENA:-probosque-desarrollo}
+  BD_SERVIDOR: bd
+  BD_PUERTO: "5432"
+  ARCHIVOS_RAIZ: /srv/archivos
+  ESTATICOS_RAIZ: /srv/estaticos
+  USAR_X_ACCEL: "1"
+  MAPA_TESELAS_URL: ${MAPA_TESELAS_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
+  CARGAR_DEMO: ${CARGAR_DEMO:-1}
+
+services:
+  bd:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: ${BD_NOMBRE:-probosque}
+      POSTGRES_USER: ${BD_USUARIO:-probosque}
+      POSTGRES_PASSWORD: ${BD_CONTRASENA:-probosque-desarrollo}
+    volumes:
+      - bd_datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      target: produccion
+    image: probosque-sistema:0.1
+    environment:
+      <<: *entorno
+      PREPARAR_SITIO: "1"   # migraciones, estáticos, reglas y datos de demostración al arrancar
+    volumes:
+      - archivos:/srv/archivos
+      - estaticos:/srv/estaticos
+    depends_on:
+      bd:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/salud/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.29-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - archivos:/srv/archivos:ro
+      - estaticos:/srv/estaticos:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Revisión diaria de plazos (sin cron ni Celery: un bucle que corre el comando cada 24 h).
+  plazos:
+    image: probosque-sistema:0.1
+    pull_policy: never   # usa la imagen que construye el servicio web
+    init: true           # para que el bucle termine limpio con docker compose down
+    environment:
+      <<: *entorno
+    volumes:
+      - archivos:/srv/archivos
+    depends_on:
+      web:
+        condition: service_healthy
+    command: ["sh", "-c", "while true; do python manage.py revisar_plazos; sleep 86400; done"]
+    restart: unless-stopped
+
+  # Pruebas: docker compose --profile pruebas run --rm pruebas
+  pruebas:
+    profiles: ["pruebas"]
+    build:
+      context: .
+      target: pruebas
+    image: probosque-sistema-pruebas:0.1
+    environment:
+      <<: *entorno
+      DJANGO_DEBUG: "0"
+      USAR_X_ACCEL: "0"
+      MAPA_TESELAS_URL: ""
+      ARCHIVOS_RAIZ: /tmp/archivos_pruebas
+      CAPTURAS_DIR: /entregas/sprint_1/capturas
+    volumes:
+      - .:/app
+      - ../entregas:/entregas
+    depends_on:
+      bd:
+        condition: service_healthy
+
+volumes:
+  bd_datos:
+  archivos:
+  estaticos:

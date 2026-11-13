@@ -1,0 +1,5 @@
+Django==5.2.19
+psycopg[binary]==3.3.9
+gunicorn==27.0.1
+django-simple-history==3.13.0
+weasyprint==70.0

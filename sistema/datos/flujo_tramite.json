@@ -1,0 +1,21 @@
+{
+  "nota": "Estados del trámite y transiciones permitidas (sprint 1: módulo M1 y flujos alternos A y B). Los sprints siguientes agregan estados y transiciones aquí sin cambiar el código. tipo_unidad_bandeja = unidad que atiende el estado; tipo_unidad de la transición = unidad que puede hacerla; programa null = todos.",
+  "estados": [
+    {"clave": "recibida", "nombre": "Solicitud recibida", "descripcion": "Registrada en la ventanilla de la Delegación; en revisión de requisitos y levantamiento del polígono.", "tipo_unidad_bandeja": "delegacion", "color": "primary", "orden": 10},
+    {"clave": "enviada_direccion", "nombre": "En revisión de la Dirección", "descripcion": "Expediente digital enviado a la Dirección que es Instancia Ejecutora para su validación.", "tipo_unidad_bandeja": "direccion", "color": "info", "orden": 20},
+    {"clave": "faltantes", "nombre": "Aviso de faltantes", "descripcion": "La Dirección avisó faltantes con fecha límite; la Delegación notifica a la persona solicitante y recaba la documentación (flujo alterno A).", "tipo_unidad_bandeja": "delegacion", "flujo_alterno": "A", "color": "warning", "orden": 25},
+    {"clave": "validada", "nombre": "Expediente validado", "descripcion": "Cumple los requisitos; pasa a dictamen técnico y jurídico (módulo M2).", "tipo_unidad_bandeja": "direccion", "color": "success", "orden": 30},
+    {"clave": "no_factible", "nombre": "No factible", "descripcion": "Dictamen técnico no factible o jurídico no procedente (flujo alterno B).", "tipo_unidad_bandeja": "", "flujo_alterno": "B", "final": true, "color": "danger", "orden": 90},
+    {"clave": "desechada", "nombre": "Solicitud desechada", "descripcion": "No se complementó la documentación faltante en el plazo (ROP CC 8.1.1.2 fr. XIV; flujo alterno A).", "tipo_unidad_bandeja": "", "flujo_alterno": "A", "final": true, "color": "dark", "orden": 95}
+  ],
+  "transiciones": [
+    {"origen": "recibida", "destino": "enviada_direccion", "tipo_unidad": "delegacion", "accion": "Enviar el expediente a la Dirección"},
+    {"origen": "recibida", "destino": "desechada", "tipo_unidad": "delegacion", "accion": "Tener por desechada la solicitud", "requiere_motivo": true},
+    {"origen": "faltantes", "destino": "enviada_direccion", "tipo_unidad": "delegacion", "accion": "Reenviar a la Dirección con los faltantes"},
+    {"origen": "faltantes", "destino": "desechada", "tipo_unidad": "direccion", "accion": "Tener por desechada la solicitud", "requiere_motivo": true},
+    {"origen": "enviada_direccion", "destino": "validada", "tipo_unidad": "direccion", "accion": "Validar el expediente"},
+    {"origen": "enviada_direccion", "destino": "faltantes", "tipo_unidad": "direccion", "accion": "Emitir aviso de faltantes"},
+    {"origen": "validada", "destino": "no_factible", "tipo_unidad": "direccion", "accion": "Dictaminar no factible (técnico)", "requiere_motivo": true},
+    {"origen": "validada", "destino": "no_factible", "tipo_unidad": "juridica", "accion": "Dictaminar no procedente (jurídico)", "requiere_motivo": true}
+  ]
+}

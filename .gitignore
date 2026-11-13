@@ -34,3 +34,9 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Sistema de programas (Django)
+sistema/.env
+sistema/archivos_locales/
+sistema/estaticos_recolectados/
+sistema/.pytest_cache/

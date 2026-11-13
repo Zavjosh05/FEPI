@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}{{ exp.folio }}{% endblock %}
+{% block estilos %}{% if pestana == "ubicacion" %}
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/leaflet-geoman/leaflet-geoman.css' %}">
+{% endif %}{% endblock %}
+{% block contenido %}
+<div class="tarjeta encabezado-exp mb-3">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div>
+      <div class="dato">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }}{% if exp.es_refrendo %} · <strong>Refrendo</strong>{% endif %}</div>
+      <h1>Expediente {{ exp.folio }}</h1>
+      <div class="dato">Predio <strong>{{ exp.predio.folio }}</strong> · {{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }}</div>
+    </div>
+    <div class="text-md-end">
+      <span class="badge fs-6 text-bg-{{ exp.estado.color }}" data-prueba="estado">{{ exp.estado.nombre }}</span>
+      {% if exp.estado.flujo_alterno %}<span class="badge text-bg-light border">Flujo alterno {{ exp.estado.flujo_alterno }}</span>{% endif %}
+      <div class="dato mt-1">{{ exp.delegacion.nombre }}</div>
+      <div class="dato">Recibida el {{ exp.fecha_recepcion|date:"d/m/Y H:i:s" }} h</div>
+      {% if puede_validar %}<a class="btn btn-primary btn-sm mt-2" href="{% url 'recepcion:validar' exp.folio %}">Validar expediente</a>{% endif %}
+    </div>
+  </div>
+</div>
+
+<ul class="nav nav-tabs flex-nowrap overflow-auto" role="tablist">
+  {% for clave, nombre in pestanas %}
+  <li class="nav-item"><a class="nav-link text-nowrap {% if pestana == clave %}active{% endif %}" href="?pestana={{ clave }}" data-pestana="{{ clave }}">{{ nombre }}</a></li>
+  {% endfor %}
+</ul>
+<div class="bg-white border border-top-0 rounded-bottom p-3">
+  {% if pestana == "solicitud" %}{% include "recepcion/pestanas/solicitud.html" %}
+  {% elif pestana == "requisitos" %}{% include "recepcion/pestanas/requisitos.html" %}
+  {% elif pestana == "ubicacion" %}{% include "recepcion/pestanas/ubicacion.html" %}
+  {% elif pestana == "validacion" %}{% include "recepcion/pestanas/validacion.html" %}
+  {% elif pestana == "documentos" %}{% include "recepcion/pestanas/documentos.html" %}
+  {% elif pestana == "bitacora" %}{% include "recepcion/pestanas/bitacora.html" %}{% endif %}
+</div>
+{% endblock %}
+{% block scripts %}{% if pestana == "ubicacion" %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'vendor/leaflet-geoman/leaflet-geoman.min.js' %}"></script>
+<script src="{% static 'js/mapa_poligono.js' %}"></script>
+{% endif %}{% endblock %}
