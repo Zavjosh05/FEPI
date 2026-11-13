@@ -1,0 +1,20 @@
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+  <div>
+    <div class="titulo-seccion mb-1">Requisitos de {{ exp.ejercicio.programa.clave }} {{ exp.ejercicio.anio }} para {{ exp.tipo_persona.nombre|lower }}{% if exp.modalidad %} · {{ exp.modalidad.nombre|lower }}{% endif %}</div>
+    <div class="small text-secondary">Cada requisito queda entregado (con su archivo digitalizado), faltante o, si es condicional, «no aplica». Tomados de las reglas del programa: {{ exp.ejercicio.fuente|truncatechars:140 }}</div>
+    {% if exp.es_refrendo and vigencia_refrendo %}
+    <div class="alert alert-info py-2 small mt-2 mb-0">Refrendo: la documentación que obra en PROBOSQUE vale si no tiene más de <strong>{{ vigencia_refrendo.texto_plazo }}</strong> ({{ vigencia_refrendo.fundamento }}). Solo para los requisitos que las reglas no piden en refrendo.</div>
+    {% endif %}
+  </div>
+</div>
+<div id="panel-envio" hx-get="{% url 'recepcion:panel_envio' exp.folio %}" hx-trigger="requisitos-actualizados from:body">
+  {% include "recepcion/_panel_envio.html" %}
+</div>
+<div class="table-responsive">
+<table class="table table-sm align-middle" id="tabla-requisitos">
+  <thead class="table-light"><tr><th>Clave</th><th>Requisito</th><th style="min-width: 22rem">Revisión</th></tr></thead>
+  <tbody>
+  {% for r in revisiones %}{% include "recepcion/_fila_requisito.html" %}{% endfor %}
+  </tbody>
+</table>
+</div>

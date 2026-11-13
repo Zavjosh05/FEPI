@@ -1,0 +1,24 @@
+<div class="tarjeta mb-3 {% if problemas_envio %}border-warning{% else %}border-success{% endif %}" data-prueba="panel-envio">
+  <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
+    <div class="small">
+      <strong>{{ resumen.entregado }}</strong> entregados · <strong>{{ resumen.faltante }}</strong> faltantes ·
+      <strong>{{ resumen.no_aplica }}</strong> no aplican · <strong>{{ resumen.pendiente }}</strong> sin revisar
+      {% if limite_recepcion and exp.estado.clave == "recibida" and resumen.faltante %}
+      <div class="text-danger">Plazo para completar desde la recepción: hasta el {{ limite_recepcion|date:"d/m/Y" }}.</div>
+      {% endif %}
+      {% if exp.enviado_direccion %}<div class="text-secondary">Último envío a la Dirección: {{ exp.enviado_direccion|date:"d/m/Y H:i:s" }} h</div>{% endif %}
+    </div>
+    {% if puede_enviar %}
+    <form method="post" action="{% url 'recepcion:enviar' exp.folio %}">
+      {% csrf_token %}
+      <button class="btn btn-primary" type="submit" {% if problemas_envio %}disabled{% endif %} data-prueba="boton-enviar">
+        {% if exp.estado.clave == "faltantes" %}Reenviar a la Dirección{% else %}Enviar expediente digital a la Dirección{% endif %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+  {% if puede_enviar and problemas_envio %}
+  <ul class="small text-secondary mb-0 mt-2">{% for p in problemas_envio %}<li>{{ p }}</li>{% endfor %}</ul>
+  <div class="small text-secondary">Regla de envío: todos los requisitos revisados, ninguno faltante y cada entregado con su archivo (o, en refrendo, la documentación vigente que obra en PROBOSQUE).</div>
+  {% endif %}
+</div>
