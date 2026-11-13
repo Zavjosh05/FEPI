@@ -1,0 +1,46 @@
+<div class="tarjeta" data-prueba="acuerdos">
+  <div class="titulo-seccion">Acuerdos</div>
+  <div class="table-responsive">
+  <table class="table table-sm small align-middle" id="tabla-acuerdos">
+    <thead class="table-light"><tr><th>Número</th><th>Tipo</th><th>Acuerdo</th><th>Expedientes</th><th>Área que lo cumple</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for a in acuerdos %}
+    <tr>
+      <td class="text-nowrap fw-semibold">{{ a.numero }}</td>
+      <td>{% for k, t in tipos_acuerdo.items %}{% if k == a.tipo %}{{ t.nombre }}{% endif %}{% endfor %}
+        {% if a.ministracion %}<div>Ministración {{ a.ministracion }}</div>{% endif %}{% if a.periodo %}<div>Periodo {{ a.periodo }}</div>{% endif %}</td>
+      <td>{{ a.descripcion }}</td>
+      <td>{% for e in a.expedientes.all %}<a class="d-block text-nowrap" href="{% url 'recepcion:expediente' e.folio %}?pestana=dictamenes">{{ e.folio }}</a>{% endfor %}</td>
+      <td>{{ a.unidad_responsable }}</td>
+      <td><span class="badge {% if a.estado == 'cumplido' %}text-bg-success{% else %}text-bg-warning{% endif %}">{{ a.get_estado_display }}</span>
+        {% if a.cumplido_en %}<div class="text-secondary">{{ a.cumplido_en|date:"d/m/Y H:i" }}</div>{% endif %}</td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-secondary">Sin acuerdos.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if es_st and sesion.estado != "celebrada" %}
+  {% if sesion.convocatoria_enviada %}
+  <form method="post" action="{% url 'dictamen:sesion_acuerdo' sesion.pk %}" class="border-top pt-3" id="form-acuerdo">
+    {% csrf_token %}
+    <div class="titulo-seccion">Registrar acuerdo</div>
+    <div class="row g-2">
+      <div class="col-md-5">{% include "recepcion/_campo.html" with campo=form_acuerdo.tipo %}</div>
+      <div class="col-md-7">{% include "recepcion/_campo.html" with campo=form_acuerdo.descripcion %}</div>
+      <div class="col-md-5">{% include "recepcion/_campo.html" with campo=form_acuerdo.expedientes %}</div>
+      <div class="col-md-7">
+        {% include "recepcion/_campo.html" with campo=form_acuerdo.unidad_responsable %}
+        <div class="row g-2">
+          <div class="col-6">{% include "recepcion/_campo.html" with campo=form_acuerdo.ministracion %}</div>
+          <div class="col-6">{% include "recepcion/_campo.html" with campo=form_acuerdo.periodo %}</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Registrar acuerdo</button>
+  </form>
+  <form method="post" action="{% url 'dictamen:sesion_cerrar' sesion.pk %}" class="mt-2 text-end">{% csrf_token %}
+    <button class="btn btn-outline-secondary btn-sm" type="submit" {% if not acuerdos %}disabled{% endif %}>Cerrar la sesión (acta registrada)</button></form>
+  {% else %}<div class="small text-secondary">Los acuerdos se registran después de enviar la convocatoria.</div>{% endif %}
+  {% endif %}
+  <div class="small text-secondary mt-2">Los acuerdos todavía no ejecutan pagos ni sustituciones: el área responsable los ve en su bandeja y los marca como cumplidos. Los módulos M3 a M6 se conectarán en <code>dictamen.seguimiento.RECEPTORES</code>.</div>
+</div>
