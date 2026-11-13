@@ -1,0 +1,23 @@
+<div class="tarjeta h-100" data-prueba="resumen-tecnico">
+  <div class="d-flex justify-content-between align-items-start">
+    <div class="titulo-seccion mb-1">Dictamen técnico</div>
+    {% if tecnico %}<span class="badge {% if tecnico.resultado == 'factible' %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ tecnico.get_resultado_display }}</span>
+    {% else %}<span class="badge text-bg-light border">Pendiente</span>{% endif %}
+  </div>
+  {% if plazo_dictamen.limite %}
+  <div class="small mb-2" data-prueba="plazo-dictamen">Plazo: {% if plazo_dictamen.plazo.cantidad %}{{ plazo_dictamen.plazo.texto_plazo }} {% endif %}({{ plazo_dictamen.plazo.fundamento|truncatechars:70 }}) · límite <strong>{{ plazo_dictamen.limite|date:"d/m/Y" }}</strong> ·
+    <span class="badge {% if plazo_dictamen.situacion == 'cumplido' or plazo_dictamen.situacion == 'en_plazo' %}text-bg-success{% elif plazo_dictamen.situacion == 'por_vencer' %}text-bg-warning{% else %}text-bg-danger{% endif %}">{{ texto_situacion }}</span>
+    {% if plazo_dictamen.dias_habiles_restantes is not None and plazo_dictamen.dias_habiles_restantes >= 0 %}<span class="text-secondary">({{ plazo_dictamen.dias_habiles_restantes }} días hábiles)</span>{% endif %}
+  </div>
+  {% endif %}
+  {% if tecnico %}
+  <div class="small"><strong>Motivo:</strong> {{ tecnico.motivo }}</div>
+  <div class="small">Superficie factible: {{ tecnico.superficie_factible_ha|default:"—" }} ha · {{ tecnico.usuario }} · {{ tecnico.fecha_hora|date:"d/m/Y H:i" }}
+    {% if tecnico.acuse %}· <a href="{% url 'nucleo:acuse' tecnico.acuse.folio %}" target="_blank">{{ tecnico.acuse.folio }}</a>{% endif %}</div>
+  {% if tecnico.analisis.traslapes %}<div class="small text-danger">Traslapes: {% for t in tecnico.analisis.traslapes %}{{ t.folio }} ({{ t.superficie_ha|floatformat:2 }} ha){% if not forloop.last %}, {% endif %}{% endfor %}</div>{% endif %}
+  {% elif puede_dictaminar_tecnico %}
+  <a class="btn btn-primary btn-sm mt-2" href="{% url 'dictamen:tecnico' exp.folio %}">Elaborar dictamen técnico</a>
+  {% else %}
+  <div class="small text-secondary">Lo elabora el área responsable del programa cuando el expediente está validado.</div>
+  {% endif %}
+</div>

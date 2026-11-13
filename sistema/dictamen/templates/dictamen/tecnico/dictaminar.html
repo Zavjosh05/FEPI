@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Dictamen técnico {{ exp.folio }}{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">Dictamen técnico del expediente {{ exp.folio }}</h1>
+    <div class="small">{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }} · {{ exp.modalidad.nombre|default:"" }}{% if exp.es_refrendo %} · <strong>Refrendo</strong>{% endif %}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=dictamenes">Ver expediente</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-xl-7">
+    <div class="tarjeta h-100">
+      <div class="titulo-seccion">Análisis cartográfico</div>
+      {% if exp.ejercicio.programa.usa_poligono %}
+      <div id="mapa" style="height: 360px" data-url="{% url 'dictamen:tecnico_mapa' exp.folio %}" data-teselas="{{ MAPA_TESELAS_URL }}"></div>
+      <div class="leyenda-mapa small text-secondary mt-1">
+        <span style="border-color:#1f5130;background:#1f513033"></span>Polígono vigente
+        <span class="ms-3" style="border-color:#b02a37;background:#b02a3722"></span>Polígonos de otros expedientes que se traslapan
+        <span class="ms-3" style="border-color:#c47f00"></span>Municipio
+      </div>
+      {% else %}<div class="alert alert-secondary small">El programa no usa polígono.</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-xl-5">
+    <div class="tarjeta h-100" data-prueba="analisis">
+      <div class="titulo-seccion">Resultados del análisis (PostGIS)</div>
+      {% if analisis.tiene_poligono %}
+      <table class="table table-sm small mb-2">
+        <tr><th class="fw-normal text-secondary">Superficie del polígono vigente</th><td><strong>{{ analisis.superficie_ha|floatformat:4 }} ha</strong> (EPSG:32614)</td></tr>
+        <tr><th class="fw-normal text-secondary">Rango del programa</th><td>{{ analisis.superficie_minima_ha }} a {{ analisis.superficie_maxima_ha }} ha ·
+          {% if analisis.superficie_en_rango %}<span class="text-success">dentro</span>{% elif analisis.superficie_en_rango is False %}<span class="text-danger">fuera</span>{% else %}—{% endif %}</td></tr>
+        <tr><th class="fw-normal text-secondary">Municipio {{ analisis.municipio }}</th><td>{% if analisis.ubicacion_municipio == "dentro" %}<span class="text-success">Dentro del municipio</span>{% else %}<span class="text-danger">{{ analisis.aviso_municipio }}</span>{% endif %}</td></tr>
+        <tr><th class="fw-normal text-secondary">Traslapes con otros expedientes de {{ exp.ejercicio }}</th><td data-prueba="traslapes">
+          {% for t in analisis.traslapes %}<div class="text-danger">{{ t.folio }} · {{ t.predio }}: {{ t.superficie_ha|floatformat:2 }} ha ({{ t.porcentaje }} %)</div>{% empty %}<span class="text-success">Ninguno</span>{% endfor %}</td></tr>
+      </table>
+      {% elif analisis.usa_poligono %}
+      <div class="alert alert-warning small">El expediente no tiene polígono vigente: la Delegación debe levantarlo (pestaña Ubicación).</div>
+      {% endif %}
+      <div class="small">Plazo de dictaminación:
+        {% if plazo.limite %}{% if plazo.plazo.cantidad %}{{ plazo.plazo.texto_plazo }} · {% endif %}límite <strong>{{ plazo.limite|date:"d/m/Y" }}</strong>
+        ({% for k, v in texto_situacion.items %}{% if k == plazo.situacion %}{{ v }}{% endif %}{% endfor %}){% else %}sin plazo en las reglas{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+<form method="post" class="tarjeta" id="form-dictamen-tecnico">
+  {% csrf_token %}
+  <div class="titulo-seccion">Lista de verificación con los criterios del programa</div>
+  <div class="table-responsive">
+  <table class="table table-sm align-middle small" id="tabla-verificacion">
+    <thead class="table-light"><tr><th>Criterio</th><th>Numeral</th><th style="min-width: 14rem">Revisión</th><th>Nota</th></tr></thead>
+    <tbody>
+    {% regroup items by grupo as grupos %}
+    {% for g in grupos %}
+      <tr class="table-light"><td colspan="4" class="fw-semibold">{{ g.grouper }}</td></tr>
+      {% for i in g.list %}
+      <tr data-criterio="{{ i.clave }}">
+        <td class="req-texto">{{ i.texto|truncatechars:220 }}{% if i.automatico %} <span class="badge text-bg-light border">ver análisis</span>{% endif %}</td>
+        <td class="text-nowrap text-secondary">{{ i.numeral|truncatechars:30 }}</td>
+        <td>
+          {% if i.informativo %}<span class="text-secondary">Informativo (orden del Comité)</span>{% else %}
+          <div class="btn-group btn-group-sm" role="group">
+            {% for valor, texto in respuestas.items %}
+            <input type="radio" class="btn-check" name="v-{{ i.clave }}" id="v-{{ i.clave }}-{{ valor }}" value="{{ valor }}" {% if valor == "si" %}checked{% endif %}>
+            <label class="btn btn-outline-secondary" for="v-{{ i.clave }}-{{ valor }}">{{ texto }}</label>
+            {% endfor %}
+          </div>{% endif %}
+        </td>
+        <td><input class="form-control form-control-sm" name="n-{{ i.clave }}" aria-label="Nota"></td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="row g-3">
+    <div class="col-12 col-md-4">
+      <label class="form-label">{{ form.resultado.label }}</label>
+      {% for r in form.resultado %}<div class="form-check">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}
+      {% for e in form.resultado.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      <div class="mt-2">{% include "recepcion/_campo.html" with campo=form.superficie_factible_ha %}</div>
+    </div>
+    <div class="col-12 col-md-8">{% include "recepcion/_campo.html" with campo=form.motivo %}</div>
+  </div>
+  <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar dictamen técnico</button></div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/mapa_dictamen.js' %}"></script>
+{% endblock %}

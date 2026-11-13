@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Listado preliminar{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Listado preliminar de solicitudes factibles y no factibles</h1>
+    <div class="small text-secondary">Resultado técnico y jurídico de cada solicitud validada ({{ ejercicio.fuente|truncatechars:60 }}). Lo revisa el Comité en la sesión de aprobación (CC 10.1 fr. VI).</div>
+  </div>
+  <div class="d-flex gap-2 align-items-end">
+    <form method="get" class="d-flex gap-2">
+      <select name="ejercicio" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Programa y ejercicio">
+        {% for e in ejercicios %}<option value="{{ e.pk }}" {% if e == ejercicio %}selected{% endif %}>{{ e.programa.clave }} {{ e.anio }}</option>{% endfor %}
+      </select>
+    </form>
+    <a class="btn btn-outline-primary btn-sm text-nowrap" href="?ejercicio={{ ejercicio.pk }}&formato=csv" data-prueba="exportar-csv">Exportar CSV (Excel)</a>
+  </div>
+</div>
+<div class="small mb-2"><span class="badge text-bg-success">{{ resumen.factible }} factibles</span>
+  <span class="badge text-bg-danger">{{ resumen.no_factible }} no factibles</span>
+  <span class="badge text-bg-light border">{{ resumen.pendiente }} pendientes</span></div>
+<div class="tarjeta p-0">
+  <div class="table-responsive">
+  <table class="table table-sm table-hover mb-0 small" id="tabla-listado">
+    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Predio</th><th class="d-none d-md-table-cell">Persona solicitante</th><th>Técnico</th><th>Jurídico</th><th>Resultado</th><th class="d-none d-lg-table-cell">Estado</th></tr></thead>
+    <tbody>
+    {% for f in filas %}
+    <tr>
+      <td class="ps-3 text-nowrap"><a href="{% url 'recepcion:expediente' f.folio %}?pestana=dictamenes">{{ f.folio }}</a></td>
+      <td>{{ f.predio }}<div class="text-secondary">{{ f.municipio }}</div></td>
+      <td class="d-none d-md-table-cell">{{ f.solicitante }}</td>
+      <td>{{ f.tecnico }}{% if f.motivo_tecnico %}<div class="text-secondary">{{ f.motivo_tecnico|truncatechars:70 }}</div>{% endif %}</td>
+      <td>{{ f.juridico }}{% if f.motivo_juridico %}<div class="text-secondary">{{ f.motivo_juridico|truncatechars:70 }}</div>{% endif %}</td>
+      <td><span class="badge {% if f.resultado == 'factible' %}text-bg-success{% elif f.resultado == 'no_factible' %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ f.resultado_texto }}</span></td>
+      <td class="d-none d-lg-table-cell">{{ f.estado }}</td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center text-secondary py-4">No hay solicitudes validadas en este ejercicio.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}
