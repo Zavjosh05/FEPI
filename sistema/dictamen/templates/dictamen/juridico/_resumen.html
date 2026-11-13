@@ -1,0 +1,23 @@
+<div class="tarjeta h-100" data-prueba="resumen-juridico">
+  <div class="d-flex justify-content-between align-items-start">
+    <div class="titulo-seccion mb-1">Dictamen jurídico</div>
+    {% if juridico %}<span class="badge {% if juridico.resultado == 'procedente' %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ juridico.get_resultado_display }}</span>
+    {% else %}<span class="badge text-bg-light border">Pendiente</span>{% endif %}
+  </div>
+  {% if cotejo is not None %}
+  <div class="small mb-2">Cotejo con el Listado de Incumplidas y predios sancionados:
+    {% if cotejo %}<span class="text-danger fw-semibold">{{ cotejo|length }} coincidencia{{ cotejo|length|pluralize }}</span>
+    <ul class="mb-0">{% for c in cotejo %}<li>{{ c.catalogo }}: {{ c.nombre }} (por {{ c.coincide_por }})</li>{% endfor %}</ul>
+    {% else %}<span class="text-success">sin coincidencias</span>{% endif %}
+  </div>
+  {% endif %}
+  {% if juridico %}
+  <div class="small"><strong>Motivo:</strong> {{ juridico.motivo }}</div>
+  <div class="small">{{ juridico.usuario }} · {{ juridico.fecha_hora|date:"d/m/Y H:i" }}
+    {% if juridico.acuse %}· <a href="{% url 'nucleo:acuse' juridico.acuse.folio %}" target="_blank">{{ juridico.acuse.folio }}</a>{% endif %}</div>
+  {% elif puede_dictaminar_juridico %}
+  <a class="btn btn-primary btn-sm mt-2" href="{% url 'dictamen:juridico' exp.folio %}">Elaborar dictamen jurídico</a>
+  {% else %}
+  <div class="small text-secondary">Lo elabora la Unidad Jurídica{% if exp.es_refrendo %} (en refrendo también: CC 10.1 fr. IV){% endif %}.</div>
+  {% endif %}
+</div>

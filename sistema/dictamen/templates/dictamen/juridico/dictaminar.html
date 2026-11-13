@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}Dictamen jurídico {{ exp.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">Dictamen jurídico del expediente {{ exp.folio }}</h1>
+    <div class="small">{{ exp.predio.folio }} · {{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }}{% if exp.solicitante.curp %} · CURP {{ exp.solicitante.curp }}{% endif %}{% if exp.es_refrendo %} · <strong>Refrendo</strong>{% endif %}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=dictamenes">Ver expediente</a>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <div class="tarjeta mb-3 {% if cotejo %}border-danger{% else %}border-success{% endif %}" data-prueba="cotejo">
+      <div class="titulo-seccion mb-1">Cotejo automático</div>
+      <div class="small text-secondary mb-2">Listado de Personas Beneficiarias Incumplidas y predios con procedimiento o sanción (por persona, CURP, RFC, nombre y predio).</div>
+      {% if cotejo %}
+      <div class="alert alert-danger small py-2">El titular o el predio aparece en los catálogos: la solicitud <strong>no puede ser procedente</strong> (CC 8.1.1.1, inelegibles).</div>
+      <ul class="small mb-0">{% for c in cotejo %}<li><strong>{{ c.catalogo }}</strong>: {{ c.nombre }} — coincide por {{ c.coincide_por }}. {{ c.motivo }} ({{ c.fecha }})</li>{% endfor %}</ul>
+      {% else %}<div class="text-success">Sin coincidencias.</div>{% endif %}
+    </div>
+    {% if exp.es_refrendo %}<div class="alert alert-info small">Refrendo: las ROP piden un nuevo dictamen jurídico aunque la documentación legal obre en PROBOSQUE (CC 10.1 fr. IV).</div>{% endif %}
+  </div>
+  <div class="col-12 col-lg-7">
+    <div class="tarjeta mb-3">
+      <div class="titulo-seccion mb-1">Documentación legal del expediente</div>
+      <table class="table table-sm small mb-0">
+        {% for r in documentos_legales %}
+        <tr><td class="fw-semibold text-nowrap">{{ r.requisito.clave }}</td><td>{{ r.requisito.titulo }}</td>
+          <td class="text-nowrap">{{ r.get_estado_display }}{% if r.documento %} · <a href="{% url 'nucleo:documento' r.documento.pk %}" target="_blank">ver</a>{% endif %}{% if r.en_archivo_probosque %} · archivo PROBOSQUE {{ r.fecha_documento|date:"d/m/Y" }}{% endif %}</td></tr>
+        {% empty %}<tr><td class="text-secondary">Sin documentos legales.</td></tr>{% endfor %}
+      </table>
+    </div>
+    <form method="post" class="tarjeta" id="form-dictamen-juridico">
+      {% csrf_token %}
+      <label class="form-label">{{ form.resultado.label }}</label>
+      {% for r in form.resultado %}<div class="form-check">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}
+      <div class="mt-2">{% include "recepcion/_campo.html" with campo=form.motivo %}</div>
+      <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar dictamen jurídico</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}
