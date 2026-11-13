@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Nueva sesión{% endblock %}
+{% block contenido %}
+<h1 class="h4">Nueva sesión del Comité</h1>
+<form method="post" class="tarjeta" style="max-width: 760px">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="row g-2">
+    <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.ejercicio %}</div>
+    <div class="col-md-3">{% include "recepcion/_campo.html" with campo=form.tipo %}</div>
+    <div class="col-md-3">{% include "recepcion/_campo.html" with campo=form.caracter %}</div>
+    <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.fecha_hora %}</div>
+    <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.lugar %}</div>
+  </div>
+  {% include "recepcion/_campo.html" with campo=form.orden_del_dia %}
+  <div class="small text-secondary mb-3">La convocatoria se envía con la anticipación de las reglas del programa (CC 9.4.2: tres días hábiles para ordinarias, 24 horas para extraordinarias).</div>
+  <div class="d-flex justify-content-end gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'dictamen:sesiones' %}">Cancelar</a>
+    <button class="btn btn-primary" type="submit">Crear sesión</button>
+  </div>
+</form>
+{% endblock %}

@@ -13,6 +13,13 @@ def datos_e2e(transactional_db):
     asegurar_catalogos()
 
 
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    """Chromium en español de México: los controles nativos (fecha, archivo) salen en español."""
+    return {**browser_type_launch_args, "args": [*browser_type_launch_args.get("args", []), "--lang=es-MX"],
+            "env": {**os.environ, "LANG": "es_MX.UTF-8", "LANGUAGE": "es_MX:es", "TZ": "America/Mexico_City"}}
+
+
 @pytest.fixture
 def browser_context_args(browser_context_args):
     return {**browser_context_args, "viewport": {"width": 1366, "height": 900}, "locale": "es-MX",

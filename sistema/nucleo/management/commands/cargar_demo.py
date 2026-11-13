@@ -14,5 +14,9 @@ class Command(BaseCommand):
             call_command("cargar_catalogos")
             call_command("cargar_reglas")
         n = cargar_demo()
+        from nucleo.extensiones import DEMOS
+
+        for demo in DEMOS:
+            n += demo()
         self.stdout.write(self.style.SUCCESS(
             f"Demostración lista: {n} solicitudes nuevas. Contraseña de prueba de los usuarios: {CONTRASENA_DEMO}"))

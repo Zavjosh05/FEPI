@@ -97,6 +97,8 @@ def completar_requisitos(usuario, exp, faltar=(), fecha_archivo=None):
             servicios.revisar_requisito(usuario, r, EstadoRevision.FALTANTE, observaciones="No lo presentó")
         elif r.requisito.es_condicional:
             servicios.revisar_requisito(usuario, r, EstadoRevision.NO_APLICA)
+        elif not r.requisito.requiere_documento:
+            servicios.revisar_requisito(usuario, r, EstadoRevision.ENTREGADO, observaciones="Cumple")
         elif fecha_archivo and servicios.puede_usar_archivo_probosque(r):
             servicios.revisar_requisito(usuario, r, EstadoRevision.ENTREGADO, en_archivo_probosque=True,
                                         fecha_documento=fecha_archivo)

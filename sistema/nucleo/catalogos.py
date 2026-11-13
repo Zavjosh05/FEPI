@@ -121,16 +121,21 @@ def cargar_flujo(ruta=None):
         Estado.objects.update_or_create(clave=e["clave"], defaults={
             "nombre": e["nombre"], "descripcion": e.get("descripcion", ""),
             "tipo_unidad_bandeja": e.get("tipo_unidad_bandeja", ""), "flujo_alterno": e.get("flujo_alterno", ""),
+            "visible_para": e.get("visible_para", ""),
             "final": e.get("final", False), "color": e.get("color", "secondary"), "orden": e.get("orden", 0),
         })
     estados = {e.clave: e for e in Estado.objects.all()}
+    vigentes = []
     for t in datos["transiciones"]:
         programa = Programa.objects.get(clave=t["programa"]) if t.get("programa") else None
-        Transicion.objects.update_or_create(
+        transicion, _ = Transicion.objects.update_or_create(
             programa=programa, origen=estados[t["origen"]], destino=estados[t["destino"]],
             tipo_unidad=t["tipo_unidad"],
             defaults={"accion": t["accion"], "requiere_motivo": t.get("requiere_motivo", False)},
         )
+        vigentes.append(transicion.pk)
+    # Las transiciones que ya no están en el archivo dejan de estar permitidas.
+    Transicion.objects.exclude(pk__in=vigentes).delete()
 
 
 def cargar_dias_inhabiles(ruta=None):
@@ -182,6 +187,7 @@ def cargar_reglas_programa(ruta, sistema=None):
     programa = Programa.objects.get(clave=datos["clave"])
     ajustes = sistema.get("ajustes_reglas", {}).get(programa.clave, {})
     no_seleccionables = set(ajustes.get("modalidades_no_seleccionables", []))
+    sin_documento = set(ajustes.get("requisitos_sin_documento", []))
     with transaction.atomic():
         ejercicio, _ = Ejercicio.objects.get_or_create(programa=programa, anio=int(datos["ejercicio"]))
         fuente = datos.get("fuente", {})
@@ -211,6 +217,7 @@ def cargar_reglas_programa(ruta, sistema=None):
                 ejercicio=ejercicio, clave=r["clave"],
                 defaults={
                     "texto": r["texto"], "aplica_en_refrendo": r.get("aplica_en_refrendo"),
+                    "requiere_documento": r.get("requiere_documento", r["clave"] not in sin_documento),
                     "es_documento_legal": bool(r.get("es_documento_legal")), "opcional": bool(r.get("opcional")),
                     "condicion": (r.get("condicion") or "")[:300], "nota_refrendo": (r.get("nota_refrendo") or "")[:300],
                     "formato": (r.get("formato") or "")[:80], "fundamento": _numeral(r),
@@ -229,6 +236,9 @@ def cargar_reglas_programa(ruta, sistema=None):
                 "unidad": p.get("unidad") or "otro", "fecha_fin": p.get("fecha_fin"),
                 "corre_desde": (p.get("corre_desde") or "")[:300], "responsable": (p.get("responsable") or "")[:200],
                 "fundamento": _numeral(p), "linea_rop": p.get("linea"),
+                "datos": {k: v for k, v in p.items() if k not in {
+                    "clave", "descripcion", "cantidad", "unidad", "fecha_fin", "corre_desde", "responsable",
+                    "numeral", "linea"}},
             })
         ejercicio.formatos.all().delete()
         for i, f in enumerate(datos.get("formatos", [])):

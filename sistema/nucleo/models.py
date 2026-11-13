@@ -220,6 +220,10 @@ class Requisito(models.Model):
                   "si está vigente. Vacío: las ROP no lo dicen (se pide).",
     )
     es_documento_legal = models.BooleanField(default=False)
+    requiere_documento = models.BooleanField(
+        default=True,
+        help_text="No: es una condición que se revisa (por ejemplo, la nacionalidad), no un documento que se digitaliza.",
+    )
     opcional = models.BooleanField(default=False)
     condicion = models.CharField(max_length=300, blank=True, help_text="Cuándo aplica, si no siempre.")
     nota_refrendo = models.CharField(max_length=300, blank=True)
@@ -267,6 +271,7 @@ class Plazo(models.Model):
     responsable = models.CharField(max_length=200, blank=True)
     fundamento = models.CharField(max_length=200, blank=True)
     linea_rop = models.PositiveIntegerField(null=True, blank=True)
+    datos = models.JSONField(default=dict, blank=True, help_text="Campos adicionales del archivo de reglas.")
 
     class Meta:
         unique_together = [("ejercicio", "clave")]
@@ -336,12 +341,19 @@ class Ministracion(models.Model):
 
 # ----------------------------------------------------------------------------- estados y transiciones
 class Estado(models.Model):
-    """Estado del trámite. Su ``tipo_unidad_bandeja`` dice qué unidad lo atiende (su bandeja)."""
+    """Estado del trámite.
+
+    ``tipo_unidad_bandeja``: tipos de unidad (separados por coma) que lo atienden, o sea, en cuya bandeja
+    aparece. ``visible_para``: otros tipos de unidad que pueden consultar el expediente en ese estado.
+    """
 
     clave = models.CharField(max_length=40, unique=True)
     nombre = models.CharField(max_length=120)
     descripcion = models.TextField(blank=True)
-    tipo_unidad_bandeja = models.CharField(max_length=30, choices=TipoUnidad.choices, blank=True)
+    tipo_unidad_bandeja = models.CharField(max_length=200, blank=True,
+                                           help_text="Tipos de unidad separados por coma (delegacion, direccion…).")
+    visible_para = models.CharField(max_length=200, blank=True,
+                                    help_text="Otros tipos de unidad que consultan el expediente en este estado.")
     flujo_alterno = models.CharField(max_length=2, blank=True, help_text="A, B, … si es parte de un flujo alterno.")
     final = models.BooleanField(default=False)
     color = models.CharField(max_length=20, default="secondary", help_text="Clase de color de Bootstrap.")
@@ -352,6 +364,10 @@ class Estado(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    @property
+    def tipos_bandeja(self):
+        return [t.strip() for t in self.tipo_unidad_bandeja.split(",") if t.strip()]
 
 
 class Transicion(models.Model):
@@ -563,7 +579,9 @@ class Acuse(models.Model):
     """Acuse en PDF de un envío o entrega, con folio, fecha y hora."""
 
     folio = models.CharField(max_length=30, unique=True, editable=False)
-    expediente = models.ForeignKey(Expediente, on_delete=models.CASCADE, related_name="acuses")
+    expediente = models.ForeignKey(Expediente, null=True, blank=True, on_delete=models.CASCADE, related_name="acuses",
+                                   help_text="Vacío en los acuses de una sesión del Comité (varios expedientes).")
+    referencia = models.CharField(max_length=120, blank=True, help_text="Sesión u otro objeto al que se refiere.")
     tipo = models.CharField(max_length=40)
     titulo = models.CharField(max_length=200)
     fecha_hora = models.DateTimeField(default=timezone.now)
@@ -637,8 +655,13 @@ def expedientes_visibles(usuario):
         return qs.filter(delegacion=unidad)
     if unidad.tipo == TipoUnidad.DIRECCION:
         return qs.filter(ejercicio__programa__in=unidad.programas.all())
-    # Las demás unidades ven lo que esté en su bandeja (sprints siguientes).
-    return qs.filter(estado__tipo_unidad_bandeja=unidad.tipo)
+    # Las demás unidades ven los estados que atienden o que pueden consultar (datos del flujo).
+    return qs.filter(_q_tipo("estado__tipo_unidad_bandeja", unidad.tipo) | _q_tipo("estado__visible_para", unidad.tipo))
+
+
+def _q_tipo(campo, tipo):
+    """El campo (lista separada por comas) contiene el tipo de unidad."""
+    return models.Q(**{f"{campo}__regex": rf"(^|,)\s*{tipo}\s*(,|$)"})
 
 
 def puede_ver_expediente(usuario, expediente):
@@ -651,4 +674,9 @@ def bandeja(usuario):
         return expedientes_visibles(usuario).filter(estado__final=False)
     if not usuario.unidad_id:
         return Expediente.objects.none()
-    return expedientes_visibles(usuario).filter(estado__tipo_unidad_bandeja=usuario.unidad.tipo)
+    from .extensiones import FILTROS_BANDEJA
+
+    qs = expedientes_visibles(usuario).filter(_q_tipo("estado__tipo_unidad_bandeja", usuario.unidad.tipo))
+    for filtro in FILTROS_BANDEJA:
+        qs = filtro(usuario, qs)
+    return qs

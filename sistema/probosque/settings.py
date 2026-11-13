@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "simple_history",
     "nucleo",
     "recepcion",
+    "dictamen",
 ]
 
 MIDDLEWARE = [

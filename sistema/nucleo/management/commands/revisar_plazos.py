@@ -42,4 +42,9 @@ class Command(BaseCommand):
                                  f"Venció el {limite:%d/%m/%Y} el plazo para completar la documentación "
                                  "desde la recepción.", datos={"fecha_limite": limite.isoformat()})
                 avisos += 1
+        # 3) Revisiones que registran los demás módulos (por ejemplo, el plazo del dictamen).
+        from nucleo.extensiones import REVISIONES_PLAZO
+
+        for revisar in REVISIONES_PLAZO:
+            avisos += revisar(hoy)
         self.stdout.write(self.style.SUCCESS(f"Plazos revisados al {hoy:%d/%m/%Y}: {avisos} vencimientos señalados."))

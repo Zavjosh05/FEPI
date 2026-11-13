@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Sesiones del Comité{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Sesiones del Comité</h1>
+    <div class="small text-secondary">La Secretaría Técnica prepara la convocatoria, los documentos y el acta; el Comité aprueba los listados y toma los acuerdos de seguimiento.</div>
+  </div>
+  {% if puede_crear %}
+  <div class="d-flex gap-2">
+    <a class="btn btn-primary" href="{% url 'dictamen:sesion_nueva' %}?tipo=aprobacion">Nueva sesión de aprobación</a>
+    <a class="btn btn-outline-primary" href="{% url 'dictamen:sesion_nueva' %}?tipo=seguimiento">Nueva sesión de seguimiento</a>
+  </div>
+  {% endif %}
+</div>
+<div class="tarjeta p-0">
+  <div class="table-responsive">
+  <table class="table table-sm table-hover mb-0" id="tabla-sesiones">
+    <thead class="table-light"><tr><th class="ps-3">Sesión</th><th>Tipo</th><th>Programa</th><th>Fecha y hora</th><th>Estado</th><th class="d-none d-md-table-cell">Convocatoria</th></tr></thead>
+    <tbody>
+    {% for s in sesiones %}
+    <tr>
+      <td class="ps-3"><a class="fw-semibold" href="{% url 'dictamen:sesion' s.pk %}">{{ s.numero }}</a></td>
+      <td>{{ s.get_tipo_display }}<div class="small text-secondary">{{ s.get_caracter_display }}</div></td>
+      <td>{{ s.ejercicio.programa.clave }} {{ s.ejercicio.anio }}</td>
+      <td>{{ s.fecha_hora|date:"d/m/Y H:i" }}</td>
+      <td><span class="badge {% if s.estado == 'celebrada' %}text-bg-success{% elif s.estado == 'convocada' %}text-bg-info{% else %}text-bg-light border{% endif %}">{{ s.get_estado_display }}</span></td>
+      <td class="d-none d-md-table-cell small">{{ s.convocatoria_enviada|date:"d/m/Y H:i"|default:"—" }}</td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-center text-secondary py-4">No hay sesiones.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

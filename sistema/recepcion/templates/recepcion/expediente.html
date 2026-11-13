@@ -34,7 +34,8 @@
   {% elif pestana == "ubicacion" %}{% include "recepcion/pestanas/ubicacion.html" %}
   {% elif pestana == "validacion" %}{% include "recepcion/pestanas/validacion.html" %}
   {% elif pestana == "documentos" %}{% include "recepcion/pestanas/documentos.html" %}
-  {% elif pestana == "bitacora" %}{% include "recepcion/pestanas/bitacora.html" %}{% endif %}
+  {% elif pestana == "bitacora" %}{% include "recepcion/pestanas/bitacora.html" %}
+  {% elif plantilla_pestana %}{% include plantilla_pestana %}{% endif %}
 </div>
 {% endblock %}
 {% block scripts %}{% if pestana == "ubicacion" %}

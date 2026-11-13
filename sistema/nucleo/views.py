@@ -47,6 +47,9 @@ def ver_bandeja(request):
         "estados": Estado.objects.all(),
         "filtros": {"programa": programa, "estado": estado, "q": q, "alcance": alcance},
     }
+    from .extensiones import PANELES_BANDEJA
+
+    contexto["paneles"] = [p for p in (f(request) for f in PANELES_BANDEJA) if p]
     if request.headers.get("HX-Request") and request.headers.get("HX-Target") == "tabla-bandeja":
         return render(request, "nucleo/_tabla_bandeja.html", contexto)
     if request.user.unidad is None and not request.user.is_superuser:
@@ -76,6 +79,11 @@ def descargar_documento(request, pk):
 @login_required
 def descargar_acuse(request, folio):
     acuse = get_object_or_404(Acuse, folio=folio)
-    if not puede_ver_expediente(request.user, acuse.expediente) or not acuse.archivo:
+    if acuse.expediente_id is None:
+        # Acuses de sesiones del Comité: los consulta el personal de PROBOSQUE con unidad asignada.
+        permitido = request.user.is_superuser or request.user.unidad_id is not None
+    else:
+        permitido = puede_ver_expediente(request.user, acuse.expediente)
+    if not permitido or not acuse.archivo:
         raise Http404
     return _entregar_archivo(acuse.archivo, f"{acuse.folio}.pdf")

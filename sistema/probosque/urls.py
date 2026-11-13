@@ -8,5 +8,6 @@ admin.site.index_title = "Catálogos y reglas"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("recepcion/", include("recepcion.urls")),
+    path("dictamen/", include("dictamen.urls")),
     path("", include("nucleo.urls")),
 ]

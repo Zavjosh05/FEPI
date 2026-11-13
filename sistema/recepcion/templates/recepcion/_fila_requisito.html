@@ -1,45 +1,62 @@
-<tr id="req-{{ r.pk }}" class="req-fila" data-clave="{{ r.requisito.clave }}">
+<tbody id="req-{{ r.pk }}" class="req-fila" data-clave="{{ r.requisito.clave }}">
+<tr>
   <td class="text-nowrap small fw-semibold">{{ r.requisito.clave }}</td>
   <td class="req-texto">
-    {{ r.requisito.texto|truncatechars:260 }}
-    <div class="small text-secondary mt-1">
-      {{ r.requisito.fundamento }}{% if r.requisito.formato %} · Formato {{ r.requisito.formato }}{% endif %}
+    <span title="{{ r.requisito.texto }}">{{ r.requisito.texto|truncatechars:150 }}</span>
+    <div class="small text-secondary">
+      {{ r.requisito.fundamento|truncatechars:60 }}{% if r.requisito.formato %} · {{ r.requisito.formato|truncatechars:30 }}{% endif %}
       {% if r.requisito.es_documento_legal %} · <span class="badge text-bg-light border">Documento legal</span>{% endif %}
+      {% if not r.requisito.requiere_documento %} · <span class="badge text-bg-light border">Sin documento</span>{% endif %}
       {% if r.requisito.opcional %} · <span class="badge text-bg-light border">Opcional</span>{% endif %}
-      {% if r.requisito.condicion %} · <em>Aplica si: {{ r.requisito.condicion }}</em>{% endif %}
+      {% if r.requisito.condicion %} · <em>Aplica si: {{ r.requisito.condicion|truncatechars:70 }}</em>{% endif %}
     </div>
   </td>
-  <td>
-    <div class="mb-1">
-      {% if r.estado == "entregado" %}<span class="badge text-bg-success" data-prueba="estado-req">Entregado</span>
-      {% elif r.estado == "faltante" %}<span class="badge text-bg-warning" data-prueba="estado-req">Faltante</span>
-      {% elif r.estado == "no_aplica" %}<span class="badge text-bg-secondary" data-prueba="estado-req">No aplica</span>
-      {% else %}<span class="badge text-bg-light border" data-prueba="estado-req">Sin revisar</span>{% endif %}
-      {% if r.en_archivo_probosque %}<span class="small">Obra en PROBOSQUE ({{ r.fecha_documento|date:"d/m/Y" }})</span>{% endif %}
-      {% if r.documento %}<a class="small" href="{% url 'nucleo:documento' r.documento.pk %}" target="_blank">{{ r.documento.archivo.name|cut:"expedientes/"|truncatechars:40 }}</a>{% endif %}
-      {% if r.revisado_en %}<span class="small text-secondary">· {{ r.revisado_por }} {{ r.revisado_en|date:"d/m/Y H:i" }}</span>{% endif %}
-      {% if r.observaciones %}<div class="small text-secondary">{{ r.observaciones }}</div>{% endif %}
-    </div>
-    {% if error_fila %}<div class="alert alert-danger py-1 px-2 small mb-1" data-prueba="error-req">{{ error_fila }}</div>{% endif %}
+  <td class="text-nowrap">
+    {% if r.estado == "entregado" %}<span class="badge text-bg-success" data-prueba="estado-req">{% if r.requisito.requiere_documento %}Entregado{% else %}Cumple{% endif %}</span>
+    {% elif r.estado == "faltante" %}<span class="badge text-bg-warning" data-prueba="estado-req">Faltante</span>
+    {% elif r.estado == "no_aplica" %}<span class="badge text-bg-secondary" data-prueba="estado-req">No aplica</span>
+    {% else %}<span class="badge text-bg-light border" data-prueba="estado-req">Sin revisar</span>{% endif %}
+    {% if r.documento %}<a class="small ms-1" href="{% url 'nucleo:documento' r.documento.pk %}" target="_blank">archivo</a>{% endif %}
+    {% if r.en_archivo_probosque %}<div class="small">Obra en PROBOSQUE ({{ r.fecha_documento|date:"d/m/Y" }})</div>{% endif %}
+    {% if r.revisado_en %}<div class="small text-secondary">{{ r.revisado_en|date:"d/m/Y H:i" }}</div>{% endif %}
+  </td>
+  <td class="text-end">
     {% if puede_editar_requisitos %}
-    <form class="d-flex flex-wrap gap-1 align-items-center" hx-post="{% url 'recepcion:revisar_requisito' exp.folio r.pk %}"
-          hx-encoding="multipart/form-data" hx-target="#req-{{ r.pk }}" hx-swap="outerHTML">
-      <select name="estado" class="form-select form-select-sm w-auto" aria-label="Estado del requisito">
-        <option value="entregado" {% if r.estado == "entregado" %}selected{% endif %}>Entregado</option>
-        <option value="faltante" {% if r.estado == "faltante" %}selected{% endif %}>Faltante</option>
-        {% if r.requisito.es_condicional %}<option value="no_aplica" {% if r.estado == "no_aplica" %}selected{% endif %}>No aplica</option>{% endif %}
-      </select>
-      <input type="file" name="archivo" class="form-control form-control-sm" style="max-width: 15rem" aria-label="Archivo digitalizado">
-      {% if exp.es_refrendo and r.requisito.aplica_en_refrendo == False %}
-      <div class="form-check form-check-inline small ms-1">
-        <input class="form-check-input" type="checkbox" name="en_archivo_probosque" id="arch-{{ r.pk }}" {% if r.en_archivo_probosque %}checked{% endif %}>
-        <label class="form-check-label" for="arch-{{ r.pk }}">Obra en PROBOSQUE, de fecha</label>
-      </div>
-      <input type="date" name="fecha_documento" class="form-control form-control-sm w-auto" value="{{ r.fecha_documento|date:'Y-m-d' }}" aria-label="Fecha de la documentación">
-      {% endif %}
-      <input type="text" name="observaciones" class="form-control form-control-sm" style="max-width: 12rem" placeholder="Observaciones" value="{{ r.observaciones }}">
-      <button class="btn btn-sm btn-outline-primary" type="submit">Guardar</button>
-    </form>
+    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#form-req-{{ r.pk }}"
+            aria-expanded="{% if error_fila %}true{% else %}false{% endif %}" aria-controls="form-req-{{ r.pk }}">Revisar</button>
     {% endif %}
   </td>
 </tr>
+{% if puede_editar_requisitos or error_fila or r.observaciones %}
+<tr class="req-detalle">
+  <td colspan="4" class="p-0 border-0">
+    {% if r.observaciones %}<div class="small text-secondary px-2 pb-1">Observaciones: {{ r.observaciones }}</div>{% endif %}
+    {% if error_fila %}<div class="alert alert-danger py-1 px-2 small mx-2 mb-1" data-prueba="error-req">{{ error_fila }}</div>{% endif %}
+    {% if puede_editar_requisitos %}
+    <div class="collapse {% if error_fila %}show{% endif %}" id="form-req-{{ r.pk }}">
+      <form class="d-flex flex-wrap gap-1 align-items-center bg-light rounded p-2 m-2" hx-post="{% url 'recepcion:revisar_requisito' exp.folio r.pk %}"
+            hx-encoding="multipart/form-data" hx-target="#req-{{ r.pk }}" hx-swap="outerHTML">
+        <select name="estado" class="form-select form-select-sm w-auto" aria-label="Estado del requisito">
+          <option value="entregado" {% if r.estado == "entregado" %}selected{% endif %}>{% if r.requisito.requiere_documento %}Entregado{% else %}Cumple{% endif %}</option>
+          <option value="faltante" {% if r.estado == "faltante" %}selected{% endif %}>{% if r.requisito.requiere_documento %}Faltante{% else %}No cumple{% endif %}</option>
+          {% if r.requisito.es_condicional %}<option value="no_aplica" {% if r.estado == "no_aplica" %}selected{% endif %}>No aplica</option>{% endif %}
+        </select>
+        {% if r.requisito.requiere_documento %}
+        <input type="file" name="archivo" class="form-control form-control-sm" style="max-width: 16rem" aria-label="Archivo digitalizado">
+        {% endif %}
+        {% if exp.es_refrendo and r.requisito.aplica_en_refrendo == False %}
+        <div class="form-check form-check-inline small ms-1">
+          <input class="form-check-input" type="checkbox" name="en_archivo_probosque" id="arch-{{ r.pk }}" {% if r.en_archivo_probosque %}checked{% endif %}>
+          <label class="form-check-label" for="arch-{{ r.pk }}">Obra en PROBOSQUE, de fecha</label>
+        </div>
+        <input type="date" name="fecha_documento" class="form-control form-control-sm w-auto" value="{{ r.fecha_documento|date:'Y-m-d' }}" aria-label="Fecha de la documentación">
+        {% endif %}
+        <input type="text" name="observaciones" class="form-control form-control-sm" style="max-width: 14rem" placeholder="Observaciones" value="{{ r.observaciones }}">
+        <button class="btn btn-sm btn-primary" type="submit">Guardar</button>
+      </form>
+    </div>
+    {% endif %}
+  </td>
+</tr>
+{% endif %}
+</tbody>

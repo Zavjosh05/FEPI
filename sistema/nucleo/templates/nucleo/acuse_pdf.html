@@ -31,10 +31,14 @@
     <h1>{{ acuse.titulo }}</h1>
   </div>
   <table>
+    {% if expediente %}
     <tr><th>Programa y ejercicio</th><td>{{ expediente.ejercicio.programa.nombre }} {{ expediente.ejercicio.anio }}</td></tr>
     <tr><th>Folio de la solicitud</th><td>{{ expediente.folio }}</td></tr>
     <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
     <tr><th>Persona solicitante</th><td>{{ expediente.solicitante.nombre }}</td></tr>
+    {% else %}
+    <tr><th>Referencia</th><td>{{ acuse.referencia }}</td></tr>
+    {% endif %}
     <tr><th>Fecha y hora</th><td>{{ fecha_local|date:"l j \d\e F \d\e Y, H:i:s" }} h (hora del centro de México)</td></tr>
     <tr><th>Emite</th><td>{{ acuse.emitido_por }}{% if acuse.unidad %} · {{ acuse.unidad.nombre }}{% endif %}</td></tr>
     {% if acuse.destinatario %}<tr><th>Destinatario</th><td>{{ acuse.destinatario }}</td></tr>{% endif %}
@@ -42,7 +46,7 @@
   </table>
   {% if detalle %}
   <table class="detalle">
-    <thead><tr><th>Clave</th><th>Requisito o concepto</th><th>Estado</th></tr></thead>
+    <thead><tr>{% for h in encabezado_detalle %}<th>{{ h }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for d in detalle %}<tr><td>{{ d.clave }}</td><td>{{ d.texto }}</td><td>{{ d.estado }}</td></tr>{% endfor %}
     </tbody>

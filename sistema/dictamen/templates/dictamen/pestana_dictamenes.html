@@ -1,0 +1,29 @@
+{% with combinado=resultado_combinado %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <div class="titulo-seccion mb-1">Dictámenes técnico y jurídico</div>
+    <div class="small text-secondary">Los dos se elaboran en paralelo sobre el expediente validado; con los dos, el expediente pasa a la Secretaría Técnica del Comité.</div>
+  </div>
+  <div class="text-end">
+    <span class="badge fs-6 {% if combinado.0 == 'factible' %}text-bg-success{% elif combinado.0 == 'no_factible' %}text-bg-danger{% else %}text-bg-light border{% endif %}" data-prueba="resultado-combinado">
+      {% if combinado.0 == 'factible' %}Factible{% elif combinado.0 == 'no_factible' %}No factible{% else %}Pendiente{% endif %}</span>
+    <div class="small text-secondary mt-1">{{ combinado.1 }}</div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-6">{% include "dictamen/tecnico/_resumen.html" %}</div>
+  <div class="col-12 col-lg-6">{% include "dictamen/juridico/_resumen.html" %}</div>
+</div>
+{% if resoluciones %}
+<div class="titulo-seccion mt-4">Sesiones del Comité</div>
+<ul class="small">{% for r in resoluciones %}
+  <li>{{ r.sesion.numero }} ({{ r.sesion.fecha_hora|date:"d/m/Y" }}): <strong>{{ r.get_resultado_display }}</strong>{% if r.orden %}, lugar {{ r.orden }}{% endif %}{% if r.motivo_ajuste %} — ajuste del Comité: {{ r.motivo_ajuste }}{% endif %}</li>
+{% endfor %}</ul>
+{% endif %}
+{% if acuerdos %}
+<div class="titulo-seccion mt-3">Acuerdos de seguimiento</div>
+<ul class="small">{% for a in acuerdos %}
+  <li><strong>{{ a.numero }}</strong> {{ a.descripcion }} · Debe cumplirlo: {{ a.unidad_responsable }} · <span class="badge {% if a.estado == 'cumplido' %}text-bg-success{% else %}text-bg-warning{% endif %}">{{ a.get_estado_display }}</span></li>
+{% endfor %}</ul>
+{% endif %}
+{% endwith %}

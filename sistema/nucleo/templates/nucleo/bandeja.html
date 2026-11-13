@@ -41,6 +41,7 @@
     </div>
   </div>
 </form>
+{% for panel in paneles %}{% include panel.plantilla with panel=panel.contexto %}{% endfor %}
 <div class="position-relative">
   <div id="cargando" class="htmx-indicator position-absolute top-0 end-0 small text-secondary">Actualizando…</div>
   <div id="tabla-bandeja">{% include "nucleo/_tabla_bandeja.html" %}</div>

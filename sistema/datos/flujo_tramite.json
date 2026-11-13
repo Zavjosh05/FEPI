@@ -1,11 +1,14 @@
 {
-  "nota": "Estados del trámite y transiciones permitidas (sprint 1: módulo M1 y flujos alternos A y B). Los sprints siguientes agregan estados y transiciones aquí sin cambiar el código. tipo_unidad_bandeja = unidad que atiende el estado; tipo_unidad de la transición = unidad que puede hacerla; programa null = todos.",
+  "nota": "Estados del trámite y transiciones permitidas (sprint 1: módulos M1 y M2, flujos alternos A, B y C). Los sprints siguientes agregan estados y transiciones aquí sin cambiar el código. tipo_unidad_bandeja = tipos de unidad (separados por coma) que atienden el estado; visible_para = otros tipos que lo consultan; tipo_unidad de la transición = unidad que puede hacerla; programa null = todos. Al cargar, las transiciones que ya no estén aquí dejan de estar permitidas.",
   "estados": [
     {"clave": "recibida", "nombre": "Solicitud recibida", "descripcion": "Registrada en la ventanilla de la Delegación; en revisión de requisitos y levantamiento del polígono.", "tipo_unidad_bandeja": "delegacion", "color": "primary", "orden": 10},
     {"clave": "enviada_direccion", "nombre": "En revisión de la Dirección", "descripcion": "Expediente digital enviado a la Dirección que es Instancia Ejecutora para su validación.", "tipo_unidad_bandeja": "direccion", "color": "info", "orden": 20},
     {"clave": "faltantes", "nombre": "Aviso de faltantes", "descripcion": "La Dirección avisó faltantes con fecha límite; la Delegación notifica a la persona solicitante y recaba la documentación (flujo alterno A).", "tipo_unidad_bandeja": "delegacion", "flujo_alterno": "A", "color": "warning", "orden": 25},
-    {"clave": "validada", "nombre": "Expediente validado", "descripcion": "Cumple los requisitos; pasa a dictamen técnico y jurídico (módulo M2).", "tipo_unidad_bandeja": "direccion", "color": "success", "orden": 30},
-    {"clave": "no_factible", "nombre": "No factible", "descripcion": "Dictamen técnico no factible o jurídico no procedente (flujo alterno B).", "tipo_unidad_bandeja": "", "flujo_alterno": "B", "final": true, "color": "danger", "orden": 90},
+    {"clave": "validada", "nombre": "Validado · en dictamen", "descripcion": "Cumple los requisitos; la Dirección elabora el dictamen técnico y la Unidad Jurídica el jurídico, en paralelo (módulo M2).", "tipo_unidad_bandeja": "direccion,juridica", "visible_para": "secretaria_comite", "color": "success", "orden": 30},
+    {"clave": "dictaminada", "nombre": "Dictaminada", "descripcion": "Tiene dictamen técnico y jurídico; la Secretaría Técnica la lleva a la sesión de aprobación del Comité.", "tipo_unidad_bandeja": "secretaria_comite", "visible_para": "juridica", "color": "info", "orden": 40},
+    {"clave": "aprobada", "nombre": "Aprobada (persona beneficiaria)", "descripcion": "El Comité la aprobó en la Lista de Personas Beneficiarias; sigue publicación y contrato (módulo M3).", "visible_para": "juridica,secretaria_comite", "color": "success", "orden": 50},
+    {"clave": "lista_espera", "nombre": "Lista de espera", "descripcion": "Factible sin recurso asignado; espera reasignación por acuerdo del Comité (flujo alterno C).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "C", "color": "secondary", "orden": 55},
+    {"clave": "no_factible", "nombre": "No factible", "descripcion": "El Comité aprobó la Lista de solicitudes No factibles (dictamen técnico no factible o jurídico no procedente; flujo alterno B).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "B", "final": true, "color": "danger", "orden": 90},
     {"clave": "desechada", "nombre": "Solicitud desechada", "descripcion": "No se complementó la documentación faltante en el plazo (ROP CC 8.1.1.2 fr. XIV; flujo alterno A).", "tipo_unidad_bandeja": "", "flujo_alterno": "A", "final": true, "color": "dark", "orden": 95}
   ],
   "transiciones": [
@@ -15,7 +18,11 @@
     {"origen": "faltantes", "destino": "desechada", "tipo_unidad": "direccion", "accion": "Tener por desechada la solicitud", "requiere_motivo": true},
     {"origen": "enviada_direccion", "destino": "validada", "tipo_unidad": "direccion", "accion": "Validar el expediente"},
     {"origen": "enviada_direccion", "destino": "faltantes", "tipo_unidad": "direccion", "accion": "Emitir aviso de faltantes"},
-    {"origen": "validada", "destino": "no_factible", "tipo_unidad": "direccion", "accion": "Dictaminar no factible (técnico)", "requiere_motivo": true},
-    {"origen": "validada", "destino": "no_factible", "tipo_unidad": "juridica", "accion": "Dictaminar no procedente (jurídico)", "requiere_motivo": true}
+    {"origen": "validada", "destino": "dictaminada", "tipo_unidad": "direccion", "accion": "Completar el dictamen (técnico, con el jurídico ya emitido)"},
+    {"origen": "validada", "destino": "dictaminada", "tipo_unidad": "juridica", "accion": "Completar el dictamen (jurídico, con el técnico ya emitido)"},
+    {"origen": "dictaminada", "destino": "aprobada", "tipo_unidad": "secretaria_comite", "accion": "Aprobada por el Comité (Lista de Personas Beneficiarias)"},
+    {"origen": "dictaminada", "destino": "lista_espera", "tipo_unidad": "secretaria_comite", "accion": "Lista de espera aprobada por el Comité"},
+    {"origen": "dictaminada", "destino": "no_factible", "tipo_unidad": "secretaria_comite", "accion": "Lista de solicitudes No factibles aprobada por el Comité"},
+    {"origen": "lista_espera", "destino": "aprobada", "tipo_unidad": "secretaria_comite", "accion": "Reasignación del recurso por acuerdo del Comité"}
   ]
 }

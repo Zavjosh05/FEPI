@@ -23,6 +23,8 @@
   "ajustes_reglas": {
     "CC": {
       "modalidades_no_seleccionables": ["pago_unico_hasta_5_ha", "dos_ministraciones_mas_de_5_ha", "refrendo"],
+      "requisitos_sin_documento": ["CC-REQ-01", "CC-REQ-03"],
+      "nota_requisitos_sin_documento": "CC-REQ-01 (ser persona física o jurídico colectiva propietaria o poseedora…) y CC-REQ-03 (designar a la segunda persona beneficiaria, que se anota en la Solicitud Única) son condiciones que se revisan, no documentos aparte: se marcan como cumplidos sin archivo.",
       "nota": "En CC las «modalidades» del archivo de reglas incluyen regímenes de pago (dependen de la superficie aprobada) y el refrendo, que el sistema maneja como casilla del expediente. Al registrar solo se eligen los tipos de superficie."
     }
   },

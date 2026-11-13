@@ -207,7 +207,7 @@ def revisar_requisito(usuario, revision, estado, archivo=None, en_archivo_probos
                         "debe entregarse de nuevo.")
                 revision.en_archivo_probosque = True
                 revision.fecha_documento = fecha_documento
-            elif archivo is None and revision.documento_id is None:
+            elif archivo is None and revision.documento_id is None and revision.requisito.requiere_documento:
                 raise ValidationError("Adjunte el archivo digitalizado del requisito.")
             if archivo is not None:
                 doc = Documento.objects.create(
@@ -245,7 +245,8 @@ def problemas_para_enviar(expediente):
     pendientes = [r.requisito.clave for r in revisiones if r.estado == EstadoRevision.PENDIENTE]
     faltantes = [r.requisito.clave for r in revisiones if r.estado == EstadoRevision.FALTANTE]
     sin_archivo = [r.requisito.clave for r in revisiones
-                   if r.estado == EstadoRevision.ENTREGADO and not r.documento_id and not r.en_archivo_probosque]
+                   if r.estado == EstadoRevision.ENTREGADO and not r.documento_id and not r.en_archivo_probosque
+                   and r.requisito.requiere_documento]
     if pendientes:
         problemas.append("Requisitos sin revisar: " + ", ".join(pendientes))
     if faltantes:
@@ -364,6 +365,8 @@ def evaluar_para_validacion(expediente):
                 resultado.append(RevisionEvaluada(
                     r, False, f"Refrendo: documentación de {r.fecha_documento:%d/%m/%Y} con más de "
                               f"{plazo.texto_plazo if plazo else '—'}; no es válida"))
+        elif not r.requisito.requiere_documento:
+            resultado.append(RevisionEvaluada(r, True, "Cumple (condición sin documento)"))
         elif not r.documento_id:
             resultado.append(RevisionEvaluada(r, False, "Sin archivo digitalizado"))
         else:

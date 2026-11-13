@@ -1,12 +1,13 @@
 # Sistema de programas de PROBOSQUE
 
-Prototipo del sprint 1 (módulo M1, Recepción y expediente) del sistema que lleva el trámite de los
+Prototipo del sprint 1 (módulos M1, Recepción y expediente, y M2, Dictamen y Comité) del sistema que lleva el trámite de los
 seis programas de apoyo de PROBOSQUE: Capturando Carbono (CC), Manejo Forestal Sustentable (MFS),
 Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), PSAHEM (PSA) y
 Guardabosques (PEG). En este sprint solo CC tiene reglas cargadas; los demás existen en el catálogo.
 
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
-HU-1.3 Ubicación del predio y HU-1.4 Validación del expediente.
+HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
+jurídico, HU-2.3 Sesión de aprobación y HU-2.4 Sesiones de seguimiento.
 
 ## Cómo levantar
 
@@ -44,13 +45,17 @@ docker compose --profile pruebas run --rm pruebas
 ```
 
 Corre las pruebas unitarias y de criterios (pytest-django contra PostGIS) y, al final, los recorridos
-de Playwright, que dejan las capturas en `entregas/sprint_1/capturas/hu_1_*.png` (carpeta de la raíz
+de Playwright, que dejan las capturas en `entregas/sprint_1/capturas/hu_1_*.png` y `hu_2_*.png` (carpeta de la raíz
 del repositorio montada en el contenedor). Las historias, sus criterios y las necesidades se leen de
 `especificacion/modelo.json` y `especificacion/necesidades_v12.json`; ahí está también el texto de las
 Reglas de Operación 2026 al que remiten los numerales y las líneas de `reglas/*.json`.
 
 Cada criterio de aceptación tiene al menos una prueba con el ID de su historia en el nombre
-(`pruebas/test_hu_1_1.py` … `test_hu_1_4.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
+(`pruebas/test_hu_1_1.py` … `test_hu_2_4.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
+Los recorridos de Playwright están en `pruebas/e2e/` (uno por historia; los de M2 en archivos
+`test_recorrido_hu_2_*.py`) y corren con Chromium en español de México (`--lang=es-MX`, zona horaria de
+la Ciudad de México). Los programas sin archivo de reglas (PEG y PSAHEM) se prueban con fixtures
+(`pruebas/fixtures_m2.py`) que crean su programa-ejercicio, su plazo y sus ministraciones.
 
 ## Usuarios de demostración
 
@@ -61,19 +66,24 @@ Contraseña de prueba para todos: **`Probosque2026`** (solo para demostración; 
 | `del_amecameca` | Delegación Regional Forestal Amecameca | Ventanilla: registra, revisa requisitos, levanta polígono, envía, notifica. |
 | `del_toluca` | Delegación Regional Forestal Toluca | Igual, otra Delegación (solo ve lo suyo). |
 | `del_valle` | Delegación Regional Forestal Valle de Bravo | Igual. |
-| `dir_drff` | Dirección de Restauración y Fomento Forestal | Instancia Ejecutora de CC, MFS, PS, RHF y PSA: valida o avisa faltantes. |
-| `dir_dpf` | Dirección de Protección Forestal | Instancia Ejecutora de PEG. |
-| `juridica` | Unidad Jurídica | (Sprint siguiente: dictamen jurídico.) |
-| `comite` | Secretaría Técnica del Comité | (Sprint siguiente.) |
+| `dir_drff` | Dirección de Restauración y Fomento Forestal | Instancia Ejecutora de CC, MFS, PS, RHF y PSA: valida o avisa faltantes, dictamen técnico, listado preliminar, cumple acuerdos. |
+| `dir_dpf` | Dirección de Protección Forestal | Instancia Ejecutora de PEG (dictamen técnico; validación de reportes). |
+| `juridica` | Unidad Jurídica | Dictamen jurídico, Listado de Personas Beneficiarias Incumplidas y predios sancionados. |
+| `comite` | Secretaría Técnica del Comité | Sesiones: convocatoria, documentos, listados, acta, acuerdos. |
 | `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | (Sprint 2.) |
 | `vivero` | Vivero (demostración) | (Sprint 2.) |
-| `fiduciaria` | Fiduciaria | (Sprint 2.) |
+| `fiduciaria` | Fiduciaria | Ve en su bandeja las instrucciones de pago del Comité (PSAHEM). |
 | `admin` | — (superusuario) | Admin de Django para catálogos: `/admin/`. |
 
 Solicitudes de demostración (CC 2026): Los Ocotes (recibida, revisión a medias), Ejido San Rafael
 (recibida, completa, con polígono), La Cañada (en la Dirección), Rancho El Capulín (aviso de faltantes
-notificado), Predio Agua Blanca (refrendo validado, con cambio de lugar del polígono) y El Tecolote
-(desechada).
+notificado), El Tecolote (desechada) y, para M2: Los Encinos del Monte (con dictamen técnico, falta el
+jurídico; traslapa con La Joya Alta), El Ocotal (en dictamen, plazo vencido), Potrero Viejo
+(dictaminada, en la bandeja de la Secretaría Técnica) y la sesión de aprobación SO-CC-2026-01 con acta:
+Predio Agua Blanca (refrendo, con cambio de lugar del polígono) y La Joya Alta aprobadas, Las Trojes en
+lista de espera y Cerro de la Cruz no factible (su titular, Rogelio Bautista Núñez, está en el Listado
+de Incumplidas). La sesión de seguimiento SO-CC-2026-02 tiene tres acuerdos (uno cumplido; dos
+pendientes en las bandejas de la Dirección y de la Unidad Jurídica).
 
 ## Estructura
 
@@ -87,13 +97,19 @@ sistema/
 │                      revisar_plazos) y datos de demostración
 ├── recepcion/         app M1: revisión de requisitos, polígonos, validación; servicios.py (reglas),
 │                      geometria.py (GeoJSON/KML/SHP), vistas y plantillas por pestaña
+├── dictamen/          app M2, un módulo por historia: tecnico.py (HU-2.1), juridico.py (HU-2.2),
+│                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
+│                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
+│                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
 ├── plantillas/        base.html
 ├── estaticos/         css, js del mapa y vendor/ (Bootstrap 5.3.9, htmx 2.0.11, Leaflet 1.9.4,
 │                      Leaflet-Geoman 2.20.6; sin CDN)
 ├── reglas/            CC.json, catalogos.json, indice_rop.json (extraídos de las ROP; no se editan a mano)
-├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dias_inhabiles_2026.json
+├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json,
+│                      dias_inhabiles_2026.json
+├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
 ├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON)
-└── pruebas/           pytest (test_nucleo_*, test_hu_1_*) y e2e/ (Playwright)
+└── pruebas/           pytest (test_nucleo_*, test_hu_1_*, test_hu_2_*, fixtures_m2.py) y e2e/ (Playwright)
 ```
 
 ## Estados del trámite (sprint 1)
@@ -101,7 +117,8 @@ sistema/
 Los estados y las transiciones son datos (`datos/flujo_tramite.json`, editables en el admin). El único
 punto del código que cambia un estado es `Expediente.cambiar_estado(destino, usuario, motivo)`: valida
 contra la tabla (origen, destino, tipo de unidad, programa opcional), revisa que el expediente sea de la
-unidad del usuario, pide motivo cuando la transición lo exige y escribe la bitácora.
+unidad del usuario, pide motivo cuando la transición lo exige y escribe la bitácora. Al cargar el
+archivo, las transiciones que ya no aparecen en él dejan de estar permitidas.
 
 ```mermaid
 stateDiagram-v2
@@ -112,14 +129,26 @@ stateDiagram-v2
     enviada_direccion --> faltantes: Dirección avisa faltantes (A)
     faltantes --> enviada_direccion: Delegación reenvía
     faltantes --> desechada: Dirección, faltantes no atendidos (A)
-    validada --> no_factible: Dirección (técnico) o Unidad Jurídica (B, M2)
+    validada --> dictaminada: con los dos dictámenes, técnico (Dirección, HU-2.1) y jurídico (UJ, HU-2.2)
+    dictaminada --> aprobada: acta del Comité, Lista de Personas Beneficiarias (HU-2.3)
+    dictaminada --> lista_espera: acta del Comité, Lista de espera (C)
+    dictaminada --> no_factible: acta del Comité, Lista de No factibles (B)
+    lista_espera --> aprobada: reasignación por acuerdo del Comité
     desechada --> [*]
     no_factible --> [*]
 ```
 
-Bandejas: `recibida` y `faltantes` las atiende la Delegación; `enviada_direccion` y `validada` (para el
-dictamen del sprint siguiente), la Dirección. Una Delegación solo ve sus expedientes; una Dirección, los
-de los programas de los que es Instancia Ejecutora.
+| Estado | Bandeja (quién lo atiende) | También lo consultan |
+| --- | --- | --- |
+| `recibida`, `faltantes` | Delegación | Dirección del programa |
+| `enviada_direccion` | Dirección del programa | — |
+| `validada` (en dictamen) | Dirección (si le falta el técnico) y Unidad Jurídica (si le falta el jurídico) | Secretaría Técnica |
+| `dictaminada` | Secretaría Técnica del Comité | Unidad Jurídica |
+| `aprobada`, `lista_espera`, `no_factible` | — (M3 en el sprint 2) | Unidad Jurídica, Secretaría Técnica |
+
+Una Delegación solo ve sus expedientes; una Dirección, los de los programas de los que es Instancia
+Ejecutora; las demás unidades, los estados que atienden o consultan. Además, cada unidad ve en su bandeja
+los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 
 ## Decisiones tomadas
 
@@ -182,6 +211,65 @@ de los programas de los que es Instancia Ejecutora.
   no cambia estados.
 - **Mapa base.** OpenStreetMap si hay conexión (`MAPA_TESELAS_URL`); vacío = sin teselas (las pruebas
   corren así).
+- **Requisitos que no son documentos (ajuste a M1).** `datos/sistema.json`
+  (`ajustes_reglas.CC.requisitos_sin_documento`) marca CC-REQ-01 y CC-REQ-03 como condiciones: se
+  revisan como «cumple» o «no cumple» sin archivo (campo `Requisito.requiere_documento`). La pestaña
+  Requisitos muestra solo el estado de cada fila y un botón «Revisar» que despliega su formulario. Los
+  campos de archivo usan un botón «Elegir archivo» propio (`estaticos/js/archivos.js`), porque el texto
+  del control nativo depende del idioma del navegador.
+
+### Módulo M2 (Dictamen y Comité)
+
+- **Organización.** Un módulo de servicios por historia (`dictamen/tecnico.py`, `juridico.py`,
+  `aprobacion.py`, `seguimiento.py`), con sus vistas (`dictamen/vistas/`), formularios
+  (`dictamen/formularios/`), plantillas (`templates/dictamen/<historia>/`) y pruebas por separado. Lo
+  común: `models.py`, migraciones, `urls.py`, `admin.py`, `comun.py`, `sesiones.py` (convocatoria) y
+  `registro.py`. El núcleo no depende de `dictamen`: la app se registra en `nucleo/extensiones.py`
+  (filtros y paneles de bandeja, pestaña del expediente, menú, revisión de plazos y datos de
+  demostración), que es donde se conectarán los módulos M3 a M6.
+- **Estados.** Los dictámenes técnico y jurídico corren en paralelo sobre el expediente validado; el que
+  completa el par pasa el expediente a `dictaminada` (bandeja de la Secretaría Técnica). Se quitó la
+  transición `validada → no_factible` del sprint anterior: según las ROP de CC (10.1 fr. VI y VII; 9.4.3
+  fr. I y III) los dictámenes producen el listado preliminar y es el Comité quien aprueba la Lista de
+  Personas Beneficiarias, la Lista de espera y la Lista de No factibles. Por eso las tres salidas de
+  `dictaminada` las registra la Secretaría Técnica con el acta. `Estado.tipo_unidad_bandeja` admite
+  varios tipos de unidad (separados por coma) y `Estado.visible_para`, las unidades que solo consultan.
+- **HU-2.1.** La lista de verificación se arma con `superficie`, `criterios_elegibilidad_tecnica`,
+  `inelegibles` y `criterios_seleccion` del archivo de reglas; un criterio «no cumple» impide el dictamen
+  factible. El análisis cartográfico usa PostGIS: polígono vigente, superficie en EPSG:32614, rango del
+  programa, ubicación en el municipio y traslapes (`geom__intersects`) con polígonos vigentes de otros
+  expedientes del mismo ejercicio, con su superficie en hectáreas; se guarda una copia en el dictamen.
+  El plazo de dictaminación sale de las reglas (`datos/dictamen.json` nombra las claves): en PEG,
+  45 días hábiles desde la recepción (Convocatoria PEG, base quinta, fr. II, línea 9516); en CC, la fecha
+  límite de la Convocatoria (30-jun-2026). El dictamen queda «en plazo» o «fuera de plazo»; sin
+  dictamen, «en plazo», «por vencer» (5 días hábiles o menos) o «vencido», y `revisar_plazos` lo señala
+  una vez en la bitácora. El listado preliminar reúne el resultado técnico y jurídico de cada solicitud
+  validada y se exporta a CSV en UTF-8 con BOM (Excel lo abre con acentos).
+- **HU-2.2.** El Listado de Personas Beneficiarias Incumplidas y los predios con procedimiento o
+  sanción son catálogos con historial (`django-simple-history`); una baja desactiva, no borra. El cotejo
+  es automático (persona, CURP, RFC, nombre sin acentos y predio) y se muestra en la pantalla y en el
+  acuse. Con coincidencias, el **servicio** rechaza el dictamen procedente. Un predio sancionado con el
+  reintegro hecho deja de impedir el apoyo (CC 8.1.1.1, inelegibles fr. III). En refrendo se pide el
+  dictamen igual (CC 10.1 fr. IV).
+- **HU-2.3.** La convocatoria exige orden del día y al menos un documento y se rechaza si no se envía con
+  la anticipación de las reglas (`convocatoria_sesion_comite`: 3 días hábiles; 24 horas si es
+  extraordinaria); su acuse lleva la fecha y la hora del envío, el orden del día y los integrantes del
+  Comité tomados de `CC.json` (`instancias.comite`) o de `catalogos.json`. La propuesta de listados
+  ordena las factibles por los criterios de priorización que se pueden leer del expediente
+  (`datos/dictamen.json`: reforestaciones primero, 8.1.2 fr. I; refrendos, fr. II) y desempata por fecha y
+  hora de registro (8.1.2, último párrafo); asigna hasta donde alcance el recurso disponible
+  ($2,000 por ha de superficie factible, numeral 7.2) y el resto va a la lista de espera con su lugar.
+  El Comité puede mover una solicitud de listado o de lugar con un motivo obligatorio, que queda en el
+  acta, en el historial y en la bitácora; una no factible no puede pasar a los listados de apoyo. El acta
+  (PDF) trae los tres listados y la autorización de publicación, y mueve cada expediente a `aprobada`,
+  `lista_espera` o `no_factible`.
+- **HU-2.4.** Los tipos de acuerdo y el área que los cumple por omisión están en `datos/dictamen.json`
+  (reasignación, sustitución, caso fortuito, suspensión, cancelación, baja, reintegro, instrucción de
+  pago a la Fiduciaria solo en PSAHEM y por ministración, validación de reportes solo en PEG y por
+  periodo, y otro). Cada acuerdo lleva sus expedientes y su unidad responsable, que lo ve en su bandeja y
+  lo marca como cumplido. `ministraciones_sin_instruccion` y `periodos_sin_validacion` dicen qué falta.
+  Los acuerdos todavía no ejecutan nada en otros módulos: `dictamen.seguimiento.RECEPTORES` es el punto
+  de conexión (tipo de acuerdo → funciones) para pagos (M5) y seguimiento (M6).
 
 ## Diferencias con la especificación (mandan las ROP)
 
@@ -190,6 +278,11 @@ de los programas de los que es Instancia Ejecutora.
   confirmar.
 - El polígono se levanta después de entregar el expediente (CC 10.1 fr. III), por eso no es requisito
   para enviarlo a la Dirección.
+- La no factibilidad no la decide la Dirección ni la Unidad Jurídica por sí solas: el dictamen produce
+  el listado preliminar y el Comité aprueba la Lista de solicitudes No factibles (CC 10.1 fr. VI y VII;
+  9.4.3 fr. I y III). Se quitó la transición directa `validada → no_factible`.
+- En CC el plazo de dictaminación no es un número de días sino la fecha límite de la Convocatoria
+  (30-jun-2026); el de 45 días hábiles es solo de PEG.
 
 ## Pendientes con el cliente
 
@@ -198,8 +291,17 @@ de los programas de los que es Instancia Ejecutora.
   (10.1 fr. V) sin cantidad; se usó el de complemento (5 días hábiles, 8.1.1.2 fr. XIV) contado desde el
   aviso. Falta decidir si corre desde el aviso o desde la notificación de la Delegación, y si debe
   topar con la fecha límite de recepción de la Convocatoria (27-mar-2026).
-- Varios requisitos de CC no son documentos (por ejemplo CC-REQ-01, «ser persona física o jurídico
-  colectiva…»); hoy se marcan entregados con un archivo. Convendría una bandera en las reglas.
+- Requisitos que no son documentos: se marcaron CC-REQ-01 y CC-REQ-03 (`datos/sistema.json`); confirmar
+  la lista.
+- Priorización en CC: las ROP no traen puntaje; se propone el orden reforestaciones → refrendos → fecha
+  de registro. Confirmar con el Comité los demás criterios (8.1.2 fr. III a X necesitan datos que hoy no
+  se capturan: índice de presión, ANP, grupos prioritarios…).
+- Recurso disponible por sesión y monto por hectárea cuando la superficie factible difiere de la
+  solicitada.
+- Plazo de convocatoria de los Comités de PSAHEM y PEG (5 días hábiles en el CASPEG, línea 8939) y
+  sus integrantes: cuando existan sus archivos de reglas.
+- Si el acta debe esperar a la fecha de la sesión: hoy se puede registrar en cuanto se envía la
+  convocatoria.
 - Clave INEGI de los municipios (la capa de IDEFOR no la trae).
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
 - Reglas de MFS, PS, RHF, PSA y PEG (archivos `reglas/<CLAVE>.json`).

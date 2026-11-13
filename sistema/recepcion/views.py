@@ -82,12 +82,21 @@ def delegacion_de_municipio(request):
 def expediente(request, folio):
     exp = _expediente(request, folio)
     pestana = request.GET.get("pestana", "solicitud")
-    if pestana not in dict(PESTANAS):
-        pestana = "solicitud"
     if pestana == "ubicacion" and not exp.programa.usa_poligono:
         pestana = "solicitud"
     contexto = contexto_expediente(request, exp)
-    contexto.update({"pestana": pestana, "pestanas": [p for p in PESTANAS if p[0] != "ubicacion" or exp.programa.usa_poligono]})
+    from nucleo.extensiones import PESTANAS_EXPEDIENTE
+
+    pestanas = [p for p in PESTANAS if p[0] != "ubicacion" or exp.programa.usa_poligono]
+    extra = {p["clave"]: p for p in PESTANAS_EXPEDIENTE}
+    # Las pestañas de otros módulos van antes de «Documentos y acuses».
+    pestanas[-2:-2] = [(p["clave"], p["nombre"]) for p in PESTANAS_EXPEDIENTE]
+    if pestana not in {c for c, _ in pestanas}:
+        pestana = "solicitud"
+    if pestana in extra:
+        contexto["plantilla_pestana"] = extra[pestana]["plantilla"]
+        contexto.update(extra[pestana]["contexto"](request, exp))
+    contexto.update({"pestana": pestana, "pestanas": pestanas})
     if pestana == "ubicacion":
         contexto["form_poligono"] = PoligonoForm()
     return render(request, "recepcion/expediente.html", contexto)

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}Sesión {{ sesion.numero }}{% endblock %}
+{% block contenido %}
+<div class="tarjeta encabezado-exp mb-3">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div>
+      <div class="dato">{{ sesion.integrantes.nombre|default:sesion.ejercicio.programa.nombre }}</div>
+      <h1>{{ sesion.get_tipo_display }} {{ sesion.numero }}</h1>
+      <div class="dato">{{ sesion.get_caracter_display }} · {{ sesion.fecha_hora|date:"l j \d\e F \d\e Y, H:i" }} h · {{ sesion.lugar }}</div>
+    </div>
+    <div class="text-md-end">
+      <span class="badge fs-6 {% if sesion.estado == 'celebrada' %}text-bg-success{% elif sesion.estado == 'convocada' %}text-bg-info{% else %}text-bg-light border{% endif %}" data-prueba="estado-sesion">{{ sesion.get_estado_display }}</span>
+      <div class="dato mt-1"><a href="{% url 'dictamen:sesiones' %}">Todas las sesiones</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta h-100" data-prueba="convocatoria">
+      <div class="titulo-seccion">Convocatoria</div>
+      <div class="small text-secondary">Orden del día</div>
+      <ol class="small">{% for p in sesion.puntos %}<li>{{ p }}</li>{% endfor %}</ol>
+      <div class="small text-secondary">Documentos de la sesión</div>
+      <ul class="small">{% for d in documentos %}<li><a href="{% url 'dictamen:sesion_documento_archivo' sesion.pk d.pk %}" target="_blank">{{ d.nombre }}</a> <span class="text-secondary">{{ d.fecha_hora|date:"d/m/Y H:i" }}</span></li>{% empty %}<li class="text-secondary">Sin documentos.</li>{% endfor %}</ul>
+      {% if sesion.convocatoria_enviada %}
+      <div class="alert alert-success py-2 small mb-0">Enviada el <strong>{{ sesion.convocatoria_enviada|date:"d/m/Y H:i:s" }} h</strong> · acuse
+        <a href="{% url 'nucleo:acuse' sesion.acuse_convocatoria.folio %}" target="_blank">{{ sesion.acuse_convocatoria.folio }}</a></div>
+      {% elif es_st %}
+      <form method="post" action="{% url 'dictamen:sesion_documento' sesion.pk %}" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 mb-2">
+        {% csrf_token %}
+        <input class="form-control form-control-sm" name="nombre" placeholder="Nombre del documento" style="max-width: 14rem">
+        <input class="form-control form-control-sm" type="file" name="archivo" style="max-width: 16rem" aria-label="Archivo del documento">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Agregar documento</button>
+      </form>
+      <form method="post" action="{% url 'dictamen:sesion_convocar' sesion.pk %}">
+        {% csrf_token %}
+        <div class="small text-secondary mb-1">Anticipación: {{ texto_plazo|default:"sin plazo en las reglas" }}{% if limite_convocatoria %}; enviar a más tardar el <strong>{{ limite_convocatoria|date:"d/m/Y" }}</strong>{% endif %}.</div>
+        <button class="btn btn-primary btn-sm" type="submit">Enviar convocatoria a los integrantes</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta h-100">
+      <div class="titulo-seccion">Integrantes del Comité</div>
+      <div class="small text-secondary">{{ sesion.integrantes.fundamento }}</div>
+      {% if sesion.integrantes.presidencia %}<div class="small"><strong>Presidencia:</strong> {{ sesion.integrantes.presidencia }}</div>{% endif %}
+      {% if sesion.integrantes.secretaria_tecnica %}<div class="small"><strong>Secretaría Técnica:</strong> {{ sesion.integrantes.secretaria_tecnica }}</div>{% endif %}
+      {% if sesion.integrantes.vocales %}<div class="small mt-1"><strong>Vocales (voz y voto)</strong></div><ul class="small mb-1">{% for v in sesion.integrantes.vocales %}<li>{{ v }}</li>{% endfor %}</ul>{% endif %}
+      {% if sesion.integrantes.invitados %}<div class="small"><strong>Invitados (solo voz)</strong></div><ul class="small mb-0">{% for v in sesion.integrantes.invitados %}<li>{{ v }}</li>{% endfor %}</ul>{% endif %}
+      {% if sesion.integrantes.composicion %}<div class="small">{{ sesion.integrantes.composicion }}</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% include plantilla_tipo %}
+{% endblock %}

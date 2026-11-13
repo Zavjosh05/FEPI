@@ -80,6 +80,7 @@ def test_hu_1_2_recorrido_revision_y_envio(datos_e2e, page, live_server, entrar,
     archivo = tmp_path / "curp.pdf"
     from nucleo.demo import _pdf_demo
     archivo.write_bytes(_pdf_demo("CURP"))
+    fila.locator("button:has-text('Revisar')").click()
     fila.locator("select[name=estado]").select_option("entregado")
     fila.locator("input[name=archivo]").set_input_files(str(archivo))
     fila.locator("button:has-text('Guardar')").click()
@@ -177,7 +178,7 @@ def test_hu_1_4_recorrido_validacion_y_aviso_de_faltantes(datos_e2e, page, live_
     captura("hu_1_4_05_refrendo_documentacion_vigente")
     page.click("button:has-text('Validar expediente')")
     page.wait_for_url("**pestana=validacion")
-    expect(page.locator("[data-prueba=estado]")).to_have_text("Expediente validado")
+    expect(page.locator("[data-prueba=estado]")).to_have_text("Validado · en dictamen")
     captura("hu_1_4_06_expediente_validado")
     page.goto(f"{live_server.url}/recepcion/expediente/{refrendo.folio}/?pestana=bitacora")
     captura("hu_1_4_07_bitacora")

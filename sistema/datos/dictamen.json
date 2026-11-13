@@ -1,0 +1,101 @@
+{
+  "nota": "Datos del módulo M2 (Dictamen y Comité) que no vienen de las ROP o que las interpretan. Editables.",
+  "plazos": {
+    "dictamen": [
+      "dictaminacion_tecnica_juridica",
+      "evaluacion_y_dictaminacion"
+    ],
+    "convocatoria_comite": "convocatoria_sesion_comite",
+    "dictamen_por_vencer_dias_habiles": 5,
+    "nota": "dictamen: se usa el primer plazo que exista en las reglas del programa. En PEG es «dictaminacion_tecnica_juridica» (45 días hábiles desde la recepción, Convocatoria PEG base quinta, fr. II, línea 9516); en CC, «evaluacion_y_dictaminacion» (fecha límite 30-jun-2026)."
+  },
+  "priorizacion": {
+    "nota": "Orden propuesto para la sesión de aprobación. Las ROP de CC no traen tabla de puntos (8.1.2): se ordena por los criterios que se pueden leer del expediente, en este orden, y se desempata por fecha y hora de registro (8.1.2, último párrafo). El Comité puede ajustar el orden dejando constancia.",
+    "CC": [
+      {
+        "criterio": "Reforestaciones primero (8.1.2 fr. I: «priorizando las reforestaciones»)",
+        "campo": "modalidad",
+        "valores": [
+          "reforestacion"
+        ]
+      },
+      {
+        "criterio": "Personas que cumplieron en ejercicios anteriores: refrendo (8.1.2 fr. II)",
+        "campo": "es_refrendo",
+        "valores": [
+          true
+        ]
+      }
+    ]
+  },
+  "tipos_acuerdo": [
+    {
+      "clave": "reasignacion",
+      "nombre": "Reasignación del recurso liberado a la lista de espera",
+      "unidad": "DRFF",
+      "fundamento": "CC 10.2; Convocatoria base sexta"
+    },
+    {
+      "clave": "sustitucion",
+      "nombre": "Sustitución de la persona beneficiaria",
+      "unidad": "DRFF",
+      "fundamento": "CC 10.2"
+    },
+    {
+      "clave": "caso_fortuito",
+      "nombre": "Atención de caso fortuito o fuerza mayor",
+      "unidad": "DRFF",
+      "fundamento": "CC 8.1.7 fr. VI"
+    },
+    {
+      "clave": "suspension",
+      "nombre": "Suspensión temporal del apoyo",
+      "unidad": "DRFF",
+      "fundamento": "CC 8.1.9 a)"
+    },
+    {
+      "clave": "cancelacion",
+      "nombre": "Cancelación del apoyo",
+      "unidad": "UJ",
+      "fundamento": "CC 8.1.9 b)"
+    },
+    {
+      "clave": "baja",
+      "nombre": "Baja del programa e inscripción en el Listado de Personas Beneficiarias Incumplidas",
+      "unidad": "UJ",
+      "fundamento": "CC 8.1.9 b); 9.4.3 fr. V"
+    },
+    {
+      "clave": "reintegro",
+      "nombre": "Reintegro de recursos",
+      "unidad": "UJ",
+      "fundamento": "CC 8.1.9 c); 10.1 fr. II"
+    },
+    {
+      "clave": "instruccion_pago",
+      "nombre": "Instrucción de pago a la Fiduciaria (por ministración)",
+      "unidad": "FIDUCIARIA",
+      "programas": [
+        "PSA"
+      ],
+      "pide": "ministracion",
+      "fundamento": "PSAHEM 10.1 fr. VIII y X (líneas 2281-2292)"
+    },
+    {
+      "clave": "validacion_reportes",
+      "nombre": "Validación de la evaluación de reportes mensuales (por periodo)",
+      "unidad": "DPF",
+      "programas": [
+        "PEG"
+      ],
+      "pide": "periodo",
+      "fundamento": "Convocatoria PEG base cuarta (línea 9505)"
+    },
+    {
+      "clave": "otro",
+      "nombre": "Otro acuerdo",
+      "unidad": "DRFF",
+      "fundamento": "9.4.3 fr. VIII"
+    }
+  ]
+}

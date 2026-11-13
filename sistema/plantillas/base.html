@@ -24,6 +24,9 @@
         {% if unidad_actual.es_delegacion %}
         <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'registrar' %}active{% endif %}" href="{% url 'recepcion:registrar' %}">Registrar solicitud</a></li>
         {% endif %}
+        {% for m in menu_extra %}
+        <li class="nav-item"><a class="nav-link text-nowrap {% if request.resolver_match.url_name == m.nombre_url %}active{% endif %}" href="{{ m.url }}">{{ m.nombre }}</a></li>
+        {% endfor %}
         {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Catálogos</a></li>{% endif %}
       </ul>
       <div class="d-flex align-items-center gap-3 text-white small usuario-barra">
@@ -56,6 +59,7 @@
 </footer>
 <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+<script src="{% static 'js/archivos.js' %}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

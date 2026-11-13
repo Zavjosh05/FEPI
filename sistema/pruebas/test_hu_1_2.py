@@ -40,7 +40,7 @@ def test_hu_1_2_cada_requisito_queda_entregado_o_faltante(nueva_solicitud, usuar
     estados = dict(exp.revisiones.values_list("requisito__clave", "estado"))
     assert EstadoRevision.PENDIENTE not in estados.values()
     assert estados["CC-REQ-08"] == EstadoRevision.FALTANTE
-    entregados = exp.revisiones.filter(estado=EstadoRevision.ENTREGADO)
+    entregados = exp.revisiones.filter(estado=EstadoRevision.ENTREGADO, requisito__requiere_documento=True)
     assert entregados.exists() and all(r.documento and r.documento.archivo for r in entregados)
     assert exp.eventos.filter(tipo="revision_requisito").count() == exp.revisiones.count()
 
@@ -97,3 +97,17 @@ def test_hu_1_2_revision_por_htmx_devuelve_la_fila(client, nueva_solicitud, cont
     assert f'id="req-{r.pk}"' in resp.content.decode()
     r.refresh_from_db()
     assert r.estado == "entregado" and r.documento is not None
+
+
+def test_hu_1_2_requisito_que_no_es_documento_se_cumple_sin_archivo(nueva_solicitud, usuarios, cc):
+    """Ajuste: los requisitos que son condiciones (datos/sistema.json) no exigen archivo."""
+    req = cc.requisitos.get(clave="CC-REQ-01")
+    assert req.requiere_documento is False and cc.requisitos.get(clave="CC-REQ-08").requiere_documento
+    exp = nueva_solicitud()
+    r = exp.revisiones.get(requisito=req)
+    servicios.revisar_requisito(usuarios["del_amecameca"], r, EstadoRevision.ENTREGADO)
+    r.refresh_from_db()
+    assert r.estado == EstadoRevision.ENTREGADO and r.documento is None
+    completar_requisitos(usuarios["del_amecameca"], exp)
+    assert servicios.problemas_para_enviar(exp) == []
+    assert all(e.valida for e in servicios.evaluar_para_validacion(exp))
