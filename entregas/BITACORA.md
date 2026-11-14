@@ -93,13 +93,13 @@ numeral y la línea del texto de las ROP.
 
 | ID | Problema | Propuesta | Estado |
 | --- | --- | --- | --- |
-| P-01 | La lista de verificación del dictamen técnico viene con todo marcado «Cumple». | Que venga sin marcar y exigir que cada criterio se revise. | Aceptado (ajuste A-1) |
-| P-02 | El acta se puede registrar antes de la fecha de la sesión. | Impedirlo en el servicio. | Aceptado (ajuste A-2) |
+| P-01 | La lista de verificación del dictamen técnico viene con todo marcado «Cumple». | Que venga sin marcar y exigir que cada criterio se revise. | Hecho (ajuste A-1, `045feb7`) |
+| P-02 | El acta se puede registrar antes de la fecha de la sesión. | Impedirlo en el servicio. | Hecho (ajuste A-2, `045feb7`) |
 | P-03 | Todo en la demostración tiene fecha de «hoy», así que los plazos de CC salen vencidos. | Datos de demostración con el calendario de la convocatoria. Ver G-03. | Aceptado (sprint 2) |
-| P-04 | La etiqueta «Ajustado» marca también las filas que solo se recorrieron de lugar. | Marcar solo la fila que el Comité movió. | Aceptado (ajuste A-3) |
-| P-05 | Los montos salen sin separador de miles ($20500.00). | Formato de moneda en un solo filtro de plantilla. | Aceptado (ajuste A-4) |
-| P-06 | Cada corrida de pruebas reescribe las 49 capturas y ensucia git. | Guardar capturas solo cuando se pida. | Aceptado (ajuste A-5) |
-| P-07 | Las pruebas pasaron de 40 s a 133 s y seguirán creciendo. | Separar las rápidas de las de navegador. | Aceptado (ajuste A-6) |
+| P-04 | La etiqueta «Ajustado» marca también las filas que solo se recorrieron de lugar. | Marcar solo la fila que el Comité movió. | Hecho (ajuste A-3, `045feb7`) |
+| P-05 | Los montos salen sin separador de miles ($20500.00). | Formato de moneda en un solo filtro de plantilla. | Hecho (ajuste A-4, `045feb7`) |
+| P-06 | Cada corrida de pruebas reescribe las 49 capturas y ensucia git. | Guardar capturas solo cuando se pida. | Hecho (ajuste A-5, `045feb7`) |
+| P-07 | Las pruebas pasaron de 40 s a 133 s y seguirán creciendo. | Separar las rápidas de las de navegador. | Hecho (ajuste A-6, `045feb7`) |
 | P-08 | El comando diario solo avisa de los faltantes vencidos; no desecha la solicitud. | Decidir si el desecho es automático o lo hace una persona. | Por decidir (cliente; recomendación: que lo haga una persona con un clic, por ser un acto con efectos legales) |
 | P-09 | La cadena completa solo se probó a nivel de servicios; por la interfaz, historia por historia. | Un recorrido de navegador de punta a punta al cerrar cada sprint. | Aceptado (sprints 2 y 3) |
 | P-10 | No se probó con dos usuarios sobre el mismo expediente, con volumen ni en navegadores distintos de Chromium. | Ver G-02 para el volumen; lo demás, al final del sprint 3. | Propuesto |
@@ -140,6 +140,8 @@ numeral y la línea del texto de las ROP.
 | W-04 | Trabajo reanudable: tareas pequeñas (una historia o menos), commit en cuanto se verifican, y el tablero [AVANCE.md](AVANCE.md) con el «siguiente paso» siempre al día. | Si el trabajo se interrumpe a la mitad, se retoma desde el tablero sin rehacer nada. | Hecho (14-nov) |
 | W-05 | Cada tarea delegada empieza de cero leyendo `sistema/README.md`, el modelo de datos y solo los archivos de su historia; no se reanuda una tarea que ya acumuló mucho historial. | El sprint 1 gastó entre 1.2 y 1.6 millones de unidades de proceso en tareas delegadas, cerca de un millón en una sola que se fue alargando. | Aceptado (desde el sprint 2) |
 | W-06 | Extracción de reglas y ajustes pequeños con el modelo más económico; construcción de módulos con el más capaz. | Usar la capacidad donde hace falta. | Hecho en el sprint 1; sigue |
-| W-07 | Durante la construcción se corren solo las pruebas de la historia; la batería completa, una vez al cerrar cada tarea. | La batería completa tarda más de dos minutos y crecerá. | Aceptado (desde el ajuste A-6) |
+| W-07 | Durante la construcción se corren solo las pruebas de la historia; la batería completa, una vez al cerrar cada tarea. | La batería completa tarda más de dos minutos y crecerá. | Hecho (`045feb7`); sigue |
 | W-08 | Nada se da por hecho con el informe de quien lo construyó: se vuelven a correr las pruebas y se revisan las capturas antes del commit. | En el sprint 1 esa revisión encontró el doble redondeo (C-04) y la dependencia de una carpeta fuera del repositorio (T-11). | Hecho; sigue |
-| W-09 | Esta bitácora se actualiza en el mismo commit que el cambio que documenta. | Que la documentación no se quede atrás del código. | Hecho (14-nov) |
+| W-09 | Esta bitácora se actualiza en el mismo commit que el cambio que documenta, o en el siguiente cuando necesita citar su identificador. | Que la documentación no se quede atrás del código. | Hecho (14-nov) |
+| W-10 | Después de cambiar código, el sitio se levanta con `docker compose up --build`. | Al verificar los ajustes se levantó sin reconstruir y corrió la imagen anterior: el sitio no respondió y la demostración mostraba datos viejos. Con `--build` responde en 39 s con una base nueva. | Hecho (14-nov; anotado en AVANCE.md) |
+| W-11 | Los ajustes A-1 a A-6 se hicieron con una tarea delegada nueva y el modelo económico: unas 150 mil unidades de proceso, contra cerca de un millón del módulo más caro del sprint 1. | Primera aplicación de W-05 y W-06. | Hecho (`045feb7`) |

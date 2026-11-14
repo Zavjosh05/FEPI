@@ -5,8 +5,8 @@ El porqué de cada decisión está en [BITACORA.md](BITACORA.md).
 
 ## Siguiente paso
 
-> **Ajustes del sprint 1 (A-1 a A-6), en curso.** Al terminar: esperar la indicación de Joshua para
-> iniciar el sprint 2, que empieza por subir la rama `prototipos` al repositorio remoto (tarea S2-00).
+> **Esperar la indicación de Joshua para iniciar el sprint 2.** Empieza por subir la rama `prototipos`
+> al repositorio remoto (tarea S2-00) y sigue con las reglas de PS, RHF y PSAHEM (S2-01a, b y c).
 
 ## Cómo retomar un trabajo interrumpido
 
@@ -30,7 +30,17 @@ Desde Windows, con Docker dentro de WSL:
 wsl -e bash -lc "cd /mnt/c/Users/josh/Documents/GitHub/FEPI/sistema && docker compose --profile pruebas run --rm pruebas"
 ```
 
-La Calculadora se prueba aparte, con el entorno de Python del repositorio: `pytest pruebas/calculadora`.
+Ese comando corre todo (unos 2 minutos). Durante el trabajo se usan las formas cortas, agregando al final:
+
+| Para | Se agrega | Tarda |
+| --- | --- | --- |
+| Pruebas rápidas, sin navegador | `pytest -m "not navegador"` | ~1 min |
+| Una sola historia | `pytest pruebas/test_hu_2_3.py` | ~20 s |
+| Guardar capturas | `-e CAPTURAS=1` antes de `pruebas` | — |
+
+Si cambió el código, el sitio se levanta con `docker compose up --build`: sin `--build` corre la imagen
+anterior. La Calculadora se prueba aparte, con el entorno de Python del repositorio:
+`pytest pruebas/calculadora`.
 
 ## Sprint 1 · Recepción y dictamen (M1, M2; M7.1) — terminado, en revisión
 
@@ -48,21 +58,21 @@ La Calculadora se prueba aparte, con el entorno de Python del repositorio: `pyte
 | HU-2.3 | Sesión de aprobación con acta | Hecho | `40ac657` |
 | HU-2.4 | Sesiones de seguimiento con acuerdos | Hecho | `a27e107` |
 | Revisión | Diagrama del modelo de datos y prueba del recorrido completo | Hecho | `68dc445` |
-| Revisión | Bitácora de decisiones y este tablero | Hecho | (este commit) |
+| Revisión | Bitácora de decisiones y este tablero | Hecho | `9b4a013` |
 
-Pruebas al cierre: 121 del sistema y 15 de la Calculadora, todas en verde. Capturas en
+Pruebas al cierre: 127 del sistema (121 antes de los ajustes) y 15 de la Calculadora, todas en verde. Capturas en
 `sprint_1/capturas/` (49).
 
 ### Ajustes tras la revisión del 14-nov
 
 | Tarea | Qué (problema en la bitácora) | Estado | Commit |
 | --- | --- | --- | --- |
-| A-1 | Lista de verificación del dictamen técnico sin marcar por omisión (P-01) | Pendiente | |
-| A-2 | El acta no se registra antes de la fecha de la sesión (P-02) | Pendiente | |
-| A-3 | «Ajustado» solo en la fila que el Comité movió (P-04) | Pendiente | |
-| A-4 | Montos con separador de miles (P-05) | Pendiente | |
-| A-5 | Capturas solo cuando se piden (P-06) | Pendiente | |
-| A-6 | Pruebas rápidas separadas de las de navegador (P-07) | Pendiente | |
+| A-1 | Lista de verificación del dictamen técnico sin marcar por omisión (P-01) | Hecho | `045feb7` |
+| A-2 | El acta no se registra antes de la fecha de la sesión (P-02) | Hecho | `045feb7` |
+| A-3 | «Ajustado» solo en la fila que el Comité movió (P-04) | Hecho | `045feb7` |
+| A-4 | Montos con separador de miles (P-05) | Hecho | `045feb7` |
+| A-5 | Capturas solo cuando se piden (P-06) | Hecho | `045feb7` |
+| A-6 | Pruebas rápidas separadas de las de navegador (P-07) | Hecho | `045feb7` |
 
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — sin empezar
 
