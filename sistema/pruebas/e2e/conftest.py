@@ -5,7 +5,12 @@ import pytest
 
 from pruebas.conftest import asegurar_catalogos
 
+# Las capturas solo se guardan con CAPTURAS=1; la carpeta se elige con CAPTURAS_DIR (por omisión, la del sprint 1).
 CAPTURAS = Path(os.environ.get("CAPTURAS_DIR", Path(__file__).resolve().parents[3] / "entregas" / "sprint_1" / "capturas"))
+
+
+def capturas_activas():
+    return os.environ.get("CAPTURAS", "").strip().lower() in ("1", "true", "si", "sí", "yes")
 
 
 @pytest.fixture
@@ -28,9 +33,13 @@ def browser_context_args(browser_context_args):
 
 @pytest.fixture
 def captura(page):
-    CAPTURAS.mkdir(parents=True, exist_ok=True)
+    activas = capturas_activas()
+    if activas:
+        CAPTURAS.mkdir(parents=True, exist_ok=True)
 
     def _tomar(nombre, pagina=None):
+        if not activas:
+            return
         (pagina or page).screenshot(path=str(CAPTURAS / f"{nombre}.png"), full_page=True)
     return _tomar
 

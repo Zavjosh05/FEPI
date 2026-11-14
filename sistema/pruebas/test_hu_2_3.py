@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils import timezone
 
 from dictamen import aprobacion, sesiones
-from dictamen.models import ResultadoListado, TipoSesion
+from dictamen.models import ResultadoListado, SesionComite, TipoSesion
 
 from .conftest import historia
 from .fixtures_m2 import *  # noqa: F401,F403
@@ -70,10 +70,11 @@ def test_hu_2_3_existe_acta_con_listados_aprobados_y_autorizacion_de_publicacion
     assert (res[c.pk].resultado, res[c.pk].orden) == (ResultadoListado.BENEFICIARIA, 2)
     assert (res[b.pk].resultado, res[b.pk].orden) == (ResultadoListado.LISTA_ESPERA, 1)
     assert res[d.pk].resultado == ResultadoListado.NO_FACTIBLE
-    acta = aprobacion.registrar_acta(usuarios["comite"], s, True, "Unanimidad")
+    acta = aprobacion.registrar_acta(usuarios["comite"], s, True, "Unanimidad", momento=despues_de(s))
     s.refresh_from_db()
     assert s.estado == "celebrada" and s.autoriza_publicacion and s.acuse_acta == acta
     assert "Sí" in dict(acta.contenido["renglones"])["Autorización de publicación"]
+    assert any("$10,000.00" in x["texto"] for x in acta.contenido["detalle"])   # monto con separador de miles
     listados = {x["clave"] for x in acta.contenido["detalle"]}
     assert listados == {"Lista de Personas Beneficiarias", "Lista de espera", "Lista de solicitudes No factibles"}
     for exp, estado in [(a, "aprobada"), (c, "aprobada"), (b, "lista_espera"), (d, "no_factible")]:
@@ -98,12 +99,51 @@ def test_hu_2_3_ajuste_del_orden_deja_constancia(sesion, dictaminada, usuarios):
     assert b.eventos.filter(tipo="ajuste_comite").exists()
 
 
+def test_hu_2_3_ajustado_solo_en_la_fila_que_el_comite_movio(sesion, dictaminada, usuarios, client, contrasena):
+    a = dictaminada(nombre="Primero", ha=5)
+    b = dictaminada(nombre="Segundo", municipio="Tlalmanalco", ha=5)
+    c = dictaminada(nombre="Tercero", municipio="Ozumba", ha=5)
+    s = sesion()
+    aprobacion.proponer_listados(usuarios["comite"], s)
+    aprobacion.ajustar(usuarios["comite"], s.resoluciones.get(expediente=c), "beneficiaria", 1, "Zona prioritaria")
+    por_exp = {r.expediente_id: r for r in s.resoluciones.all()}
+    assert [por_exp[x.pk].orden for x in (c, a, b)] == [1, 2, 3]      # a y b solo se recorrieron
+    assert por_exp[c.pk].ajustada and por_exp[c.pk].motivo_ajuste == "Zona prioritaria"
+    assert not por_exp[a.pk].ajustada and not por_exp[b.pk].ajustada
+    assert por_exp[a.pk].motivo_ajuste == "" and por_exp[b.pk].motivo_ajuste == ""
+    client.login(username="comite", password=contrasena)
+    html = client.get(f"/dictamen/sesiones/{s.pk}/").content.decode()
+    assert html.count("ajustado</span>") == 1 and html.count("Constancia:") == 1
+
+
 def test_hu_2_3_no_factible_no_pasa_a_listados_de_apoyo(sesion, dictaminada, usuarios):
     d = dictaminada(tecnico_resultado="no_factible")
     s = sesion()
     aprobacion.proponer_listados(usuarios["comite"], s)
     with pytest.raises(ValidationError):
         aprobacion.ajustar(usuarios["comite"], s.resoluciones.get(expediente=d), "beneficiaria", 1, "Caso especial")
+
+
+def test_hu_2_3_el_acta_no_se_registra_antes_de_la_sesion(sesion, dictaminada, usuarios):
+    dictaminada()
+    s = sesion()
+    sesiones.enviar_convocatoria(usuarios["comite"], s)
+    aprobacion.proponer_listados(usuarios["comite"], s)
+    with pytest.raises(ValidationError, match="antes de la sesión"):
+        aprobacion.registrar_acta(usuarios["comite"], s, True)
+    with pytest.raises(ValidationError, match="antes de la sesión"):
+        aprobacion.registrar_acta(usuarios["comite"], s, True, momento=s.fecha_hora - timedelta(minutes=1))
+    s.refresh_from_db()
+    assert s.estado == "convocada" and s.acuse_acta_id is None
+    # Una sesión ya celebrada (convocada con su anticipación en una fecha pasada) sí admite el acta.
+    pasada = sesion(dias=6)
+    envio = pasada.fecha_hora - timedelta(days=15)
+    sesiones.enviar_convocatoria(usuarios["comite"], pasada, momento=envio)
+    pasada.refresh_from_db()
+    assert pasada.convocatoria_enviada == envio
+    tarde = sesion(dias=6)
+    with pytest.raises(ValidationError, match="anticipación"):
+        sesiones.enviar_convocatoria(usuarios["comite"], tarde, momento=tarde.fecha_hora - timedelta(days=1))
 
 
 def test_hu_2_3_acta_requiere_convocatoria_y_la_hace_la_secretaria_tecnica(sesion, dictaminada, usuarios):
@@ -132,7 +172,11 @@ def test_hu_2_3_pantallas_de_la_sesion(sesion, dictaminada, client, contrasena):
     client.post(url + "proponer/", {"presupuesto": ""})
     r = client.get(url)
     assert "Lista de Personas Beneficiarias" in r.content.decode()
-    r = client.post(url + "acta/", {"autoriza_publicacion": "on"})
+    # La sesión es dentro de 8 días hábiles: el acta no se registra todavía.
+    client.post(url + "acta/", {"autoriza_publicacion": "on"})
+    assert "Acta registrada" not in client.get(url).content.decode()
+    SesionComite.objects.update(fecha_hora=timezone.now() - timedelta(hours=3))   # la sesión ya se celebró
+    client.post(url + "acta/", {"autoriza_publicacion": "on"})
     assert "Acta registrada" in client.get(url).content.decode()
 
 

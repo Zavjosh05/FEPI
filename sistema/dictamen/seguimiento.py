@@ -105,12 +105,17 @@ def cumplir(usuario, acuerdo, observaciones=""):
     return acuerdo
 
 
-def cerrar_sesion(usuario, sesion, observaciones=""):
+def cerrar_sesion(usuario, sesion, observaciones="", momento=None):
+    """Cierra la sesión de seguimiento; no antes de su fecha y hora (`momento`: solo servicios, pruebas y demo)."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
+    ahora = momento or timezone.now()
+    if ahora < sesion.fecha_hora:
+        raise ValidationError(f"La sesión no se cierra antes de celebrarse: está convocada para el "
+                              f"{timezone.localtime(sesion.fecha_hora):%d/%m/%Y a las %H:%M} h.")
     if not sesion.acuerdos.exists():
         raise ValidationError("La sesión no tiene acuerdos.")
     sesion.estado = EstadoSesion.CELEBRADA
-    sesion.acta_fecha = timezone.now()
+    sesion.acta_fecha = ahora
     sesion.observaciones_acta = observaciones
     sesion.save()
     return sesion

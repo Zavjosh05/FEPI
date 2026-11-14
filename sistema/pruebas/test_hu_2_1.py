@@ -55,6 +55,28 @@ def test_hu_2_1_criterio_no_cumplido_impide_factible(validada, usuarios):
     assert next(i for i in d.verificacion if i["clave"] == "inelegible-6")["nota"] == "Incendio 2026"
 
 
+def test_hu_2_1_no_se_dictamina_con_criterios_sin_revisar(validada, usuarios, client):
+    """La lista de verificación llega sin marcar: desde la pantalla no se dictamina con criterios sin revisar."""
+    exp = validada()
+    revisables = [i for i in tecnico.lista_verificacion(exp.ejercicio) if not i.get("informativo")]
+    with pytest.raises(ValidationError, match=f"Falta marcar {len(revisables)} criterios"):
+        tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Cumple", {}, exigir_revision=True)
+    parcial = {revisables[0]["clave"]: {"respuesta": "si"}}
+    with pytest.raises(ValidationError, match=f"Falta marcar {len(revisables) - 1} criterios"):
+        tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Cumple", parcial, exigir_revision=True)
+    completa = {i["clave"]: {"respuesta": "si"} for i in revisables}
+    d = tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Cumple", completa, exigir_revision=True)
+    assert d.resultado == "factible"
+    # Por la pantalla: sin marcar no se registra; el formulario no trae ningún criterio preseleccionado.
+    otro = validada(nombre="Otro predio")
+    client.force_login(usuarios["dir_drff"])
+    url = f"/dictamen/tecnico/{otro.folio}/"
+    assert 'checked' not in client.get(url).content.decode().split("tabla-verificacion")[1].split("</table>")[0]
+    cliente = client.post(url, {"resultado": "factible", "motivo": "Cumple"}, follow=True)
+    assert "Falta marcar" in cliente.content.decode()
+    assert not DictamenTecnico.objects.filter(expediente=otro).exists()
+
+
 def test_hu_2_1_analisis_cartografico_con_postgis(validada, usuarios):
     primero = validada(municipio="Juchitepec", nombre="Predio A", ha=9)
     segundo = validada(municipio="Juchitepec", nombre="Predio B", ha=5, desplazamiento=(180, 120))
@@ -148,7 +170,8 @@ def test_hu_2_1_pantalla_de_dictamen_tecnico(validada, client, contrasena):
     r = client.get(f"/dictamen/tecnico/{exp.folio}/")
     assert r.status_code == 200 and "Lista de verificación" in r.content.decode()
     assert client.get(f"/dictamen/tecnico/{exp.folio}/mapa.json").json()["poligonos"]["features"]
-    r = client.post(f"/dictamen/tecnico/{exp.folio}/", {"resultado": "factible", "motivo": "Cumple"})
+    marcas = {f"v-{i['clave']}": "si" for i in tecnico.lista_verificacion(exp.ejercicio) if not i.get("informativo")}
+    r = client.post(f"/dictamen/tecnico/{exp.folio}/", {"resultado": "factible", "motivo": "Cumple", **marcas})
     assert r.status_code == 302 and DictamenTecnico.objects.filter(expediente=exp).exists()
     r = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=dictamenes")
     assert "Dictamen técnico" in r.content.decode()

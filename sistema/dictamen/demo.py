@@ -1,6 +1,6 @@
 """Datos de demostración del módulo M2 (idempotente): expedientes en dictamen y dictaminados, una persona en el
 Listado de Incumplidas, una sesión de aprobación con acta y una de seguimiento con acuerdos."""
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 
 from django.core.files.base import ContentFile
@@ -79,8 +79,10 @@ def cargar_demo():
         juridico.dictaminar(uj, agua_blanca, "procedente", "Refrendo con documentación vigente; nuevo dictamen jurídico (10.1 fr. IV).")
 
     # Sesión de aprobación con acta
-    fecha = timezone.localtime(timezone.now()).replace(hour=11, minute=0, second=0, microsecond=0)
-    fecha = timezone.make_aware(datetime.combine(dias_habiles.sumar_dias_habiles(fecha, 5), fecha.time()))
+    # La sesión de aprobación ya se celebró (hace unas horas) y se convocó con 21 días naturales de anticipación;
+    # el acta no puede registrarse antes de la sesión.
+    ahora = timezone.localtime(timezone.now())
+    fecha = ahora - timedelta(hours=2)
     sesion = sesiones.crear_sesion(
         st, ejercicio, TipoSesion.APROBACION, fecha, "Sala de juntas de PROBOSQUE, Metepec (y videoconferencia)",
         "Lista de asistencia y declaración de quórum\nLectura y aprobación del orden del día\n"
@@ -91,7 +93,7 @@ def cargar_demo():
                                "Listado preliminar de solicitudes")
     sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo("Dictamenes tecnicos y juridicos"), name="dictamenes.pdf"),
                                "Dictámenes técnicos y jurídicos")
-    sesiones.enviar_convocatoria(st, sesion)
+    sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
     aprobacion.proponer_listados(st, sesion, Decimal("57000"))
     aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.")
 
@@ -102,7 +104,7 @@ def cargar_demo():
     creadas += 1
 
     # Sesión de seguimiento con acuerdos
-    fecha2 = timezone.make_aware(datetime.combine(dias_habiles.sumar_dias_habiles(fecha, 10), fecha.time()))
+    fecha2 = timezone.make_aware(datetime.combine(dias_habiles.sumar_dias_habiles(ahora, 15), time(11, 0)))
     seg = sesiones.crear_sesion(st, ejercicio, TipoSesion.SEGUIMIENTO, fecha2, "Sala de juntas de PROBOSQUE, Metepec",
                                 "Lista de asistencia y declaración de quórum\nSeguimiento de casos del ejercicio\nAsuntos generales")
     sesiones.agregar_documento(st, seg, ContentFile(_pdf_demo("Casos para seguimiento"), name="casos.pdf"), "Casos para seguimiento")

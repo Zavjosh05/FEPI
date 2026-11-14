@@ -218,7 +218,8 @@ class ResolucionSesion(models.Model):
 
     @property
     def ajustada(self):
-        return self.resultado != self.resultado_propuesto or self.orden != self.orden_propuesto
+        """Solo la resolución que el Comité cambió (lleva constancia); las que apenas se recorren de lugar no."""
+        return bool(self.motivo_ajuste)
 
 
 class EstadoAcuerdo(models.TextChoices):

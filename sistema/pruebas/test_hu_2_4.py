@@ -44,6 +44,17 @@ def test_hu_2_4_cada_acuerdo_indica_expedientes_y_area_que_debe_cumplirlo(cc, va
     assert otro in seguimiento.acuerdos_pendientes(usuarios["juridica"].unidad)
 
 
+def test_hu_2_4_la_sesion_de_seguimiento_no_se_cierra_antes_de_celebrarse(cc, validada, usuarios):
+    exp = validada()
+    s = _sesion(usuarios, cc)
+    seguimiento.registrar_acuerdo(usuarios["comite"], s, "caso_fortuito", "Atender el caso fortuito", [exp])
+    with pytest.raises(ValidationError, match="antes de celebrarse"):
+        seguimiento.cerrar_sesion(usuarios["comite"], s, "Cierre")
+    seguimiento.cerrar_sesion(usuarios["comite"], s, "Cierre", momento=despues_de(s))
+    s.refresh_from_db()
+    assert s.estado == "celebrada" and s.acta_fecha > s.fecha_hora
+
+
 def test_hu_2_4_acuerdo_pendiente_en_la_bandeja_y_cumplimiento(cc, validada, usuarios, client, contrasena):
     exp = validada()
     s = _sesion(usuarios, cc)

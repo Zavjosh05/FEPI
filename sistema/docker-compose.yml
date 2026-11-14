@@ -1,6 +1,7 @@
 # Sistema de programas de PROBOSQUE — entorno completo.
 #   docker compose up                                  -> sitio en http://localhost:8080
-#   docker compose --profile pruebas run --rm pruebas  -> pytest + Playwright (capturas en entregas/sprint_1/capturas)
+#   docker compose --profile pruebas run --rm pruebas  -> pytest + Playwright (sin capturas)
+#   ... run --rm pruebas pytest -m "not navegador"      -> solo las rápidas;  ... -e CAPTURAS=1 pruebas -> con capturas
 # Las variables se leen de .env (copiar .env.ejemplo); sin .env se usan los valores de desarrollo de abajo.
 
 name: probosque
@@ -100,7 +101,9 @@ services:
       USAR_X_ACCEL: "0"
       MAPA_TESELAS_URL: ""
       ARCHIVOS_RAIZ: /tmp/archivos_pruebas
-      CAPTURAS_DIR: /entregas/sprint_1/capturas
+      # Capturas: solo con CAPTURAS=1 (docker compose ... run --rm -e CAPTURAS=1 pruebas); carpeta por sprint.
+      CAPTURAS: ${CAPTURAS:-0}
+      CAPTURAS_DIR: ${CAPTURAS_DIR:-/entregas/sprint_1/capturas}
     volumes:
       - .:/app
       - ../entregas:/entregas

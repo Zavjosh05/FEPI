@@ -38,15 +38,25 @@ Servicios de `docker-compose.yml`:
 
 ## Cómo probar
 
-Un solo comando (desde `sistema/`):
+Desde `sistema/` (en este equipo, dentro de WSL: `wsl -e bash -lc "cd /mnt/c/.../FEPI/sistema && <comando>"`).
+Docker Compose acepta argumentos para el servicio `pruebas`; al terminar, `docker compose down`.
 
-```
-docker compose --profile pruebas run --rm pruebas
-```
+| Qué | Comando | Tiempo medido |
+|---|---|---|
+| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador"` | 119 pruebas, ~62 s (71 s con arranque) |
+| Una historia | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~15–25 s |
+| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 127 pruebas, ~114 s (120 s con arranque) |
+| Todo y regenerar capturas | `docker compose --profile pruebas run --rm -e CAPTURAS=1 pruebas` | igual que «todo» |
 
-Corre las pruebas unitarias y de criterios (pytest-django contra PostGIS) y, al final, los recorridos
-de Playwright, que dejan las capturas en `entregas/sprint_1/capturas/hu_1_*.png` y `hu_2_*.png` (carpeta de la raíz
-del repositorio montada en el contenedor). Las historias, sus criterios y las necesidades se leen de
+Los recorridos de Playwright (todo lo que usa `page` o `live_server`, en `pruebas/e2e/`) llevan el marcador
+`navegador` (registrado en `pytest.ini`) y corren al final. **Las capturas solo se guardan con `CAPTURAS=1`**; sin
+esa variable la fixture `captura` no escribe nada y `git status` queda limpio. Van a `CAPTURAS_DIR`
+(por omisión `/entregas/sprint_1/capturas`, la carpeta `entregas/` de la raíz del repositorio montada en el
+contenedor); para otro sprint: `-e CAPTURAS_DIR=/entregas/sprint_2/capturas`. Para regenerar solo algunas:
+`... run --rm -e CAPTURAS=1 pruebas pytest pruebas/e2e/test_recorrido_hu_2_3.py`.
+
+Las pruebas unitarias y de criterios corren con pytest-django contra PostGIS. Las historias, sus criterios y las
+necesidades se leen de
 `especificacion/modelo.json` y `especificacion/necesidades_v12.json`; ahí está también el texto de las
 Reglas de Operación 2026 al que remiten los numerales y las líneas de `reglas/*.json`.
 

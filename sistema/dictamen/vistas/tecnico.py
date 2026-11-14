@@ -32,7 +32,8 @@ def dictaminar(request, folio):
                                      "nota": request.POST.get(f"n-{i['clave']}", "")} for i in items}
         try:
             d = tecnico.dictaminar(request.user, exp, form.cleaned_data["resultado"], form.cleaned_data["motivo"],
-                                   verificacion, form.cleaned_data.get("superficie_factible_ha"))
+                                   verificacion, form.cleaned_data.get("superficie_factible_ha"),
+                                   exigir_revision=True)
         except (ValidationError, PermissionDenied) as e:
             for m in mensajes_error(e):
                 messages.error(request, m)

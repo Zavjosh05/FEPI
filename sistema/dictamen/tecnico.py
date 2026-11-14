@@ -119,8 +119,11 @@ TEXTO_SITUACION = {
 
 
 # ----------------------------------------------------------------------------- dictamen
-def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superficie_factible_ha=None):
-    """La Dirección (área responsable del programa) emite el dictamen técnico con su motivo."""
+def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superficie_factible_ha=None,
+               exigir_revision=False):
+    """La Dirección (área responsable del programa) emite el dictamen técnico con su motivo.
+
+    Con `exigir_revision` (el dictamen llega de la pantalla) todo criterio revisable debe quedar marcado."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
     exigir_acceso(usuario, expediente)
     exigir_programa(usuario, expediente)
@@ -137,6 +140,11 @@ def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superf
     for item in lista_verificacion(expediente.ejercicio):
         respuesta = verificacion.get(item["clave"], {})
         items.append({**item, "respuesta": respuesta.get("respuesta", ""), "nota": respuesta.get("nota", "")})
+    if exigir_revision:
+        faltan = sum(1 for i in items if not i.get("informativo") and i["respuesta"] not in RESPUESTAS)
+        if faltan:
+            raise ValidationError(f"Falta marcar {faltan} criterio{'s' if faltan != 1 else ''} de la lista de verificación "
+                                  "(cumple, no cumple o no aplica): revise todos antes de registrar el dictamen.")
     if resultado == ResultadoTecnico.FACTIBLE and any(i["respuesta"] == "no" and not i.get("informativo") for i in items):
         raise ValidationError("Hay criterios marcados como «no cumple»: el dictamen no puede ser factible.")
     analisis = analisis_cartografico(expediente)

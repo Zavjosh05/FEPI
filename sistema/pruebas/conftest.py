@@ -16,8 +16,12 @@ ESPECIFICACION = RAIZ_SISTEMA / "especificacion"
 
 
 def pytest_collection_modifyitems(items):
-    """Los recorridos de Playwright (live_server vacía la base al terminar) van al final."""
-    items.sort(key=lambda it: "e2e" in str(it.fspath))
+    """Todo lo que usa Playwright (fixture `page` o `live_server`, o está en pruebas/e2e) lleva el marcador
+    `navegador`; esas pruebas van al final porque live_server vacía la base al terminar."""
+    for it in items:
+        if "e2e" in str(it.fspath) or {"page", "live_server"} & set(getattr(it, "fixturenames", ())):
+            it.add_marker(pytest.mark.navegador)
+    items.sort(key=lambda it: it.get_closest_marker("navegador") is not None)
 
 
 def asegurar_catalogos():

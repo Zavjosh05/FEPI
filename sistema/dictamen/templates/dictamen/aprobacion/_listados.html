@@ -1,8 +1,9 @@
+{% load moneda %}
 <div class="tarjeta" data-prueba="listados">
   <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-2">
     <div>
       <div class="titulo-seccion mb-1">Listados para aprobación</div>
-      <div class="small text-secondary">Propuesta: factibles en orden de priorización (reforestaciones y refrendos primero; desempate por fecha de registro) hasta donde alcance el recurso{% if monto_ha %} (${{ monto_ha|floatformat:2 }} por ha){% endif %}; el resto a la lista de espera. El Comité puede ajustar el orden dejando constancia.</div>
+      <div class="small text-secondary">Propuesta: factibles en orden de priorización (reforestaciones y refrendos primero; desempate por fecha de registro) hasta donde alcance el recurso{% if monto_ha %} ({{ monto_ha|moneda }} por ha){% endif %}; el resto a la lista de espera. El Comité puede ajustar el orden dejando constancia.</div>
     </div>
     {% if es_st and sesion.estado != "celebrada" %}
     <form method="post" action="{% url 'dictamen:sesion_proponer' sesion.pk %}" class="d-flex gap-2 align-items-end">
@@ -12,7 +13,7 @@
     </form>
     {% endif %}
   </div>
-  {% if sesion.presupuesto %}<div class="small mb-2">Recurso disponible: <strong>${{ sesion.presupuesto|floatformat:2 }}</strong></div>{% endif %}
+  {% if sesion.presupuesto %}<div class="small mb-2">Recurso disponible: <strong>{{ sesion.presupuesto|moneda }}</strong></div>{% endif %}
   {% for valor, etiqueta, filas in listados %}
   <div class="mt-3 fw-semibold">{{ etiqueta }} <span class="badge text-bg-light border">{{ filas|length }}</span></div>
   <div class="table-responsive">
@@ -25,7 +26,7 @@
       <td class="text-nowrap"><a href="{% url 'recepcion:expediente' r.expediente.folio %}?pestana=dictamenes">{{ r.expediente.folio }}</a></td>
       <td>{{ r.expediente.solicitante.nombre }}<div class="text-secondary">{{ r.expediente.predio.nombre }}</div>
         {% if r.motivo_ajuste %}<div class="text-warning-emphasis">Constancia: {{ r.motivo_ajuste }} (propuesta: {{ r.get_resultado_propuesto_display }}{% if r.orden_propuesto %}, lugar {{ r.orden_propuesto }}{% endif %})</div>{% endif %}</td>
-      <td>{{ r.expediente.dictamen_tecnico.superficie_factible_ha|default:"—" }} ha{% if r.monto %}<div>${{ r.monto|floatformat:2 }}</div>{% endif %}</td>
+      <td>{{ r.expediente.dictamen_tecnico.superficie_factible_ha|default:"—" }} ha{% if r.monto %}<div>{{ r.monto|moneda }}</div>{% endif %}</td>
       <td>{% for c in r.criterios %}<div class="text-secondary">{{ c|truncatechars:50 }}</div>{% empty %}—{% endfor %}</td>
       {% if es_st and sesion.estado != "celebrada" %}
       <td>{% if valor != "no_factible" %}

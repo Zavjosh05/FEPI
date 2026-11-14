@@ -25,6 +25,14 @@ def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, en
     expect(page.locator("[data-prueba=traslapes]")).to_contain_text("La Joya Alta")
     captura("hu_2_1_02_analisis_cartografico_y_lista_de_verificacion")
     page.check("#id_resultado_0")
+    page.fill("#id_motivo", "Intento sin revisar la lista de verificación.")
+    page.click("button:has-text('Registrar dictamen técnico')")
+    expect(page.locator(".alert-danger, .alert")).to_contain_text("Falta marcar")
+    for criterio in page.locator("#tabla-verificacion tr[data-criterio]").all():
+        si = criterio.locator("label[for$='-si']")
+        if si.count():
+            si.click()
+    page.check("#id_resultado_0")
     page.fill("#id_motivo", "Reforestación de 6 años con densidad de 72 %; el traslape con La Joya Alta se aclara en campo.")
     page.click("button:has-text('Registrar dictamen técnico')")
     page.wait_for_url("**pestana=dictamenes")

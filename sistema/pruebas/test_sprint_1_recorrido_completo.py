@@ -18,7 +18,7 @@ from nucleo.models import Municipio, TransicionNoPermitida, bandeja
 from recepcion import servicios as recepcion
 from recepcion.models import EstadoRevision
 
-from .fixtures_m2 import documento_sesion, fecha_sesion
+from .fixtures_m2 import despues_de, documento_sesion, fecha_sesion
 
 pytestmark = pytest.mark.django_db
 
@@ -103,7 +103,7 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     aprobacion.proponer_listados(comite, sesion, Decimal("500000"))
     resolucion = sesion.resoluciones.get(expediente=exp)
     assert resolucion.resultado == ResultadoListado.BENEFICIARIA
-    acta = aprobacion.registrar_acta(comite, sesion, True, "Aprobado por unanimidad")
+    acta = aprobacion.registrar_acta(comite, sesion, True, "Aprobado por unanimidad", momento=despues_de(sesion))
     exp.refresh_from_db()
     sesion.refresh_from_db()
     assert exp.estado.clave == "aprobada" and sesion.autoriza_publicacion and acta.archivo

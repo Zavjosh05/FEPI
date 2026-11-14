@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
+from nucleo.templatetags.moneda import formato_moneda
 
 from .comun import datos_dictamen, exigir_unidad, resultado_combinado
 from .models import EstadoSesion, ResolucionSesion, ResultadoListado, TipoSesion
@@ -128,8 +129,11 @@ def ajustar(usuario, resolucion, resultado, orden, motivo):
     return resolucion
 
 
-def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones=""):
-    """Acta con los listados aprobados y la autorización de publicación; mueve cada expediente a su estado."""
+def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones="", momento=None):
+    """Acta con los listados aprobados y la autorización de publicación; mueve cada expediente a su estado.
+
+    No se registra antes de la fecha y hora de la sesión. `momento` (solo servicios, pruebas y demostración)
+    es el instante contra el que se compara; por omisión, ahora."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
     if sesion.tipo != TipoSesion.APROBACION:
         raise ValidationError("El acta con listados es de una sesión de aprobación.")
@@ -137,10 +141,13 @@ def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones=""):
         raise ValidationError("Primero se envía la convocatoria.")
     if sesion.estado == EstadoSesion.CELEBRADA:
         raise ValidationError("La sesión ya tiene acta.")
+    ahora = momento or timezone.now()
+    if ahora < sesion.fecha_hora:
+        raise ValidationError(f"El acta no se registra antes de la sesión: está convocada para el "
+                              f"{timezone.localtime(sesion.fecha_hora):%d/%m/%Y a las %H:%M} h.")
     resoluciones = list(sesion.resoluciones.select_related("expediente__predio", "expediente__solicitante"))
     if not resoluciones:
         raise ValidationError("No hay listados que aprobar: genere la propuesta.")
-    ahora = timezone.now()
     with transaction.atomic():
         detalle = []
         for resultado in (ResultadoListado.BENEFICIARIA, ResultadoListado.LISTA_ESPERA, ResultadoListado.NO_FACTIBLE):
@@ -149,7 +156,7 @@ def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones=""):
                 if resultado == ResultadoListado.NO_FACTIBLE:
                     texto += f" — {resultado_combinado(r.expediente)[1]}"
                 elif r.monto is not None:
-                    texto += f" — ${r.monto:,.2f}"
+                    texto += f" — {formato_moneda(r.monto)}"
                 if r.motivo_ajuste:
                     texto += f" (ajuste del Comité: {r.motivo_ajuste})"
                 detalle.append({"clave": r.get_resultado_display(), "texto": texto[:220],

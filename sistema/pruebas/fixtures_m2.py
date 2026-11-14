@@ -11,7 +11,7 @@ from nucleo.demo import _pdf_demo, completar_requisitos, cuadro_en_municipio
 from nucleo.models import Ejercicio, Ministracion, Municipio, Plazo, Requisito, TipoPersona
 from recepcion import servicios as recepcion
 
-__all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "fecha_sesion", "documento_sesion"]
+__all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "fecha_sesion", "despues_de", "documento_sesion"]
 
 
 def registrar_validada(usuarios, ejercicio, municipio="Amecameca", nombre="Predio M2", ha=6, desplazamiento=(0, 0),
@@ -97,6 +97,11 @@ def psa(catalogos):
 def fecha_sesion(dias=6):
     hoy = timezone.localtime(timezone.now())
     return timezone.make_aware(datetime.combine(dias_habiles.sumar_dias_habiles(hoy, dias), time(11, 0)))
+
+
+def despues_de(sesion, horas=2):
+    """Un momento posterior a la hora de la sesión (para registrar el acta o cerrar la sesión en pruebas)."""
+    return sesion.fecha_hora + timedelta(hours=horas)
 
 
 def documento_sesion(nombre="listado.pdf"):

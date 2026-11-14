@@ -82,8 +82,10 @@ def anticipacion_requerida(sesion):
     return f"{plazo.texto_plazo} de anticipación ({plazo.fundamento})", fin_del_dia
 
 
-def enviar_convocatoria(usuario, sesion):
-    """Envía la convocatoria con orden del día y documentos; queda la fecha y hora del envío y su acuse."""
+def enviar_convocatoria(usuario, sesion, momento=None):
+    """Envía la convocatoria con orden del día y documentos; queda la fecha y hora del envío y su acuse.
+
+    `momento` (solo servicios, pruebas y demostración; la interfaz no lo pasa) es la fecha de envío; por omisión, ahora."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
     if sesion.convocatoria_enviada:
         raise ValidationError("La convocatoria ya se envió.")
@@ -91,7 +93,7 @@ def enviar_convocatoria(usuario, sesion):
         raise ValidationError("La convocatoria debe llevar el orden del día.")
     if not sesion.documentos.exists():
         raise ValidationError("Adjunte los documentos de la sesión antes de convocar.")
-    ahora = timezone.now()
+    ahora = momento or timezone.now()
     texto, limite = anticipacion_requerida(sesion)
     if limite is not None and ahora > limite:
         raise ValidationError(f"La convocatoria debe enviarse con {texto}: a más tardar el "

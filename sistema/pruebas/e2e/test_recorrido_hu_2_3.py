@@ -1,8 +1,11 @@
 """HU-2.3 · Recorrido de la sesión de aprobación con capturas."""
+from datetime import timedelta
+
 from django.utils import timezone
 from playwright.sync_api import expect
 
 from dictamen import juridico, tecnico
+from dictamen.models import SesionComite
 from nucleo.demo import _pdf_demo
 from nucleo.models import Ejercicio, Usuario
 from pruebas.fixtures_m2 import fecha_sesion, registrar_validada
@@ -51,6 +54,11 @@ def test_hu_2_3_recorrido_sesion_de_aprobacion(datos_e2e, page, live_server, ent
     fila.locator("button:has-text('Ajustar')").click()
     expect(page.locator("[data-listado=beneficiaria]")).to_contain_text("Constancia")
     captura("hu_2_3_05_ajuste_del_comite_con_constancia")
+    page.check("#id_autoriza_publicacion")
+    page.click("button:has-text('Registrar acta')")
+    expect(page.locator(".alert-danger")).to_contain_text("antes de la sesión")   # la sesión aún no llega
+    SesionComite.objects.update(fecha_hora=timezone.now() - timedelta(hours=3))   # ya se celebró
+    page.reload()
     page.check("#id_autoriza_publicacion")
     page.click("button:has-text('Registrar acta')")
     expect(page.locator("[data-prueba=acta]")).to_contain_text("Acta registrada")
