@@ -1,0 +1,447 @@
+erDiagram
+  Acuerdo }o--o{ Expediente : expedientes
+  Acuse |o--o{ DictamenJuridico : acuse
+  Acuse |o--o{ DictamenTecnico : acuse
+  Acuse |o--o{ Evento : acuse
+  Acuse |o--o{ SesionComite : acuse_acta
+  Acuse |o--o{ SesionComite : acuse_convocatoria
+  Acuse |o--o{ Validacion : acuse
+  Acuse |o--o{ Validacion : acuse_notificacion
+  Documento |o--o{ RevisionRequisito : documento
+  Ejercicio ||--o{ Expediente : ejercicio
+  Ejercicio ||--o{ Formato : ejercicio
+  Ejercicio ||--o{ Ministracion : ejercicio
+  Ejercicio ||--o{ Modalidad : ejercicio
+  Ejercicio ||--o{ MontoApoyo : ejercicio
+  Ejercicio ||--o{ Plazo : ejercicio
+  Ejercicio ||--o{ Requisito : ejercicio
+  Ejercicio ||--o{ SesionComite : ejercicio
+  Ejercicio ||--o{ TipoPersona : ejercicio
+  Estado |o--o{ Evento : estado_destino
+  Estado |o--o{ Evento : estado_origen
+  Estado ||--o{ Expediente : estado
+  Estado ||--o{ Transicion : destino
+  Estado ||--o{ Transicion : origen
+  Expediente |o--o{ Acuse : expediente
+  Expediente ||--o{ Documento : expediente
+  Expediente ||--o{ Evento : expediente
+  Expediente ||--o{ Poligono : expediente
+  Expediente ||--o{ ResolucionSesion : expediente
+  Expediente ||--o{ RevisionRequisito : expediente
+  Expediente ||--o{ Validacion : expediente
+  Expediente ||--o| DictamenJuridico : expediente
+  Expediente ||--o| DictamenTecnico : expediente
+  Modalidad |o--o{ Expediente : modalidad
+  Modalidad |o--o{ MontoApoyo : modalidad
+  Municipio |o--o{ PredioSancionado : municipio
+  Municipio ||--o{ Predio : municipio
+  Persona |o--o{ PersonaIncumplida : persona
+  Persona |o--o{ Poligono : prestador
+  Persona ||--o{ Expediente : solicitante
+  Persona ||--o{ Predio : titular
+  Poligono |o--o{ Poligono : anterior
+  Predio |o--o{ PredioSancionado : predio
+  Predio ||--o{ Expediente : predio
+  Programa |o--o{ Transicion : programa
+  Programa ||--o{ Ejercicio : programa
+  Requisito |o--o{ Documento : requisito
+  Requisito ||--o{ RevisionRequisito : requisito
+  Requisito }o--o{ Modalidad : modalidades
+  Requisito }o--o{ TipoPersona : tipos_persona
+  SesionComite ||--o{ Acuerdo : sesion
+  SesionComite ||--o{ DocumentoSesion : sesion
+  SesionComite ||--o{ ResolucionSesion : sesion
+  TipoPersona ||--o{ Expediente : tipo_persona
+  Unidad |o--o{ Acuse : unidad
+  Unidad |o--o{ Documento : unidad
+  Unidad |o--o{ Evento : unidad
+  Unidad |o--o{ Municipio : delegacion
+  Unidad |o--o{ Usuario : unidad
+  Unidad ||--o{ Acuerdo : unidad_responsable
+  Unidad ||--o{ Expediente : delegacion
+  Unidad }o--o{ Programa : programas
+  Validacion }o--o{ RevisionRequisito : faltantes
+  Acuerdo {
+    int id PK
+    int sesion_id FK
+    texto numero
+    texto tipo
+    texto descripcion
+    int unidad_responsable_id FK
+    int ministracion
+    texto periodo
+    texto estado
+    fecha_hora cumplido_en
+    int cumplido_por_id FK
+    texto observaciones_cumplimiento
+    fecha_hora registrado
+  }
+  DictamenJuridico {
+    int id PK
+    int expediente_id FK
+    texto resultado
+    texto motivo
+    json cotejo
+    int usuario_id FK
+    fecha_hora fecha_hora
+    int acuse_id FK
+  }
+  DictamenTecnico {
+    int id PK
+    int expediente_id FK
+    texto resultado
+    texto motivo
+    decimal superficie_factible_ha
+    json verificacion
+    json analisis
+    fecha fecha_limite
+    bool dentro_de_plazo
+    int usuario_id FK
+    fecha_hora fecha_hora
+    int acuse_id FK
+  }
+  DocumentoSesion {
+    int id PK
+    int sesion_id FK
+    texto nombre
+    archivo archivo
+    fecha_hora fecha_hora
+    int registrado_por_id FK
+  }
+  PersonaIncumplida {
+    int id PK
+    texto nombre
+    texto curp
+    texto rfc
+    int persona_id FK
+    texto programa
+    texto motivo
+    texto acuerdo
+    fecha fecha_inscripcion
+    bool activa
+    int registrado_por_id FK
+  }
+  PredioSancionado {
+    int id PK
+    int predio_id FK
+    texto descripcion_predio
+    int municipio_id FK
+    texto tipo
+    texto descripcion
+    texto autoridad
+    fecha fecha
+    bool reintegro_realizado
+    bool activo
+    int registrado_por_id FK
+  }
+  ResolucionSesion {
+    int id PK
+    int sesion_id FK
+    int expediente_id FK
+    texto resultado
+    texto resultado_propuesto
+    int orden
+    int orden_propuesto
+    decimal monto
+    json criterios
+    texto motivo_ajuste
+  }
+  SesionComite {
+    int id PK
+    int ejercicio_id FK
+    texto tipo
+    texto caracter
+    texto numero
+    fecha_hora fecha_hora
+    texto lugar
+    texto orden_del_dia
+    json integrantes
+    texto estado
+    decimal presupuesto
+    fecha_hora convocatoria_enviada
+    int acuse_convocatoria_id FK
+    fecha_hora acta_fecha
+    bool autoriza_publicacion
+    texto observaciones_acta
+    int acuse_acta_id FK
+    int creada_por_id FK
+  }
+  Acuse {
+    int id PK
+    texto folio UK
+    int expediente_id FK
+    texto referencia
+    texto tipo
+    texto titulo
+    fecha_hora fecha_hora
+    int emitido_por_id FK
+    int unidad_id FK
+    texto destinatario
+    json contenido
+    archivo archivo
+    texto huella
+  }
+  Consecutivo {
+    int id PK
+    texto clave UK
+    int ultimo
+  }
+  DiaInhabil {
+    int id PK
+    fecha fecha UK
+    texto descripcion
+    texto fuente
+  }
+  Documento {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    int requisito_id FK
+    texto nombre
+    archivo archivo
+    fecha_hora fecha_entrega
+    int registrado_por_id FK
+    int unidad_id FK
+  }
+  Ejercicio {
+    int id PK
+    int programa_id FK
+    int anio
+    bool vigente
+    texto fuente
+    texto archivo_reglas
+    fecha_hora reglas_cargadas
+    json datos
+  }
+  Estado {
+    int id PK
+    texto clave UK
+    texto nombre
+    texto descripcion
+    texto tipo_unidad_bandeja
+    texto visible_para
+    texto flujo_alterno
+    bool final
+    texto color
+    int orden
+  }
+  Evento {
+    int id PK
+    int expediente_id FK
+    fecha_hora fecha_hora
+    int usuario_id FK
+    int unidad_id FK
+    texto tipo
+    texto descripcion
+    int estado_origen_id FK
+    int estado_destino_id FK
+    texto motivo
+    int acuse_id FK
+    json datos
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    int ejercicio_id FK
+    int predio_id FK
+    int solicitante_id FK
+    int tipo_persona_id FK
+    int modalidad_id FK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    int delegacion_id FK
+    int estado_id FK
+    fecha_hora fecha_recepcion
+    int registrado_por_id FK
+    fecha_hora enviado_direccion
+    texto observaciones
+    fecha_hora actualizado
+  }
+  Formato {
+    int id PK
+    int ejercicio_id FK
+    texto clave
+    texto nombre
+    texto uso
+    int linea_rop
+    int orden
+  }
+  Ministracion {
+    int id PK
+    int ejercicio_id FK
+    int numero
+    decimal porcentaje
+    texto regimen
+    texto condicion
+    texto fundamento
+  }
+  Modalidad {
+    int id PK
+    int ejercicio_id FK
+    texto clave
+    texto nombre
+    texto descripcion
+    texto fundamento
+    bool seleccionable
+    int orden
+  }
+  MontoApoyo {
+    int id PK
+    int ejercicio_id FK
+    texto concepto
+    decimal monto
+    texto unidad
+    int modalidad_id FK
+    texto fundamento
+  }
+  Municipio {
+    int id PK
+    texto clave UK
+    texto nombre UK
+    geom_multipoligono geom
+    int delegacion_id FK
+  }
+  Persona {
+    int id PK
+    texto tipo
+    texto nombre
+    texto curp
+    texto rfc
+    texto rfn
+    texto representante
+    texto telefono
+    texto correo
+    texto domicilio
+  }
+  Plazo {
+    int id PK
+    int ejercicio_id FK
+    texto clave
+    texto descripcion
+    int cantidad
+    texto unidad
+    fecha fecha_fin
+    texto corre_desde
+    texto responsable
+    texto fundamento
+    int linea_rop
+    json datos
+  }
+  Predio {
+    int id PK
+    texto folio UK
+    texto nombre
+    int municipio_id FK
+    texto localidad
+    int titular_id FK
+    decimal superficie_declarada_ha
+    fecha_hora creado
+  }
+  Programa {
+    int id PK
+    texto clave UK
+    texto nombre
+    bool usa_poligono
+    texto descripcion
+  }
+  Requisito {
+    int id PK
+    int ejercicio_id FK
+    texto clave
+    texto texto
+    bool aplica_en_refrendo
+    bool es_documento_legal
+    bool requiere_documento
+    bool opcional
+    texto condicion
+    texto nota_refrendo
+    texto formato
+    texto fundamento
+    int linea_rop
+    int orden
+  }
+  TipoPersona {
+    int id PK
+    int ejercicio_id FK
+    texto clave
+    texto nombre
+    texto fundamento
+    int orden
+  }
+  Transicion {
+    int id PK
+    int programa_id FK
+    int origen_id FK
+    int destino_id FK
+    texto tipo_unidad
+    texto accion
+    bool requiere_motivo
+  }
+  Unidad {
+    int id PK
+    texto clave UK
+    texto nombre
+    texto tipo
+    texto sede
+    texto domicilio
+    texto telefono
+    bool asignacion_confirmada
+    texto fuente_asignacion
+    bool activa
+  }
+  Usuario {
+    int id PK
+    texto username UK
+    int unidad_id FK
+    texto cargo
+  }
+  Poligono {
+    int id PK
+    int expediente_id FK
+    geom_multipoligono geom
+    decimal superficie_ha
+    texto levantado_por
+    int prestador_id FK
+    texto responsable
+    fecha fecha_levantamiento
+    texto origen
+    archivo archivo
+    bool vigente
+    int anterior_id FK
+    texto tipo_cambio
+    decimal traslape_anterior_pct
+    texto ubicacion_municipio
+    texto aviso
+    texto motivo_cambio
+    int registrado_por_id FK
+    fecha_hora registrado_en
+  }
+  RevisionRequisito {
+    int id PK
+    int expediente_id FK
+    int requisito_id FK
+    texto estado
+    int documento_id FK
+    bool en_archivo_probosque
+    fecha fecha_documento
+    texto observaciones
+    int revisado_por_id FK
+    fecha_hora revisado_en
+  }
+  Validacion {
+    int id PK
+    int expediente_id FK
+    texto resultado
+    int usuario_id FK
+    fecha_hora fecha_hora
+    texto observaciones
+    json detalle
+    fecha fecha_limite
+    texto plazo_aplicado
+    int acuse_id FK
+    fecha_hora notificado_en
+    int notificado_por_id FK
+    int acuse_notificacion_id FK
+    bool vencimiento_avisado
+  }

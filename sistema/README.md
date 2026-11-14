@@ -305,3 +305,13 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - Clave INEGI de los municipios (la capa de IDEFOR no la trae).
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
 - Reglas de MFS, PS, RHF, PSA y PEG (archivos `reglas/<CLAVE>.json`).
+
+## Modelo de datos y recorrido completo
+
+- [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
+  dictamen), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
+  campos, está en `docs/modelo_datos.mmd`.
+- `pruebas/test_sprint_1_recorrido_completo.py`: una sola solicitud recorre el registro, los requisitos, el
+  polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
+  aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
+  queda, el acuse y el renglón de la bitácora.
