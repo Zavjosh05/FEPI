@@ -1,0 +1,1987 @@
+{
+  "clave": "PSA",
+  "nombre": "Pago por Servicios Ambientales Hidrológicos del Estado de México (PSAHEM)",
+  "ejercicio": 2026,
+  "fuente": {
+    "documento": "Acuerdo del Director General de PROBOSQUE por el que se emiten las modificaciones a las Reglas de Operación del Programa Pago por Servicios Ambientales Hidrológicos del Estado de México (Gaceta del Gobierno, 27-ene-2026), más la Convocatoria 2026 (bases primera a séptima) y el Manual de formatos (FO-PB-501-A y FO-PB-502)",
+    "fecha_publicacion": "2026-01-27",
+    "archivo": "sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt",
+    "lineas": [
+      986,
+      2432
+    ],
+    "lineas_reglas": [
+      1140,
+      2432
+    ],
+    "lineas_convocatoria_relacionadas": [
+      [
+        227,
+        336
+      ],
+      [
+        638,
+        772
+      ],
+      [
+        773,
+        818
+      ],
+      [
+        903,
+        920
+      ]
+    ],
+    "lineas_formatos": [
+      [
+        11972,
+        12112
+      ],
+      [
+        12244,
+        12337
+      ]
+    ],
+    "aprobacion": "Acuerdo FIPASAHEM 25/EXT039/01 del Comité Técnico del FIPASAHEM (18-dic-2025, línea 1126); Acuerdo PBE/06-2025/004 del Consejo Directivo de PROBOSQUE (11-dic-2025, línea 1129); dictamen de la Comisión Estatal de Mejora Regulatoria del 15-ene-2026 (línea 1136). La Convocatoria fue validada por la Unidad Jurídica (Oficio 225C0201000100S/0870/2025, 5-dic-2025) y por el Comité Técnico del FIPASAHEM (acuerdo FIPASAHEM 25/EXT039/02, 18-dic-2025; líneas 967-972)"
+  },
+  "definicion": {
+    "texto": "Fomentar la sostenibilidad de los bosques de la entidad mexiquense, mediante la entrega de recurso económico y acompañamiento técnico forestal a las personas propietarias y/o poseedores que cuenten con superficie cubierta por bosques templados y bosques tropicales caducifolios, dentro del territorio del Estado de México, con cobertura mayor o igual al 50 %; y vegetación de zonas semiáridas con cobertura mayor o igual al 40 %.",
+    "numeral": "1.1 y 4.1",
+    "linea": 1146,
+    "cobertura": "Municipios del Estado de México que tengan cobertura forestal (numeral 6, línea 1345)",
+    "tipo_de_apoyo": "Recurso económico por hectárea según las Zonas de Recarga Hídrica de las Cuencas del Estado de México (ZRHCEM), entregado mediante cheque en dos ministraciones (70 % y 30 %) a través de las Delegaciones Regionales, y acompañamiento técnico gratuito (7.1.1 y 7.1.2, líneas 1348-1367; 8.1.7, fr. XVI, línea 2069)",
+    "origen_recursos": "El recurso lo cubre en su totalidad el Gobierno del Estado de México a través de PROBOSQUE, sin costo para las personas beneficiarias (7.2, línea 1369); proviene del Fideicomiso FIPASAHEM (capital semilla de 26.4 millones y Aportaciones de Mejoras por Servicios Ambientales, 3.5 % de los ingresos por suministro de agua potable, arts. 216-I y 216-J del Código Financiero; 7.3, líneas 1381-1388)",
+    "objetivos_especificos": "I. Entregar recurso económico y acompañamiento técnico por el servicio ambiental que proporcionan los bosques; II. Fomentar el cuidado de los bosques con acciones de conservación y protección que permitan la recarga hídrica; III. Promover la productividad social generando empleos (4.2, líneas 1317-1324)"
+  },
+  "instancias": {
+    "normativa": "Comité Técnico del FIPASAHEM (numerales 3 y 9.3, líneas 1237 y 2190): responsable de normar el Programa e interpretar las Reglas; canaliza los apoyos a las personas beneficiarias",
+    "ejecutora": "Dirección de Restauración y Fomento Forestal de PROBOSQUE (numerales 3 y 9.2, líneas 1236 y 2188), con las Delegaciones Regionales Forestales y el «área responsable del Programa»",
+    "responsable": "Protectora de Bosques del Estado de México (PROBOSQUE) (numerales 3 y 9.1, líneas 1238 y 2186)",
+    "comite_tecnico": {
+      "nombre": "Comité Técnico del FIPASAHEM (Fideicomiso Público de Administración e Inversión F/663, «Fideicomiso Pago por Servicios Ambientales Hidrológicos del Estado de México»)",
+      "numeral": "3 (glosario), 9.4",
+      "linea": 1185,
+      "integracion": "Se integra y funciona conforme al artículo 216-K del Código Financiero del Estado de México y Municipios, la Ley para la Coordinación y Control de Organismos Auxiliares del Estado de México y el Reglamento Interno del Comité Técnico (9.4.1, línea 2195). La lista de integrantes, la presidencia y la Secretaría Técnica NO están en las ROP (VER DUDAS); sí se menciona a la «Secretaría Técnica del Comité» (10.1, fr. VI y X, líneas 2268 y 2291).",
+      "sesiones": "Se apegan al Capítulo V, Artículo 13, Fracciones I-VI, y al Capítulo X, De las Sesiones y Votaciones, Artículos 25-30, del Reglamento Interno del Comité Técnico (9.4.2, línea 2199). Las ROP NO dan el plazo de convocatoria ni el quórum: el Reglamento Interno no está en el texto (por eso el archivo no trae el plazo convocatoria_sesion_comite; VER DUDAS).",
+      "atribuciones": "9.4.3, fr. I-XI, líneas 2203-2232: aprobar el pago de las solicitudes y la distribución de fondos; acordar el reintegro de los cheques no reclamados o de recursos no ejercidos; autorizar la publicación de listados de solicitudes aprobadas y no aprobadas en la página web y en la Gaceta; autorizar a PROBOSQUE los dictámenes; suspender y/o cancelar apoyos, su reintegro y reasignación; emitir lineamientos internos; modificar las Reglas; resolver lo no previsto."
+    },
+    "comision_verificacion_tecnica": {
+      "texto": "Órgano del Comité Técnico del Fideicomiso que vigila y supervisa las condiciones de los predios candidatos y la correcta aplicación de los recursos autorizados y para gastos de operación del Fideicomiso, e informa al Comité. La Instancia Ejecutora convoca a sus integrantes para conocimiento del ingreso de solicitudes y el análisis de cada dictamen (factible o no factible de pago).",
+      "numeral": "3 (glosario) y 10.1, fr. V",
+      "linea": 1181,
+      "lineas_adicionales": [
+        2263
+      ]
+    },
+    "fiduciaria": {
+      "texto": "Institución financiera contratada para la administración de los recursos del FIPASAHEM. El Comité Técnico le instruye que destine los apoyos del Fideicomiso al pago de las personas beneficiarias y ella (o, según la redacción, el Fideicomiso) emite los cheques y/o depósitos; la Dirección de Administración, Finanzas y de Gestión Documental de PROBOSQUE solicita ante la Fiduciaria la emisión de los pagos una vez solicitados por la Dirección de Restauración y Fomento Forestal. A su cuenta bancaria se devuelven los reintegros (8.1.9.3).",
+      "numeral": "3 (glosario); 10.1, fr. VIII, X y XIV; 8.1.9.3",
+      "linea": 1212,
+      "lineas_adicionales": [
+        2281,
+        2290,
+        2321,
+        2150
+      ]
+    },
+    "otras_unidades_que_intervienen": [
+      "Delegaciones Regionales Forestales (recepción, polígono, firma del contrato, entrega de cheques, verificación y minuta en campo) (8.1.3; 10.1, fr. I, VI, X y XI)",
+      "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia (dictamen jurídico, validación del contrato y adendum, gestión de la devolución de recursos) (10.1, fr. IV, VII y XV)",
+      "Dirección de Administración, Finanzas y de Gestión Documental (administración de recursos, solicitud de pagos a la Fiduciaria y cuenta para reintegros) (10.1, fr. XII y XIV)",
+      "Coordinación de Delegaciones Regionales (seguimiento) (15)",
+      "Asesores técnicos externos independientes con Registro Forestal Nacional (SEMARNAT) o inscritos en el mecanismo de asesores técnicos de la CONAFOR (7.1.2)"
+    ]
+  },
+  "poblacion_objetivo": {
+    "texto": "Las personas propietarias y/o poseedoras que cuenten con superficie de terrenos cubiertos por bosques templados con cobertura mayor o igual al 50 %, bosques tropicales caducifolios y vegetación de zonas semiáridas con coberturas mayores o iguales al 40 % que se encuentren en el territorio del Estado de México.",
+    "numeral": "5 c)",
+    "linea": 1340
+  },
+  "tipos_persona": [
+    {
+      "clave": "fisica",
+      "nombre": "Persona física (propietaria, poseedora, usufructuaria o su representante legal)",
+      "numeral": "3 (glosario) y 8.1.1.2, fr. I y VII b)",
+      "linea": 1252
+    },
+    {
+      "clave": "juridica_colectiva",
+      "nombre": "Persona jurídico colectiva (constituida conforme a las leyes mexicanas)",
+      "numeral": "3 (glosario) y 8.1.1.2, fr. I y VII b)",
+      "linea": 1254
+    },
+    {
+      "clave": "nucleo_agrario",
+      "nombre": "Núcleo agrario (ejido o comunidad); se representa con el Órgano del Comisariado: Presidencia, Secretaría y Tesorería",
+      "numeral": "3 (glosario) y 8.1.1.2, fr. III, VI a) y VII a)",
+      "linea": 1247
+    },
+    {
+      "clave": "institucion_educativa_o_osc",
+      "nombre": "Institución educativa, sociedad o asociación no gubernamental sin fines de lucro, con terrenos bajo su administración directa o con convenio con los titulares (variante de persona jurídico colectiva con requisito extra de convenio)",
+      "numeral": "8.1.2, Lineamientos generales, fr. 17",
+      "linea": 1834
+    },
+    {
+      "clave": "dependencia_publica",
+      "nombre": "Dependencia de la Administración Pública Federal, Estatal o Municipal propietaria del predio (apoyo condicionado a suficiencia presupuestal; si no, va a lista de espera)",
+      "numeral": "8.1.2, fr. V y Lineamientos generales, fr. 3",
+      "linea": 1744
+    }
+  ],
+  "modalidades": [
+    {
+      "clave": "cuenca_alta",
+      "nombre": "Cuenca Alta o área de captación hídrica (Prioridad 1)",
+      "descripcion": "Bosque templado con cobertura arbolada de 50 al 100 %; bosque tropical caducifolio y vegetación de zonas semiáridas con 40 al 100 %. Superficie de 20 a 400 ha (hasta 450 ha para predios con certificación FSC). Pago de $3,500.00 por hectárea ($3,600.00 con certificación FSC). Debe realizar obras que infiltren agua, contengan el suelo y eviten deslaves.",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); 8.1.2, Lineamiento 2; Convocatoria base tercera, fila I",
+      "linea": 1421,
+      "seleccionable": true
+    },
+    {
+      "clave": "cuenca_media_baja",
+      "nombre": "Cuenca Media y Baja o áreas de almacenamiento y descarga (Prioridad 2)",
+      "descripcion": "Bosque templado con 50 al 100 %; bosque tropical caducifolio y vegetación de zonas semiáridas con 40 al 100 %. Superficie de 20 a 300 ha. Pago de $1,500.00 por hectárea ($1,700.00 con certificación FSC).",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+      "linea": 1437,
+      "seleccionable": true
+    },
+    {
+      "clave": "fondos_concurrentes",
+      "nombre": "Fondos concurrentes (MLPSA-FC) CONAFOR-PROBOSQUE, con Convenio de Concertación",
+      "descripcion": "Predios aprobados en el concepto de Servicios Ambientales por el Mecanismo Local de Pago por Servicios Ambientales a través de Fondos Concurrentes. Firman un Convenio de Concertación con PROBOSQUE y CONAFOR (no un Contrato de Adhesión), conservan el monto por hectárea del convenio, no pueden incrementar su superficie mientras el convenio esté vigente y se atienden en las Cuencas Media y Baja. Se evalúan con las Reglas federales y las del PSAHEM; las actividades se asientan en el PMPM.",
+      "numeral": "3 (glosario); 8.1.2, Lineamientos generales, fr. 8, 15 y 16; 10.1, fr. X",
+      "linea": 1194,
+      "seleccionable": false
+    },
+    {
+      "clave": "refrendo",
+      "nombre": "Refrendo",
+      "descripcion": "Predios que han sido beneficiados en el ejercicio inmediato anterior y mantienen el mismo polígono. Trámite simplificado (Solicitud Única y Registro de Información si la documentación legal obra en PROBOSQUE con antigüedad de hasta 3 años). El sistema lo maneja como casilla del expediente.",
+      "numeral": "3 (glosario) y 8.1.1.2, fr. VIII",
+      "linea": 1292,
+      "seleccionable": false
+    }
+  ],
+  "nota_modalidades": "Las ROP de PSAHEM no definen «modalidades» como tales: la tabla de 8.1.1.1 distingue dos categorías de Zonas de Recarga Hídrica (Cuenca Alta, Prioridad 1; Cuenca Media y Baja, Prioridad 2). Las dos primeras claves son esas categorías (se eligen al registrar); «fondos_concurrentes» y «refrendo» son regímenes derivados y se marcan «seleccionable: false». La certificación FSC no es modalidad: modifica el monto y el máximo de superficie (ver montos) y se maneja con el requisito PSA-REQ-17. La sección 8.1.3 «Modalidades de registro» solo trata el registro presencial en la Delegación.",
+  "superficie": {
+    "minima_ha": 20,
+    "maxima_ha": 450,
+    "numeral": "7.1.1 y 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+    "linea": 1418,
+    "por_categoria": {
+      "cuenca_alta": {
+        "minima_ha": 20,
+        "maxima_ha": 400,
+        "maxima_ha_con_FSC": 450,
+        "linea": 1423
+      },
+      "cuenca_media_baja": {
+        "minima_ha": 20,
+        "maxima_ha": 300,
+        "maxima_ha_con_FSC": 300,
+        "linea": 1439
+      }
+    },
+    "cobertura_arbolada_minima_pct": {
+      "bosque_templado": 50,
+      "bosque_tropical_caducifolio": 40,
+      "vegetacion_zonas_semiaridas": 40,
+      "rango_tabla": "50 al 100 / 40 al 100"
+    },
+    "nota": "maxima_ha = 450 es el tope absoluto (Cuenca Alta con certificación FSC) para que la verificación genérica de rango del sistema no rechace superficies válidas; el máximo de cada categoría está en por_categoria (400 y 300 ha; Cuenca Media y Baja con FSC: 300 ha según la tabla y la línea 1360).",
+    "conjuntos_prediales": "Para reunir la superficie mínima se pueden integrar conjuntos prediales, considerando preferentemente «predios adyacentes» (cercanos o próximos entre sí, con características ecológicas similares, contiguos o colindantes), de preferencia formando un área compacta o, en su caso, dentro de un mismo municipio (8.1.2, Lineamientos generales, fr. 9, línea 1786).",
+    "umbral_pago_unico_ha": null
+  },
+  "requisitos": [
+    {
+      "clave": "PSA-REQ-01",
+      "texto": "Ser personas físicas o jurídico colectivas de nacionalidad mexicana o que hayan adquirido la residencia mexicana, que sean usufructuarios, poseedores, propietarios o representantes legales de terrenos forestales con cubierta arbolada de acuerdo a lo especificado en el cuadro criterios de selección en el punto 8.1.1.1 de las presentes Reglas.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. I",
+      "linea": 1575,
+      "requiere_documento": false
+    },
+    {
+      "clave": "PSA-REQ-02",
+      "texto": "Presentar Solicitud Única debidamente requisitada, conforme a la Convocatoria y las presentes Reglas, en la oficina receptora de la Delegación Regional Forestal de PROBOSQUE a la que corresponda (según el municipio donde se ubica el predio), la cual será incorporada al expediente respectivo y turnada por la Delegación, junto con los demás requisitos, al área ejecutora. En ningún caso se reciben solicitudes en oficinas centrales ni en una Delegación que no corresponda. Se entrega comprobante de recepción con nombre y firma de quien recibe, siempre que se cumplan todos los requisitos.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": "FO-PB-501-A",
+      "numeral": "8.1.1.2, fr. II; 8.1.3; Convocatoria base cuarta",
+      "linea": 1578
+    },
+    {
+      "clave": "PSA-REQ-03",
+      "texto": "En la Solicitud Única se debe designar una Segunda persona beneficiaria, quien por imposibilidad del titular o mediante causa justificada podrá recibir el apoyo directamente y será responsable de cumplir con las Reglas y con el total de las obligaciones comprometidas en el contrato de adhesión o Convenio de Concertación. En los núcleos agrarios, la designación deberá recaer en algún integrante titular del órgano del comisariado.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "formato": "FO-PB-501-A (renglón «Segunda persona beneficiaria»)",
+      "numeral": "8.1.1.2, fr. II (segundo enunciado)",
+      "linea": 1580,
+      "requiere_documento": false,
+      "nota_refrendo": "La fr. VIII (refrendos) no la menciona; se anota en la Solicitud Única, que sí se presenta en refrendo."
+    },
+    {
+      "clave": "PSA-REQ-04",
+      "texto": "Opcional (cuando así lo determinen viable las personas solicitantes físicas o jurídico colectivas): carta poder alterna en la que especifiquen que, por causas de fuerza mayor, desde el momento de la solicitud otorgan poder amplio y cumplido a la persona que determinen. Debe presentarse en original vigente, debidamente requisitada, signada por la persona otorgante, el apoderado y sus dos testigos, anexando copias simples de las identificaciones oficiales vigentes y legibles de quienes participan; aplica únicamente al ejercicio fiscal en curso.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. II (segundo párrafo)",
+      "linea": 1586,
+      "opcional": true,
+      "nota_refrendo": "Aplica solo al ejercicio fiscal en curso; en refrendo se actualizan las cartas poder simples ya vencidas (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-05",
+      "texto": "Presentar el Registro de Información de la persona solicitante y/o beneficiario(a), describiendo toda la información catalogada como «obligatoria». Para Núcleos Agrarios se llena con la información de las personas integrantes del Comisariado (Presidente(a), Secretario(a) y Tesorero(a)). Cuando la segunda persona beneficiaria o designada adquiera la titularidad del apoyo, deberá integrar la información.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": "FO-PB-502",
+      "numeral": "8.1.1.2, fr. III",
+      "linea": 1592
+    },
+    {
+      "clave": "PSA-REQ-06",
+      "texto": "Entregar copia de identificación oficial vigente, con fotografía legible.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. IV; copia simple legible según el último párrafo de 8.1.1.2",
+      "linea": 1598,
+      "nota_refrendo": "La fr. VIII solo pide Solicitud Única y Registro de Información cuando la documentación legal obra en PROBOSQUE con antigüedad de hasta 3 años; la Solicitud Única (nota del apartado IV, línea 12076) agrega la CURP actualizada."
+    },
+    {
+      "clave": "PSA-REQ-07",
+      "texto": "Comprobante de domicilio (recibo de luz, teléfono, agua, predial, cable, etc.) con vigencia no mayor a tres meses y, solo en los casos en que no se cuente con alguno de los anteriores, constancia domiciliaria emitida por la autoridad competente, en caso de que la identificación no cuente con el domicilio de la persona solicitante.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. IV",
+      "linea": 1598,
+      "condicion": "La identificación oficial no trae el domicilio de la persona solicitante"
+    },
+    {
+      "clave": "PSA-REQ-08",
+      "texto": "Presentar la Clave Única de Registro de Población (CURP) actualizada.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. V; Solicitud Única (nota del apartado IV) para refrendos",
+      "linea": 1602,
+      "nota_refrendo": "La fr. VIII no la menciona, pero la nota del apartado IV de la Solicitud Única FO-PB-501-A dice que en refrendos se presenta Solicitud Única, CURP actualizada y documentación legal actualizada (línea 12076)."
+    },
+    {
+      "clave": "PSA-REQ-09",
+      "texto": "Núcleos Agrarios: acreditar la legal propiedad o posesión con PHINA y/o Carpeta Básica (conformada por la Resolución Presidencial, Acta de Posesión y Deslinde y, en su caso, Plano definitivo) o resolución ejecutoriada por la autoridad competente. Los Núcleos Agrarios ya certificados por el PROCEDE presentan únicamente el ADDATE o el ADDATBC.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VI a)",
+      "linea": 1604,
+      "nota_refrendo": "En refrendo solo se requiere si la documentación legal no obra en PROBOSQUE o tiene más de 3 años (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-10",
+      "texto": "Personas físicas y/o jurídico colectivas: documento legible que acredite la propiedad o posesión del predio que se destinará al Programa (inmatriculación administrativa, escritura pública, sentencia ejecutoriada emitida por autoridad competente, usucapión, sucesión ad perpetuam, traslado de dominio, contrato privado de compraventa, certificado parcelario, cesión de derechos agrarios o parcelarios) o constancia de posesión vigente para el ejercicio fiscal correspondiente, emitida y firmada por los integrantes del Órgano de representación del Núcleo Agrario (Presidente(a), Secretario(a) y Tesorero(a)) o, en su caso, por el Secretario del Ayuntamiento según la ubicación del predio y el régimen de propiedad. Las constancias deben contener la ubicación del predio, medidas y colindancias y la superficie total; en predios particulares, solo valen cuando el predio no es parte de la superficie de núcleos agrarios. No se aceptan constancias o certificados de uso común de ejidatarios o comuneros, salvo acta de asamblea vigente inscrita o en trámite ante el RAN que autorice las actividades.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VI b)",
+      "linea": 1607,
+      "nota_refrendo": "En refrendo solo se requiere si la documentación legal no obra en PROBOSQUE o tiene más de 3 años; las constancias de posesión vencidas se actualizan (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-11",
+      "texto": "Contrato de usufructo o arrendamiento del predio: debe estar vigente conforme a los plazos de ejecución del Programa, sin exceder un plazo máximo de 5 años (Código Civil del Estado de México), acompañado del instrumento legal que acredite la propiedad o posesión, y su objeto deberá ser acorde al programa.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VI b) (segundo párrafo)",
+      "linea": 1614,
+      "condicion": "El predio se ocupa por contrato de usufructo o arrendamiento"
+    },
+    {
+      "clave": "PSA-REQ-12",
+      "texto": "Plano o croquis de localización que permita identificar espacialmente el área propuesta a ser beneficiada (o captura de Google Earth), con al menos una coordenada correspondiente a un vértice o esquina del predio, firmado por el propietario, posesionario y/o representante legal. Se adjunta en ambos casos (núcleos agrarios y personas físicas o jurídico colectivas).",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VI (último párrafo)",
+      "linea": 1634,
+      "nota_refrendo": "La fr. VIII no lo menciona; el polígono se valida con la visita en campo."
+    },
+    {
+      "clave": "PSA-REQ-13",
+      "texto": "Cuando se solicite el recurso a través de un representante legal, Núcleos Agrarios: copia del acta de asamblea de elección vigente del órgano de representación, inscrita o presentada para su trámite ante el RAN; si los integrantes del comisariado ya cuentan con credenciales vigentes expedidas por el RAN que los acreditan como Presidente(a), Secretario(a) y Tesorero(a), se aceptan como acreditación de dicho registro.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VII a), a.1",
+      "linea": 1644,
+      "nota_refrendo": "En refrendo se actualizan las actas de elección de órganos que ya hayan fenecido, para el ejercicio fiscal correspondiente (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-14",
+      "texto": "Núcleos Agrarios: acta de asamblea en la que se manifieste el consentimiento para incorporarse a los beneficios de los Programas, inscrita o presentada ante el Registro Agrario Nacional (RAN), con el compromiso de destinar los terrenos al objetivo de los Programas. El acta no deberá tener fecha posterior al cierre de la Convocatoria. Si no puede llevarse a cabo la asamblea por contingencia sanitaria, los integrantes del comisariado suscriben una manifestación bajo protesta de decir verdad y después presentan el acuse de inscripción. Se exceptúan los núcleos que participen en el esquema MLPSA-FC, que se apegan a la Convocatoria de la CONAFOR.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VII a), a.2",
+      "linea": 1655,
+      "nota_refrendo": "En refrendo se actualizan las actas de asamblea de incorporación ya vencidas (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-15",
+      "texto": "Personas físicas y/o jurídico colectivas, cuando se solicite a través de representante legal: documento vigente que acredite la representación legal, en su caso con facultades de administración y/o dominio. Para conjuntos prediales puede ser copia del poder notarial o carta poder simple en original vigente, debidamente requisitada, con copia simple de cada una de las identificaciones oficiales vigentes de las personas que participan.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VII b)",
+      "linea": 1665,
+      "condicion": "La solicitud la presenta un representante legal",
+      "nota_refrendo": "En refrendo los poderes notariales deben estar vigentes y las cartas poder simples se actualizan (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-16",
+      "texto": "Personas jurídico colectivas, exceptuando núcleos agrarios: copia del Acta Constitutiva, escritura, estatutos o documento legal con que se constituyó, protocolizado ante Notario Público, que contenga facultades de administración.",
+      "tipos_persona": [
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VII b) (último párrafo)",
+      "linea": 1670,
+      "nota_refrendo": "Se requiere solo si no obra en PROBOSQUE con antigüedad de hasta 3 años (fr. VIII)."
+    },
+    {
+      "clave": "PSA-REQ-17",
+      "texto": "Certificado de manejo forestal (certificación FSC u otra nacional o internacional de buen manejo forestal). Se requiere para el monto con certificación FSC (3,600 o 1,700 pesos por hectárea, hasta 450 o 300 ha) y para recibir pago por las áreas bajo manejo (áreas de corta) de predios con autorización de aprovechamiento maderable; suma 14 puntos en la calificación frente a 5 sin certificado.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "formato": "FO-PB-501-A, apartado IV, numeral 11 «Certificado del Manejo Forestal (PSAHEM)»",
+      "numeral": "8.1.1.1 (tabla y criterio 14); 8.1.2, lineamiento 14; FO-PB-501-A apartado IV n.º 11",
+      "linea": 12074,
+      "opcional": true,
+      "condicion": "Solicita el monto con certificación FSC, o el predio tiene autorización de aprovechamiento de recursos forestales maderables",
+      "lineas_adicionales": [
+        1429,
+        1520,
+        1810
+      ]
+    },
+    {
+      "clave": "PSA-REQ-18",
+      "texto": "Instituciones educativas, sociedades o asociaciones no gubernamentales sin fines de lucro: convenio con las o los titulares de la propiedad, cuando los terrenos no estén bajo su administración directa. El convenio es exclusivo para participar en el Programa y refiere la vigencia, la superficie que se registrará para el pago y la ubicación del área propuesta.",
+      "tipos_persona": [
+        "institucion_educativa_o_osc"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.2, Lineamientos generales, fr. 17",
+      "linea": 1834,
+      "condicion": "Los terrenos no están bajo su administración directa"
+    },
+    {
+      "clave": "PSA-REQ-19",
+      "texto": "Predios que participan o participaron en el MLPSA-FC (fondos concurrentes CONAFOR-PROBOSQUE; Convenio de Colaboración): ingresar la solicitud con base en la Convocatoria de PROBOSQUE del ejercicio en turno, llenando solo la Solicitud Única y la documentación que no fue solicitada en las convocatorias que dieron origen a su aprobación o que requiera actualización (acta de elección conforme a la fr. VII a.1). No se requiere visita técnica ni Dictamen Jurídico, salvo cambio de representación o de documentación legal o de la situación jurídica del predio.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fondos_concurrentes"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "formato": "FO-PB-501-A, apartado III a) n.º 2 (año del convenio y superficie)",
+      "numeral": "8.1.1.2, fr. IX y X",
+      "linea": 1683,
+      "condicion": "La persona es beneficiaria de pago por servicios ambientales de la CONAFOR en un convenio vigente de MLPSA-FC con PROBOSQUE",
+      "opcional": true
+    }
+  ],
+  "reglas_generales_requisitos": [
+    {
+      "texto": "La documentación debe estar completa para que la solicitud sea atendida; la Delegación informa conforme al acuse y la persona tiene 5 días hábiles a partir de la recepción de la solicitud para presentar lo faltante, sin exceder la fecha límite de recepción de la Convocatoria; se genera el folio de solicitud; si no se complementa dentro de los plazos establecidos, se tiene por desechada la solicitud.",
+      "numeral": "8.1.1.2 (último párrafo); Convocatoria base cuarta",
+      "linea": 1722
+    },
+    {
+      "texto": "Para los requisitos de las fracciones IV, VI, VII y VIII se entrega copia simple legible de los documentos y, en su caso, el original para verificación cuando se requiera, salvo los que deban presentarse en original.",
+      "numeral": "8.1.1.2 (párrafo previo a la documentación faltante)",
+      "linea": 1719
+    },
+    {
+      "texto": "Los interesados que hayan solicitado apoyo de otro programa de PROBOSQUE y quieran participar en este conservan el folio ya asignado al expediente existente y lo complementan con la documentación legal necesaria.",
+      "numeral": "8.1.1.2 (último párrafo)",
+      "linea": 1728
+    },
+    {
+      "texto": "Los núcleos agrarios, personas físicas y/o jurídico colectivas beneficiarias a través de Fondos Concurrentes o de convenio de colaboración no pueden incrementar su superficie mientras el convenio esté vigente.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 8",
+      "linea": 1783
+    },
+    {
+      "texto": "Con el fin de mantener actualizado el expediente, si durante la evaluación o el ejercicio del Programa cambian los representantes, se presenta en la Delegación Regional la documentación legal que lo acredite, conforme a los requisitos de núcleos agrarios.",
+      "numeral": "8.1.1.2 (párrafo posterior a la fr. XII)",
+      "linea": 1715
+    },
+    {
+      "texto": "Refrendos (aplica para fondos concurrentes): solo se requiere la Solicitud Única y el Registro de Información cuando la documentación legal obra en PROBOSQUE con antigüedad no mayor a tres años; se actualizan las cartas poder simples, actas de asamblea y actas de elección ya fenecidas, y los poderes notariales deben estar vigentes; se puede pedir información o documentación adicional con notificación.",
+      "numeral": "8.1.1.2, fr. VIII",
+      "linea": 1673
+    },
+    {
+      "texto": "Las solicitudes se presentan de manera personal, únicamente en la oficina receptora de la Delegación Regional Forestal que corresponda al municipio del predio; en ningún caso en oficinas centrales o en una Delegación que no corresponda.",
+      "numeral": "8.1.3; 10.1, fr. I",
+      "linea": 1847
+    }
+  ],
+  "criterios_seleccion": [
+    {
+      "texto": "Criterio 1: Cobertura forestal (según el formato «Dictamen Técnico» del Sistema de Gestión de Calidad).",
+      "puntaje": 8,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Bosques templados con coberturas entre el 50 y 100 %",
+          "puntos": 8
+        },
+        {
+          "opcion": "Bosque tropical caducifolio con coberturas de entre el 40 y 100 %",
+          "puntos": 5
+        },
+        {
+          "opcion": "Vegetación de zonas semiáridas con coberturas del 40 al 100 %",
+          "puntos": 3
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 1",
+      "linea": 1462
+    },
+    {
+      "texto": "Criterio 2: El predio recibió apoyos de los Programas de Gobiernos Federal, Estatal o Municipal para actividades de protección, restauración y fomento forestal en el año anterior a esta Convocatoria.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "No",
+          "puntos": 5
+        },
+        {
+          "opcion": "Sí",
+          "puntos": 3
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 2",
+      "linea": 1466
+    },
+    {
+      "texto": "Criterio 3: La persona solicitante recibe algún pago del gobierno federal, municipal o de alguna ONG por concepto de servicios ambientales hidrológicos.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "No",
+          "puntos": 5
+        },
+        {
+          "opcion": "Sí",
+          "puntos": 3
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 3",
+      "linea": 1470
+    },
+    {
+      "texto": "Criterio 4: En la superficie propuesta existe tala clandestina.",
+      "puntaje": 8,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "No",
+          "puntos": 8
+        },
+        {
+          "opcion": "Sí",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 4",
+      "linea": 1474
+    },
+    {
+      "texto": "Criterio 5: En la superficie propuesta existen plagas o enfermedades forestales.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "No",
+          "puntos": 5
+        },
+        {
+          "opcion": "Sí",
+          "puntos": 3
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 5",
+      "linea": 1477
+    },
+    {
+      "texto": "Criterio 6: En el predio existen corrientes o cuerpos de agua.",
+      "puntaje": 10,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Ríos y/o arroyos permanentes",
+          "puntos": 10
+        },
+        {
+          "opcion": "Cuerpos de agua (presa, lago natural, laguna o bordo) o corrientes intermitentes",
+          "puntos": 7
+        },
+        {
+          "opcion": "Ninguno de los anteriores",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 6",
+      "linea": 1480
+    },
+    {
+      "texto": "Criterio 7: La persona solicitante se encuentra en situación de vulnerabilidad y discriminación (indígena o mujer).",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Sí",
+          "puntos": 5
+        },
+        {
+          "opcion": "No",
+          "puntos": 3
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 7",
+      "linea": 1493
+    },
+    {
+      "texto": "Criterio 8: El predio propuesto se ubica en un Área Natural Protegida (ANP).",
+      "puntaje": 10,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "ANP, Área de Protección de Flora y Fauna, Área de Protección de los Recursos Naturales o Reserva de la Biósfera de carácter federal",
+          "puntos": 10
+        },
+        {
+          "opcion": "Parque o Reserva de carácter estatal",
+          "puntos": 7
+        },
+        {
+          "opcion": "Al menos el 50 % de la superficie propuesta se ubica dentro de la zona de amortiguamiento del ANP",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 8",
+      "linea": 1496
+    },
+    {
+      "texto": "Criterio 9: Zona con riesgo de deforestación de acuerdo al Índice de Presión Económica a la Deforestación elaborado por el INECC (Versión 2018).",
+      "puntaje": 10,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Muy alto y Alto",
+          "puntos": 10
+        },
+        {
+          "opcion": "Medio",
+          "puntos": 7
+        },
+        {
+          "opcion": "Bajo y Muy Bajo",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 9",
+      "linea": 1504
+    },
+    {
+      "texto": "Criterio 12: Áreas Prioritarias de Captación y Recarga de Mantos Acuíferos (APCRMA) (indicar la más dominante en el predio).",
+      "puntaje": 10,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Alta y muy alta",
+          "puntos": 10
+        },
+        {
+          "opcion": "Baja y moderada",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 12",
+      "linea": 1510
+    },
+    {
+      "texto": "Criterio 13: El área propuesta se ubica dentro de un acuífero con sobreexplotación, de acuerdo con la clasificación de la CONAGUA.",
+      "puntaje": 10,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Déficit",
+          "puntos": 10
+        },
+        {
+          "opcion": "Disponibilidad",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 13",
+      "linea": 1514
+    },
+    {
+      "texto": "Criterio 14: El predio solicitante cuenta con certificado al buen manejo forestal otorgado por alguna certificadora nacional o internacional.",
+      "puntaje": 14,
+      "tipo": "puntaje",
+      "opciones": [
+        {
+          "opcion": "Sí",
+          "puntos": 14
+        },
+        {
+          "opcion": "No",
+          "puntos": 5
+        }
+      ],
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación, criterio 14",
+      "linea": 1518
+    },
+    {
+      "texto": "Máximo total de puntos: 100 (suma de los máximos de los criterios 1 a 9, 12, 13 y 14). Si no hay cobertura presupuestal suficiente para todas las solicitudes factibles, la calificación determina la asignación, del puntaje más alto (100) hacia abajo hasta donde alcance el recurso; en caso de empate de puntos se toman en cuenta los criterios de priorización y la fecha en que fue registrada la solicitud en el Programa.",
+      "puntaje": 100,
+      "tipo": "regla_de_asignacion",
+      "numeral": "8.1.1.1, 1) Criterios de dictaminación (después de la tabla)",
+      "linea": 1522
+    },
+    {
+      "texto": "Criterios de priorización: se prefiere a las personas solicitantes cuyos predios estén en Áreas Naturales Protegidas federales, en zonas con riesgo de deforestación (Índice de Presión Económica a la Deforestación del INECC 2016), con incidencia de cambio de uso del suelo, tala ilegal u otros factores de degradación, y las definidas por PROBOSQUE.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2 (primer párrafo)",
+      "linea": 1733
+    },
+    {
+      "texto": "Predios que tengan ríos con cauces de primer orden.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. I",
+      "linea": 1739
+    },
+    {
+      "texto": "Que las personas participantes cuenten con mayor porcentaje de cobertura arbórea (75-100 %).",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. II",
+      "linea": 1740
+    },
+    {
+      "texto": "Áreas con alta presión por el cambio del uso de suelo (de forestal a urbano o agrícola) de acuerdo con los criterios de dictaminación.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. III",
+      "linea": 1741
+    },
+    {
+      "texto": "Predios que presenten menor impacto de incendios, tala, plagas, entre otros.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. IV",
+      "linea": 1743
+    },
+    {
+      "texto": "Predios que no son propiedad de Dependencias de la Administración Pública Federal, del Estado de México o Municipales (si lo son, se apoyan con suficiencia presupuestal; de lo contrario van a la lista de espera).",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. V",
+      "linea": 1744
+    },
+    {
+      "texto": "Propietarios o personas con predios que pertenezcan a: grupos de mujeres y/o grupos indígenas; comunidad y/o grupo de personas afromexicanas; personas con enfermedades crónico degenerativas; víctimas u ofendidas en delitos investigados o juzgados con perspectiva de género; personas repatriadas; mujeres cuidadoras de hijas e hijos menores de edad o de mujeres privadas de su libertad por resolución judicial (con documento que lo acredite).",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. VI",
+      "linea": 1747
+    },
+    {
+      "texto": "Los demás que determine la instancia normativa.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "numeral": "8.1.2, fr. VII",
+      "linea": 1764
+    }
+  ],
+  "criterios_elegibilidad_tecnica": [
+    {
+      "texto": "Se determina la superficie factible con base en el análisis cartográfico, las visitas de verificación en campo y la documentación legal presentada, con la participación de las Delegaciones Regionales Forestales, del área responsable del programa y de la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia.",
+      "numeral": "8.1.1.1",
+      "linea": 1403
+    },
+    {
+      "texto": "Cobertura arbolada mínima: bosque templado de 50 al 100 %; bosque tropical caducifolio y vegetación de zonas semiáridas de 40 al 100 %.",
+      "numeral": "1.1; 8.1.1.1 (tabla)",
+      "linea": 1146
+    },
+    {
+      "texto": "Categorías de predios elegibles según las ZRHCEM: Cuenca Alta o Área de Captación (Prioridad 1) y Cuencas Media y Baja o áreas de almacenamiento y descarga (Prioridad 2), con superficie mínima de 20 ha y máxima de 400 (450 con FSC) o 300 ha, respectivamente.",
+      "numeral": "8.1.1.1 (tabla)",
+      "linea": 1406
+    },
+    {
+      "texto": "Cuando la superficie factible se encuentre en el límite de las ZRHCEM, se estima el porcentaje de superficie en cada parte; si es mayor al 50 % dentro de una ZRHCEM, se asigna a la prioridad 1 o 2 de la superficie dominante.",
+      "numeral": "8.1.1.1, 1) fr. III",
+      "linea": 1456
+    },
+    {
+      "texto": "La dictaminación se realiza conforme se reciben las solicitudes; el Comité Técnico del FIPASAHEM asigna los apoyos disponibles a las solicitudes factibles y hasta donde alcance el recurso presupuestal, con base en el cumplimiento de requisitos, especificaciones técnicas y tiempos de la Convocatoria (fr. I) y en la información de gabinete, la verificación en campo y los dictámenes técnico y jurídico (fr. II).",
+      "numeral": "8.1.1.1, 1) fr. I y II",
+      "linea": 1450
+    },
+    {
+      "texto": "Bosques tropicales caducifolios: las superficies a registrar deben estar cubiertas con vegetación original, excluyendo los terrenos con cambio de uso del suelo repoblados con vegetación arbustiva.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 6",
+      "linea": 1777
+    },
+    {
+      "texto": "El tipo de bosque y su ubicación se toman del Inventario Estatal Forestal y de Suelos 2022 o, en su caso, de recorridos de campo con apoyo de un Sistema de Información Geográfica.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 7",
+      "linea": 1780
+    },
+    {
+      "texto": "Certificados parcelarios: las coordenadas de la poligonal registrada deben coincidir con las del certificado y con la capa de parcelas publicada por el Registro Agrario Nacional.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 4",
+      "linea": 1773
+    },
+    {
+      "texto": "Cuenca Alta (Prioridad 1): deben realizarse obras que infiltren agua, contengan el suelo y eviten deslaves en la ladera e inundaciones en la cuenca baja.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 2",
+      "linea": 1767
+    },
+    {
+      "texto": "Predios con autorización de aprovechamiento de recursos forestales maderables: son susceptibles de pago todas las áreas bajo manejo (áreas de corta) si están certificados en buen manejo forestal (cotejo con Programas de Manejo Forestal y Documentos Técnicos Unificados); si no están certificados, solo la superficie de conservación, protección y las áreas de corta no intervenidas durante cinco años continuos o ya intervenidas, que reúnan los criterios técnicos.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 14",
+      "linea": 1810
+    },
+    {
+      "texto": "Predios con solo una a cinco anualidades continuas en su ciclo de corta (10 años): pueden apoyarse una vez concluida la última área de corta, manteniendo los compromisos del Programa de Manejo.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 13",
+      "linea": 1806
+    },
+    {
+      "texto": "Predios con autorización para aprovechamiento de recursos forestales no maderables: son sujetos de pago las áreas arboladas que cumplan las Reglas.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 5",
+      "linea": 1775
+    },
+    {
+      "texto": "Aplicación de los recursos: del 100 % del apoyo se aplica como mínimo el 60 % a acciones de protección, restauración, conservación y fomento (dentro del predio aprobado, propuesta en el documento «Aplicación de los recursos asignados al pago por servicios ambientales hidrológicos del Estado de México», validado por la Delegación y comprobado con notas, facturas, listas de raya y evidencia fotográfica); el 40 % restante lo define la persona beneficiaria (con opinión de la asamblea) para compensar a los participantes, pagar asistencia técnica externa y, en segundo término, obras sociales.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 10",
+      "linea": 1791
+    },
+    {
+      "texto": "Predios beneficiarios de 100 ha o más: deben integrar una brigada capacitada para prevención, control y combate de incendios forestales; con menos de 100 ha, contar con personal capacitado.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 12",
+      "linea": 1803
+    },
+    {
+      "texto": "Si no hay presupuesto suficiente para todas las solicitudes aprobadas, los pagos pueden ajustarse proporcionalmente a la disponibilidad presupuestal o como determine el Comité Técnico del FIPASAHEM con base en las características prioritarias de cada predio.",
+      "numeral": "8.1.2, Lineamientos generales, fr. 18",
+      "linea": 1840
+    }
+  ],
+  "inelegibles": [
+    {
+      "texto": "Aquellas personas beneficiarias que presentan algún incumplimiento en los Programas y/o adeudo con PROBOSQUE.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. I",
+      "linea": 1528
+    },
+    {
+      "texto": "Las personas físicas o jurídico colectivas sancionadas con la cancelación o suspensión de apoyos de cualquier índole que se encuentren en el listado de sancionados de PROBOSQUE y de la CONAFOR.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. II",
+      "linea": 1529
+    },
+    {
+      "texto": "Los predios sancionados administrativamente por infracciones a la normatividad forestal aplicable, siempre y cuando no se haga el reintegro del recurso respectivo previo a la aprobación de la Instancia Normativa.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. III",
+      "linea": 1531
+    },
+    {
+      "texto": "Aquellos predios que no cumplan con los requisitos establecidos o proporcionen información incompleta, falsa o apócrifa para su inscripción en el Programa.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. IV",
+      "linea": 1533
+    },
+    {
+      "texto": "Áreas afectadas por incendios en la temporada actual e inmediata anterior a la Convocatoria actual, derivada del análisis cartográfico y verificación en campo.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. V",
+      "linea": 1535
+    },
+    {
+      "texto": "Persona beneficiaria con autorización de su Programa de Manejo Forestal que desista de la ejecución y de los compromisos contraídos, hasta que se ejecute el Programa autorizado, salvo que el área técnica considere viable el desistimiento, previa opinión de la Unidad Jurídica.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. VI",
+      "linea": 1537
+    },
+    {
+      "texto": "Predios con procedimiento administrativo de suspensión, revocación, nulidad u otra respecto de su autorización de aprovechamiento forestal o registro de plantación.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. VII",
+      "linea": 1542
+    },
+    {
+      "texto": "Evidencia (escrito o notificación de autoridad competente, o documentales en los archivos de PROBOSQUE) de conflictos sociales o de representación o propiedad del predio que pueda poner en riesgo la aplicación de los apoyos; se pone a consideración del Comité Técnico del FIPASAHEM.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. VIII",
+      "linea": 1544
+    },
+    {
+      "texto": "Áreas que están siendo beneficiadas con algún programa de Pago de Servicios Ambientales (Hidrológicos, Captura de Carbono, Biodiversidad, entre otros) de la CONAFOR o PROBOSQUE, exceptuando las que se suscriban en Convenios entre el Comité Técnico del FIPASAHEM y los gobiernos Federal, Estatal o Municipal.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. IX",
+      "linea": 1549
+    },
+    {
+      "texto": "Las personas beneficiarias de ejercicios anteriores que hayan comprometido actividades y no las hayan realizado o justificado oportunamente ante el Comité Técnico del FIPASAHEM.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. X",
+      "linea": 1553
+    },
+    {
+      "texto": "Las y los servidores públicos, cónyuge, parientes consanguíneos, parientes civiles o terceros con los que tengan relaciones profesionales, laborales o de negocios, o socios o sociedades de las que formen parte.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. XI",
+      "linea": 1563
+    },
+    {
+      "texto": "Ejidos y comunidades que no tengan vigentes sus Órganos de representación, con excepción del plazo otorgado por la Ley Agraria a los cargos de suplentes con posterioridad al vencimiento.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. XII",
+      "linea": 1567
+    },
+    {
+      "texto": "Las personas beneficiarias que hayan recibido recurso mayor al establecido en el contrato de adhesión en convocatorias anteriores y no hayan hecho el reintegro a PROBOSQUE, a la cuenta bancaria proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. XIII",
+      "linea": 1569
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.1.1, 2) Serán inelegibles, fr. XIV",
+      "linea": 1572
+    }
+  ],
+  "montos": [
+    {
+      "concepto": "Cuenca Alta (Prioridad 1): pago compensatorio por hectárea, superficie mínima 20 ha y máxima 400 ha (bosque templado 50-100 % de cobertura; bosque tropical caducifolio y zonas semiáridas 40-100 %)",
+      "monto": 3500,
+      "unidad": "pesos por hectárea",
+      "superficie_minima_ha": 20,
+      "superficie_maxima_ha": 400,
+      "modalidad": "cuenca_alta",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+      "linea": 1352
+    },
+    {
+      "concepto": "Cuenca Alta (Prioridad 1) con certificación en manejo forestal FSC: pago por hectárea y superficie máxima de hasta 450 ha",
+      "monto": 3600,
+      "unidad": "pesos por hectárea",
+      "superficie_minima_ha": 20,
+      "superficie_maxima_ha": 450,
+      "modalidad": "cuenca_alta",
+      "requiere": "certificacion_FSC",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+      "linea": 1354
+    },
+    {
+      "concepto": "Cuenca Media y Baja (Prioridad 2): pago compensatorio por hectárea, superficie mínima 20 ha y máxima 300 ha",
+      "monto": 1500,
+      "unidad": "pesos por hectárea",
+      "superficie_minima_ha": 20,
+      "superficie_maxima_ha": 300,
+      "modalidad": "cuenca_media_baja",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+      "linea": 1356
+    },
+    {
+      "concepto": "Cuenca Media y Baja (Prioridad 2) con certificación en manejo forestal FSC: pago por hectárea y superficie máxima de hasta 300 ha",
+      "monto": 1700,
+      "unidad": "pesos por hectárea",
+      "superficie_minima_ha": 20,
+      "superficie_maxima_ha": 300,
+      "modalidad": "cuenca_media_baja",
+      "requiere": "certificacion_FSC",
+      "numeral": "7.1.1; 8.1.1.1 (tabla); Convocatoria base tercera, fila I",
+      "linea": 1359
+    },
+    {
+      "concepto": "Predios de fondos concurrentes (MLPSA-FC) o de otros instrumentos jurídicos distintos a la convocatoria: se mantiene el monto por hectárea del convenio; el pago conjunto no puede exceder el monto del numeral 7.1",
+      "monto": null,
+      "unidad": "según el convenio",
+      "modalidad": "fondos_concurrentes",
+      "numeral": "8.1.2, Lineamientos generales, fr. 15; 10.1, fr. X (cuarto párrafo)",
+      "linea": 1819
+    },
+    {
+      "concepto": "Acompañamiento técnico forestal (delegaciones regionales o asesores técnicos externos independientes con RFN o inscritos en el mecanismo de la CONAFOR)",
+      "monto": null,
+      "unidad": "gratuito (sin costo para la persona beneficiaria)",
+      "numeral": "7.1.2 y 7.2",
+      "linea": 1361
+    }
+  ],
+  "ministraciones": [
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "regimen": "dos_ministraciones",
+      "condicion": "70 % del monto total asignado, con fecha posterior a la firma del Contrato de Adhesión o Convenio de Concertación, dependiendo del caso en concreto. No se puede solicitar el pago si aún no se cuenta con la firma del instrumento. Se paga con cheque: la Instancia Ejecutora solicita al Comité Técnico que instruya a la Fiduciaria; el pago se solicita a la Fiduciaria a través de la Secretaría Técnica del Comité en un máximo de 5 días hábiles desde la recepción de la solicitud del área operativa; la entrega es por las Delegaciones Regionales.",
+      "numeral": "7.2; 10.1, fr. VIII, IX y X; Convocatoria base quinta, fila VI",
+      "linea": 1374
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "regimen": "dos_ministraciones",
+      "condicion": "30 % del monto total asignado (pago final), posterior a la conclusión de las actividades comprometidas, presentado el informe final de actividades y verificados los trabajos con visita de campo y minuta de verificación en campo firmada por la persona beneficiaria, el técnico comisionado por PROBOSQUE y, en su caso, el asesor técnico independiente; sin exceder el último bimestre de la vigencia del contrato. La Instancia Ejecutora solicita su emisión a la Dirección de Administración, Finanzas y de Gestión Documental; mismo plazo de 5 días hábiles de la Secretaría Técnica ante la Fiduciaria. En MLPSA-FC se comprueba para el depósito del 30 % o del siguiente año concurrente de la CONAFOR.",
+      "numeral": "7.2; 10.1, fr. X a XII; Convocatoria base quinta, fila VI",
+      "linea": 1376
+    }
+  ],
+  "plazos": [
+    {
+      "clave": "recepcion_solicitudes",
+      "descripcion": "Recepción y registro de solicitudes, a partir del día hábil siguiente a la publicación de la Convocatoria y hasta el 27 de marzo de 2026.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-03-27",
+      "corre_desde": "Día hábil siguiente a la publicación de la Convocatoria (27-ene-2026)",
+      "responsable": "Delegación Regional Forestal",
+      "numeral": "Convocatoria base quinta (PSAHEM y CC), actividad I",
+      "linea": 776
+    },
+    {
+      "clave": "complemento_documentacion_faltante",
+      "descripcion": "Término para presentar la documentación faltante, siempre y cuando este tiempo no exceda la fecha límite de recepción de solicitudes de la Convocatoria; se genera el folio de solicitud y, si no se complementa dentro de los plazos establecidos, se tiene por desechada la solicitud.",
+      "cantidad": 5,
+      "unidad": "dias_habiles",
+      "corre_desde": "Recepción de la solicitud (la Delegación informa lo conducente conforme al acuse)",
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2 (último párrafo); Convocatoria base cuarta",
+      "linea": 1722,
+      "lineas_adicionales": [
+        761
+      ]
+    },
+    {
+      "clave": "aviso_faltantes_en_evaluacion",
+      "descripcion": "Si con posterioridad se determina que es necesario presentar nuevamente la documentación o información o documentos complementarios, se notifica a la persona solicitante dentro del plazo de la evaluación, validación y calificación en campo y gabinete (sin número fijo de días).",
+      "cantidad": null,
+      "unidad": "plazo_de_evaluacion",
+      "corre_desde": "Durante la evaluación (hasta el último día hábil de junio de 2026)",
+      "responsable": "Instancia Ejecutora (Dirección de Restauración y Fomento Forestal)",
+      "numeral": "10.1, fr. III",
+      "linea": 2257
+    },
+    {
+      "clave": "evaluacion_y_dictaminacion",
+      "descripcion": "Al cierre de la Convocatoria se realizan las evaluaciones correspondientes (evaluación, validación y calificación en campo; dictaminación técnica y jurídica), sin exceder el último día hábil de junio de 2026 para la validación de las solicitudes. La dictaminación se realiza conforme se reciban las solicitudes.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-06-30",
+      "corre_desde": "Cierre de la Convocatoria",
+      "responsable": "Delegaciones, área técnica y Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia",
+      "numeral": "Convocatoria base quinta (PSAHEM y CC), actividad II; 8.1.1.1, 1) Criterios de dictaminación",
+      "linea": 781,
+      "lineas_adicionales": [
+        1450
+      ]
+    },
+    {
+      "clave": "aprobacion_solicitudes",
+      "descripcion": "Aprobación de solicitudes con base en la disponibilidad de presupuesto, hasta agotar el recurso; fallo inapelable; periodo del término del punto anterior hasta el último día hábil de julio de 2026.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-07-31",
+      "corre_desde": "Término de la evaluación",
+      "responsable": "Comité Técnico del FIPASAHEM",
+      "numeral": "Convocatoria base quinta (PSAHEM y CC), actividad III",
+      "linea": 783
+    },
+    {
+      "clave": "publicacion_resultados",
+      "descripcion": "Posterior a la aprobación de las solicitudes por el Comité, los resultados se publican en https://probosque.edomex.gob.mx y, en PSAHEM, también en el Periódico Oficial «Gaceta del Gobierno»; quedan disponibles en Oficinas Centrales y Delegaciones Regionales. No hay número de días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Aprobación de las solicitudes por el Comité Técnico del FIPASAHEM",
+      "responsable": "Instancia Ejecutora, previa autorización del Comité",
+      "numeral": "Convocatoria base quinta, actividad IV y base sexta; 9.4.3, fr. III; 10.1, fr. VI",
+      "linea": 795,
+      "lineas_adicionales": [
+        903,
+        2215,
+        2266
+      ]
+    },
+    {
+      "clave": "notificacion_solicitudes_no_aprobadas",
+      "descripcion": "Los resultados de las solicitudes no aprobadas se notifican a las personas solicitantes por la Instancia Ejecutora, a través de la Secretaría Técnica del Comité, en un plazo perentorio determinado en reunión del Comité y plasmado en el acta de la sesión.",
+      "cantidad": null,
+      "unidad": "otro",
+      "corre_desde": "Decisión del Comité asentada en el acta de la sesión",
+      "responsable": "Instancia Ejecutora, a través de la Secretaría Técnica del Comité Técnico del FIPASAHEM",
+      "numeral": "10.1, fr. VI",
+      "linea": 2267
+    },
+    {
+      "clave": "firma_contrato",
+      "descripcion": "Elaboración y firma del Contrato de Adhesión (o del Convenio de Concertación, según el caso): «Se llevará a cabo 10 días hábiles posteriores a la publicación de resultados» (Convocatoria). Las Reglas remiten a «los plazos establecidos en la Convocatoria vigente para su firma» (10.1, fr. VI) y a suscribir «en tiempo y forma» (8.1.7, fr. IV). Beneficiarios reasignados: fecha límite el último día hábil de septiembre de 2026.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "corre_desde": "Convocatoria: publicación de resultados. Las ROP de PSAHEM no fijan otro evento de arranque (VER DUDAS)",
+      "responsable": "Persona beneficiaria, con la Instancia Ejecutora a través de las Delegaciones Regionales",
+      "numeral": "Convocatoria base quinta, actividad V; 8.1.7, fr. IV; 10.1, fr. VI",
+      "linea": 802,
+      "lineas_adicionales": [
+        803,
+        2018,
+        2275
+      ],
+      "fecha_limite_reasignados": "2026-09-30"
+    },
+    {
+      "clave": "plazo_convenio_concertacion_mlpsa",
+      "descripcion": "Para personas beneficiarias de fondos concurrentes (MLPSA-FC), el informe final y el seguimiento se apegan a los plazos del Convenio de Concertación vigente; las ROP no dan días.",
+      "cantidad": null,
+      "unidad": "otro",
+      "corre_desde": "Convenio de Concertación vigente (CONAFOR-PROBOSQUE)",
+      "responsable": "Persona beneficiaria de fondos concurrentes",
+      "numeral": "8.1.7, fr. XVII; 10.1, fr. X",
+      "linea": 2074,
+      "lineas_adicionales": [
+        2296
+      ]
+    },
+    {
+      "clave": "primera_ministracion",
+      "descripcion": "Primera ministración por el 70 % del monto total asignado, con fecha posterior a la firma del Contrato de Adhesión o Convenio de Concertación, según el caso; la entrega del recurso depende de la disponibilidad presupuestal. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Firma del Contrato de Adhesión o Convenio de Concertación e instrucción de pago a la Fiduciaria",
+      "responsable": "Comité Técnico del FIPASAHEM (instruye) y Fiduciaria (emite cheques); entrega por las Delegaciones Regionales",
+      "numeral": "7.2; Convocatoria base quinta, actividad VI; 10.1, fr. IX y X",
+      "linea": 1374,
+      "lineas_adicionales": [
+        808,
+        2286
+      ]
+    },
+    {
+      "clave": "instruccion_pago_fiduciaria",
+      "descripcion": "Los pagos del monto total aprobado (70 % y 30 %), según corresponda, se solicitan a la Fiduciaria a través de la Secretaría Técnica del Comité Técnico del FIPASAHEM, en un plazo máximo de 5 días hábiles, a partir de la recepción de la solicitud presentada por el área operativa del Programa. No se puede solicitar el pago de una persona beneficiaria si no se cuenta con la firma del Contrato de Adhesión o Convenio de Concertación.",
+      "cantidad": 5,
+      "unidad": "dias_habiles",
+      "corre_desde": "Recepción, por la Secretaría Técnica del Comité, de la solicitud presentada por el área operativa (responsable) del Programa",
+      "responsable": "Secretaría Técnica del Comité Técnico del FIPASAHEM (solicita a la Fiduciaria)",
+      "numeral": "10.1, fr. X (segundo párrafo); ver también fr. VIII, IX y XIV",
+      "linea": 2290,
+      "lineas_adicionales": [
+        2281,
+        2286,
+        2321
+      ],
+      "de": "Área responsable del Programa (Instancia Ejecutora) → Comité Técnico del FIPASAHEM → Fiduciaria"
+    },
+    {
+      "clave": "notificacion_pago_disponible",
+      "descripcion": "La notificación de los pagos se realiza a través de las Delegaciones Regionales Forestales por llamada telefónica, medios electrónicos o visita domiciliaria, una vez que oficinas centrales libere el pago; se da prioridad a los pagos de MLPSA-FC. Sin plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Liberación del pago por oficinas centrales",
+      "responsable": "Delegaciones Regionales Forestales",
+      "numeral": "10.1, fr. X (tercer párrafo)",
+      "linea": 2293
+    },
+    {
+      "clave": "cobro_cheque",
+      "descripcion": "La persona beneficiaria debe recoger el cheque donde se le indique y hacerlo efectivo en un periodo no mayor a 3 meses. Solo se puede reexpedir otro cheque bajo causa plenamente justificada. Si el cheque concluye su vigencia sin cobrarse, procede la cancelación del apoyo (baja) y el Comité acuerda el reintegro de los cheques no reclamados.",
+      "cantidad": 3,
+      "unidad": "meses",
+      "corre_desde": "No se indica el evento de arranque: el texto dice «recoger donde se le indique y hacer efectivo el cobro en un periodo no mayor a 3 meses» (VER DUDAS)",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.7, fr. XVI; 8.1.9.2, fr. VI y VII; 9.4.3, fr. II",
+      "linea": 2069,
+      "lineas_adicionales": [
+        2125,
+        2126,
+        2211
+      ]
+    },
+    {
+      "clave": "informe_final_actividades",
+      "descripcion": "Presentar el informe final de actividades, que describa que se han ejecutado y finalizado los trabajos comprometidos, incluyendo la comprobación de gastos que corresponda, a más tardar el último día de la vigencia del Contrato de Adhesión (convocatoria estatal).",
+      "cantidad": null,
+      "unidad": "vigencia_del_contrato",
+      "corre_desde": "Vigencia del Contrato de Adhesión (no se indica en días ni fecha)",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.7, fr. XVII",
+      "linea": 2072
+    },
+    {
+      "clave": "segunda_ministracion",
+      "descripcion": "Segunda ministración (pago final) por el 30 % del monto total aprobado, posterior a la conclusión de las actividades comprometidas, presentado el informe final y verificados los trabajos, sin exceder el último bimestre de la vigencia del contrato; se entrega según la información técnica, de gabinete y geográfica, previa visita de campo con minuta de verificación firmada por la persona beneficiaria y el técnico comisionado por PROBOSQUE (y, en su caso, el asesor técnico independiente).",
+      "cantidad": null,
+      "unidad": "ultimo_bimestre_de_vigencia_del_contrato",
+      "corre_desde": "Informe final presentado y trabajos verificados en campo (minuta de verificación)",
+      "responsable": "Instancia Ejecutora; Dirección de Administración, Finanzas y de Gestión Documental; Comité Técnico del FIPASAHEM y Fiduciaria",
+      "numeral": "7.2; Convocatoria base quinta, actividad VI; 10.1, fr. XI y XII",
+      "linea": 810,
+      "lineas_adicionales": [
+        1376,
+        2303,
+        2315
+      ]
+    },
+    {
+      "clave": "verificacion_ejecucion_actividades",
+      "descripcion": "Verificación de la ejecución de las actividades comprometidas en el Contrato de Adhesión: de la firma y hasta el término de la vigencia del Contrato de Adhesión. La Instancia Ejecutora, a través de las Delegaciones, acude a todos los predios beneficiados.",
+      "cantidad": null,
+      "unidad": "vigencia_del_contrato",
+      "corre_desde": "Firma del Contrato de Adhesión",
+      "responsable": "Delegaciones Regionales Forestales y área técnica",
+      "numeral": "Convocatoria base quinta (PSAHEM y CC), actividad VII; 10.1, fr. XI",
+      "linea": 814,
+      "lineas_adicionales": [
+        2303
+      ]
+    },
+    {
+      "clave": "aviso_caso_fortuito_conflicto",
+      "descripcion": "Notificar por escrito al Comité Técnico del FIPASAHEM, en un plazo que no exceda 15 días hábiles, por conducto de la Delegación Regional Forestal o de la Dirección de Restauración y Fomento Forestal, los conflictos sociales, de representación o de posesión, o de cualquier índole, que impidan realizar las actividades y el otorgamiento del recurso, y cualquier siniestro o afectación al predio, con la documentación que lo sustente.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "corre_desde": "No se indica (se infiere: desde que ocurre el conflicto o siniestro)",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.7, fr. VII",
+      "linea": 2034
+    },
+    {
+      "clave": "segunda_persona_beneficiaria_interes",
+      "descripcion": "Baja si, por fallecimiento del titular que firma el Contrato de Adhesión, no se notifica en el término de 30 días hábiles el interés de la segunda persona beneficiaria de continuar con el programa.",
+      "cantidad": 30,
+      "unidad": "dias_habiles",
+      "corre_desde": "No se indica (se infiere: fallecimiento del titular)",
+      "responsable": "Segunda persona beneficiaria",
+      "numeral": "8.1.9.2, fr. XI",
+      "linea": 2131
+    },
+    {
+      "clave": "vigencia_documentacion_legal_refrendo",
+      "descripcion": "Para refrendos (aplica para fondos concurrentes), la documentación legal que obra en los archivos de PROBOSQUE debe tener una antigüedad no mayor a tres años anteriores a la solicitud.",
+      "cantidad": 3,
+      "unidad": "anios",
+      "corre_desde": "Fecha de la solicitud (hacia atrás)",
+      "responsable": "Instancia Ejecutora / Delegación",
+      "numeral": "8.1.1.2, fr. VIII; 10.1, fr. II",
+      "linea": 1673,
+      "lineas_adicionales": [
+        2253
+      ]
+    },
+    {
+      "clave": "suplentes_nucleo_agrario",
+      "descripcion": "Cuando los titulares del Órgano del Comisariado concluyen su gestión sin elecciones, los suplentes toman el cargo como titulares hasta por un plazo no mayor de sesenta días naturales; después entran los nuevos representantes con acta de elección y acuse RAN (o Calificación registral Positiva y/o credenciales), o son dados de baja del Programa.",
+      "cantidad": 60,
+      "unidad": "dias_naturales",
+      "corre_desde": "Fecha en que los propietarios concluyeron su periodo de gestión",
+      "responsable": "Núcleo agrario",
+      "numeral": "8.1.1.2, fr. XI; 8.1.9.2, fr. XV",
+      "linea": 1703,
+      "lineas_adicionales": [
+        2139
+      ]
+    },
+    {
+      "clave": "vigencia_comprobantes",
+      "descripcion": "Comprobante de domicilio con vigencia no mayor a tres meses.",
+      "cantidad": 3,
+      "unidad": "meses",
+      "corre_desde": "Fecha de emisión del comprobante",
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2, fr. IV",
+      "linea": 1599
+    },
+    {
+      "clave": "arrendamiento_usufructo_maximo",
+      "descripcion": "Contrato de usufructo o arrendamiento vigente acorde a los plazos de ejecución del Programa, con plazo máximo de 5 años.",
+      "cantidad": 5,
+      "unidad": "anios",
+      "corre_desde": null,
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2, fr. VI b)",
+      "linea": 1614
+    },
+    {
+      "clave": "reintegro",
+      "descripcion": "Reintegro de recursos recibidos y no aplicados, cuando se determine el incumplimiento, y de los depositados de más (de manera obligatoria e inmediata): desde que se notifica a la persona beneficiaria por cualquier medio. El monto no ejercido por ajustes menores al 70 %, cancelaciones y desistimientos debe reintegrarse y puede reasignarse con acuerdo del Comité. Sin días fijos.",
+      "cantidad": null,
+      "unidad": "inmediato",
+      "corre_desde": "Notificación al beneficiario por cualquier medio (y acuerdo previo del Comité en el reintegro por incumplimiento)",
+      "responsable": "Persona beneficiaria; la Unidad Jurídica gestiona la devolución",
+      "numeral": "8.1.7, fr. XIV y XXIII; 8.1.9.3; 10.1, fr. XV",
+      "linea": 2062,
+      "lineas_adicionales": [
+        2084,
+        2147,
+        2324
+      ]
+    },
+    {
+      "clave": "informe_anual_comite",
+      "descripcion": "La Instancia Responsable (PROBOSQUE) presenta un informe anual a la Instancia Normativa sobre la ejecución del programa al final del ejercicio fiscal.",
+      "cantidad": null,
+      "unidad": "fin_del_ejercicio_fiscal",
+      "corre_desde": null,
+      "responsable": "Instancia Responsable (PROBOSQUE)",
+      "numeral": "16.1",
+      "linea": 2367
+    },
+    {
+      "clave": "segunda_convocatoria",
+      "descripcion": "Si hay recursos disponibles al término de la aprobación de solicitudes, puede emitirse una segunda convocatoria.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Término de la aprobación",
+      "responsable": "PROBOSQUE",
+      "numeral": "Convocatoria base séptima",
+      "linea": 917
+    }
+  ],
+  "calendario_convocatoria": [
+    {
+      "evento": "Publicación de la Convocatoria y de las ROP en la Gaceta del Gobierno",
+      "inicio": "2026-01-27",
+      "fin": "2026-01-27",
+      "linea": 973
+    },
+    {
+      "evento": "Entrada en vigor de la Convocatoria (al día siguiente de su publicación)",
+      "inicio": "2026-01-28",
+      "fin": null,
+      "linea": 959
+    },
+    {
+      "evento": "Recepción y registro de solicitudes (a partir del día hábil siguiente a la publicación)",
+      "inicio": "2026-01-28",
+      "fin": "2026-03-27",
+      "nota": "El inicio se deriva: la Convocatoria dice «a partir del día hábil siguiente» y el 28-ene-2026 es miércoles",
+      "linea": 777
+    },
+    {
+      "evento": "Evaluación, validación y calificación en campo; dictaminación técnica y jurídica (hasta el último día hábil de junio)",
+      "inicio": "2026-03-28",
+      "fin": "2026-06-30",
+      "nota": "El inicio es «al cierre de la Convocatoria»",
+      "linea": 781
+    },
+    {
+      "evento": "Aprobación de solicitudes por el Comité Técnico del FIPASAHEM (hasta el último día hábil de julio)",
+      "inicio": "2026-07-01",
+      "fin": "2026-07-31",
+      "nota": "«Del término del punto anterior hasta el último día hábil del mes de julio»",
+      "linea": 784
+    },
+    {
+      "evento": "Firma del Contrato de Adhesión de beneficiarios reasignados (fecha límite)",
+      "inicio": null,
+      "fin": "2026-09-30",
+      "linea": 803
+    }
+  ],
+  "formatos": [
+    {
+      "clave": "FO-PB-501-A",
+      "nombre": "Solicitud Única (PSAHEM, RHF, PS y CC), versión 15, revisión 29-ene-2026; incluye comprobante de recepción, checklist de documentos y declaratoria de no litigio",
+      "uso": "Solicitud, registro del predio, tipo de persona, grupos prioritarios, superficie a incorporar a la convocatoria estatal (ha), si es beneficiario de fondos concurrentes (año del convenio y superficie), segunda persona beneficiaria y comprobante de recepción",
+      "en_texto": true,
+      "linea": 11972
+    },
+    {
+      "clave": "FO-PB-502",
+      "nombre": "Registro de Información de la persona solicitante y/o beneficiaria (versión 14, revisión 22-ene-2026) con aviso de privacidad",
+      "uso": "Datos personales de la persona solicitante, de los integrantes del comisariado y de la segunda persona beneficiaria",
+      "en_texto": true,
+      "linea": 12245
+    },
+    {
+      "clave": "FO-PB-520 A",
+      "nombre": "Aplicación de los recursos asignados al pago por servicios ambientales hidrológicos del Estado de México",
+      "uso": "Propuesta de actividades de protección, restauración, conservación y fomento (mínimo 60 % del apoyo); se presenta al suscribir el Contrato de Adhesión o Convenio de Concertación y se anexa a él; validada por la Delegación. La clave aparece escrita «FO-PB-520 A» y «FO-PB520 A» en las ROP",
+      "en_texto": false,
+      "linea": 2046,
+      "lineas_adicionales": [
+        1794,
+        2055
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Informe final de actividades (las ROP de PSAHEM no le dan clave de formato)",
+      "uso": "Describe que se ejecutaron y finalizaron los trabajos, con comprobación de gastos; base técnica, de gabinete y geográfica de la segunda ministración; a más tardar el último día de la vigencia del Contrato de Adhesión",
+      "en_texto": false,
+      "linea": 1377,
+      "lineas_adicionales": [
+        2072
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Minuta de verificación en campo (sin clave)",
+      "uso": "Acredita la visita de campo previa a la segunda ministración; firmada por la persona beneficiaria, el técnico comisionado por PROBOSQUE y, en su caso, el asesor técnico independiente",
+      "en_texto": false,
+      "linea": 1378
+    },
+    {
+      "clave": null,
+      "nombre": "Contrato de Adhesión (sin clave de formato en las ROP; el proyecto lo valida la Unidad Jurídica, con adendum en su caso)",
+      "uso": "Formaliza el apoyo con PROBOSQUE; condición para solicitar el primer pago",
+      "en_texto": false,
+      "linea": 1190,
+      "lineas_adicionales": [
+        2278,
+        2286
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Convenio de Concertación (sin clave de formato) entre la persona beneficiaria, PROBOSQUE y CONAFOR, mediante el MLPSA-FC",
+      "uso": "Sustituye al Contrato de Adhesión en los predios de fondos concurrentes; los plazos del informe final y el seguimiento se apegan a él",
+      "en_texto": false,
+      "linea": 1194,
+      "lineas_adicionales": [
+        1375,
+        2074
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Oficio de solicitud de pago y Solicitud de cheque por beneficiario, con documentación comprobatoria (copia de INE, dictamen, etc.)",
+      "uso": "Soporte de la solicitud de pago que presenta el área responsable del programa al Comité Técnico para que instruya a la Fiduciaria",
+      "en_texto": false,
+      "linea": 2284
+    },
+    {
+      "clave": null,
+      "nombre": "Dictamen Técnico (formato del Sistema de Gestión de Calidad) y Dictamen Jurídico",
+      "uso": "Evalúan la cobertura forestal (criterio 1) y el cumplimiento de requisitos y la validez de la documentación",
+      "en_texto": false,
+      "linea": 1462,
+      "lineas_adicionales": [
+        1205,
+        1208
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Programa de Mejores Prácticas de Manejo (PMPM)",
+      "uso": "Programación de actividades (generalmente por cinco años) de los beneficiarios del MLPSA-FC; sustituye al formato FO-PB-520 A para ellos",
+      "en_texto": false,
+      "linea": 1267,
+      "lineas_adicionales": [
+        2055
+      ]
+    },
+    {
+      "clave": null,
+      "nombre": "Los demás formatos que determine la Instancia Normativa",
+      "uso": "Abierto",
+      "en_texto": false,
+      "linea": 1988
+    }
+  ],
+  "derechos": [
+    {
+      "texto": "Recibir la información necesaria en tiempo y forma respecto a la aplicación de la Convocatoria y las Reglas, a través de la instancia ejecutora y del personal de las Delegaciones Regionales Forestales.",
+      "numeral": "8.1.6, fr. I",
+      "linea": 1997
+    },
+    {
+      "texto": "Recibir de conformidad el apoyo otorgado en caso de ser aprobado.",
+      "numeral": "8.1.6, fr. II",
+      "linea": 1999
+    },
+    {
+      "texto": "Reserva y privacidad de su información personal conforme a la normatividad aplicable del INFOEM.",
+      "numeral": "8.1.6, fr. III",
+      "linea": 2000
+    },
+    {
+      "texto": "Ser tratados con respeto, equidad y con base en el derecho a la no discriminación.",
+      "numeral": "8.1.6, fr. IV",
+      "linea": 2001
+    },
+    {
+      "texto": "Que los apoyos se otorguen sin distinción de género, raza, etnia, credo religioso, condición socioeconómica, condiciones de salud, opiniones, estado civil, preferencias, filiación política o cualquier otra.",
+      "numeral": "8.1.6, fr. V",
+      "linea": 2002
+    },
+    {
+      "texto": "Asociarse libremente para solicitar el apoyo a través de un grupo u Organización o compartir las metas de protección y conservación de las áreas beneficiadas.",
+      "numeral": "8.1.6, fr. VI",
+      "linea": 2005
+    },
+    {
+      "texto": "Las demás que se señalen en las Reglas y la Convocatoria.",
+      "numeral": "8.1.6, fr. VII",
+      "linea": 2007
+    }
+  ],
+  "obligaciones": [
+    {
+      "texto": "Proporcionar la información y/o documentación completa y legible requerida, de manera veraz, en los términos establecidos.",
+      "numeral": "8.1.7, fr. I",
+      "linea": 2009
+    },
+    {
+      "texto": "Acudir a la visita técnica con el personal de la Delegación para mostrar y delimitar el polígono a incorporar al PSAHEM y cuantificar la superficie, y a las visitas de verificación o seguimiento a las que sea convocado.",
+      "numeral": "8.1.7, fr. II",
+      "linea": 2011
+    },
+    {
+      "texto": "Asistir al lugar designado por PROBOSQUE para recibir de manera gratuita la capacitación sobre la actividad a desarrollar y sus derechos y obligaciones.",
+      "numeral": "8.1.7, fr. III",
+      "linea": 2014
+    },
+    {
+      "texto": "Suscribir en tiempo y forma el Contrato de Adhesión o Convenio de Concertación, cuando así sea requerido por PROBOSQUE, en apego a los tiempos establecidos en la Convocatoria.",
+      "numeral": "8.1.7, fr. IV",
+      "linea": 2018
+    },
+    {
+      "texto": "Cumplir el clausulado del contrato de adhesión o Convenio de Concertación y realizar las actividades especificadas; la superficie aprobada por el Comité será verificada en campo, georreferenciada y aceptada como dato definitivo, asentado en los instrumentos legales.",
+      "numeral": "8.1.7, fr. V",
+      "linea": 2020
+    },
+    {
+      "texto": "Supervisar el desarrollo del proyecto hasta su finalización y cumplir todas las condiciones que dieron origen a su elegibilidad.",
+      "numeral": "8.1.7, fr. VI",
+      "linea": 2024
+    },
+    {
+      "texto": "Notificar por escrito al Comité Técnico del FIPASAHEM, en un plazo que no deberá exceder los 15 días hábiles, por conducto de la Delegación o de la Dirección de Restauración y Fomento Forestal, los conflictos sociales, de representación o de posesión o de cualquier índole que impidan realizar las actividades y el otorgamiento del recurso, y cualquier siniestro o afectación al predio, con la documentación que lo sustente (y denuncia ante la autoridad competente si es por caso fortuito o de fuerza mayor).",
+      "numeral": "8.1.7, fr. VII",
+      "linea": 2034
+    },
+    {
+      "texto": "No cambiar el uso del suelo ni la cobertura forestal de los predios sujetos al Contrato de Adhesión o Convenio de Concertación durante el plazo del mismo.",
+      "numeral": "8.1.7, fr. VIII",
+      "linea": 2043
+    },
+    {
+      "texto": "Conservar en buenas condiciones el predio mediante actividades que conserven o incrementen la cobertura forestal, descritas en el formato FO-PB-520 A y las que especifique PROBOSQUE.",
+      "numeral": "8.1.7, fr. IX",
+      "linea": 2045
+    },
+    {
+      "texto": "Aceptar y otorgar facilidades al personal de PROBOSQUE para el estudio de colecta de Germoplasma Forestal.",
+      "numeral": "8.1.7, fr. X",
+      "linea": 2048
+    },
+    {
+      "texto": "Mantener la vigilancia para asegurar la conservación de la densidad y cobertura arbórea que tiene el predio al momento de la firma del Contrato de Adhesión.",
+      "numeral": "8.1.7, fr. XI",
+      "linea": 2050
+    },
+    {
+      "texto": "Una vez asignado el apoyo, coordinarse con el personal de las Delegaciones para determinar las actividades y registrarlas en el formato FO-PB-520 A, que se anexa al contrato de adhesión; en MLPSA-FC, las actividades quedan en el PMPM.",
+      "numeral": "8.1.7, fr. XII",
+      "linea": 2052
+    },
+    {
+      "texto": "Coordinarse con PROBOSQUE para realizar las actividades de protección, conservación y mantenimiento de las áreas forestales convenidas en el Contrato de Adhesión.",
+      "numeral": "8.1.7, fr. XIII",
+      "linea": 2060
+    },
+    {
+      "texto": "Reintegrar los recursos económicos recibidos y no aplicados cuando se determine el incumplimiento, a la cuenta bancaria de PROBOSQUE proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental, una vez notificado por cualquier medio; en caso contrario se sanciona conforme indique el Comité Técnico y la notificación del área jurídica.",
+      "numeral": "8.1.7, fr. XIV",
+      "linea": 2062
+    },
+    {
+      "texto": "Manifestar por escrito o a través del Sistema de Atención Mexiquense (SAM) las quejas, denuncias e inconformidades ante las instancias del numeral 18.",
+      "numeral": "8.1.7, fr. XV",
+      "linea": 2067
+    },
+    {
+      "texto": "El apoyo se otorga mediante cheque: la persona beneficiaria debe recogerlo donde se le indique y hacerlo efectivo en un periodo no mayor a 3 meses; solo se puede reexpedir otro cheque bajo causa plenamente justificada.",
+      "numeral": "8.1.7, fr. XVI",
+      "linea": 2069
+    },
+    {
+      "texto": "Presentar el informe final de actividades, con comprobación de gastos, a más tardar el último día de la vigencia del Contrato de Adhesión (convocatoria estatal) o conforme a los plazos del Convenio de Concertación (fondos concurrentes).",
+      "numeral": "8.1.7, fr. XVII",
+      "linea": 2072
+    },
+    {
+      "texto": "Atender, conforme a sus capacidades, de forma oportuna los incendios forestales ocurridos en el predio y realizar la denuncia correspondiente.",
+      "numeral": "8.1.7, fr. XVIII",
+      "linea": 2076
+    },
+    {
+      "texto": "Informar en la solicitud si el predio está beneficiado en otro programa Federal, Estatal o Municipal con el mismo propósito.",
+      "numeral": "8.1.7, fr. XIX",
+      "linea": 2078
+    },
+    {
+      "texto": "En la preparación de terrenos agrícolas con quema de rastrojos y chamizales, observar la NOM-015-SEMARNAT/SAGARPA-2007.",
+      "numeral": "8.1.7, fr. XX",
+      "linea": 2080
+    },
+    {
+      "texto": "Responder las encuestas que aplique PROBOSQUE, en caso de ser requerido.",
+      "numeral": "8.1.7, fr. XXI",
+      "linea": 2082
+    },
+    {
+      "texto": "Utilizar los apoyos para los fines que fueron otorgados.",
+      "numeral": "8.1.7, fr. XXII",
+      "linea": 2083
+    },
+    {
+      "texto": "Reintegrar de manera obligatoria e inmediata los recursos depositados de más o que no correspondan a lo asignado por el Comité y/o en el contrato, a la cuenta proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental, en el momento en que se notifique por cualquier medio.",
+      "numeral": "8.1.7, fr. XXIII",
+      "linea": 2084
+    },
+    {
+      "texto": "Las demás que determine la instancia normativa.",
+      "numeral": "8.1.7, fr. XXIV",
+      "linea": 2088
+    }
+  ],
+  "causas_incumplimiento": [
+    {
+      "texto": "No cumplir con lo establecido en el punto 8.1.7.",
+      "numeral": "8.1.8, fr. I",
+      "linea": 2090
+    },
+    {
+      "texto": "Cuando se detecte que han proporcionado información falsa para su inscripción en el Programa.",
+      "numeral": "8.1.8, fr. II",
+      "linea": 2091
+    },
+    {
+      "texto": "No realizar las actividades comprometidas con el Programa.",
+      "numeral": "8.1.8, fr. III",
+      "linea": 2092
+    },
+    {
+      "texto": "No realizar los trabajos conforme a la asesoría técnica brindada por PROBOSQUE.",
+      "numeral": "8.1.8, fr. IV",
+      "linea": 2093
+    },
+    {
+      "texto": "Cuando no se informe de la existencia de conflictos o litigios de cualquier índole durante el periodo establecido a PROBOSQUE.",
+      "numeral": "8.1.8, fr. V",
+      "linea": 2094
+    },
+    {
+      "texto": "Negligencia u omisión de las personas beneficiarias en la atención de los incendios forestales en sus predios.",
+      "numeral": "8.1.8, fr. VI",
+      "linea": 2104
+    },
+    {
+      "texto": "Utilizar los apoyos para fines distintos a los que le fueron otorgados.",
+      "numeral": "8.1.8, fr. VII",
+      "linea": 2106
+    },
+    {
+      "texto": "No cumplir con las cláusulas del Contrato de Adhesión o Convenio de Concertación.",
+      "numeral": "8.1.8, fr. VIII",
+      "linea": 2107
+    },
+    {
+      "texto": "Cuando no se cumpla con las obligaciones establecidas en las Reglas por parte de la persona beneficiaria.",
+      "numeral": "8.1.8, fr. IX",
+      "linea": 2108
+    },
+    {
+      "texto": "Las demás que determine la instancia normativa.",
+      "numeral": "8.1.8, fr. X",
+      "linea": 2109
+    }
+  ],
+  "causas_cancelacion": [
+    {
+      "texto": "Incurrir en alguno de los supuestos del numeral 8.1.8.",
+      "numeral": "8.1.9.2, fr. I",
+      "linea": 2117
+    },
+    {
+      "texto": "Cuando se detecten alteraciones en la cobertura arbolada o superficie mayor al 10 % de la superficie beneficiada, ocasionada por cambio de uso del suelo.",
+      "numeral": "8.1.9.2, fr. II",
+      "linea": 2118
+    },
+    {
+      "texto": "Cuando se determine la existencia de conflictos o litigios de cualquier índole (de representación, posesión o propiedad) por parte de PROBOSQUE, o lo determine o informe la autoridad competente.",
+      "numeral": "8.1.9.2, fr. III",
+      "linea": 2120
+    },
+    {
+      "texto": "Cuando se hayan utilizado los apoyos para fines distintos a los que fueron otorgados.",
+      "numeral": "8.1.9.2, fr. IV",
+      "linea": 2122
+    },
+    {
+      "texto": "Cuando no acuda o se niegue a la firma del Contrato de Adhesión, siempre y cuando así lo justifique o informe la Delegación Regional correspondiente.",
+      "numeral": "8.1.9.2, fr. V",
+      "linea": 2123
+    },
+    {
+      "texto": "No presentarse a recibir el apoyo, sin causa justificada.",
+      "numeral": "8.1.9.2, fr. VI",
+      "linea": 2125
+    },
+    {
+      "texto": "Cancelación del apoyo cuando el pago emitido mediante cheque haya concluido su vigencia.",
+      "numeral": "8.1.9.2, fr. VII",
+      "linea": 2126
+    },
+    {
+      "texto": "No proporcionar información veraz para su incorporación al Programa.",
+      "numeral": "8.1.9.2, fr. VIII",
+      "linea": 2127
+    },
+    {
+      "texto": "No cumplir con las obligaciones que le correspondan como beneficiaria(o) del Programa.",
+      "numeral": "8.1.9.2, fr. IX",
+      "linea": 2128
+    },
+    {
+      "texto": "Desistimiento por escrito dirigido a la Instancia normativa, firmado por la persona beneficiaria (en núcleos agrarios, sellado y firmado por presidente(a), secretario(a) y tesorero), notificando los motivos.",
+      "numeral": "8.1.9.2, fr. X",
+      "linea": 2129
+    },
+    {
+      "texto": "Fallecimiento del titular que firma el Contrato de Adhesión sin que se notifique en el término de 30 días hábiles el interés de la segunda persona beneficiaria de continuar con el programa.",
+      "numeral": "8.1.9.2, fr. XI",
+      "linea": 2131
+    },
+    {
+      "texto": "Fallecimiento del titular sin haberse firmado el Contrato de Adhesión, cuando la segunda persona beneficiaria o un sucesor no pueda acreditar la legal posesión del predio.",
+      "numeral": "8.1.9.2, fr. XII",
+      "linea": 2133
+    },
+    {
+      "texto": "Negligencia o caso omiso de la persona beneficiaria respecto de los incendios forestales ocurridos en sus predios.",
+      "numeral": "8.1.9.2, fr. XIII",
+      "linea": 2135
+    },
+    {
+      "texto": "Se podrá cancelar el apoyo cuando se incorpore al manejo forestal sustentable y no cuente con superficie factible para pago o no cuente con el certificado de buen manejo forestal.",
+      "numeral": "8.1.9.2, fr. XIV",
+      "linea": 2137
+    },
+    {
+      "texto": "Cuando no se presente el acta de elección de órganos de representación una vez transcurrido el término de la fr. XI del numeral 8.1.1.2, inscrita o presentada ante el RAN.",
+      "numeral": "8.1.9.2, fr. XV",
+      "linea": 2139
+    },
+    {
+      "texto": "Cuando la persona tenga antecedentes de venta, intercambio, donación u otro análogo con la ayuda funcional y/o apoyo especial obtenidos en esta u otra institución.",
+      "numeral": "8.1.9.2, fr. XVI",
+      "linea": 2142
+    },
+    {
+      "texto": "Ser persona beneficiaria de Programas federales, estatales o municipales con el mismo propósito en la misma área, a decisión de la Instancia Normativa.",
+      "numeral": "8.1.9.2, fr. XVII",
+      "linea": 2144
+    },
+    {
+      "texto": "Las demás que determine la instancia normativa.",
+      "numeral": "8.1.9.2, fr. XVIII",
+      "linea": 2146
+    }
+  ],
+  "sanciones": [
+    {
+      "clave": "suspension_temporal",
+      "texto": "Los apoyos pueden suspenderse temporalmente durante el periodo que determine el Comité Técnico del FIPASAHEM a través de PROBOSQUE, por incumplimiento de las condiciones que dieron origen a la elegibilidad, para que se subsanen las omisiones que se les informen; en caso contrario, se procede a la cancelación y baja del programa y a la inclusión en el Listado de Personas Beneficiarias Incumplidas.",
+      "numeral": "8.1.9.1",
+      "linea": 2111
+    },
+    {
+      "clave": "baja_del_programa",
+      "texto": "Baja del programa por las causas del numeral 8.1.9.2 (ver causas_cancelacion), incluida la cancelación del apoyo cuando el cheque concluye su vigencia sin cobrarse (fr. VII).",
+      "numeral": "8.1.9.2",
+      "linea": 2116
+    },
+    {
+      "clave": "reintegro_de_recursos",
+      "texto": "Reintegro de los montos de las ministraciones otorgadas, previo acuerdo del Comité y notificación a la Unidad Jurídica, a la cuenta bancaria de la FIDUCIARIA proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental, una vez notificado por cualquier medio. Causas: incumplimiento de Reglas, Convocatoria y Contrato (previo acuerdo del Comité); información falseada o evidencias de conflictos de propiedad, posesión, representación o litigio de autoridad competente; baja o desistimiento; el monto no ejercido por ajustes menores al 70 %, cancelaciones y desistimientos, que puede reasignarse a otros predios factibles sin cobertura con acuerdo del Comité; los recursos a reintegrar se depositan en la cuenta del Fideicomiso.",
+      "numeral": "8.1.9.3, fr. I a V",
+      "linea": 2147
+    },
+    {
+      "clave": "listado_personas_beneficiarias_incumplidas",
+      "texto": "Las personas en el Listado de Personas Beneficiarias Incumplidas pueden solicitar ser excluidas si comprueban que cumplieron las obligaciones de su año de asignación, equivalentes a los recursos ministrados, y en ningún caso pueden solicitar el pago de la ministración pendiente.",
+      "numeral": "8.1.9.3, fr. VI",
+      "linea": 2161
+    }
+  ],
+  "refrendo": {
+    "descripcion": "Refrendo: predios que han sido beneficiados en el ejercicio inmediato anterior y mantienen el mismo polígono (glosario). Para simplificar el trámite, solo se requiere la Solicitud Única y el Registro de Información de la persona solicitante y/o beneficiaria cuando la documentación legal obra en los archivos de PROBOSQUE por un periodo no mayor a tres años anteriores a la solicitud; se actualizan las cartas poder simples, actas de asamblea de incorporación y actas de elección ya fenecidas, y los poderes notariales deben estar vigentes. La nota de la Solicitud Única agrega la CURP actualizada. En la mecánica, los refrendos dentro de los tres años anteriores solo se validan con la visita en campo y, en su caso, la actualización de la documentación legal, y sí requieren un nuevo dictamen jurídico. La fr. VIII dice «(aplica para fondos concurrentes)»: VER DUDAS.",
+    "vigencia_documentacion_legal_anios": 3,
+    "numeral": "3 (glosario), 8.1.1.2 fr. VIII y 10.1 fr. II",
+    "linea": 1673,
+    "lineas_adicionales": [
+      1292,
+      2253,
+      12076
+    ]
+  },
+  "mecanica_operativa": [
+    {
+      "paso": "I",
+      "texto": "Publicadas la Convocatoria y las Reglas en la Gaceta del Gobierno, la Instancia Ejecutora, a través de las Delegaciones Regionales Forestales, recibe las solicitudes de manera física; las Delegaciones integran los expedientes y los entregan en oficinas centrales para su dictaminación jurídica; después se levanta en campo la poligonal y se recopilan datos técnicos. No se reciben solicitudes en oficinas centrales ni en una Delegación que no corresponda.",
+      "numeral": "10.1, fr. I",
+      "linea": 2243
+    },
+    {
+      "paso": "II",
+      "texto": "La Instancia Ejecutora, a través de las áreas de la Dirección de Restauración y Fomento Forestal, revisa, registra, integra, valida y digitaliza los expedientes y los remite a las unidades responsables de dictaminar. Los refrendos dentro de los tres años anteriores solo se validan con la visita en campo y, en su caso, la actualización de la documentación legal, con nuevo dictamen jurídico.",
+      "numeral": "10.1, fr. II",
+      "linea": 2251
+    },
+    {
+      "paso": "III",
+      "texto": "Si con posterioridad se necesita documentación nueva o complementaria, se notifica a la persona solicitante dentro del plazo de la evaluación, validación y calificación en campo y gabinete.",
+      "numeral": "10.1, fr. III",
+      "linea": 2257
+    },
+    {
+      "paso": "IV",
+      "texto": "La Instancia Ejecutora, con la Unidad Jurídica y el área responsable del programa, emite los dictámenes jurídico y técnico y el listado preliminar de solicitudes factibles y no factibles.",
+      "numeral": "10.1, fr. IV",
+      "linea": 2260
+    },
+    {
+      "paso": "V",
+      "texto": "El área responsable del programa convoca a los integrantes de la Comisión de Verificación Técnica para conocimiento del ingreso de solicitudes y analiza cada dictamen, clasificándolas como factible o no factible de pago.",
+      "numeral": "10.1, fr. V",
+      "linea": 2263
+    },
+    {
+      "paso": "VI",
+      "texto": "El Comité Técnico del FIPASAHEM aprueba el listado de solicitudes Factibles y No Factibles (el rechazo por algún dictamen se funda y motiva). Las no aprobadas se notifican por la Instancia Ejecutora a través de la Secretaría Técnica del Comité en un plazo perentorio fijado en la reunión; la lista de factibles se publica en la Gaceta del Gobierno y en la página web, y está en Oficinas Centrales y Delegaciones. Después de la aprobación se elaboran los Contratos de Adhesión o Convenios de Concertación, que las personas beneficiarias requisitan a través de las Delegaciones en los plazos de la Convocatoria vigente, con firma y sello (en núcleos agrarios) de cada parte.",
+      "numeral": "10.1, fr. VI",
+      "linea": 2266
+    },
+    {
+      "paso": "VII",
+      "texto": "La Instancia Ejecutora, con apoyo de la Unidad Jurídica, revisa la fundamentación legal y valida el proyecto de Contrato de Adhesión y, en su caso, el adendum.",
+      "numeral": "10.1, fr. VII",
+      "linea": 2278
+    },
+    {
+      "paso": "VIII",
+      "texto": "La Instancia Ejecutora, a través del área responsable del programa, solicita al Comité Técnico del FIPASAHEM, con base en los dictámenes, que instruya a la Fiduciaria para que destine los apoyos del Fideicomiso al pago de las personas beneficiarias; el área responsable soporta las solicitudes de cheque con la documentación comprobatoria (oficio de solicitud, solicitud de cheque por beneficiario, copia de INE, dictamen, etc.).",
+      "numeral": "10.1, fr. VIII",
+      "linea": 2281
+    },
+    {
+      "paso": "IX",
+      "texto": "No se puede solicitar el pago de una persona beneficiaria si aún no se cuenta con la firma del Contrato de Adhesión o Convenio de Concertación.",
+      "numeral": "10.1, fr. IX",
+      "linea": 2286
+    },
+    {
+      "paso": "X",
+      "texto": "Los pagos se realizan mediante cheque y se entregan por medio de las Delegaciones Regionales, previa firma del Contrato o Convenio. Los pagos (70 % y 30 %) se solicitan a la Fiduciaria a través de la Secretaría Técnica del Comité en un máximo de 5 días hábiles desde la recepción de la solicitud del área operativa; las Delegaciones notifican la disponibilidad por llamada, medios electrónicos o visita domiciliaria cuando oficinas centrales libera el pago; prioridad a los pagos de MLPSA-FC.",
+      "numeral": "10.1, fr. X",
+      "linea": 2288
+    },
+    {
+      "paso": "XI",
+      "texto": "La Instancia Ejecutora, a través de las Delegaciones, acude a todos los predios beneficiados para verificar que se realizaron las acciones del Contrato o Convenio y genera el documento que lo avala, remitido al área responsable con copia a la Dirección de Restauración y Fomento Forestal.",
+      "numeral": "10.1, fr. XI",
+      "linea": 2303
+    },
+    {
+      "paso": "XII",
+      "texto": "Hecho lo anterior, el área responsable solicita la emisión de la segunda ministración y la remite a la Dirección de Administración, Finanzas y de Gestión Documental, o, en su caso, la solicitud de cancelación del apoyo.",
+      "numeral": "10.1, fr. XII",
+      "linea": 2315
+    },
+    {
+      "paso": "XIII",
+      "texto": "La Instancia Ejecutora emite los listados con los resultados finales y los presenta a la Instancia Normativa para su conocimiento y aprobación.",
+      "numeral": "10.1, fr. XIII",
+      "linea": 2318
+    },
+    {
+      "paso": "XIV",
+      "texto": "La Dirección de Administración, Finanzas y de Gestión Documental administra los recursos y solicita ante la Fiduciaria la emisión de los pagos, una vez solicitados por la Dirección de Restauración y Fomento Forestal.",
+      "numeral": "10.1, fr. XIV",
+      "linea": 2321
+    },
+    {
+      "paso": "XV",
+      "texto": "La Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia realiza la dictaminación legal, revisa el listado de incumplidos y de predios con procedimientos o sanciones, y gestiona la devolución de recursos no ejercidos, previo acuerdo e instrucción del Comité Técnico del FIPASAHEM.",
+      "numeral": "10.1, fr. XV",
+      "linea": 2324
+    }
+  ],
+  "flujos_alternos": {
+    "A_expediente_incompleto": "Si la documentación está incompleta, la Delegación informa conforme al acuse; la persona tiene 5 días hábiles a partir de la recepción de la solicitud para completarla sin pasar de la fecha límite de recepción (27-mar-2026); si no, se desecha la solicitud (8.1.1.2, último párrafo, línea 1722). Después, si hace falta documentación nueva, se notifica dentro del plazo de evaluación (10.1 fr. III, línea 2257).",
+    "B_no_factible": "El dictamen técnico y jurídico produce el listado preliminar de factibles y no factibles (10.1 fr. IV); el Comité aprueba los listados y autoriza su publicación (9.4.3 fr. III, línea 2215); las no aprobadas se notifican por la Secretaría Técnica en un plazo fijado por el Comité (10.1 fr. VI, línea 2267). El fallo es inapelable (Convocatoria base quinta III, línea 783 y base sexta, línea 904).",
+    "C_lista_espera": "Lista de espera: personas solicitantes que cumplen los requisitos pero no son sujetas de apoyo por haberse cumplido la meta o por no existir suficiencia presupuestal (glosario, línea 1239). También van a ella los predios de dependencias públicas sin suficiencia (8.1.2 fr. V, línea 1744). El recurso liberado por desistimientos o ajustes de superficie se reasigna conforme a la lista de espera, previa autorización del Comité (Convocatoria base sexta, línea 909); el monto no ejercido por ajustes menores al 70 %, cancelaciones y desistimientos puede reasignarse a predios factibles sin cobertura, con acuerdo del Comité (8.1.9.3 fr. IV, línea 2157). Beneficiarios reasignados firman a más tardar el último día hábil de septiembre de 2026 (línea 803). Sustitución: 10.2, línea 2329.",
+    "D_caso_fortuito": "La persona beneficiaria avisa por escrito en un máximo de 15 días hábiles los conflictos o siniestros que impidan las actividades, con documentación (8.1.7 fr. VII, línea 2034); el Comité Técnico puede aprobar apoyos para recuperar la superficie dañada; si no, se sanciona conforme a las Reglas.",
+    "E_incumplimiento_reintegro": "Incumplimiento (8.1.8) → suspensión temporal para subsanar omisiones (8.1.9.1, línea 2111) → si no se subsana, cancelación y baja con inclusión en el Listado de Personas Beneficiarias Incumplidas (8.1.9.2) → reintegro de las ministraciones, previo acuerdo del Comité y con notificación a la Unidad Jurídica (8.1.9.3, línea 2147; 9.4.3 fr. V, línea 2222; 10.1 fr. XV, línea 2324). Cuenta de reintegro: ver dudas.",
+    "F_sustitucion": "Por desistimiento, cancelación, disminución de superficie u otra causal puede sustituirse a la persona beneficiaria inicial y atenderse a personas asignadas sin atender por insuficiencia presupuestal, previa aprobación del Comité (10.2, línea 2329). Segunda persona beneficiaria: designada en la solicitud (8.1.1.2 fr. II, línea 1580); si fallece el titular tiene 30 días hábiles para notificar su interés (8.1.9.2 fr. XI, línea 2131) y, si no se firmó el Contrato, debe acreditar la legal posesión (fr. XII, línea 2133).",
+    "G_prorroga": "No existe en PSAHEM.",
+    "H_pago_con_cheques": {
+      "texto": "El apoyo se otorga mediante cheque (8.1.7 fr. XVI, línea 2069; 10.1 fr. X, línea 2288).",
+      "primer_pago_70": {
+        "condicion": "Con fecha posterior a la firma del Contrato de Adhesión o Convenio de Concertación (no se solicita el pago sin la firma)",
+        "numeral": "7.2; 10.1 fr. IX y X",
+        "linea": 1374
+      },
+      "segundo_pago_30": {
+        "condicion": "Conclusión de las actividades, informe final de actividades presentado y trabajos verificados en campo con minuta firmada por la persona beneficiaria y el técnico de PROBOSQUE (y asesor técnico independiente, en su caso); sin exceder el último bimestre de la vigencia del contrato",
+        "numeral": "7.2; Convocatoria base quinta, fila VI; 10.1 fr. XI y XII",
+        "linea": 1376
+      },
+      "instruccion_de_pago": {
+        "quien_solicita": "Área responsable del Programa (Instancia Ejecutora) pide al Comité Técnico del FIPASAHEM que instruya a la Fiduciaria (fr. VIII); los pagos (70 % y 30 %) se solicitan a la Fiduciaria a través de la Secretaría Técnica del Comité (fr. X)",
+        "a_quien": "Fiduciaria (institución financiera que administra el FIPASAHEM); la Dirección de Administración, Finanzas y de Gestión Documental solicita ante ella la emisión (fr. XIV)",
+        "plazo": "5 días hábiles máximo",
+        "corre_desde": "Recepción de la solicitud presentada por el área operativa del Programa",
+        "numeral": "10.1 fr. VIII, X y XIV",
+        "linea": 2290
+      },
+      "envio_y_entrega": "Los cheques se entregan por medio de las Delegaciones Regionales Forestales, previa firma del Contrato o Convenio; las Delegaciones notifican a la persona beneficiaria por llamada telefónica, medios electrónicos o visita domiciliaria una vez que oficinas centrales libere el pago (10.1 fr. X, líneas 2288-2294). La persona beneficiaria debe recoger el cheque donde se le indique (8.1.7 fr. XVI, línea 2069).",
+      "plazo_para_cobrar": {
+        "cantidad": 3,
+        "unidad": "meses",
+        "texto": "Periodo no mayor a 3 meses para hacer efectivo el cobro",
+        "numeral": "8.1.7 fr. XVI",
+        "linea": 2070
+      },
+      "si_no_se_cobra": "Solo se puede reexpedir otro cheque bajo causa plenamente justificada (8.1.7 fr. XVI, línea 2070); es causa de baja no presentarse a recibir el apoyo sin causa justificada (8.1.9.2 fr. VI, línea 2125) y la cancelación del apoyo cuando el cheque concluyó su vigencia (fr. VII, línea 2126); el Comité acuerda el reintegro de los cheques de apoyos autorizados no reclamados, definiendo si se dejan a salvo los derechos de las personas beneficiarias y las condicionantes (9.4.3 fr. II, línea 2211)."
+    }
+  },
+  "dias_inhabiles": "Las ROP de PSAHEM no mencionan días inhábiles ni calendario; usan «días hábiles» sin definirlos.",
+  "dudas": [
+    "FIRMA DEL CONTRATO O CONVENIO (¿desde cuándo corre?): la Convocatoria (base quinta, actividad V, línea 800-802) dice: «Elaboración y Firma del Contrato de Adhesión. Se llevará a cabo 10 días hábiles posteriores a la publicación de resultados.» y que los reasignados tienen fecha límite el último día hábil de septiembre de 2026. Las ROP de PSAHEM solo remiten a la Convocatoria: 8.1.7 fr. IV (línea 2018) «Suscribir en tiempo y forma el Contrato de Adhesión o Convenio de Concertación, cuando así sea requerido por PROBOSQUE, en apego a los tiempos establecidos en la Convocatoria» y 10.1 fr. VI (líneas 2274-2277) «…elabora y requisita los Contratos de Adhesión o Convenio concertación posterior a la aprobación de las solicitudes factibles por el Comité Técnico del FIPASAHEM, y serán requisitados por las personas beneficiarias a través de las Delegaciones Regionales, las cuales se apegarán a los plazos establecidos en la Convocatoria vigente para su firma y sello (en caso de Núcleos Agrarios) por cada uno de las partes que intervienen, posterior a su elaboración». Es decir: el plazo corre desde la PUBLICACIÓN de resultados (Convocatoria); las ROP de PSAHEM no hablan de «notificación» (a diferencia de CC 8.1.9 b fr. IV), pero la redacción «posterior a su elaboración» abre una segunda lectura (desde que PROBOSQUE elabora el instrumento). En PSAHEM los resultados se publican también en la Gaceta del Gobierno (línea 799). Propuesta: parametrizar el evento de arranque, con la publicación de resultados por omisión. El Convenio de Concertación (fondos concurrentes) no tiene plazo propio en días.",
+    "DOCUMENTACIÓN FALTANTE (¿desde cuándo corre?): 8.1.1.2, último párrafo (líneas 1722-1727): «…la Delegación Regional Forestal correspondiente informará lo conducente conforme al acuse y contará con un término de cinco días hábiles a partir de la recepción de la solicitud para la presentación de la documentación faltante, siempre y cuando este tiempo no exceda la fecha límite, establecida en la Convocatoria, para la recepción de solicitudes; generando el folio de solicitud correspondiente, en caso de no complementar la documentación faltante dentro de los plazos establecidos se tendrá por desechada su solicitud.» Idéntico en la Convocatoria base cuarta (líneas 761-765). El plazo corre «a partir de la recepción de la solicitud», no desde que la Delegación informa lo faltante; el sujeto de «contará» es ambiguo (la Delegación o la persona solicitante). El sistema lo cuenta desde la recepción, como CC.",
+    "CHEQUES: el plazo de 3 meses para cobrar (8.1.7 fr. XVI, línea 2069-2071: «…deberá recoger donde se le indique y hacer efectivo el cobro en un periodo no mayor a 3 meses. Solo se podrá reexpedir otro cheque bajo causa plenamente justificada») no dice desde cuándo corre (emisión, entrega en la Delegación o notificación del pago) ni qué plazo tiene la persona para recogerlo. La consecuencia de no cobrar está repartida: baja por «Cancelación del apoyo cuando el pago emitido mediante cheque haya concluido su vigencia» (8.1.9.2 fr. VII) y el Comité acuerda el reintegro de los cheques no reclamados (9.4.3 fr. II). Falta definir qué es la «vigencia» del cheque (¿los 3 meses?) y si el monto de un cheque cancelado puede reasignarse.",
+    "INSTRUCCIÓN DE PAGO: hay tres redacciones que no coinciden del todo. 10.1 fr. VIII: el área responsable «solicitará al Comité Técnico del FIPASAHEM, con base en los dictámenes, instruya a la FIDUCIARIA para que destine los apoyos… y éste a su vez, será el encargado de emitir los cheques y/o depósitos» (el sujeto de «éste» es ambiguo: Comité, Fiduciaria o Fideicomiso). 10.1 fr. X: «Los pagos del monto total aprobado (70% y 30%)… se solicitarán a la Fiduciaria a través de la Secretaría Técnica del Comité Técnico del FIPASAHEM, en un plazo máximo de 5 días hábiles, a partir de la recepción de la solicitud presentada por el área operativa del Programa». 10.1 fr. XIV: la Dirección de Administración, Finanzas y de Gestión Documental es la responsable «de solicitar ante la FIDUCIARIA la emisión de los pagos, una vez solicitados por la Dirección de Restauración y Fomento Forestal». Los 5 días hábiles son para que la Secretaría Técnica pida el pago a la Fiduciaria, no para que se emita el cheque; no hay plazo de la Fiduciaria ni del Comité para instruir. El texto no dice quién ocupa la Secretaría Técnica ni quién es el «área operativa».",
+    "COMITÉ TÉCNICO: las ROP no traen integrantes, presidencia, Secretaría Técnica, quórum ni el plazo de convocatoria a sesión; remiten al artículo 216-K del Código Financiero y a los artículos 25-30 del Reglamento Interno (9.4.1 y 9.4.2), que no están en el texto. Por eso este archivo NO incluye el plazo «convocatoria_sesion_comite» (el sistema lo usa para validar la anticipación de la convocatoria y fallaría con cantidad vacía en sesiones ordinarias); si el cliente entrega el Reglamento Interno, agregarlo. La composición se toma de reglas/catalogos.json (sin integrantes).",
+    "MINISTRACIONES: la Convocatoria (base quinta, actividad VI, línea 808) dice «la primera ministración por el 70% o 100% del monto total aprobado según sea el caso»; las ROP de PSAHEM (7.2, línea 1374) solo prevén 70 % y 30 %; el 100 % solo aparece para CC. Este archivo carga 70 % y 30 %. Tampoco se define la «vigencia del contrato de adhesión» (días ni fechas) de la que depende el último bimestre.",
+    "CUENTA PARA REINTEGROS: contradictoria. 8.1.7 fr. XIV y XXIII (líneas 2063 y 2086) y 8.1.1.1 inelegibles fr. XIII (línea 1570): «la cuenta bancaria de PROBOSQUE, misma que será proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental». 8.1.9.3 (línea 2150): «la cuenta bancaria de la FIDUCIARIA proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental» y fr. V (línea 2160): «Los recursos a reintegrar serán depositados a la cuenta del Fideicomiso». Las ROP no traen el número de cuenta ni un plazo en días (solo «inmediata» en la fr. XXIII).",
+    "MONTOS Y SUPERFICIES: el texto de 7.1.1 (líneas 1356-1358) dice que los $1,500 de Cuenca Media y Baja son para «bosque tropical caducifolio y zonas semiáridas», pero la tabla de 8.1.1.1 y de la Convocatoria incluye también bosque templado en Cuenca Media y Baja. El máximo con FSC en Media y Baja es 300 ha (línea 1360 y tabla), igual que sin FSC; en Cuenca Alta sube de 400 a 450 ha. La tabla pone la superficie mínima de 20 ha para ambas categorías; las ROP no dicen si un conjunto predial puede sumar superficies de distinta categoría. Por eso superficie.maxima_ha = 450 (tope absoluto) y el máximo por categoría está en superficie.por_categoria.",
+    "ORDEN DE ASIGNACIÓN: 7.2 (línea 1371) dice que el presupuesto «se distribuirá en el orden de recepción de las solicitudes que el Comité Técnico del FIPASAHEM califique con carácter aprobatorio», mientras que 8.1.1.1 (líneas 1523-1526) dice que, sin cobertura suficiente, la calificación determina la asignación «desde el puntaje más alto (100 puntos), y de manera descendente», con desempate por criterios de priorización y fecha de registro. No se dice cuál prevalece.",
+    "ÍNDICE DE PRESIÓN ECONÓMICA A LA DEFORESTACIÓN: el criterio 9 de puntaje (líneas 1504-1506) lo atribuye al «Instituto Nacional de Energía y Cambio Climático (INECC) Versión 2018» y 8.1.2 (línea 1735) al «INECC 2016»; el glosario (línea 1235) define INECC como Instituto Nacional de Ecología y Cambio Climático. No se dice qué versión del índice usar ni dónde se consulta. La tabla de puntaje no tiene criterios 10 y 11 (numeración 1-9, 12-14); los máximos suman 100.",
+    "FORMATOS FALTANTES: no vienen en el texto ni en el PDF FO-PB-520 A (Aplicación de los recursos asignados; escrito «FO-PB-520 A» en la línea 2047 y «FO-PB520 A» en la 2055), el formato del Informe final de actividades (sin clave en PSAHEM), la minuta de verificación en campo, el modelo del Contrato de Adhesión, del Convenio de Concertación y del adendum, el oficio y la solicitud de cheque. 8.1.7 fr. XII (línea 2058) todavía cita las «Reglas del Programa Pago por Servicios Ambientales Hidrológicos del Estado de México 2025» y las del programa federal 2025.",
+    "CONTRATO DE ADHESIÓN O CONVENIO DE CONCERTACIÓN: el glosario (líneas 1190-1196) define el Convenio de Concertación como el que firma cada persona beneficiaria con PROBOSQUE y CONAFOR por el MLPSA-FC; 7.2 (línea 1375) solo dice «dependiendo del caso en concreto». Se interpreta: convocatoria estatal → Contrato de Adhesión; fondos concurrentes → Convenio de Concertación. El «adendum» (10.1 fr. VII, línea 2279) no se define ni se dice cuándo procede.",
+    "REFRENDO: la fr. VIII de 8.1.1.2 (línea 1673) dice «Para el caso de refrendos (aplica para fondos concurrentes)», lo que podría limitar el trámite simplificado a los predios de fondos concurrentes; el glosario define refrendo para todo predio beneficiado el año anterior con el mismo polígono, y la nota de la Solicitud Única lo aplica a PSAHEM sin distinción (línea 12076). Se tomó la lectura amplia. La nota de la Solicitud Única menciona la CURP actualizada; la fr. VIII no.",
+    "INELEGIBLES V: «áreas afectadas por incendios en la temporada actual e inmediata anterior a la Convocatoria» (línea 1535) no define las fechas de las temporadas. 8.1.9.2 fr. II: baja por alteraciones en la cobertura o superficie «mayor al 10 %»; 8.1.9.3 fr. IV: reintegro del monto no ejercido por «ajustes menores al 70 %» sin decir 70 % de qué (superficie o actividades). El numeral 8.2 (graduación) no fija plazos ni requisitos.",
+    "SIN REQUISITOS DE PAGO: a diferencia de CC, PSAHEM paga con cheque y no pide comprobante bancario; los requisitos documentales no incluyen datos bancarios. Tampoco hay fecha límite de conclusión de actividades (en CC es el 13 de noviembre): solo «la vigencia del contrato».",
+    "DELEGACIONES: la tabla de Delegaciones y municipios (líneas 1853-1984) es la misma de la Convocatoria base cuarta; no se extrae aquí (está en reglas/catalogos.json)."
+  ]
+}
