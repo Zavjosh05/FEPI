@@ -10,7 +10,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from nucleo import dias_habiles, notificaciones
+from nucleo import dias_habiles, notificaciones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import datos_sistema
 from nucleo.models import (
@@ -127,8 +127,8 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
         )
         for req in requisitos_aplicables(datos.ejercicio, datos.tipo_persona, datos.modalidad):
             RevisionRequisito.objects.create(expediente=expediente, requisito=req)
-        plazo = datos.ejercicio.plazo(_clave_plazo("faltantes"))
-        limite = dias_habiles.vencimiento_de_plazo(plazo, expediente.fecha_recepcion) if plazo and plazo.es_calculable else None
+        venc = plazos.vencimiento(expediente, "faltantes_ventanilla")
+        limite = venc.vencimiento if venc else None
         renglones = [
             ("Delegación que recibe", delegacion.nombre),
             ("Fecha y hora de recepción", fmt_fecha_hora(expediente.fecha_recepcion)),
@@ -140,9 +140,12 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
         ]
         nota = ""
         if limite:
-            nota = (f"Si falta documentación, la persona solicitante cuenta con {plazo.texto_plazo} a partir de la "
+            nota = (f"Si falta documentación, la persona solicitante cuenta con {venc.texto_plazo} a partir de la "
                     f"recepción para presentarla (hasta el {limite:%d/%m/%Y}), sin exceder la fecha límite de la "
-                    f"Convocatoria; de lo contrario la solicitud se tendrá por desechada ({plazo.fundamento}).")
+                    f"Convocatoria; de lo contrario la solicitud se tendrá por desechada ({venc.fundamento}).")
+            if venc.evento_despues_del_tope:
+                nota += (f" Aviso: la solicitud se recibió después de la fecha límite de recepción de la "
+                         f"Convocatoria ({venc.tope:%d/%m/%Y}).")
         acuse = emitir_acuse(expediente, "recepcion", "Acuse de recepción de la solicitud", usuario, renglones,
                              destinatario=solicitante.nombre, nota=nota)
         Evento.registrar(expediente, usuario, "registro",
@@ -408,11 +411,11 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
             expediente.cambiar_estado("validada", usuario, tipo_evento="validacion", acuse=acuse,
                                       descripcion="Expediente validado por la Dirección.")
             return val
-        plazo = expediente.ejercicio.plazo(_clave_plazo("faltantes"))
-        if plazo is None or not plazo.es_calculable:
+        venc = plazos.vencimiento(expediente, "faltantes_direccion", fecha_evento=ahora)
+        if venc is None or not venc.tiene_fecha:
             raise ValidationError("Las reglas del programa no tienen un plazo calculable para los faltantes.")
-        limite = dias_habiles.vencimiento_de_plazo(plazo, ahora)
-        texto_plazo = f"{plazo.texto_plazo} ({plazo.fundamento})"
+        limite = venc.vencimiento
+        texto_plazo = f"{venc.texto_plazo} ({venc.fundamento})"
         val = Validacion.objects.create(
             expediente=expediente, resultado=ResultadoValidacion.FALTANTES, usuario=usuario, fecha_hora=ahora,
             observaciones=observaciones, detalle=detalle, fecha_limite=limite, plazo_aplicado=texto_plazo[:300],
@@ -466,8 +469,6 @@ def registrar_notificacion(usuario, validacion, medio=MedioNotificacion.PERSONAL
 
 
 def plazo_recepcion(expediente):
-    """Fecha límite para completar la documentación en la Delegación (desde la recepción)."""
-    plazo = expediente.ejercicio.plazo(_clave_plazo("faltantes"))
-    if plazo is None or not plazo.es_calculable:
-        return None
-    return dias_habiles.vencimiento_de_plazo(plazo, expediente.fecha_recepcion)
+    """Fecha límite para completar la documentación en la Delegación (desde la recepción, con tope)."""
+    venc = plazos.vencimiento(expediente, "faltantes_ventanilla")
+    return venc.vencimiento if venc else None

@@ -700,6 +700,30 @@ class Notificacion(models.Model):
         return self.notificada_en is not None
 
 
+# ----------------------------------------------------------------------------- hitos del trámite
+class Hito(models.Model):
+    """Evento fechado del trámite que puede arrancar un plazo (publicación de resultados, firma del
+    contrato, entrega del Vale o del cheque…). Lo registra cada módulo con ``nucleo.plazos.registrar_hito``;
+    el servicio de plazos lo lee sin conocer al módulo."""
+
+    expediente = models.ForeignKey(Expediente, on_delete=models.CASCADE, related_name="hitos")
+    clave = models.CharField(max_length=60)
+    fecha_hora = models.DateTimeField()
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+                                related_name="+")
+    referencia = models.CharField(max_length=120, blank=True)
+    datos = models.JSONField(default=dict, blank=True)
+    registrado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-fecha_hora", "-id"]
+        verbose_name = "hito del trámite"
+        verbose_name_plural = "hitos del trámite"
+
+    def __str__(self):
+        return f"{self.expediente.folio} · {self.clave} {self.fecha_hora:%Y-%m-%d}"
+
+
 # ----------------------------------------------------------------------------- permisos por unidad
 def expedientes_visibles(usuario):
     """Expedientes que ve el usuario: una Delegación solo los suyos; una Dirección los de sus programas."""

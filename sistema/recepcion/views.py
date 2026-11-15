@@ -288,12 +288,13 @@ def validar(request, folio):
                                               f"{exp.delegacion.nombre}.")
                 return redirect(reverse("recepcion:expediente", args=[folio]) + "?pestana=validacion")
     contexto["evaluacion"] = servicios.evaluar_para_validacion(exp)
-    plazo = exp.ejercicio.plazo(servicios._clave_plazo("faltantes"))
-    contexto["plazo_faltantes"] = plazo
-    if plazo and plazo.es_calculable:
-        from django.utils import timezone
-        from nucleo.dias_habiles import vencimiento_de_plazo
-        contexto["limite_si_hoy"] = vencimiento_de_plazo(plazo, timezone.now())
+    from django.utils import timezone
+    from nucleo import plazos
+
+    venc = plazos.vencimiento(exp, "faltantes_direccion", fecha_evento=timezone.now())
+    contexto["plazo_faltantes"] = venc.plazo if venc else None
+    if venc and venc.tiene_fecha:
+        contexto["limite_si_hoy"] = venc.vencimiento
     return render(request, "recepcion/validar.html", contexto)
 
 

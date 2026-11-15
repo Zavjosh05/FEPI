@@ -12,6 +12,8 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
 - DEMOS: funciones ``() -> int`` que agregan datos de demostración (``manage.py cargar_demo``).
 - AL_NOTIFICAR: funciones ``(notificacion) -> None`` que corren cuando la Delegación registra que
   notificó a la persona (``nucleo.notificaciones.registrar_notificacion``).
+- EVENTOS_PLAZO: ``{evento: fn(expediente, config) -> datetime | None}`` para eventos de arranque de
+  plazo que no se registran como ``Hito`` (``nucleo.plazos``). Lo normal es registrar un Hito.
 """
 
 FILTROS_BANDEJA = []
@@ -21,3 +23,4 @@ MENU = []
 REVISIONES_PLAZO = []
 DEMOS = []
 AL_NOTIFICAR = []
+EVENTOS_PLAZO = {}

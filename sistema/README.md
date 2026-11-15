@@ -167,7 +167,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   condición), plazos (cantidad + unidad; admite `cantidad: null` y unidades como `fecha_limite`),
   formatos, montos y ministraciones (estas dos quedan listas para el sprint 2). Las claves que el
   esquema no usa todavía se guardan en `Ejercicio.datos`. `datos/sistema.json` indica qué plazo usa el
-  sistema para los faltantes (`complemento_documentacion_faltante`, 5 días hábiles) y para la vigencia
+  sistema para cada cosa y qué evento lo arranca (`usos_de_plazo`, ver «Base de M3 y M5») y para la vigencia
   en refrendo (`vigencia_documentacion_legal_refrendo`, 3 años).
 - **Modalidades de CC.** El archivo de CC trae como «modalidades» los tres tipos de superficie, dos
   regímenes de pago y el refrendo. Al registrar solo se eligen los tipos de superficie
@@ -293,6 +293,28 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   y plazos; `extensiones.AL_NOTIFICAR` avisa a los módulos. Cada módulo guarda una referencia a la suya: M1
   lo hace en `Validacion.notificacion` (la migración `recepcion/0002` pasó los avisos existentes al núcleo;
   `Validacion.notificado_en`, `notificado_por` y `acuse_notificacion` quedan como propiedades).
+- **Plazos con evento de arranque (R-03, R-12).** `nucleo.plazos.vencimiento(expediente, uso)` es el único
+  cálculo de vencimientos por evento. `datos/sistema.json` → `usos_de_plazo` resuelve cada uso **por programa**
+  (`por_omision` + lo propio del programa; `false` = no lo tiene) a una clave de plazo de las reglas, un evento
+  de arranque y, si aplica, un tope. Devuelve un `Vencimiento` (`vencimiento`, `fecha_evento`, `tope`,
+  `topado`, `texto`, `estado()`): si el evento no ha ocurrido, «sin fecha todavía». Los eventos que producen
+  otros módulos se registran con `plazos.registrar_hito(expediente, clave, usuario, fecha_hora)` (modelo
+  `Hito`) o con una función en `extensiones.EVENTOS_PLAZO`; el servicio no cambia.
+
+  | Uso | Plazo de las reglas | Evento | Tope / nota |
+  | --- | --- | --- | --- |
+  | `faltantes_ventanilla` | `complemento_documentacion_faltante` (5 d. háb.) | `recepcion_solicitud` | fecha límite de recepción (`recepcion_solicitudes`, 27-mar-2026), ROP 8.1.1.2 |
+  | `faltantes_direccion` | el mismo | `aviso_direccion` | decisión propia (las ROP no dan días, 10.1) |
+  | `firma_programada` | `firma_contrato` (10 d. háb.) | CC y PSA: `publicacion_resultados`; PS y RHF: `notificacion_persona` | reasignadas: desde su notificación, hasta `fecha_limite_reasignados` |
+  | `firma_liberacion` | `firma_contrato` | CC y RHF: `notificacion_persona`; PS y PSA: `publicacion_resultados` | vencido = «sin firma en plazo», recurso por liberar |
+  | `cita_firma` (PS) | `cita_firma_contrato` (5 d. háb.) | `publicacion_resultados` | la Delegación notifica y cita |
+  | `recoger_planta` (PS, RHF) | `recoger_planta_vivero` / `recoger_planta_vale` | `entrega_vale` | PS: «30 días» como naturales (R-13) |
+  | `ptrfi_actualizado` (RHF) | `entrega_ptrfi_actualizado` | `notificacion_persona` | |
+  | `instruccion_pago_fiduciaria`, `cobro_cheque` (PSA) | los de las reglas | `solicitud_pago_fiduciaria`, `entrega_cheque` | cheque: desde la entrega (R-14) |
+
+  Si el evento ocurrió después del tope (por ejemplo, una solicitud de demostración recibida después del
+  27-mar-2026), no se topa: se marca `evento_despues_del_tope` y el acuse lo avisa. M1 ya usa el servicio
+  (acuse de recepción, aviso de faltantes, revisión de plazos).
 
 ## Diferencias con la especificación (mandan las ROP)
 
