@@ -12,8 +12,15 @@
 </div>
 <form class="tarjeta mb-3" hx-get="{% url 'nucleo:bandeja' %}" hx-target="#tabla-bandeja" hx-push-url="true"
       hx-trigger="change, input changed delay:350ms from:#filtro-q" hx-indicator="#cargando">
+  <div class="btn-group mb-3 flex-wrap" role="group" aria-label="Alcance de la bandeja" data-prueba="alcance">
+    <input type="radio" class="btn-check" name="alcance" id="alcance-bandeja" value="bandeja" {% if filtros.alcance == "bandeja" %}checked{% endif %}>
+    <label class="btn btn-outline-primary px-4" for="alcance-bandeja">Por atender <span class="badge text-bg-light border ms-1" id="cuenta-bandeja">{{ total_por_atender }}</span></label>
+    <input type="radio" class="btn-check" name="alcance" id="alcance-todos" value="todos" {% if filtros.alcance == "todos" %}checked{% endif %}>
+    <label class="btn btn-outline-primary px-4" for="alcance-todos">Todos los míos <span class="badge text-bg-light border ms-1" id="cuenta-todos">{{ total_todos }}</span></label>
+  </div>
+  <div class="small text-secondary mb-2">«Por atender» son los expedientes cuyo estado le toca a su unidad; «Todos los míos», todos los que puede consultar (también los que ya pasaron a otra unidad).</div>
   <div class="row g-2 align-items-end">
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-5">
       <label class="form-label small mb-1" for="filtro-q">Buscar</label>
       <input class="form-control" type="search" name="q" id="filtro-q" value="{{ filtros.q }}" placeholder="Folio, predio, solicitante o municipio">
     </div>
@@ -24,20 +31,12 @@
         {% for p in programas %}<option value="{{ p.clave }}" {% if filtros.programa == p.clave %}selected{% endif %}>{{ p.clave }}</option>{% endfor %}
       </select>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-5">
       <label class="form-label small mb-1" for="filtro-estado">Estado</label>
       <select class="form-select" name="estado" id="filtro-estado">
         <option value="">Todos</option>
         {% for e in estados %}<option value="{{ e.clave }}" {% if filtros.estado == e.clave %}selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
       </select>
-    </div>
-    <div class="col-12 col-md-3">
-      <div class="btn-group w-100" role="group" aria-label="Alcance">
-        <input type="radio" class="btn-check" name="alcance" id="alcance-bandeja" value="bandeja" {% if filtros.alcance == "bandeja" %}checked{% endif %}>
-        <label class="btn btn-outline-primary" for="alcance-bandeja">Por atender</label>
-        <input type="radio" class="btn-check" name="alcance" id="alcance-todos" value="todos" {% if filtros.alcance == "todos" %}checked{% endif %}>
-        <label class="btn btn-outline-primary" for="alcance-todos">Todos los míos</label>
-      </div>
     </div>
   </div>
 </form>

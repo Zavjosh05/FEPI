@@ -34,3 +34,9 @@ body { background: #f5f6f4; }
   .encabezado-exp h1 { font-size: 1.1rem; }
   .usuario-barra { justify-content: space-between; padding: .5rem 0; }
 }
+
+/* P-15: el enlace del aviso de faltantes lleva a la fila del requisito y la resalta. */
+tbody.req-fila:target > tr:first-child { outline: 2px solid var(--bs-warning); outline-offset: -2px; background: var(--bs-warning-bg-subtle); }
+/* P-17: el alcance elegido de la bandeja se distingue sin ambigüedad. */
+.btn-check:checked + .btn-outline-primary { background-color: #1f5130; border-color: #1f5130; color: #fff; }
+.btn-check:not(:checked) + .btn-outline-primary { background-color: #fff; color: #1f5130; }

@@ -1,0 +1,11 @@
+<div class="tarjeta mb-3 border-info" data-prueba="por-sesionar">
+  <div class="titulo-seccion">Solicitudes dictaminadas por llevar a sesión de aprobación</div>
+  <div class="d-flex flex-column gap-2">
+    {% for g in panel.grupos %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span><strong>{{ g.n }}</strong> de {{ g.ejercicio.programa.nombre }} {{ g.ejercicio.anio }}{% if g.sesion %} · sesión abierta {{ g.sesion.numero }} ({{ g.sesion.fecha_hora|date:"d/m/Y H:i" }} h){% endif %}</span>
+      <a class="btn btn-primary btn-sm" href="{{ g.url }}" data-prueba="llevar-a-sesion" data-programa="{{ g.ejercicio.programa.clave }}">Llevar a sesión de aprobación</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>

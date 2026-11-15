@@ -20,10 +20,14 @@
           <td class="d-none d-md-table-cell">{{ e.fecha_recepcion|date:"d/m/Y H:i" }}</td>
         </tr>
       {% empty %}
-        <tr><td colspan="7" class="text-center text-secondary py-4">No hay expedientes con estos filtros.</td></tr>
+        <tr><td colspan="7" class="text-center text-secondary py-4" data-prueba="bandeja-vacia">No hay expedientes con estos filtros.
+          {% if filtros.alcance == "bandeja" and total_todos %}<div class="mt-1">Su unidad puede consultar {{ total_todos }} expediente{{ total_todos|pluralize }} más en
+          <label class="btn btn-link btn-sm p-0 align-baseline" for="alcance-todos">«Todos los míos»</label>.</div>{% endif %}</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
   <div class="px-3 py-2 small text-secondary border-top" data-prueba="total">{{ total }} expediente{{ total|pluralize }}</div>
 </div>
+{% if oob %}<span class="badge text-bg-light border ms-1" id="cuenta-bandeja" hx-swap-oob="true">{{ total_por_atender }}</span>
+<span class="badge text-bg-light border ms-1" id="cuenta-todos" hx-swap-oob="true">{{ total_todos }}</span>{% endif %}

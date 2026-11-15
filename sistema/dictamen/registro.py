@@ -25,6 +25,58 @@ def panel_acuerdos(request):
     return {"plantilla": "dictamen/seguimiento/_panel_pendientes.html", "contexto": {"acuerdos": pendientes}}
 
 
+def url_llevar_a_sesion(ejercicio):
+    """La sesión de aprobación abierta del ejercicio o, si no hay, el alta de una nueva (P-16)."""
+    from django.urls import reverse
+
+    from .models import EstadoSesion, SesionComite, TipoSesion
+
+    abierta = (SesionComite.objects.filter(ejercicio=ejercicio, tipo=TipoSesion.APROBACION)
+               .exclude(estado=EstadoSesion.CELEBRADA).order_by("fecha_hora").first())
+    if abierta:
+        return reverse("dictamen:sesion", args=[abierta.pk]), abierta
+    return reverse("dictamen:sesion_nueva") + f"?tipo={TipoSesion.APROBACION}&ejercicio={ejercicio.pk}", None
+
+
+def panel_por_sesionar(request):
+    """Bandeja de la Secretaría Técnica: dictaminadas por ejercicio con la acción «Llevar a sesión de aprobación»."""
+    from django.db.models import Count
+
+    from nucleo.models import Ejercicio, bandeja
+
+    if request.user.tipo_unidad != TipoUnidad.SECRETARIA_COMITE:
+        return None
+    conteo = (bandeja(request.user).filter(estado__clave="dictaminada").values("ejercicio")
+              .annotate(n=Count("pk")).order_by("ejercicio"))
+    grupos = []
+    for fila in conteo:
+        ej = Ejercicio.objects.select_related("programa").get(pk=fila["ejercicio"])
+        url, sesion = url_llevar_a_sesion(ej)
+        grupos.append({"ejercicio": ej, "n": fila["n"], "url": url, "sesion": sesion})
+    if not grupos:
+        return None
+    return {"plantilla": "dictamen/aprobacion/_panel_por_sesionar.html", "contexto": {"grupos": grupos}}
+
+
+def siguiente_paso(usuario, exp):
+    """Siguiente paso de M2 en el expediente (P-13 y P-16)."""
+    from django.urls import reverse
+
+    from .models import DictamenJuridico, DictamenTecnico
+
+    estado, tipo = exp.estado.clave, usuario.tipo_unidad
+    if estado == "validada":
+        if tipo == TipoUnidad.DIRECCION and not DictamenTecnico.objects.filter(expediente=exp).exists():
+            return {"texto": "Elaborar el dictamen técnico", "url": reverse("dictamen:tecnico", args=[exp.folio])}
+        if tipo == TipoUnidad.JURIDICA and not DictamenJuridico.objects.filter(expediente=exp).exists():
+            return {"texto": "Elaborar el dictamen jurídico", "url": reverse("dictamen:juridico", args=[exp.folio])}
+    if estado == "dictaminada" and tipo == TipoUnidad.SECRETARIA_COMITE:
+        url, sesion = url_llevar_a_sesion(exp.ejercicio)
+        return {"texto": "Llevar a sesión de aprobación", "url": url,
+                "ayuda": f"Sesión {sesion.numero}" if sesion else "Aún no hay sesión de aprobación abierta: se crea una."}
+    return None
+
+
 def contexto_pestana(request, exp):
     from .vistas.comun import contexto_dictamenes
 
@@ -50,6 +102,8 @@ def registrar():
         return
     extensiones.FILTROS_BANDEJA.append(filtro_bandeja)
     extensiones.PANELES_BANDEJA.append(panel_acuerdos)
+    extensiones.PANELES_BANDEJA.append(panel_por_sesionar)
+    extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "dictamenes", "nombre": "Dictámenes",
                                             "plantilla": "dictamen/pestana_dictamenes.html", "contexto": contexto_pestana})
     T = TipoUnidad

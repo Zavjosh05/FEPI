@@ -18,7 +18,10 @@
       {% if exp.estado.flujo_alterno %}<span class="badge text-bg-light border">Flujo alterno {{ exp.estado.flujo_alterno }}</span>{% endif %}
       <div class="dato mt-1">{{ exp.delegacion.nombre }}</div>
       <div class="dato">Recibida el {{ exp.fecha_recepcion|date:"d/m/Y H:i:s" }} h</div>
-      {% if puede_validar %}<a class="btn btn-primary btn-sm mt-2" href="{% url 'recepcion:validar' exp.folio %}">Validar expediente</a>{% endif %}
+      {% if siguiente_paso %}<div class="mt-2" data-prueba="siguiente-paso">
+        <a class="btn btn-primary btn-sm" href="{{ siguiente_paso.url }}">{{ siguiente_paso.texto }}</a>
+        {% if siguiente_paso.ayuda %}<div class="small text-secondary mt-1">{{ siguiente_paso.ayuda }}</div>{% endif %}
+      </div>{% endif %}
     </div>
   </div>
 </div>

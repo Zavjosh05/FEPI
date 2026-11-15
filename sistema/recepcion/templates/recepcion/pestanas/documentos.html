@@ -3,12 +3,13 @@
     <div class="titulo-seccion">Acuses</div>
     <div class="table-responsive">
     <table class="table table-sm" id="tabla-acuses">
-      <thead class="table-light"><tr><th>Folio</th><th>Acuse</th><th>Fecha y hora</th><th>Emitió</th></tr></thead>
+      <thead class="table-light"><tr><th>Folio</th><th>Acuse</th><th>Fecha y hora</th><th>Emitió</th><th></th></tr></thead>
       <tbody>
       {% for a in exp.acuses.all %}
       <tr><td><a href="{% url 'nucleo:acuse' a.folio %}" target="_blank">{{ a.folio }}</a></td><td>{{ a.titulo }}</td>
-          <td class="text-nowrap">{{ a.fecha_hora|date:"d/m/Y H:i:s" }}</td><td class="small">{{ a.emitido_por }}<div class="text-secondary">{{ a.unidad }}</div></td></tr>
-      {% empty %}<tr><td colspan="4" class="text-secondary">Sin acuses.</td></tr>{% endfor %}
+          <td class="text-nowrap">{{ a.fecha_hora|date:"d/m/Y H:i:s" }}</td><td class="small">{{ a.emitido_por }}<div class="text-secondary">{{ a.unidad }}</div></td>
+          <td><a class="btn btn-outline-secondary btn-sm text-nowrap" href="{% url 'nucleo:acuse' a.folio %}?descargar=1" download="{{ a.folio }}.pdf" data-prueba="descargar-acuse">Descargar</a></td></tr>
+      {% empty %}<tr><td colspan="5" class="text-secondary">Sin acuses.</td></tr>{% endfor %}
       </tbody>
     </table>
     </div>
@@ -20,7 +21,8 @@
       <thead class="table-light"><tr><th>Documento</th><th>Entregado</th><th>Registró</th></tr></thead>
       <tbody>
       {% for d in exp.documentos.all %}
-      <tr><td><a href="{% url 'nucleo:documento' d.pk %}" target="_blank">{{ d.nombre|truncatechars:60 }}</a></td>
+      <tr><td><a href="{% url 'nucleo:documento' d.pk %}" target="_blank">{{ d.nombre|truncatechars:60 }}</a>
+          <a class="small ms-1" href="{% url 'nucleo:documento' d.pk %}?descargar=1" download data-prueba="descargar-documento">descargar</a></td>
           <td class="text-nowrap">{{ d.fecha_entrega|date:"d/m/Y H:i" }}</td><td class="small">{{ d.registrado_por }}</td></tr>
       {% empty %}<tr><td colspan="3" class="text-secondary">Sin documentos digitalizados.</td></tr>{% endfor %}
       </tbody>

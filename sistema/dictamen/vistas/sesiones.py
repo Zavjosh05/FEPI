@@ -42,7 +42,8 @@ def lista(request):
 def nueva(request):
     if request.user.tipo_unidad != TipoUnidad.SECRETARIA_COMITE:
         raise PermissionDenied("La Secretaría Técnica prepara las sesiones.")
-    form = SesionForm(request.POST or None, initial={"tipo": request.GET.get("tipo", TipoSesion.APROBACION)})
+    form = SesionForm(request.POST or None, initial={"tipo": request.GET.get("tipo", TipoSesion.APROBACION),
+                                                     "ejercicio": request.GET.get("ejercicio")})
     if request.method == "POST" and form.is_valid():
         d = form.cleaned_data
         try:

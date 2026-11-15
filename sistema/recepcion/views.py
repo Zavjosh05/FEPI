@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from nucleo.models import Expediente, Persona, TipoPersonaGeneral, TipoUnidad, expedientes_visibles
+from nucleo.pasos import siguiente_paso
 from nucleo.views import _entregar_archivo
 
 from . import geometria, servicios
@@ -126,6 +127,8 @@ def contexto_expediente(request, exp):
         "historial": exp.history.select_related("history_user", "estado").order_by("-history_date")[:50],
         "es_delegacion": es_delegacion,
         "es_direccion": es_direccion,
+        "siguiente_paso": siguiente_paso(usuario, exp),
+        "sin_poligono": exp.programa.usa_poligono and not any(p.vigente for p in exp.poligonos.all()),
     }
 
 

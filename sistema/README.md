@@ -378,6 +378,16 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   convocatoria de su Comité Técnico no valida anticipación mientras no se tenga su Reglamento Interno (R-14).
   La priorización del Comité (`datos/dictamen.json`) solo tiene criterios de CC; en los demás programas se
   ordena por fecha y hora de registro.
+- **Tropiezos de interfaz del sprint 1 (P-13 a P-18).** El encabezado del expediente muestra el botón del
+  **siguiente paso** de la unidad que lo mira (`nucleo/pasos.py`; cada módulo registra el suyo en
+  `extensiones.SIGUIENTES_PASOS`: M1 en `recepcion/pasos.py`, M2 en `dictamen/registro.py`). El panel de envío
+  avisa cuando el polígono aún no se levanta (sin impedir el envío, R-09). Cada requisito del aviso de faltantes
+  enlaza a su fila (`#req-<id>`, resaltada). La bandeja de la Secretaría Técnica trae el panel «Solicitudes
+  dictaminadas por llevar a sesión de aprobación», que abre la sesión de aprobación abierta del ejercicio o el
+  alta de una nueva con el ejercicio elegido. «Por atender» y «Todos los míos» quedan arriba, con conteo, y la
+  bandeja vacía invita a ver «Todos los míos». Acuses y documentos se ven o se descargan (`?descargar=1`,
+  `Content-Disposition: attachment`); la descarga se prueba con Playwright
+  (`pruebas/e2e/test_recorrido_tropiezos_s2.py`, capturas `s2_02_*` en `entregas/sprint_2/capturas/`).
 
 ## Diferencias con la especificación (mandan las ROP)
 

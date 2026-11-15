@@ -17,7 +17,7 @@
     </form>
     {% endif %}
   </div>
-  <ul class="small mt-2 mb-0">{% for r in aviso.faltantes.all %}<li><strong>{{ r.requisito.clave }}</strong> {{ r.requisito.titulo }}</li>{% endfor %}</ul>
+  <ul class="small mt-2 mb-0" data-prueba="faltantes-aviso">{% for r in aviso.faltantes.all %}<li><a href="{% url 'recepcion:expediente' exp.folio %}?pestana=requisitos#req-{{ r.pk }}" data-requisito="{{ r.requisito.clave }}"><strong>{{ r.requisito.clave }}</strong> {{ r.requisito.titulo }}</a></li>{% endfor %}</ul>
   {% if es_delegacion %}<div class="small text-secondary mt-2">Cuando reciba la documentación, márquela como entregada en la pestaña Requisitos y reenvíe el expediente.</div>{% endif %}
 </div>
 {% endif %}

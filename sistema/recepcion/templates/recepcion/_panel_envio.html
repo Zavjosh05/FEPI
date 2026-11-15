@@ -17,6 +17,13 @@
     </form>
     {% endif %}
   </div>
+  {% if puede_enviar and sin_poligono %}
+  <div class="alert alert-info small py-2 mt-2 mb-0" data-prueba="aviso-poligono">
+    El polígono del predio aún no se levanta. Puede enviar el expediente: el polígono se levanta después de entregar
+    la documentación (CC 10.1 fr. III), pero la Dirección lo necesita para el dictamen técnico.
+    <a href="{% url 'recepcion:expediente' exp.folio %}?pestana=ubicacion">Levantar polígono</a>
+  </div>
+  {% endif %}
   {% if puede_enviar and problemas_envio %}
   <ul class="small text-secondary mb-0 mt-2">{% for p in problemas_envio %}<li>{{ p }}</li>{% endfor %}</ul>
   <div class="small text-secondary">Regla de envío: todos los requisitos revisados, ninguno faltante y cada entregado con su archivo (o, en refrendo, la documentación vigente que obra en PROBOSQUE).</div>
