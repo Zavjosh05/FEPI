@@ -10,6 +10,9 @@ body { background: #f5f6f4; }
 .contenedor { max-width: 1320px; margin: 0 auto; }
 .barra-probosque { background: var(--pb-verde); }
 .barra-probosque .marca { font-weight: 700; letter-spacing: .06em; }
+.barra-probosque .navbar-nav .nav-link { padding-left: .5rem; padding-right: .5rem; font-size: .92rem; }
+.barra-probosque .usuario-barra { flex-shrink: 0; }
+.barra-probosque .unidad-barra { max-width: 13rem; }
 .tarjeta { background: #fff; border: 1px solid #dde2dc; border-radius: .5rem; padding: 1rem 1.25rem; }
 .tarjeta + .tarjeta { margin-top: 1rem; }
 .titulo-seccion { font-size: 1.05rem; font-weight: 600; margin-bottom: .75rem; }

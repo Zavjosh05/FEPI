@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones.
+notificaciones y HU-3.2 Elaboración del contrato.
 
 ## Cómo levantar
 
@@ -100,7 +100,10 @@ Rancho La Huerta), RHF (Barranca Honda, Ojo de Agua) y PSAHEM (Bosque El Zarco, 
 con su sesión de aprobación y su acta (`contrato/demo.py`). PS y RHF ya publicaron sus resultados (HU-3.1, a
 distintas horas): en PS la Delegación notificó el resultado y la cita de Plantación Los Pinos (la otra queda
 publicada, por notificar) y en RHF solo el resultado de Barranca Honda; PSAHEM y CC tienen el acta que autoriza
-publicar, para mostrar la pantalla «Publicación de resultados». La página pública de resultados está en
+publicar, para mostrar la pantalla «Publicación de resultados». En HU-3.2, PS y RHF tienen un modelo de Contrato de
+Adhesión validado por la Unidad Jurídica y CC, PS y PSAHEM la plantilla base por validar; el contrato de Plantación
+Los Pinos (PS) está enviado a la Delegación, el de Barranca Honda (RHF) elaborado por enviar y Ojo de Agua (RHF)
+notificada y por elaborar. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
@@ -120,7 +123,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── contrato/, pagos/  apps M3 (HU-3.1 hecha) y M5 (vacía): models/ (paquete, un módulo por historia), vistas/,
+├── contrato/, pagos/  apps M3 (HU-3.1 y HU-3.2 hechas) y M5 (vacía): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
 ├── plantillas/        base.html
@@ -431,6 +434,35 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pendientes.** Los resultados de quienes pasan de la lista de espera a beneficiarias por acuerdo del Comité
   (reasignación) se publicarán con HU-3.3 (flujo alterno D); la publicación en la Gaceta (PSAHEM) no se modela: el
   lugar de publicación es un texto.
+
+### M3 · HU-3.2 Elaboración del contrato
+
+- **Organización.** `contrato/models/contratos.py` (migración `0002_hu_3_2_contratos`), servicio `contrato/contratos.py`,
+  vistas `vistas/contratos.py`, formularios y `templates/contrato/contratos/`.
+- **Modelos de contrato (S2-04, R-07).** Las ROP no traen el texto del Contrato de Adhesión, del Convenio de
+  Concertación ni del Adendum (faltan los formatos y el modelo, R-07). `ModeloContrato` (por programa-ejercicio y tipo)
+  tiene `VersionModelo`: el área responsable registra el texto (plantilla con campos `{{campo}}`, que se validan contra
+  `contratos.CAMPOS`; un campo desconocido se rechaza) y la Unidad Jurídica lo **valida** (fecha y hora, quién,
+  observaciones) o lo **devuelve** con observaciones. Cambiar el texto crea una versión nueva **por validar**; la
+  versión anterior se conserva y los contratos ya elaborados guardan la suya. Incluye una **plantilla base propia** por
+  tipo, marcada «BORRADOR – modelo por validar» en el nombre, en el texto y en las pantallas: hay que quitarle la marca
+  (versión nueva) y validarla antes de usarla.
+- **Elaborar.** `contratos.elaborar_contrato(usuario, expediente, modelo)`: solo la Dirección Instancia Ejecutora, solo
+  de una solicitud **aprobada, publicada y notificada** (estado `notificada`; antes dice qué falta), solo sobre la
+  versión vigente **validada** de un modelo del mismo programa-ejercicio y del tipo que toca (Convenio de Concertación
+  en PSAHEM con fondos concurrentes; Contrato de Adhesión en los demás casos): el servicio lo impide, no solo la
+  pantalla. El PDF (WeasyPrint) lleva persona, tipo de persona, predio, municipio, Delegación, modalidad, superficie
+  aprobada, monto y ministraciones (`nucleo.montos.monto_aprobado`) y el plazo de firma (`plazos.vencimiento`), con su
+  huella SHA-256 y la leyenda del modelo y su validación. Uno por solicitud (folio `CTO-<programa>-<año>-NNNN`); se
+  **rehace** (mismo folio, se cuenta en `rehechos`) mientras no se envíe. Estado `notificada → contrato_elaborado`.
+- **Enviar a la Delegación.** `contratos.enviar_a_delegacion`: fecha y hora, acuse en PDF (con la huella), estado
+  `contrato_en_delegacion` y bandeja de la Delegación, que ve el PDF solo desde el envío. La firma es HU-3.3.
+- **Pendiente.** La ampliación de plazo por causa externa en MFS: MFS aún no tiene reglas (sprint 3), por eso solo
+  quedó el modelo de datos `Adendum` (ligado al contrato, con motivo, plazo original y nuevo y su modelo), sin servicio
+  ni pantalla. El texto jurídico real de los modelos lo aporta el cliente (R-07).
+- **Barra de navegación.** Con las pantallas de M3 la barra de la Dirección y de la Unidad Jurídica ya no cabía:
+  nombres más cortos («Publicación», «Modelos»), subtítulo de la marca solo en pantallas anchas, colapso desde 1200 px y
+  nombre de la unidad truncado (con su `title`).
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

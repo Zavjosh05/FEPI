@@ -13,7 +13,7 @@ HISTORIAS = [
     ("HU-3.3", "Firma del contrato", "cita a la persona, recaba su firma y señala lo que no se firmó en plazo"),
     ("HU-3.4", "Entrega de planta", "valida el Vale de Planta y registra la salida por especie y cantidad"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-3.1"}
+HISTORIAS_CONSTRUIDAS = {"HU-3.1", "HU-3.2"}
 USOS_DE_PLAZO = ["cita_firma", "firma_programada", "firma_liberacion", "ptrfi_actualizado", "recoger_planta"]
 
 
@@ -41,6 +41,12 @@ def siguiente_paso(usuario, exp):
                     "ayuda": f"Sesión {sesion.numero}: el acta autoriza la publicación." if sesion.autoriza_publicacion
                     else f"Sesión {sesion.numero}: el acta no autorizó la publicación."}
         return {"texto": "Ver lo que sigue: publicación y contrato",
+                "url": reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=contrato"}
+    if estado == "notificada" and tipo == TipoUnidad.DIRECCION:
+        return {"texto": "Elaborar el contrato", "url": reverse("contrato:elaborar", args=[exp.folio]),
+                "ayuda": "Sobre un modelo validado por la Unidad Jurídica."}
+    if estado == "contrato_elaborado" and tipo == TipoUnidad.DIRECCION:
+        return {"texto": "Revisar y enviar el contrato a la Delegación",
                 "url": reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=contrato"}
     if estado == "publicada" and tipo == TipoUnidad.DELEGACION:
         return {"texto": "Notificar a la persona beneficiaria", "url": reverse("contrato:notificaciones"),
@@ -72,6 +78,17 @@ def panel_por_notificar(request):
             "contexto": {"total": total, "notificaciones": list(pendientes.order_by("enviada_en")[:6])}}
 
 
+def panel_modelos_por_validar(request):
+    from . import contratos
+
+    if request.user.tipo_unidad != TipoUnidad.JURIDICA:
+        return None
+    modelos = contratos.modelos_por_validar()
+    if not modelos:
+        return None
+    return {"plantilla": "contrato/contratos/_panel_validar.html", "contexto": {"modelos": modelos}}
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -80,13 +97,15 @@ def registrar():
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "contrato", "nombre": "Contrato",
                                             "plantilla": "contrato/pestana_contrato.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
-    extensiones.PANELES_BANDEJA.extend([panel_por_publicar, panel_por_notificar])
+    extensiones.PANELES_BANDEJA.extend([panel_por_publicar, panel_por_notificar, panel_modelos_por_validar])
     extensiones.AL_NOTIFICAR.append(publicacion.al_notificar)
     T = TipoUnidad
     extensiones.MENU.extend([
-        {"nombre": "Publicación de resultados", "url": "contrato:publicaciones",
+        {"nombre": "Publicación", "url": "contrato:publicaciones",
          "tipos": [T.DIRECCION, T.SECRETARIA_COMITE, T.JURIDICA]},
         {"nombre": "Notificaciones", "url": "contrato:notificaciones", "tipos": [T.DELEGACION, T.DIRECCION]},
+        {"nombre": "Modelos", "url": "contrato:modelos", "tipos": [T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Contratos", "url": "contrato:contratos", "tipos": [T.DIRECCION, T.JURIDICA]},
     ])
     extensiones.DEMOS.append(cargar_demo)
 

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Contratos{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Contratos</h1>
+  <div class="small text-secondary">Un contrato por solicitud aprobada, publicada y notificada, elaborado sobre un modelo validado por la Unidad Jurídica y enviado a la Delegación para su firma.</div>
+</div>
+<div class="tarjeta mb-3" data-prueba="por-elaborar">
+  <div class="titulo-seccion">Por elaborar ({{ por_elaborar|length }})</div>
+  {% include "contrato/contratos/_filas.html" with filas=por_elaborar accion="Elaborar" vacio="No hay solicitudes notificadas por elaborar." %}
+</div>
+<div class="tarjeta mb-3" data-prueba="por-enviar">
+  <div class="titulo-seccion">Elaborados por enviar a la Delegación ({{ por_enviar|length }})</div>
+  {% include "contrato/contratos/_filas.html" with filas=por_enviar accion="Revisar y enviar" vacio="No hay contratos por enviar." %}
+</div>
+<div class="tarjeta" data-prueba="enviados">
+  <div class="titulo-seccion">Enviados a la Delegación ({{ enviados|length }})</div>
+  {% if enviados %}
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Contrato</th><th>Solicitud</th><th>Envío a la Delegación</th><th>Acuse</th></tr></thead>
+    <tbody>{% for c in enviados %}<tr><td class="fw-semibold">{{ c.folio }}</td>
+      <td><a href="{% url 'recepcion:expediente' c.expediente.folio %}?pestana=contrato">{{ c.expediente.folio }}</a> · {{ c.expediente.solicitante.nombre }}</td>
+      <td class="text-nowrap">{{ c.enviado_en|date:"d/m/Y H:i:s" }} h</td>
+      <td>{% if c.acuse_envio %}<a href="{% url 'nucleo:acuse' c.acuse_envio.folio %}" target="_blank">{{ c.acuse_envio.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todavía no se envía ningún contrato.</div>{% endif %}
+</div>
+{% endblock %}

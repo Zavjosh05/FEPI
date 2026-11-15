@@ -22,7 +22,7 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
     exp = nueva_solicitud(superficie_solicitada_ha=6)
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    assert "HU-3.2 Elaboración del contrato" in html and "El monto se calcula cuando el Comité" in html
+    assert "HU-3.3 Firma del contrato" in html and "El monto se calcula cuando el Comité" in html
     Expediente.objects.filter(pk=exp.pk).update(estado=Estado.objects.get(clave="aprobada"))
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
     assert "HU-5.3 Entrega de cheques" in html and 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
@@ -34,8 +34,8 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
 def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     call_command("cargar_demo")
     call_command("cargar_demo")  # idempotente
-    # PS y RHF ya publicaron (HU-3.1); PSAHEM sigue con sus dos aprobadas por publicar.
-    estados = {"PS": {"notificada", "publicada"}, "RHF": {"notificada", "publicada"}, "PSA": {"aprobada"}}
+    # PS y RHF ya publicaron (HU-3.1) y tienen contratos en distintos puntos (HU-3.2); PSAHEM sigue con sus dos aprobadas por publicar.
+    estados = {"PS": {"contrato_en_delegacion", "publicada"}, "RHF": {"contrato_elaborado", "notificada"}, "PSA": {"aprobada"}}
     for clave in ("PS", "RHF", "PSA"):
         expedientes = Expediente.objects.filter(ejercicio__programa__clave=clave, resoluciones_comite__resultado="beneficiaria")
         assert expedientes.count() == 2, clave

@@ -11,7 +11,7 @@ from nucleo.models import Ejercicio
 
 from .fixtures_m2 import documento_sesion
 
-__all__ = ["aprobadas", "SOLICITUDES_M3"]
+__all__ = ["aprobadas", "notificadas", "modelo_validado", "delegado_de", "SOLICITUDES_M3"]
 
 # programa: (usuario Delegación, municipio, predio, persona, modalidad, hectáreas)
 SOLICITUDES_M3 = {
@@ -56,4 +56,38 @@ def aprobadas(catalogos, usuarios):
         for e in exps:
             e.refresh_from_db()
         return sesion, exps
+    return _crear
+
+
+def delegado_de(usuarios, expediente):
+    """Usuario de la Delegación que atiende el expediente."""
+    return next(u for u in usuarios.values() if u.unidad_id == expediente.delegacion_id and u.tipo_unidad == "delegacion")
+
+
+@pytest.fixture
+def notificadas(aprobadas, usuarios):
+    """``notificadas("PS", cuantas=1)`` → (sesión, [expedientes]) publicados y con el resultado ya notificado."""
+    from contrato import publicacion
+
+    def _crear(programa="PS", cuantas=1, **kw):
+        sesion, exps = aprobadas(programa, cuantas=cuantas, **kw)
+        publicacion.publicar(usuarios["dir_drff"], sesion)
+        for e in exps:
+            publicacion.registrar_entrega(delegado_de(usuarios, e), e.notificaciones.get(tipo="resultados"), "personal")
+            e.refresh_from_db()
+        return sesion, exps
+    return _crear
+
+
+@pytest.fixture
+def modelo_validado(usuarios):
+    """``modelo_validado(ejercicio)`` → modelo de Contrato de Adhesión (o el tipo pedido) validado por la Unidad Jurídica."""
+    from contrato import contratos
+    from contrato.models import TipoModelo
+
+    def _crear(ejercicio, tipo=TipoModelo.CONTRATO_ADHESION, nombre="Modelo de prueba"):
+        texto = contratos.PLANTILLAS_BASE[tipo].replace(contratos.MARCA_BORRADOR, "").strip()
+        m = contratos.registrar_modelo(usuarios["dir_drff"], ejercicio, tipo, nombre, texto)
+        contratos.validar_version(usuarios["juridica"], m.vigente, "Conforme.")
+        return m
     return _crear

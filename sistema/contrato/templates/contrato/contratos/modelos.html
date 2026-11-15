@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block titulo %}Modelos de contrato{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Modelos de contrato</h1>
+  <div class="small text-secondary">Contrato de Adhesión, Convenio de Concertación (PSAHEM, fondos concurrentes) y Adendum por programa y ejercicio. Las ROP no traen el texto (R-07): el área responsable lo registra y la Unidad Jurídica lo valida; un cambio de texto crea una versión nueva por validar.</div>
+</div>
+<div class="tarjeta mb-3" data-prueba="lista-modelos">
+  <div class="titulo-seccion">Modelos registrados ({{ modelos|length }}{% if por_validar %} · {{ por_validar }} por validar{% endif %})</div>
+  {% if modelos %}
+  <div class="table-responsive">
+  <table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Modelo</th><th>Programa</th><th>Tipo</th><th>Versión vigente</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+    {% for x in modelos %}{% with m=x.m v=x.v %}
+    <tr data-modelo="{{ m.pk }}">
+      <td class="fw-semibold">{{ m.nombre }}{% if m.es_base %} <span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}</td>
+      <td>{{ m.ejercicio.programa.clave }} {{ m.ejercicio.anio }}</td>
+      <td>{{ m.get_tipo_display }}</td>
+      <td>{{ v.numero }}</td>
+      <td><span class="badge {% if v.estado == 'validada' %}text-bg-success{% elif v.estado == 'devuelta' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">{{ v.get_estado_display }}</span>
+        {% if v.revisada_en %}<div class="text-secondary">{{ v.revisada_en|date:"d/m/Y H:i" }} h</div>{% endif %}</td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:modelo' m.pk %}">{% if not es_area and v.estado == 'pendiente' %}Revisar{% else %}Abrir{% endif %}</a></td>
+    </tr>
+    {% endwith %}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}<div class="small text-secondary">Todavía no hay modelos registrados.</div>{% endif %}
+</div>
+{% if es_area %}
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <form method="post" class="tarjeta" id="form-plantilla-base">
+      {% csrf_token %}<input type="hidden" name="accion" value="base">
+      <div class="titulo-seccion mb-1">Plantilla base propia</div>
+      <div class="small text-secondary mb-2">Texto de partida del sistema, marcado como «BORRADOR – modelo por validar». Se ajusta y la Unidad Jurídica lo valida.</div>
+      <div class="mb-2"><label class="form-label" for="base_ejercicio">Programa y ejercicio</label>
+        <select class="form-select" name="ejercicio" id="base_ejercicio">{% for e in ejercicios %}<option value="{{ e.pk }}">{{ e.programa.nombre }} {{ e.anio }}</option>{% endfor %}</select></div>
+      <div class="mb-2"><label class="form-label" for="base_tipo">Tipo</label>
+        <select class="form-select" name="tipo" id="base_tipo">{% for v, t in tipos %}<option value="{{ v }}">{{ t }}</option>{% endfor %}</select></div>
+      <button class="btn btn-outline-primary" type="submit">Crear plantilla base</button>
+    </form>
+    <div class="tarjeta mt-3 small">
+      <div class="titulo-seccion mb-1">Campos de la plantilla</div>
+      <dl class="mb-0">{% for c, d in campos.items %}<dt class="d-inline"><code>{% templatetag openvariable %}{{ c }}{% templatetag closevariable %}</code></dt> <dd class="d-inline">{{ d }}</dd><br>{% endfor %}</dl>
+    </div>
+  </div>
+  <div class="col-12 col-lg-7">
+    <form method="post" class="tarjeta" id="form-modelo">
+      {% csrf_token %}
+      <div class="titulo-seccion mb-1">Registrar un modelo propio</div>
+      {% include "recepcion/_campo.html" with campo=form.ejercicio %}
+      {% include "recepcion/_campo.html" with campo=form.tipo %}
+      {% include "recepcion/_campo.html" with campo=form.nombre %}
+      {% include "recepcion/_campo.html" with campo=form.texto %}
+      <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar modelo</button></div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

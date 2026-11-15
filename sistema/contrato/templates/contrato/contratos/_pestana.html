@@ -1,0 +1,28 @@
+<div class="titulo-seccion mt-3">Contrato (HU-3.2)</div>
+{% if contrato %}
+<div class="tarjeta mb-3" data-prueba="contrato">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+      <div><strong>{{ contrato.folio }}</strong> · {{ contrato.get_tipo_display }}
+        <span class="badge {% if contrato.enviado %}text-bg-success{% else %}text-bg-info{% endif %}" data-prueba="estado-contrato">{{ contrato.get_estado_display }}</span></div>
+      <div class="small">Elaborado el {{ contrato.elaborado_en|date:"d/m/Y H:i:s" }} h por {{ contrato.elaborado_por.get_full_name|default:contrato.elaborado_por.username }}{% if contrato.rehechos %} · rehecho {{ contrato.rehechos }} vez{{ contrato.rehechos|pluralize:"es" }}{% endif %}</div>
+      <div class="small">Modelo: {{ contrato.version_modelo.modelo.nombre }}, versión {{ contrato.version_modelo.numero }} · validado el {{ contrato.version_modelo.revisada_en|date:"d/m/Y H:i" }} h por la Unidad Jurídica</div>
+      {% if contrato.enviado %}
+      <div class="small" data-prueba="envio-contrato">Enviado a la Delegación el <strong>{{ contrato.enviado_en|date:"d/m/Y H:i:s" }} h</strong>{% if contrato.acuse_envio %} · acuse <a href="{% url 'nucleo:acuse' contrato.acuse_envio.folio %}" target="_blank">{{ contrato.acuse_envio.folio }}</a>{% endif %}</div>
+      {% else %}<div class="small text-warning-emphasis">Todavía no se envía a la Delegación.</div>{% endif %}
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      {% if puede_ver_pdf %}<a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:contrato_pdf' exp.folio %}" target="_blank">Ver el PDF</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'contrato:contrato_pdf' exp.folio %}?descargar=1">Descargar</a>{% endif %}
+      {% if puede_elaborar_contrato %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'contrato:elaborar' exp.folio %}">Rehacer</a>{% endif %}
+      {% if puede_enviar_contrato %}
+      <form method="post" action="{% url 'contrato:enviar' exp.folio %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Enviar a la Delegación</button></form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% elif puede_elaborar_contrato %}
+<div class="alert alert-info small" data-prueba="por-elaborar-exp">La persona beneficiaria ya fue notificada: falta elaborar el {{ tipo_modelo|lower }}. <a href="{% url 'contrato:elaborar' exp.folio %}">Elaborar el contrato</a>.</div>
+{% else %}
+<div class="small text-secondary">Todavía no hay contrato: se elabora cuando la solicitud está aprobada, publicada y notificada.</div>
+{% endif %}

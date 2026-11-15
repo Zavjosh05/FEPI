@@ -15,3 +15,6 @@ ministraciones (``nucleo.montos``), estados (``datos/flujo_tramite.json``, siemp
 """
 
 from .publicacion import Publicacion, ResultadoPublicado  # noqa: E402,F401
+from .contratos import (  # noqa: E402,F401
+    Adendum, Contrato, EstadoContrato, EstadoVersion, ModeloContrato, TipoModelo, VersionModelo,
+)

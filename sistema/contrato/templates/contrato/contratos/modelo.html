@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block titulo %}{{ m.nombre|truncatechars:50 }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ m.ejercicio.programa.nombre }} {{ m.ejercicio.anio }} · {{ m.get_tipo_display }}</div>
+    <h1 class="h4 mb-0">{{ m.nombre }}</h1>
+    {% if m.es_base %}<span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'contrato:modelos' %}">Volver a los modelos</a>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-xl-7">
+    <div class="tarjeta mb-3" data-prueba="version-vigente">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <div class="titulo-seccion mb-1">Versión vigente {{ vigente.numero }}</div>
+        <span class="badge {% if vigente.estado == 'validada' %}text-bg-success{% elif vigente.estado == 'devuelta' %}text-bg-warning{% else %}text-bg-secondary{% endif %}" data-prueba="estado-version">{{ vigente.get_estado_display }}</span>
+      </div>
+      {% if vigente.revisada_en %}<div class="small mb-2">Revisada el <strong>{{ vigente.revisada_en|date:"d/m/Y H:i" }} h</strong> por {{ vigente.revisada_por.get_full_name|default:vigente.revisada_por.username }}{% if vigente.observaciones %} · Observaciones: {{ vigente.observaciones }}{% endif %}</div>{% endif %}
+      <pre class="small border rounded p-2 bg-light" style="white-space: pre-wrap" data-prueba="texto-modelo">{{ vigente.texto }}</pre>
+    </div>
+    {% if puede_modificar %}
+    <form method="post" action="{% url 'contrato:modelo_version' m.pk %}" class="tarjeta" id="form-version">
+      {% csrf_token %}
+      <div class="titulo-seccion mb-1">Cambiar el texto</div>
+      <div class="small text-secondary mb-2">Guarda una versión nueva que queda <strong>por validar</strong>, aunque la actual esté validada; mientras tanto no se elaboran contratos sobre este modelo.</div>
+      {% include "recepcion/_campo.html" with campo=form_texto.texto %}
+      <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Guardar versión nueva</button></div>
+    </form>
+    {% endif %}
+  </div>
+  <div class="col-12 col-xl-5">
+    {% if puede_revisar %}
+    <form method="post" action="{% url 'contrato:modelo_revisar' m.pk %}" class="tarjeta mb-3 border-primary" id="form-revision">
+      {% csrf_token %}
+      <div class="titulo-seccion mb-1">Revisión de la Unidad Jurídica</div>
+      <label class="form-label">{{ form_revision.decision.label }}</label>
+      {% for r in form_revision.decision %}<div class="form-check">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}
+      <div class="mt-2">{% include "recepcion/_campo.html" with campo=form_revision.observaciones %}</div>
+      <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar la revisión</button></div>
+    </form>
+    {% endif %}
+    <div class="tarjeta mb-3" data-prueba="versiones">
+      <div class="titulo-seccion mb-1">Versiones</div>
+      <table class="table table-sm small align-middle mb-0">
+        <thead class="table-light"><tr><th>Ver.</th><th>Registrada</th><th>Estado</th></tr></thead>
+        <tbody>{% for v in versiones %}
+          <tr><td>{{ v.numero }}</td><td class="text-nowrap">{{ v.creada_en|date:"d/m/Y H:i" }} h<div class="text-secondary">{{ v.creada_por.get_full_name|default:v.creada_por.username }}</div></td>
+            <td>{{ v.get_estado_display }}{% if v.revisada_en %}<div class="text-secondary">{{ v.revisada_en|date:"d/m/Y H:i" }} h · {{ v.revisada_por.get_full_name|default:v.revisada_por.username }}</div>{% endif %}{% if v.observaciones %}<div class="text-secondary">{{ v.observaciones }}</div>{% endif %}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+    <div class="tarjeta small">
+      <div class="titulo-seccion mb-1">Campos de la plantilla</div>
+      <dl class="mb-0">{% for c, d in campos.items %}<dt class="d-inline"><code>{% templatetag openvariable %}{{ c }}{% templatetag closevariable %}</code></dt> <dd class="d-inline">{{ d }}</dd><br>{% endfor %}</dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

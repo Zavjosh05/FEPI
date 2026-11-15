@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Elaborar contrato {{ exp.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">{% if contrato %}Rehacer{% else %}Elaborar{% endif %} el contrato del expediente {{ exp.folio }}</h1>
+    <div class="small">{{ exp.predio.folio }} · {{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=contrato">Ver expediente</a>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <div class="tarjeta" data-prueba="datos-contrato">
+      <div class="titulo-seccion mb-1">Datos que llevará el contrato</div>
+      <table class="table table-sm small mb-0">
+        <tr><th>Persona</th><td>{{ exp.solicitante.nombre }} ({{ exp.tipo_persona.nombre }})</td></tr>
+        <tr><th>Predio</th><td>{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }}</td></tr>
+        <tr><th>Modalidad</th><td>{{ exp.modalidad.nombre|default:"—" }}</td></tr>
+        <tr><th>Superficie aprobada</th><td>{{ monto.superficie_ha|floatformat:"-4" }} ha</td></tr>
+        <tr><th>Monto</th><td>{{ monto.total|moneda }} ({{ monto.monto_ha|moneda }} por hectárea)</td></tr>
+        <tr><th>Ministraciones</th><td>{% for m in monto.ministraciones %}{{ m.numero }}.ª: {{ m.porcentaje|floatformat:"-2" }} % ({{ m.importe|moneda }}){% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="col-12 col-lg-7">
+    <div class="tarjeta">
+      <div class="titulo-seccion mb-1">Modelo de {{ tipo }}</div>
+      {% if not puede_elaborar %}
+      <div class="alert alert-warning small mb-0">{% if contrato.enviado %}El contrato ya se envió a la Delegación; no se rehace.{% else %}El expediente está «{{ exp.estado }}»: el contrato se elabora de una solicitud aprobada, publicada y notificada.{% endif %}</div>
+      {% elif elegibles %}
+      <form method="post" id="form-elaborar">
+        {% csrf_token %}
+        {% include "recepcion/_campo.html" with campo=form.modelo %}
+        <div class="small text-secondary mb-2">Solo aparecen modelos validados por la Unidad Jurídica. {% if contrato %}El contrato ya elaborado ({{ contrato.folio }}) se sustituye mientras no se envíe.{% endif %}</div>
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">{% if contrato %}Rehacer el contrato{% else %}Elaborar el contrato{% endif %}</button></div>
+      </form>
+      {% else %}
+      <div class="alert alert-warning small" data-prueba="sin-modelo-validado">No hay un modelo de {{ tipo }} validado para {{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }}. {% if todos %}Los registrados esperan la validación de la Unidad Jurídica:
+        <ul class="mb-0">{% for m in todos %}<li><a href="{% url 'contrato:modelo' m.pk %}">{{ m.nombre }}</a> — {{ m.vigente.get_estado_display }}</li>{% endfor %}</ul>{% else %}Registre uno en <a href="{% url 'contrato:modelos' %}">Modelos de contrato</a>.{% endif %}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

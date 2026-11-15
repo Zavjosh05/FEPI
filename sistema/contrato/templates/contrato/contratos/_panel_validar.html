@@ -1,0 +1,6 @@
+<div class="tarjeta mb-3 border-primary" data-prueba="panel-modelos-por-validar">
+  <div class="titulo-seccion">Modelos de contrato por validar ({{ panel.modelos|length }})</div>
+  <ul class="small mb-0">{% for m in panel.modelos %}
+    <li><a href="{% url 'contrato:modelo' m.pk %}">{{ m.nombre }}</a> · {{ m.ejercicio.programa.clave }} {{ m.ejercicio.anio }} · versión {{ m.vigente.numero }}</li>
+  {% endfor %}</ul>
+</div>

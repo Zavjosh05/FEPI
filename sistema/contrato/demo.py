@@ -4,20 +4,25 @@ que la interfaz. Las de CC aprobadas las deja ``dictamen/demo.py``.
 
 HU-3.1: PS y RHF ya publicaron sus resultados (a distintas horas); en PS la Delegación notificó el resultado
 y la cita de la primera solicitud, y en RHF solo el resultado; lo demás queda por notificar. PSAHEM y CC
-quedan con el acta que autoriza publicar, para mostrar la pantalla de publicación."""
+quedan con el acta que autoriza publicar, para mostrar la pantalla de publicación.
+
+HU-3.2: PS y RHF tienen un modelo de Contrato de Adhesión validado por la Unidad Jurídica; CC, PS y PSAHEM tienen
+además la plantilla base («BORRADOR – modelo por validar») por validar. El contrato de Plantación Los Pinos (PS)
+está elaborado y enviado a la Delegación; el de Barranca Honda (RHF), elaborado y por enviar; Ojo de Agua (RHF)
+está notificada y por elaborar."""
 from datetime import timedelta
 
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 
-from contrato import publicacion
-from contrato.models import Publicacion
+from contrato import contratos, publicacion
+from contrato.models import Contrato, ModeloContrato, Publicacion, TipoModelo
 from dictamen import aprobacion, juridico, sesiones, tecnico
 from dictamen.demo import _validada
 from dictamen.models import SesionComite, TipoSesion
 from nucleo.demo import _pdf_demo
-from nucleo.models import Ejercicio, Usuario
+from nucleo.models import Ejercicio, Expediente, Usuario
 
 # programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas)]
 SOLICITUDES = {
@@ -56,6 +61,7 @@ def cargar_demo():
         aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.",
                                   momento=fecha + timedelta(minutes=30))
     creadas += _publicaciones(u)
+    creadas += _contratos(u)
     return creadas
 
 
@@ -87,3 +93,47 @@ def _publicaciones(u):
 
 def _delegacion(u, expediente):
     return next(x for x in u.values() if x.unidad_id == expediente.delegacion_id)
+
+
+def _modelo_validado(u, ejercicio, nombre):
+    """Modelo de Contrato de Adhesión de demostración, registrado por el área responsable y validado por la UJ."""
+    existente = ModeloContrato.objects.filter(ejercicio=ejercicio, nombre=nombre).first()
+    if existente:
+        return existente
+    texto = contratos.PLANTILLAS_BASE[TipoModelo.CONTRATO_ADHESION].replace(contratos.MARCA_BORRADOR, "").strip()
+    m = contratos.registrar_modelo(u["dir_drff"], ejercicio, TipoModelo.CONTRATO_ADHESION, nombre, texto)
+    contratos.validar_version(u["juridica"], m.vigente, "Cláusulas revisadas contra las Reglas de Operación 2026 (demostración).")
+    return m
+
+
+def _contratos(u):
+    """HU-3.2: modelos (uno validado y otro por validar), y contratos en distintos puntos (idempotente)."""
+    hechos = 0
+    drff = u["dir_drff"]
+    for clave in ("PS", "RHF", "PSA", "CC"):
+        ejercicio = Ejercicio.objects.filter(programa__clave=clave, reglas_cargadas__isnull=False).order_by("-anio").first()
+        if ejercicio is None:
+            continue
+        if clave in ("PS", "RHF"):
+            _modelo_validado(u, ejercicio, f"Contrato de Adhesión {clave} {ejercicio.anio} (modelo de demostración)")
+        if clave != "RHF" and not ModeloContrato.objects.filter(ejercicio=ejercicio, es_base=True).exists():
+            contratos.crear_plantilla_base(drff, ejercicio)
+            hechos += 1
+    for clave, predio, enviar in (("PS", "Plantación Los Pinos", True), ("RHF", "Barranca Honda", False)):
+        exp = Expediente.objects.filter(ejercicio__programa__clave=clave, predio__nombre=predio).first()
+        if exp is None or Contrato.objects.filter(expediente=exp).exists() or exp.estado.clave != "notificada":
+            continue
+        modelo = contratos.modelos_elegibles(exp)[0]
+        contrato = contratos.elaborar_contrato(drff, exp, modelo)
+        if enviar:
+            contratos.enviar_a_delegacion(drff, contrato)
+        hechos += 1
+    # Ojo de Agua (RHF): la Delegación ya notificó el resultado y falta elaborar su contrato.
+    ojo = Expediente.objects.filter(ejercicio__programa__clave="RHF", predio__nombre="Ojo de Agua",
+                                    estado__clave="publicada").first()
+    if ojo is not None:
+        n = ojo.notificaciones.get(tipo="resultados")
+        publicacion.registrar_entrega(_delegacion(u, ojo), n, "correo", fecha_hora=_despues(n.enviada_en, 50),
+                                      observaciones="Notificado por correo electrónico (demostración).")
+        hechos += 1
+    return hechos

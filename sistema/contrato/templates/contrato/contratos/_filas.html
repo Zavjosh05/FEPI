@@ -1,0 +1,9 @@
+{% if filas %}
+<div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+  <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Programa</th><th></th></tr></thead>
+  <tbody>{% for e in filas %}
+  <tr><td class="fw-semibold text-nowrap">{{ e.folio }}</td><td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+    <td>{{ e.ejercicio.programa.clave }} {{ e.ejercicio.anio }}</td>
+    <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% if accion == 'Elaborar' %}{% url 'contrato:elaborar' e.folio %}{% else %}{% url 'recepcion:expediente' e.folio %}?pestana=contrato{% endif %}">{{ accion }}</a></td></tr>
+  {% endfor %}</tbody></table></div>
+{% else %}<div class="small text-secondary">{{ vacio }}</div>{% endif %}

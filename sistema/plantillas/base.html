@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="{% static 'css/probosque.css' %}">
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-<nav class="navbar navbar-expand-lg navbar-dark barra-probosque">
+<nav class="navbar navbar-expand-xl navbar-dark barra-probosque">
   <div class="container-fluid contenedor">
     <a class="navbar-brand" href="{% url 'nucleo:bandeja' %}">
-      <span class="marca">PROBOSQUE</span> <span class="d-none d-sm-inline">Sistema de programas</span>
+      <span class="marca">PROBOSQUE</span> <span class="d-none d-xxl-inline">Sistema de programas</span>
     </a>
     {% if user.is_authenticated %}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Menú">
@@ -32,7 +32,7 @@
       <div class="d-flex align-items-center gap-3 text-white small usuario-barra">
         <div class="text-end lh-sm">
           <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
-          <div class="opacity-75" data-prueba="unidad">{{ unidad_actual.nombre|default:"Sin unidad" }}</div>
+          <div class="opacity-75 text-truncate unidad-barra" data-prueba="unidad" title="{{ unidad_actual.nombre }}">{{ unidad_actual.nombre|default:"Sin unidad" }}</div>
         </div>
         <form method="post" action="{% url 'nucleo:salir' %}">{% csrf_token %}
           <button class="btn btn-sm btn-outline-light" type="submit">Salir</button>

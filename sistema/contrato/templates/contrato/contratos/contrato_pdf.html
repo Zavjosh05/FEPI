@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ folio }}</title>
+<style>
+  @page { size: letter; margin: 2cm 2cm 2.2cm 2cm;
+    @bottom-center { content: "{{ folio }} · página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; color: #1d1d1d; line-height: 1.45; }
+  .encabezado { border-bottom: 2px solid #1f5130; padding-bottom: 6px; margin-bottom: 14px; }
+  .encabezado .org { font-size: 9pt; color: #1f5130; font-weight: bold; letter-spacing: .5px; }
+  .encabezado h1 { font-size: 15pt; margin: 4px 0 0 0; }
+  .folio { float: right; text-align: right; font-size: 9pt; }
+  .folio strong { font-size: 12pt; display: block; }
+  .borrador { border: 2px solid #b02a37; color: #b02a37; font-weight: bold; text-align: center; padding: 6px; margin: 0 0 12px 0; font-size: 11pt; }
+  p { text-align: justify; margin: 0 0 9px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 9pt; }
+  th { background: #eef3ef; }
+  .datos th { width: 32%; background: none; font-weight: normal; color: #444; }
+  .firmas { margin-top: 56px; width: 100%; page-break-inside: avoid; }
+  .firmas td { border: none; width: 50%; text-align: center; padding-top: 34px; }
+  .firmas span { border-top: 1px solid #333; display: inline-block; width: 82%; padding-top: 3px; font-size: 8.5pt; }
+  .pie { margin-top: 16px; font-size: 7.5pt; color: #666; }
+</style>
+</head>
+<body>
+  <div class="encabezado">
+    <div class="folio">Folio<strong>{{ folio }}</strong>{{ fecha|date:"d/m/Y H:i" }} h</div>
+    <div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+    <h1>{{ tipo }}</h1>
+  </div>
+  {% for p in parrafos %}<p>{% if forloop.first and "BORRADOR" in p %}<span class="borrador" style="display:block">{{ p }}</span>{% else %}{{ p|linebreaksbr }}{% endif %}</p>{% endfor %}
+  <table class="datos">
+    <tr><th>Solicitud</th><td>{{ expediente.folio }} · {{ expediente.ejercicio.programa.nombre }} {{ expediente.ejercicio.anio }}</td></tr>
+    <tr><th>Persona beneficiaria</th><td>{{ expediente.solicitante.nombre }}{% if expediente.solicitante.representante %} · representante: {{ expediente.solicitante.representante }}{% endif %}</td></tr>
+    <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
+    <tr><th>Delegación</th><td>{{ expediente.delegacion.nombre }}</td></tr>
+    <tr><th>Modalidad</th><td>{{ datos.modalidad }}</td></tr>
+    <tr><th>Superficie aprobada</th><td>{{ datos.superficie_ha }} ha</td></tr>
+    <tr><th>Monto total del apoyo</th><td>{{ datos.monto_total }} ({{ datos.monto_por_hectarea }} por hectárea){% if regimen %} · régimen {{ regimen }}{% endif %}</td></tr>
+    <tr><th>Plazo de firma</th><td>{{ datos.plazo_firma }}</td></tr>
+  </table>
+  {% if ministraciones %}
+  <table>
+    <thead><tr><th>Ministración</th><th>Porcentaje</th><th>Importe</th><th>Condición</th></tr></thead>
+    <tbody>{% for m in ministraciones %}<tr><td>{{ m.numero }}</td><td>{{ m.porcentaje }} %</td><td>{{ m.importe }}</td><td>{{ m.condicion|truncatechars:200 }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+  <table class="firmas"><tr>
+    <td><span>Por PROBOSQUE<br>{{ expediente.delegacion.nombre }}</span></td>
+    <td><span>La persona beneficiaria<br>{{ expediente.solicitante.nombre }}</span></td>
+  </tr></table>
+  <div class="pie">Modelo: {{ version.modelo.nombre }}, versión {{ version.numero }} · validado por la Unidad Jurídica el {{ validada_en|date:"d/m/Y H:i" }} h{% if version.observaciones %} · observaciones: {{ version.observaciones|truncatechars:160 }}{% endif %}.
+    Documento generado por el Sistema de programas de PROBOSQUE.</div>
+</body>
+</html>
