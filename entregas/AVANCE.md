@@ -83,9 +83,9 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | Tarea | Qué | Depende de | Estado | Commit |
 | --- | --- | --- | --- | --- |
 | S2-00 | Subir la rama `prototipos` con el sprint 1 al repositorio remoto | Indicación de Joshua | Hecho | 14-nov, 17 commits |
-| S2-01a | Reglas de Plantaciones Sustentables desde las ROP (`reglas/PS.json`) | — (en paralelo) | En curso | |
+| S2-01a | Reglas de Plantaciones Sustentables desde las ROP (`reglas/PS.json`) | — (en paralelo) | Hecho | `c979a30` |
 | S2-01b | Reglas de Restauración Hidrológico-Forestal (`reglas/RHF.json`) | — (en paralelo) | En curso | |
-| S2-01c | Reglas de PSAHEM (`reglas/PSA.json`) | — (en paralelo) | En curso | |
+| S2-01c | Reglas de PSAHEM (`reglas/PSA.json`) | — (en paralelo) | Hecho | `a8dad5c` |
 | S2-02 | Base de M3 y M5: notificaciones en el núcleo, montos y ministraciones, evento que arranca cada plazo, estados nuevos | S2-01 | Pendiente | |
 | S2-03 | HU-3.1 Publicación y notificaciones | S2-02 | Pendiente | |
 | S2-04 | HU-3.2 Elaboración del contrato (modelo validado por Jurídico) | S2-02 | Pendiente | |
@@ -94,8 +94,8 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-07 | HU-5.1 Solicitud de pago | S2-05 | Pendiente | |
 | S2-08 | HU-5.2 Pago de la ministración | S2-07 | Pendiente | |
 | S2-09 | HU-5.3 Entrega de cheques (PSAHEM) | S2-08 | Pendiente | |
-| S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | En curso | |
-| S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | Pendiente | |
+| S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | Hecho | `9254478` |
+| S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | En curso | |
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
 | S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Pendiente | |
 | S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Pendiente | |
