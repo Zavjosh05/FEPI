@@ -3,7 +3,7 @@
 Prototipo del sprint 1 (módulos M1, Recepción y expediente, y M2, Dictamen y Comité) del sistema que lleva el trámite de los
 seis programas de apoyo de PROBOSQUE: Capturando Carbono (CC), Manejo Forestal Sustentable (MFS),
 Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), PSAHEM (PSA) y
-Guardabosques (PEG). En este sprint solo CC tiene reglas cargadas; los demás existen en el catálogo.
+Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG existen en el catálogo sin archivo de reglas.
 
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
@@ -64,7 +64,7 @@ Cada criterio de aceptación tiene al menos una prueba con el ID de su historia 
 (`pruebas/test_hu_1_1.py` … `test_hu_2_4.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
 Los recorridos de Playwright están en `pruebas/e2e/` (uno por historia; los de M2 en archivos
 `test_recorrido_hu_2_*.py`) y corren con Chromium en español de México (`--lang=es-MX`, zona horaria de
-la Ciudad de México). Los programas sin archivo de reglas (PEG y PSAHEM) se prueban con fixtures
+la Ciudad de México). PEG, que no tiene archivo de reglas, se prueba con fixtures
 (`pruebas/fixtures_m2.py`) que crean su programa-ejercicio, su plazo y sus ministraciones.
 
 ## Usuarios de demostración
@@ -366,6 +366,18 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   `ajustes_reglas.<CLAVE>.regimen_pago`: CC por superficie (100 % hasta 5 ha; 70 y 30 arriba), PS y RHF por
   modalidad, PSAHEM fijo (70 y 30). La última ministración absorbe el redondeo. La propuesta de listados
   del Comité (HU-2.3) ya usa este servicio.
+- **M1 y M2 con PS, RHF y PSAHEM.** El recorrido completo corre en los cuatro programas con reglas. Lo que
+  se corrigió por estar pensado para CC: el rango de superficie se lee por modalidad (`nucleo/reglas.py`,
+  `rango_superficie`: por concepto en PS, por cuenca en PSAHEM con máximo mayor si hay FSC, sin máximo en RHF),
+  en la lista de verificación y en el análisis cartográfico del dictamen técnico; el Comité de PSAHEM se lee
+  de `instancias.comite_tecnico` (Comité Técnico del FIPASAHEM); el registro rechaza en el servicio, no solo
+  en el formulario, las modalidades no seleccionables. Lo que ya funcionaba sin cambios: los requisitos que
+  no son documentos (PS, RHF y PSAHEM los marcan en sus reglas con `requiere_documento: false`), los plazos de
+  faltantes y de dictaminación (cada programa tiene el suyo) y las modalidades no seleccionables de PSAHEM
+  (fondos concurrentes y refrendo, marcadas en sus reglas). PSAHEM no trae `convocatoria_sesion_comite`: la
+  convocatoria de su Comité Técnico no valida anticipación mientras no se tenga su Reglamento Interno (R-14).
+  La priorización del Comité (`datos/dictamen.json`) solo tiene criterios de CC; en los demás programas se
+  ordena por fecha y hora de registro.
 
 ## Diferencias con la especificación (mandan las ROP)
 
@@ -400,14 +412,14 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   convocatoria.
 - Clave INEGI de los municipios (la capa de IDEFOR no la trae).
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
-- Reglas de MFS, PS, RHF, PSA y PEG (archivos `reglas/<CLAVE>.json`).
+- Reglas de MFS y PEG (archivos `reglas/<CLAVE>.json`).
 
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
   dictamen), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
-- `pruebas/test_sprint_1_recorrido_completo.py`: una sola solicitud recorre el registro, los requisitos, el
+- `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
   aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
   queda, el acuse y el renglón de la bitácora.

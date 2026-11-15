@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from nucleo import dias_habiles
+from nucleo import dias_habiles, reglas
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
 from recepcion import geometria
@@ -18,16 +18,18 @@ RESPUESTAS = {"si": "Cumple", "no": "No cumple", "na": "No aplica"}
 
 
 # ----------------------------------------------------------------------------- lista de verificación
-def lista_verificacion(ejercicio):
-    """Criterios del programa (de las reglas) como lista de verificación para el dictamen técnico."""
+def lista_verificacion(ejercicio, modalidad=None):
+    """Criterios del programa (de las reglas) como lista de verificación para el dictamen técnico. El rango de
+    superficie es el de la modalidad (concepto en PS, cuenca en PSAHEM) si las reglas lo distinguen."""
     datos = ejercicio.datos or {}
     items = []
     sup = datos.get("superficie")
     if sup:
+        rango = reglas.rango_superficie(ejercicio, modalidad)
         items.append({"clave": "superficie", "grupo": "Superficie",
-                      "texto": f"Superficie de {sup.get('minima_ha')} a {sup.get('maxima_ha')} ha"
+                      "texto": rango["texto"]
                                + (f"; edad mínima {sup['edad_minima_anios']} años" if sup.get("edad_minima_anios") else ""),
-                      "numeral": sup.get("numeral", ""), "automatico": True})
+                      "numeral": rango["numeral"], "automatico": True})
     for i, c in enumerate(datos.get("criterios_elegibilidad_tecnica", []), 1):
         items.append({"clave": f"elegibilidad-{i}", "grupo": "Criterios técnicos de elegibilidad",
                       "texto": c["texto"], "numeral": c.get("numeral", "")})
@@ -47,7 +49,7 @@ def analisis_cartografico(expediente):
     poligono = expediente.poligonos.filter(vigente=True).first()
     resultado = {"tiene_poligono": poligono is not None, "usa_poligono": expediente.programa.usa_poligono,
                  "traslapes": []}
-    sup = (expediente.ejercicio.datos or {}).get("superficie") or {}
+    sup = reglas.rango_superficie(expediente.ejercicio, expediente.modalidad)
     if poligono is None:
         return resultado
     ubicacion, aviso = geometria.ubicacion_en_municipio(poligono.geom, expediente.predio.municipio)
@@ -56,8 +58,9 @@ def analisis_cartografico(expediente):
         "ubicacion_municipio": ubicacion, "aviso_municipio": aviso, "municipio": expediente.predio.municipio.nombre,
         "superficie_minima_ha": sup.get("minima_ha"), "superficie_maxima_ha": sup.get("maxima_ha"),
     })
-    if sup.get("minima_ha") is not None and sup.get("maxima_ha") is not None:
-        resultado["superficie_en_rango"] = sup["minima_ha"] <= float(poligono.superficie_ha) <= sup["maxima_ha"]
+    dentro = reglas.en_rango(sup, poligono.superficie_ha)
+    if dentro is not None:
+        resultado["superficie_en_rango"] = dentro
     otros = (Poligono.objects.filter(vigente=True, expediente__ejercicio=expediente.ejercicio,
                                      geom__intersects=poligono.geom)
              .exclude(expediente=expediente).select_related("expediente__predio"))
@@ -137,7 +140,7 @@ def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superf
         raise ValidationError("El dictamen técnico debe llevar su motivo.")
     verificacion = verificacion or {}
     items = []
-    for item in lista_verificacion(expediente.ejercicio):
+    for item in lista_verificacion(expediente.ejercicio, expediente.modalidad):
         respuesta = verificacion.get(item["clave"], {})
         items.append({**item, "respuesta": respuesta.get("respuesta", ""), "nota": respuesta.get("nota", "")})
     if exigir_revision:

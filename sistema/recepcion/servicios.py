@@ -102,6 +102,9 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
         )
     if datos.modalidad is not None and datos.modalidad.ejercicio_id != datos.ejercicio.pk:
         raise ValidationError("La modalidad no pertenece al programa elegido.")
+    if datos.modalidad is not None and not datos.modalidad.seleccionable:
+        raise ValidationError(f"«{datos.modalidad.nombre}» no se elige al registrar la solicitud "
+                              "(es un régimen de pago, el refrendo u otro caso que el sistema maneja aparte).")
     with transaction.atomic():
         if datos.predio_existente:
             predio = datos.predio_existente

@@ -25,7 +25,7 @@ def dictaminar(request, folio):
     if hasattr(exp, "dictamen_tecnico") or exp.estado.clave != "validada":
         messages.info(request, "No hay dictamen técnico pendiente para este expediente.")
         return redirect(destino)
-    items = tecnico.lista_verificacion(exp.ejercicio)
+    items = tecnico.lista_verificacion(exp.ejercicio, exp.modalidad)
     form = DictamenTecnicoForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         verificacion = {i["clave"]: {"respuesta": request.POST.get(f"v-{i['clave']}", ""),

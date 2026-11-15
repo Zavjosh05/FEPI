@@ -19,15 +19,18 @@ from .models import CaracterSesion, DocumentoSesion, EstadoSesion, SesionComite
 
 
 def integrantes_comite(ejercicio):
-    """Integrantes del Comité del programa: de las reglas (CC.json, instancias.comite) o de reglas/catalogos.json."""
+    """Integrantes del Comité del programa: de las reglas (``instancias.comite``; en PSAHEM
+    ``instancias.comite_tecnico``, el Comité Técnico del FIPASAHEM) o de reglas/catalogos.json."""
     from django.conf import settings
 
-    comite = ((ejercicio.datos or {}).get("instancias") or {}).get("comite")
+    instancias = (ejercicio.datos or {}).get("instancias") or {}
+    comite = instancias.get("comite") or instancias.get("comite_tecnico")
     if comite:
         return {
             "nombre": comite.get("nombre", ""), "fundamento": f"{comite.get('numeral', '')} (línea {comite.get('linea', '')})",
             "presidencia": comite.get("presidencia", ""), "secretaria_tecnica": comite.get("secretaria_tecnica", ""),
             "vocales": comite.get("vocales_con_voz_y_voto", []), "invitados": comite.get("invitados_especiales_solo_voz", []),
+            "composicion": comite.get("integracion", ""),
         }
     catalogo = leer_json(settings.REGLAS_DIR / "catalogos.json")
     clave = {"PSA": "PSAHEM"}.get(ejercicio.programa.clave, ejercicio.programa.clave)
