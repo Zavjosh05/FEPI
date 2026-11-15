@@ -21,6 +21,8 @@ DATOS = SITIO / "datos"
 ARCHIVO_UNICO = RAIZ / "docs" / "mapa_edomex.html"
 SERIE = RAIZ / "resultados" / "edomex_serie_2023_2025"
 CAPTURAS = RAIZ / "entregas" / "sprint_1" / "capturas"
+CAPTURAS_S2 = RAIZ / "entregas" / "sprint_2" / "capturas"
+PRELIMINAR = RAIZ / "resultados" / "edomex_2025_2026_sepoct"
 VIEWPORT = {"width": 1366, "height": 900}
 
 
@@ -32,6 +34,7 @@ class _Silencioso(SimpleHTTPRequestHandler):
 @pytest.fixture(scope="session", autouse=True)
 def _carpeta_capturas():
     CAPTURAS.mkdir(parents=True, exist_ok=True)
+    CAPTURAS_S2.mkdir(parents=True, exist_ok=True)
 
 
 def redondeo(x):

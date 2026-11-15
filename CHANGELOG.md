@@ -4,6 +4,25 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.9.0] - 2026-11-14
+
+Sprint 2 de la Calculadora: balance entre dos años con su histograma (HU-7.2, necesidad CF-DEV-02
+de las Tablas v12, M7.2) y pérdida por incendios (HU-7.3, CF-DEV-03, M7.3).
+
+### Agregado
+
+- **Balance del periodo** (HU-7.2), tarjeta en el modo "Comparar años" que cambia con el par de
+  años y con el municipio elegido (sin elegir, el Estado): una cascada del balance en hectáreas
+  (pérdida por incendio y otras pérdidas hacia abajo, ganancia hacia arriba, cambio neto; parte de
+  cero = bosque inicial, no de un eje truncado) y un histograma de los municipios según su cambio
+  neto en %, en 12 intervalos fijos simétricos alrededor de 0 (el municipio elegido, resaltado, y
+  cuántos ganan y cuántos pierden). Solo cuentan los municipios con 500 ha o más de bosque inicial
+  (70 en 2023→2024); la página dice cuántos no entran. Texto alternativo y tabla equivalente en cada
+  gráfica; aviso en el periodo preliminar. Mismos colores de pérdida por incendio, otras pérdidas y
+  ganancia que el resto de la página. Funciona en el sitio y en el archivo único.
+- `pruebas/calculadora/test_hu_7_2_balance_entre_dos_anios.py` (12 pruebas) y capturas en
+  `entregas/sprint_2/capturas/hu_7_2_*.png` (claro, oscuro y móvil).
+
 ## [0.8.0] - 2026-11-13
 
 Masa forestal por año (HU-7.1, necesidad CF-DEV-01 de las Tablas de necesidades v12, M7.1): la

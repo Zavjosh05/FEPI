@@ -302,6 +302,11 @@ En los dos:
   vista, la gráfica del bosque del Estado de cada año de la serie (un punto y su cifra por año, con
   la recta de tendencia) y una tabla con el bosque, el % de la zona forestal y el cambio respecto
   del año anterior. «ver» abre ese año en el modo "Un año". La de cada municipio está en su detalle.
+- **Balance del periodo** (HU-7.2, CF-DEV-02 de las Tablas v12; solo en "Comparar años"): la
+  cascada del balance (pérdida por incendio, otras pérdidas, ganancia y cambio neto, en hectáreas)
+  del Estado o del municipio elegido, y el histograma de los municipios con 500 ha o más de bosque
+  inicial según su cambio neto en % (intervalos de 2 puntos, de −10 a +10, abiertos en los
+  extremos), con el municipio elegido resaltado. Cada gráfica trae su tabla equivalente.
 - **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
   por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
   años" muestra los años de la comparación elegida.

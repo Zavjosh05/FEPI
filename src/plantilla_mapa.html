@@ -208,6 +208,21 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 .evolucion tbody tr[aria-current="true"] { background: var(--hover); box-shadow: inset 3px 0 0 var(--accent); }
 .evolucion td button { font: 600 .95rem var(--f-texto); color: var(--accent); background: none; border: 0; padding: 0 0 0 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .evolucion .pie-graf { margin: 6px 0 0; font-size: .82rem; color: var(--ink-3); }
+/* Balance del periodo (HU-7.2): cascada del balance y histograma de municipios */
+.balance { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.balance .aviso { grid-column: 1 / -1; }
+.balance h3 { margin-bottom: 2px; }
+.balance .grafica { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.balance .grafica svg { display: block; width: 100%; height: auto; max-height: 240px; overflow: visible; }
+.balance .eje text { fill: var(--ink-3); font: .75rem var(--f-texto); font-variant-numeric: tabular-nums; }
+.balance .cero { stroke: var(--ink-3); stroke-width: 1; }
+.balance .rotulo { fill: var(--ink-2); font: 600 .78rem var(--f-texto); font-variant-numeric: tabular-nums; }
+.balance .barra-b.sel { stroke: var(--sel); stroke-width: 2.5; }
+.balance .barra-neto { fill: var(--ink-3); }
+.balance details { font-size: .88rem; }
+.balance summary { cursor: pointer; color: var(--accent); width: fit-content; }
+.balance details table { margin-top: 6px; }
+@media (max-width: 760px) { .balance { grid-template-columns: minmax(0, 1fr); } }
 /* Carga diferida: aviso de "cargando" sobre el mapa y mensaje si un archivo falla */
 .cargando { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: .88rem; box-shadow: 0 4px 12px rgba(0, 0, 0, .1); z-index: 3; }
 .falla { background: var(--falla-bg); color: var(--falla-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
@@ -252,6 +267,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   <div class="aviso" id="aviso" role="note" hidden></div>
 
   <section class="tarjeta evolucion" id="evolucion" aria-labelledby="evolucion-titulo" hidden></section>
+
+  <section class="tarjeta evolucion balance" id="balance" aria-labelledby="balance-titulo" hidden></section>
 
   <div class="principal">
     <div class="tarjeta mapa-tarjeta">
@@ -502,7 +519,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     if (yo !== turno) return;
     ocultarFalla();
     Object.assign(st, nuevo);
-    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); } else pintarTodo();
+    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); pintarBalance(); } else pintarTodo();
   }
 
   // ---------- Cabecera ----------
@@ -656,7 +673,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   window.addEventListener("resize", () => {
     pintarEscala(d3.zoomTransform(svg.node()).k);
     const angosta = document.getElementById("evolucion").clientWidth < 700;
-    if (pintado && angosta !== anchoEvolucion) pintarEvolucion();
+    if (pintado && angosta !== anchoEvolucion) { pintarEvolucion(); pintarBalance(); }
     anchoEvolucion = angosta;
   });
 
@@ -907,6 +924,83 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     }));
   }
 
+  // ---------- Balance del periodo (HU-7.2 / CF-DEV-02): cascada e histograma ----------
+  // Cascada: parte de cero (= bosque inicial); pérdidas hacia abajo, ganancia hacia arriba, y la
+  // última barra es el cambio neto. Histograma: los municipios con bosque suficiente, por su cambio
+  // neto en %, en intervalos fijos de 2 puntos simétricos alrededor de 0 (el primero y el último abiertos).
+  const BORDES_HIST = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
+  const binDe = v => { let k = 0; while (k < BORDES_HIST.length && v >= BORDES_HIST[k]) k++; return k; };  // 0..11
+  const sgn = e => (e < 0 ? "−" : "") + Math.abs(e);
+  const etqBin = k => k === 0 ? "menos de −10 %" : k === BORDES_HIST.length ? "10 % o más" : `${sgn(BORDES_HIST[k - 1])} a ${sgn(BORDES_HIST[k])} %`;
+  function histograma(p) {
+    const cuentas = new Array(BORDES_HIST.length + 1).fill(0);
+    let sin = 0;
+    for (const f of Object.values(p.filas)) { const v = pct(f); if (v == null) sin++; else cuentas[binDe(v)]++; }
+    return { cuentas, sin, total: cuentas.reduce((a, b) => a + b, 0) };
+  }
+  function pintarBalance() {
+    const el = document.getElementById("balance");
+    if (enAnio()) { el.hidden = true; return; }
+    el.hidden = false;
+    const p = P(), f = st.sel ? p.filas[st.sel] : null;
+    const quien = st.sel || D.titulo;
+    const v = f ? { base: f[I.base], inc: f[I.inc], otras: f[I.otras], gan: f[I.gan], actual: f[I.actual], neto: f[I.neto] }
+                : { base: p.tot.base, inc: p.tot.inc, otras: p.tot.otras, gan: p.tot.gan, actual: p.tot.actual, neto: p.tot.actual - p.tot.base };
+    const angosta = el.clientWidth < 700, w = angosta ? 340 : 400, h = 210;
+    // --- cascada ---
+    const b1 = -v.inc, b2 = b1 - v.otras, b3 = b2 + v.gan;
+    const barras = [
+      { n: "Incendio", a: 0, b: b1, tok: "--c-incendio", val: -v.inc },
+      { n: "Otras pérdidas", a: b1, b: b2, tok: "--c-otra", val: -v.otras },
+      { n: "Ganancia", a: b2, b: b3, tok: "--c-ganancia", val: v.gan },
+      { n: "Cambio neto", a: 0, b: v.neto, neto: true, val: v.neto },
+    ];
+    const m = { l: 8, r: 8, t: 26, b: 34 };
+    const cotas = barras.flatMap(b => [b.a, b.b]).concat([0]);
+    const lo = Math.min(...cotas), hi = Math.max(...cotas), pad = Math.max((hi - lo) * 0.14, 1);
+    const y = d3.scaleLinear().domain([lo - pad, hi + pad]).range([h - m.b, m.t]);
+    const x = d3.scaleBand().domain(barras.map(b => b.n)).range([m.l, w - m.r]).padding(0.28);
+    const cascada = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Balance de ${esc(quien)}, ${esc(p.etiqueta)}: bosque inicial ${n0(v.base)} hectáreas; pérdida por incendio ${n0(v.inc)}; otras pérdidas ${n0(v.otras)}; ganancia ${n0(v.gan)}; bosque final ${n0(v.actual)}; cambio neto ${signo(v.neto)} hectáreas.">
+      <g class="eje">${barras.map(b => `<text x="${x(b.n) + x.bandwidth() / 2}" y="${h - 14}" text-anchor="middle">${b.n}</text>`).join("")}</g>
+      <line class="cero" x1="${m.l}" x2="${w - m.r}" y1="${y(0)}" y2="${y(0)}"></line>
+      ${barras.map(b => {
+        const y0 = Math.min(y(b.a), y(b.b)), alto = Math.max(Math.abs(y(b.a) - y(b.b)), 1.5);
+        const ty = b.val >= 0 ? y0 - 6 : y0 + alto + 13;
+        return `<rect class="barra-b ${b.neto ? "barra-neto" : ""}" data-barra="${b.n}" data-ha="${Math.round(b.val)}" x="${x(b.n)}" y="${y0}" width="${x.bandwidth()}" height="${alto}" ${b.neto ? "" : `style="fill:var(${b.tok})"`}><title>${b.n}: ${signo(b.val)} ha</title></rect>
+          <text class="rotulo" x="${x(b.n) + x.bandwidth() / 2}" y="${ty}" text-anchor="middle">${signo(b.val)}</text>`;
+      }).join("")}
+    </svg>`;
+    // --- histograma ---
+    const hs = histograma(p), nb = hs.cuentas.length;
+    const hm = { l: 8, r: 8, t: 22, b: 40 };
+    const hx = d3.scaleBand().domain(d3.range(nb)).range([hm.l, w - hm.r]).padding(0.1);
+    const paso = hx.step();
+    const hy = d3.scaleLinear().domain([0, Math.max(...hs.cuentas, 1)]).range([h - hm.b, hm.t]);
+    const vsel = f ? pct(f) : null, bsel = vsel == null ? -1 : binDe(vsel);
+    const bordes = angosta ? [-10, -6, -2, 0, 2, 6, 10] : BORDES_HIST;
+    const hist = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Histograma de ${hs.total} municipios según su cambio neto de bosque, ${esc(p.etiqueta)}: ${hs.cuentas.map((c, k) => `${etqBin(k)}, ${c}`).join("; ")}.">
+      <line class="cero" x1="${hm.l}" x2="${w - hm.r}" y1="${h - hm.b}" y2="${h - hm.b}"></line>
+      ${hs.cuentas.map((c, k) => `<rect class="barra-b${k === bsel ? " sel" : ""}" data-bin="${k}" data-n="${c}" x="${hx(k)}" y="${hy(c)}" width="${hx.bandwidth()}" height="${h - hm.b - hy(c)}" style="fill:var(${k < 6 ? "--div-1" : "--div-5"})"><title>${etqBin(k)}: ${c} municipio${c === 1 ? "" : "s"}</title></rect>${c ? `<text class="rotulo" x="${hx(k) + hx.bandwidth() / 2}" y="${hy(c) - 5}" text-anchor="middle">${c}</text>` : ""}`).join("")}
+      <g class="eje">${bordes.map(e => `<text x="${hx(BORDES_HIST.indexOf(e)) + paso - (paso - hx.bandwidth()) / 2}" y="${h - hm.b + 14}" text-anchor="middle">${sgn(e)}</text>`).join("")}
+        <text x="${w / 2}" y="${h - 4}" text-anchor="middle">Cambio neto del municipio (% de su bosque inicial)</text></g>
+    </svg>`;
+    const pierden = hs.cuentas.slice(0, 6).reduce((a, b) => a + b, 0), ganan = hs.total - pierden;
+    const infoSel = st.sel ? (vsel == null ? ` ${esc(st.sel)} tiene menos de ${nf.format(D.minimo)} ha de bosque inicial: su porcentaje no se calcula y no entra en el histograma.`
+      : ` ${esc(st.sel)}: ${pctTxt(vsel)}, en la barra resaltada (${etqBin(bsel)}).`) : "";
+    el.innerHTML = `<header><h2 id="balance-titulo">Balance del periodo · ${esc(p.etiqueta)}${p.preliminar ? " (preliminar)" : ""}</h2>
+        <p id="balance-resumen">${esc(quien)}: bosque inicial ${ha(v.base)} (${p.base_txt}) → bosque final ${ha(v.actual)} (${p.actual_txt}); cambio neto ${signo(v.neto)} ha${v.base >= D.minimo ? ` (${pctTxt(v.neto / v.base * 100)})` : ""}. ${st.sel ? "Quita la selección para ver el Estado." : "Elige un municipio para ver el suyo."}</p></header>
+      ${p.preliminar ? `<div class="aviso" id="balance-aviso" role="note"><p>Preliminar: es otra temporada (${esc(p.meses)}) y usa su propio umbral; estas hectáreas no se comparan con las de los balances anuales de noviembre-diciembre.</p></div>` : ""}
+      <div class="grafica" id="cascada"><h3>Pérdidas y ganancia en hectáreas</h3>${cascada}
+        <p class="pie-graf">Las barras parten de cero, que es el bosque inicial; la última es el cambio neto.</p>
+        <details><summary>Ver como tabla</summary><table id="tabla-balance"><thead><tr><th>Concepto</th><th>Hectáreas</th></tr></thead><tbody>
+          <tr><td>Bosque inicial</td><td>${n0(v.base)}</td></tr><tr><td>Pérdida por incendio</td><td>${signo(-v.inc)}</td></tr>
+          <tr><td>Otras pérdidas</td><td>${signo(-v.otras)}</td></tr><tr><td>Ganancia</td><td>${signo(v.gan)}</td></tr>
+          <tr><td>Bosque final</td><td>${n0(v.actual)}</td></tr><tr><td>Cambio neto</td><td>${signo(v.neto)}</td></tr></tbody></table></details></div>
+      <div class="grafica" id="histograma"><h3>Municipios según su cambio neto</h3>${hist}
+        <p class="pie-graf" id="hist-resumen">${pierden} pierden bosque y ${ganan} ganan, de ${hs.total} municipios con ${nf.format(D.minimo)} ha o más de bosque inicial${hs.sin ? `; los otros ${hs.sin} no entran porque tienen menos` : ""}.${infoSel}</p>
+        <details><summary>Ver como tabla</summary><table id="tabla-histograma"><thead><tr><th>Cambio neto</th><th>Municipios</th></tr></thead><tbody>${hs.cuentas.map((c, k) => `<tr><td>${etqBin(k)}</td><td>${c}</td></tr>`).join("")}</tbody></table></details></div>`;
+  }
+
   // ---------- Leyenda ----------
   function pintarLeyenda() {
     const ul = document.getElementById("leyenda"), nota = document.getElementById("nota-mapa"), titulo = document.getElementById("leyenda-titulo");
@@ -1058,7 +1152,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   }
   let pintado = false;
   function pintarTodo() {
-    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
+    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarBalance(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
     marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPie();
     pintado = true;
   }
