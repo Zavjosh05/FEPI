@@ -1,0 +1,2089 @@
+{
+  "clave": "RHF",
+  "nombre": "Restauración Hidrológico-Forestal",
+  "ejercicio": 2026,
+  "fuente": {
+    "documento": "Acuerdo del Director General de PROBOSQUE por el que se emiten las Reglas de Operación del Programa Restauración Hidrológico-Forestal (Gaceta del Gobierno, 27-ene-2026), más la Convocatoria 2026 (bases tercera a sexta) y el Manual de formatos (FO-PB-501-A y FO-PB-502)",
+    "fecha_publicacion": "2026-01-27",
+    "archivo": "sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt",
+    "lineas": [
+      2433,
+      3731
+    ],
+    "lineas_reglas": [
+      2530,
+      3731
+    ],
+    "lineas_convocatoria_relacionadas": [
+      [
+        178,
+        190
+      ],
+      [
+        337,
+        448
+      ],
+      [
+        638,
+        772
+      ],
+      [
+        819,
+        850
+      ],
+      [
+        903,
+        920
+      ]
+    ],
+    "lineas_formatos": [
+      [
+        11972,
+        12112
+      ],
+      [
+        12244,
+        12337
+      ]
+    ],
+    "aprobacion": "Acuerdo PBE/06-2025/004 de la Sexta Sesión Ordinaria del Consejo Directivo de PROBOSQUE (11-dic-2025); dictamen de la Comisión Estatal de Mejora Regulatoria del 20-ene-2026 (líneas 2520-2528). El texto de las Reglas es un Acuerdo que las «emite» completas (transitorio CUARTO, línea 3712), no una modificación."
+  },
+  "definicion": {
+    "texto": "Fomentar la restauración de manera integral en ecosistemas forestales degradados mediante obras de conservación de suelos, captación de agua, reforestación y su preservación durante tres años, en beneficio de los bosques mexiquenses, a través de la entrega de recurso económico, planta y acompañamiento técnico gratuito a las personas propietarias y/o poseedoras de terrenos forestales y/o preferentemente forestales del Estado de México, con una superficie mínima de media hectárea susceptible de acciones de restauración y mantenimiento en áreas forestales perturbadas preferentemente.",
+    "numeral": "1.1 y 4.1",
+    "linea": 2535,
+    "cobertura": "125 municipios del Estado de México y los predios que espacialmente se encuentren dentro del territorio mexiquense (numeral 6, línea 2712)",
+    "tipo_de_apoyo": "Recurso económico (transferencia electrónica; cheque solo en casos excepcionales con causa justificada, solicitado por la Delegación con el visto bueno del titular de la Dirección de Restauración y Fomento Forestal), planta mediante Vale de Planta canjeable en los viveros de PROBOSQUE (excepto en Restauración Forestal Integral Modalidad uno) y acompañamiento técnico gratuito (numeral 7.1, líneas 2716-2737)",
+    "origen_recursos": "El Gobierno del Estado, a través de PROBOSQUE, aporta el 100 % de los recursos económicos; dependencias federales, estatales y municipales, iniciativa privada u otros interesados pueden aportar recursos adicionales o en especie (numeral 7.3, línea 2797)",
+    "derechos_o_dimensiones": "Medio ambiente sano y la no discriminación (numeral 2, línea 2542)"
+  },
+  "instancias": {
+    "normativa": "Comité de Admisión y Seguimiento del Programa Restauración Hidrológico-Forestal (numerales 3 y 9.3, líneas 2580 y 3436)",
+    "ejecutora": "Dirección de Restauración y Fomento Forestal de PROBOSQUE (numeral 9.2, línea 3434); opera mediante el «Área Responsable del Programa» (el glosario la llama «Área técnica del Programa», línea 2568), sin nombrarla, y las nueve Delegaciones Regionales Forestales coordinadas por la Coordinación de Delegaciones Regionales (10.1, inciso x, línea 3616)",
+    "responsable": "Protectora de Bosques del Estado de México (PROBOSQUE) (numeral 9.1, línea 3432)",
+    "comite": {
+      "nombre": "Comité de Admisión y Seguimiento del Programa Restauración Hidrológico-Forestal",
+      "numeral": "9.4",
+      "linea": 3438,
+      "presidencia": "Persona titular de la Secretaría a la que esté adscrita PROBOSQUE (Secretaría del Campo); voto de calidad en caso de empate; suplencia por quien designe la presidencia",
+      "secretaria_tecnica": "Persona titular de PROBOSQUE; suplencia por quien designe la Secretaría Técnica",
+      "vocales_con_voz_y_voto": [
+        "Representante de la Comisión Nacional Forestal (CONAFOR) en el Estado de México",
+        "Representante de la Secretaría de Medio Ambiente y Recursos Naturales (SEMARNAT) en el Estado de México",
+        "Representante de la Universidad Autónoma Chapingo (UACh)",
+        "Representante de la Universidad Autónoma del Estado de México (UAEMex)",
+        "Representante de los Ejidos Comunes y Productores Forestales del Estado de México, A.C."
+      ],
+      "invitados_especiales_solo_voz": [
+        "Titular de la Dirección de Administración, Finanzas y de Gestión Documental de PROBOSQUE",
+        "Titular de la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia de PROBOSQUE",
+        "Titular del Órgano Interno de Control de PROBOSQUE",
+        "Titular de la Coordinación de Delegaciones Regionales",
+        "Titular del Área Responsable del Programa"
+      ],
+      "suplentes": "Cada integrante designa una persona suplente que cubra sus ausencias ocasionales y firma las actas (línea 3469)",
+      "sesiones": "Convocatoria de la Secretaría Técnica por acuerdo de la presidencia, con 3 días hábiles de anticipación mínima para sesiones ordinarias y 24 horas para extraordinarias, con lugar o plataforma digital, fecha, hora y orden del día; quórum de la mitad más uno, estando presentes la Presidencia, la Secretaría Técnica y el representante de la Secretaría de la Contraloría o sus suplentes; acta firmada por la mayoría de los integrantes presentes con voz y voto en un máximo de 10 días hábiles posteriores a la sesión (numeral 9.4.2, líneas 3471-3481)",
+      "atribuciones": "Numeral 9.4.3, líneas 3482-3502: determinar requisitos y conceptos; autorizar que los listados de solicitudes aprobadas y no aprobadas se den a conocer en las Delegaciones y en la página web; aprobar apoyos en predios con sobrevivencia menor al rango cuando no se alcanzó por causas no imputables a la persona beneficiaria; analizar conflictos y decretar suspensión o cancelación con garantía de audiencia; validar incumplimientos y exigir la devolución por conducto de la Unidad Jurídica; resolver lo no previsto.",
+      "instalacion": "Dentro de los 15 días hábiles siguientes a la publicación de las Reglas; Lineamientos Internos dentro de los 15 días hábiles siguientes a su instalación (transitorios SÉPTIMO y OCTAVO, líneas 3715-3718)"
+    },
+    "otras_unidades_que_intervienen": [
+      "Delegaciones Regionales Forestales (recepción, polígono, Diagnóstico Técnico, firma, verificación)",
+      "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia (Dictamen Jurídico, validación del modelo de contrato, requerimiento de devolución) (10.1, incisos b, f, j)",
+      "Dirección de Administración, Finanzas y de Gestión Documental (pagos y cuenta de reintegros) (10.1, inciso a)",
+      "Coordinación de Delegaciones Regionales",
+      "Viveros Forestales de PROBOSQUE (entrega de planta contra Vale de Planta) (glosario, línea 2678)"
+    ]
+  },
+  "poblacion_objetivo": {
+    "texto": "Las personas propietarias y/o poseedoras de terrenos forestales y/o preferentemente forestales del Estado de México, con una superficie mínima de media hectárea susceptible de acciones de restauración y mantenimiento en áreas forestales perturbadas preferentemente.",
+    "numeral": "5 c)",
+    "linea": 2708
+  },
+  "tipos_persona": [
+    {
+      "clave": "fisica",
+      "nombre": "Persona física (propietaria, poseedora, usufructuaria o su representante legal)",
+      "numeral": "3 (Personas propietarias y/o poseedoras) y 8.1.1.2, incisos a) y g.2)",
+      "linea": 2630
+    },
+    {
+      "clave": "juridica_colectiva",
+      "nombre": "Persona jurídica colectiva (constituida conforme a las leyes mexicanas, excepto núcleo agrario)",
+      "numeral": "3 (Personas jurídicas colectivas) y 8.1.1.2, inciso h.2) III",
+      "linea": 2632
+    },
+    {
+      "clave": "nucleo_agrario",
+      "nombre": "Núcleo agrario (ejido o comunidad)",
+      "numeral": "3 (Núcleo Agrario) y 8.1.1.2, incisos g.1) y h.1)",
+      "linea": 2623
+    }
+  ],
+  "modalidades": [
+    {
+      "clave": "rfi_modalidad_uno",
+      "nombre": "Restauración Forestal Integral, Modalidad uno",
+      "descripcion": "Obras de conservación de suelos y captación de agua y preparación del sitio para la reforestación en una segunda etapa, presentadas en el PTRFI (a 5 años, en etapas anuales). $30,000.00 por hectárea anual en dos ministraciones (70 % y 30 %). No incluye planta. Plazo de conclusión: último día hábil de octubre.",
+      "seleccionable": true,
+      "numeral": "7.2.1.1; Convocatoria base primera II a) y base tercera",
+      "linea": 2740
+    },
+    {
+      "clave": "rfi_modalidad_dos",
+      "nombre": "Restauración Forestal Integral, Modalidad dos",
+      "descripcion": "Reforestación obligatoria y 2 actividades alternas (rehabilitación y/o mantenimiento de obras de conservación de suelos y captación de agua, acciones de protección forestal, entre otras), presentadas en el PTRFI. $14,000.00 por hectárea anual en dos ministraciones (70 % y 30 %), más planta nativa preferentemente (Vale de Planta) y acompañamiento técnico gratuito. Plazo de conclusión: último día hábil de septiembre.",
+      "seleccionable": true,
+      "numeral": "7.2.1.2; Convocatoria base primera II a) y base tercera",
+      "linea": 2751
+    },
+    {
+      "clave": "bosques_de_agua",
+      "nombre": "Bosques de agua",
+      "descripcion": "Reforestación obligatoria y una actividad alterna (acomodo de material vegetal muerto, cajeteo, deshierbe, terrazas individuales, zanjas bordo, zanjas trinchera, entre otras). $3,500.00 por hectárea plantada en dos ministraciones (70 % y 30 %), más planta nativa preferentemente y acompañamiento técnico gratuito. Plazo de conclusión: último día hábil de septiembre.",
+      "seleccionable": true,
+      "numeral": "7.2.2; Convocatoria base primera II b) y base tercera",
+      "linea": 2765
+    },
+    {
+      "clave": "preservacion_reforestaciones",
+      "nombre": "Preservación de reforestaciones establecidas",
+      "descripcion": "Replante obligatorio y dos actividades alternas (cajeteo, deshierbe, brechas cortafuego, cercado, podas, riegos de auxilio, vigilancia, mantenimiento o rehabilitación de terrazas individuales, zanjas bordo y zanjas trinchera, entre otras) en reforestaciones de hasta 3 años previos con sobrevivencia mínima (70 % zona templada, 40 % zona cálida). $3,000.00 por hectárea en dos ministraciones (70 % y 30 %), más planta nativa preferentemente y acompañamiento técnico gratuito. Plazo de conclusión: último día hábil de septiembre.",
+      "seleccionable": true,
+      "numeral": "7.2.3 y 8.1.1.1 inciso d); Convocatoria base primera II c) y base tercera",
+      "linea": 2776
+    }
+  ],
+  "nota_modalidades": "Las ROP de RHF llaman «concepto» a Restauración Forestal Integral, Bosques de agua y Preservación de reforestaciones establecidas, y «modalidad» (uno y dos) solo a las dos variantes de Restauración Forestal Integral. Aquí las cuatro son «modalidades» del sistema, todas seleccionables al registrar. La Solicitud Única (FO-PB-501-A, apartado III b) pide la superficie por concepto: RFI modalidad uno y dos, Bosques de agua y Preservación por año de establecimiento (2023, 2024, 2025).",
+  "superficie": {
+    "minima_ha": 0.5,
+    "maxima_ha": null,
+    "poligono_minimo_ha": 0.25,
+    "numeral": "5 b) y c), 8.1.1.1 inciso c) y 10.1 inciso r)",
+    "linea": 2811,
+    "cobertura_arborea_maxima_pct": 49,
+    "numeral_cobertura": "8.1.1.1 inciso a)",
+    "linea_cobertura": 2809,
+    "ajuste_minimo_pct_superficie_asignada": 70,
+    "numeral_ajuste": "8.1.8 inciso g), 8.1.9 c) fr. 4 y 10.1 inciso u)",
+    "linea_ajuste": 3338,
+    "nota": "No hay superficie máxima en las ROP de RHF. La superficie mínima es media hectárea y cada polígono no puede ser menor a 0.25 ha. Para Preservación se incluyen predios con reforestaciones de hasta 3 años previos de establecimiento (8.1.1.1 inciso d)."
+  },
+  "sobrevivencia": {
+    "minima": [
+      {
+        "zona_climatica": "templada",
+        "porcentaje_minimo": 70
+      },
+      {
+        "zona_climatica": "calida",
+        "porcentaje_minimo": 40
+      }
+    ],
+    "aplica_a": "Concepto Preservación de reforestaciones establecidas (criterio de selección y condición del apoyo)",
+    "texto": "Para el concepto Preservación de reforestaciones establecidas podrán ser incluidos aquellos predios que alcancen el porcentaje mínimo de sobrevivencia en reforestaciones de hasta 3 años previos de establecimiento de acuerdo a su Zona: Mayor o igual al 70 % Templada; Mayor o igual al 40 % Cálida. Predios con sobrevivencia menor al mínimo permitido de acuerdo a cada zona climática no serán considerados para el apoyo.",
+    "numeral": "8.1.1.1 inciso d); 7.2.3 a); Convocatoria base tercera (cuadro)",
+    "linea": 2812,
+    "como_se_mide": "El porcentaje de sobrevivencia se obtiene en el formato Diagnóstico Técnico (7.2.3 b, línea 2783-2784); las ROP no dicen cómo se mide (muestreo, fecha, instrumento).",
+    "excepcion": "El Comité puede aprobar apoyos en predios con sobrevivencia menor al rango cuando la sobrevivencia mínima no se haya alcanzado por causas no imputables a la persona beneficiaria (9.4.3 inciso c, línea 3489); también pueden solicitar de nuevo quienes perdieron la reforestación por causa natural o antropogénica, previa verificación técnica (10.1 inciso v, línea 3610)."
+  },
+  "requisitos": [
+    {
+      "clave": "RHF-REQ-01",
+      "texto": "Ser personas propietarias y/o poseedoras de terrenos forestales y/o preferentemente forestales, de nacionalidad mexicana o que hayan adquirido la residencia mexicana, interesadas en participar en los conceptos de apoyo que se establecen en la Base Primera de la Convocatoria y de acuerdo con las Reglas.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "requiere_documento": false,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso a)",
+      "linea": 2864
+    },
+    {
+      "clave": "RHF-REQ-02",
+      "texto": "Presentar la Solicitud Única debidamente requisitada en la oficina de la Delegación Regional Forestal de PROBOSQUE que le corresponda (según el municipio donde se ubica el predio); solo en ésta será recibida, ya que es la responsable de su correcto llenado. Se entrega comprobante de recepción con nombre y firma de quien recibe, siempre que se cumplan todos los requisitos.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": "FO-PB-501-A",
+      "numeral": "8.1.1.2, inciso b); 8.1.3; Convocatoria base cuarta",
+      "linea": 2867
+    },
+    {
+      "clave": "RHF-REQ-03",
+      "texto": "Designar una persona que fungirá como segunda persona beneficiaria. En los núcleos agrarios, la designación debe recaer en algún integrante del órgano del comisariado.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": false,
+      "formato": "FO-PB-501-A (renglón «Segunda persona beneficiaria»)",
+      "numeral": "8.1.1.2, inciso c)",
+      "linea": 2869
+    },
+    {
+      "clave": "RHF-REQ-04",
+      "texto": "Opcional (cuando así lo determinen viable las personas solicitantes físicas o jurídico colectivas): carta poder alterna en la que especifiquen que, por causas de fuerza mayor, desde el momento de la solicitud otorgan poder amplio y cumplido a la persona que determinen, en original vigente, debidamente requisitada, signada por la persona otorgante, el apoderado y sus dos testigos, anexando copias simples de las identificaciones oficiales vigentes y legibles de quienes participan, para continuar los trámites hasta su conclusión; aplica únicamente al ejercicio fiscal vigente.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "opcional": true,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso c)",
+      "linea": 2871,
+      "nota_refrendo": "Aplica únicamente al ejercicio fiscal en que se presenta"
+    },
+    {
+      "clave": "RHF-REQ-05",
+      "texto": "Presentar el formato Registro de Información de la Persona Solicitante y/o beneficiaria, describiendo toda la información catalogada como «obligatoria». Para núcleos agrarios se requisita con la información de las personas integrantes de la Presidencia, Secretaría y Tesorería del Comisariado; en predios particulares se integra la información de la segunda persona beneficiaria cuando adquiera la titularidad del apoyo.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": "FO-PB-502",
+      "numeral": "8.1.1.2, inciso d)",
+      "linea": 2877
+    },
+    {
+      "clave": "RHF-REQ-06",
+      "texto": "Entregar copia legible de la identificación oficial vigente con fotografía.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso e)",
+      "linea": 2883,
+      "nota_refrendo": "El inciso f) del refrendo solo pide Solicitud Única, Registro de Información y CURP actualizada si la documentación legal obra en PROBOSQUE con vigencia de hasta tres años (línea 2972)"
+    },
+    {
+      "clave": "RHF-REQ-07",
+      "texto": "Comprobante de domicilio (recibo de luz, teléfono, agua, predial, cable, etc.) con vigencia no mayor a tres meses, o constancia domiciliaria emitida por la autoridad competente (solo si no se cuenta con alguno de los anteriores), o credencial que lo acredita como autoridad del núcleo agrario expedida por el Registro Agrario Nacional, preferentemente a color.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "condicion": "Solo si la identificación oficial no cuenta con el domicilio de la persona solicitante",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso e)",
+      "linea": 2884
+    },
+    {
+      "clave": "RHF-REQ-08",
+      "texto": "Presentar la Clave Única de Registro de Población (CURP) actualizada.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso f)",
+      "linea": 2888
+    },
+    {
+      "clave": "RHF-REQ-09",
+      "texto": "Núcleos agrarios, acreditar la legal propiedad, posesión o usufructo del terreno: PHINA; solo en caso de no estar registrado en el Padrón, presentar la Carpeta Básica (Resolución Presidencial, Acta de Posesión y Deslinde y, en su caso, Plano definitivo) o resolución ejecutoriada por la autoridad competente. Los núcleos agrarios ya certificados por el PROCEDE presentan únicamente el ADDATE o ADDATBC.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.1)",
+      "linea": 2890,
+      "nota_refrendo": "Solo si la documentación legal no obra en PROBOSQUE o tiene más de 3 años"
+    },
+    {
+      "clave": "RHF-REQ-10",
+      "texto": "Personas físicas y/o jurídico colectivas, acreditar la propiedad o posesión del predio con documento que abarque la superficie total que se destinará al Programa (inmatriculación administrativa, escritura pública, sentencia ejecutoriada emitida por autoridad competente, usucapión, sucesión ad perpetuam, traslado de dominio, contrato privado de compraventa, certificado parcelario, cesión de derechos agrarios o parcelarios, constancia de posesión), original o copia cotejada.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.2) fr. I",
+      "linea": 2896,
+      "nota_refrendo": "Solo si la documentación legal no obra en PROBOSQUE o tiene más de 3 años"
+    },
+    {
+      "clave": "RHF-REQ-11",
+      "texto": "Si se presenta contrato de usufructo o arrendamiento del predio: debe estar vigente acorde a los plazos de ejecución del Programa, sin exceder un plazo máximo de 5 años de conformidad con el Código Civil del Estado de México, acompañado del documento legal que acredite la propiedad o posesión del predio; su objeto debe ser acorde al Programa.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando la persona solicitante es usufructuaria o arrendataria",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.2) fr. II",
+      "linea": 2900
+    },
+    {
+      "clave": "RHF-REQ-12",
+      "texto": "Constancias de posesión: en original y/o copia cotejada. De núcleo agrario: emitidas por el órgano de representación, selladas y firmadas por la Presidencia, Secretaría y Tesorería del comisariado, con vigencia para PROBOSQUE desde su expedición y hasta el año fiscal de la conclusión del periodo de representación del comisariado que las expidió. De predios particulares: emitidas por la persona titular de la Secretaría del Ayuntamiento, vigentes para el ejercicio fiscal, y solo válidas cuando los predios no sean parte de la superficie de núcleos agrarios. En ambos casos deben contener ubicación del predio, medidas y colindancias y superficie total.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando se presenta constancia de posesión",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.2) fr. III",
+      "linea": 2904,
+      "nota_refrendo": "Las constancias de posesión que ya fenecieron deben actualizarse para el ejercicio fiscal (línea 2978)"
+    },
+    {
+      "clave": "RHF-REQ-13",
+      "texto": "Cuando en la documentación presentada no se advierta la superficie total del predio, integrar una constancia expedida conforme a las especificaciones anteriores, en la que conste la ubicación del predio, las medidas y colindancias y la superficie total.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando la documentación no muestre la superficie total del predio",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.2) fr. IV",
+      "linea": 2913
+    },
+    {
+      "clave": "RHF-REQ-14",
+      "texto": "No se aceptan constancias o certificados de uso común presentados por ejidatarios o comuneros, salvo que se presente el acta de asamblea vigente, inscrita o presentada para su trámite ante el RAN, en la que se autorice el derecho a realizar las actividades correspondientes.",
+      "tipos_persona": [
+        "fisica",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "opcional": true,
+      "condicion": "Solo cuando la acreditación de la posesión sea por uso común de ejidatarios o comuneros",
+      "requiere_documento": false,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso g.2) fr. V",
+      "linea": 2916
+    },
+    {
+      "clave": "RHF-REQ-15",
+      "texto": "Núcleos agrarios, cuando se solicite la entrega del apoyo a través de un representante legal: acta de asamblea de elección vigente de los órganos de representación, inscrita o presentada para su trámite ante el Registro Agrario Nacional (RAN); si los integrantes del comisariado ya cuentan con las credenciales expedidas por el RAN y son vigentes, éstas se aceptan como acreditación de dicho registro (copia legible, preferentemente a color).",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando la entrega del apoyo se solicita a través de un representante legal",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.1) fr. I",
+      "linea": 2922,
+      "nota_refrendo": "Las actas de elección que ya fenecieron deben actualizarse para el ejercicio fiscal (línea 2978)"
+    },
+    {
+      "clave": "RHF-REQ-16",
+      "texto": "Núcleos agrarios, supuesto de contingencia sanitaria o fallecimiento de alguno de los integrantes del comisariado (únicamente para la entrega del apoyo): el apoyo se entrega a través de alguno de los titulares, previa presentación del acta de defunción y una manifestación bajo protesta de decir verdad de que ya se informó a los integrantes del núcleo agrario y están de acuerdo; mientras tanto, la solicitud y los trámites posteriores pueden continuar por el suplente designado en el acta de elección, hasta que mediante acta de asamblea se designe a quien ocupará la cartera acéfala, con el acuse de recibido de la inscripción del trámite ante el RAN.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": true,
+      "opcional": true,
+      "condicion": "Contingencia sanitaria o fallecimiento de un integrante del comisariado",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.1) fr. II",
+      "linea": 2934
+    },
+    {
+      "clave": "RHF-REQ-17",
+      "texto": "Núcleos agrarios: acta de asamblea en la que se manifieste el consentimiento para incorporarse a los beneficios del Programa, inscrita o presentada ante el Registro Agrario Nacional (RAN), y en la que se comprometan a destinar los terrenos al objetivo del Programa. El acta no debe tener fecha posterior al cierre de la Convocatoria.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.1) fr. III",
+      "linea": 2942,
+      "nota_refrendo": "Las actas de asamblea que ya fenecieron deben actualizarse para el ejercicio fiscal (línea 2978)"
+    },
+    {
+      "clave": "RHF-REQ-18",
+      "texto": "Núcleos agrarios, si no se puede llevar a cabo la asamblea por contingencia sanitaria: manifestación bajo protesta de decir verdad, suscrita por los integrantes del comisariado, de que se informó a los integrantes del núcleo agrario de su participación en el Programa y que éstos avalaron la gestión en el ejercicio fiscal vigente.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "opcional": true,
+      "condicion": "Solo si no se puede llevar a cabo la asamblea por contingencia sanitaria",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.1) fr. IV",
+      "linea": 2946
+    },
+    {
+      "clave": "RHF-REQ-19",
+      "texto": "Personas físicas y jurídico colectivas, cuando se solicite la entrega del apoyo a través de un representante legal: documento vigente que acredite la representación legal, en su caso con facultades de administración y/o dominio.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando la entrega del apoyo se solicita a través de un representante legal",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.2) fr. I",
+      "linea": 2951
+    },
+    {
+      "clave": "RHF-REQ-20",
+      "texto": "Personas físicas o conjuntos prediales, el documento que acredite la representación legal puede ser Poder Notarial vigente o carta poder simple en original, vigente, debidamente requisitada, anexando copia simple de las identificaciones oficiales vigentes de las personas que participan en la misma.",
+      "tipos_persona": [
+        "fisica"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "condicion": "Cuando la entrega del apoyo se solicita a través de un representante legal",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.2) fr. II",
+      "linea": 2952,
+      "nota_refrendo": "Los poderes notariales deben estar vigentes conforme a la normatividad aplicable y las cartas poder simples actualizarse para el ejercicio fiscal (líneas 2978-2981)"
+    },
+    {
+      "clave": "RHF-REQ-21",
+      "texto": "Personas jurídico-colectivas, exceptuando núcleos agrarios: Acta Constitutiva, escritura, estatutos o documento legal con que se constituyó, protocolizado ante Notario Público, que contenga facultades de administración.",
+      "tipos_persona": [
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso h.2) fr. III",
+      "linea": 2955,
+      "nota_refrendo": "Solo si no obra en PROBOSQUE o tiene más de 3 años"
+    },
+    {
+      "clave": "RHF-REQ-22",
+      "texto": "Restauración Forestal Integral, Modalidad uno: proporcionar el Proyecto Técnico de Restauración Forestal Integral (PTRFI), físico o digital, a ejecutar durante 5 años, dividiendo las actividades en etapas anuales (que serán apoyadas en la convocatoria correspondiente con base en la disponibilidad presupuestal). Debe apegarse a la Guía de contenido para la elaboración del PTRFI (formato disponible en la página web de PROBOSQUE) y puede ser elaborado y ejecutado, debido a su complejidad, por un Prestador de Servicios Forestales (PSF) que cuente con su RFN; el listado de PSF se consulta en la página de la SEMARNAT.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "rfi_modalidad_uno"
+      ],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": "PTRFI (Guía de contenido para la elaboración del PTRFI, página web de PROBOSQUE)",
+      "numeral": "8.1.1.2, inciso i.1); Solicitud Única apartado IV, punto 9",
+      "linea": 2959,
+      "nota_refrendo": "El refrendo simplificado no aplica a Modalidad uno (solo a Modalidad dos y Preservación, línea 2972)"
+    },
+    {
+      "clave": "RHF-REQ-23",
+      "texto": "Restauración Forestal Integral, Modalidad dos: proporcionar el PTRFI, físico o digital, actualizado, siempre y cuando la superficie beneficiada el año inmediato anterior no sea la misma que la establecida en el PTRFI y/o presente modificaciones de actividades con respecto al proyecto del año inmediato anterior, para continuar con las actividades en etapas anuales. Debe apegarse a la Guía de contenido para la elaboración del PTRFI y puede ser actualizado y ejecutado, debido a su complejidad, por un PSF que cuente con su RFN.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "rfi_modalidad_dos"
+      ],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "condicion": "Cuando la superficie beneficiada el año anterior no es la misma que la del PTRFI y/o hay modificaciones de actividades",
+      "formato": "PTRFI (Guía de contenido para la elaboración del PTRFI, página web de PROBOSQUE)",
+      "numeral": "8.1.1.2, inciso i.2)",
+      "linea": 2965,
+      "nota_refrendo": "Si solo solicita Preservación y/o RFI Modalidad dos y la superficie no cambia ni el PTRFI tiene modificaciones, basta Solicitud Única, Registro de Información y CURP actualizada (línea 2972)"
+    },
+    {
+      "clave": "RHF-REQ-24",
+      "texto": "Declaratoria de no litigio ni condicionante, bajo protesta de decir verdad: que el predio no presenta problemas de litigio de cualquier índole ni gravamen, que la documentación no es apócrifa ni falsa, que no hay problemas de representación ni conflictos sociales, ni condicionante de las autoridades forestales para la restauración de la superficie propuesta, ni pago por servicios ambientales por captura de carbono de otras dependencias.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": true,
+      "formato": "FO-PB-501-A (declaratoria)",
+      "numeral": "Manual de formatos, Solicitud Única FO-PB-501-A, hoja 2",
+      "linea": 12084
+    },
+    {
+      "clave": "RHF-REQ-25",
+      "texto": "Información o documentación adicional o complementaria, cuando se determine que para alguna solicitud es necesario que se presente nuevamente la documentación o se requiere información o documentos complementarios durante el ejercicio fiscal: se notifica a la persona solicitante (dentro del plazo de la evaluación, 10.1 inciso e). PROBOSQUE puede solicitar a las autoridades competentes la validación de la documentación.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "condicion": "Cuando PROBOSQUE lo notifica",
+      "requiere_documento": false,
+      "formato": null,
+      "numeral": "8.1.1.2, inciso i), párrafo «Si se determina...»; 10.1 inciso e)",
+      "linea": 2982
+    },
+    {
+      "clave": "RHF-REQ-26",
+      "texto": "Cambio de representantes durante la evaluación o el ejercicio del Programa: presentar la documentación legal que acredite tal situación y el formato de Registro de Información de la Persona Solicitante y/o beneficiaria conforme a los requisitos de la Convocatoria y las Reglas.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "condicion": "Cuando cambian los representantes",
+      "es_documento_legal": true,
+      "formato": "FO-PB-502",
+      "numeral": "8.1.1.2, inciso i), párrafo «Con la finalidad de mantener actualizado el expediente»",
+      "linea": 2991
+    },
+    {
+      "clave": "RHF-REQ-27",
+      "texto": "Núcleos agrarios con Órgano del Comisariado concluido sin elecciones: los suplentes toman el cargo como titulares hasta por un plazo no mayor de sesenta días naturales (art. 39 Ley Agraria); después deben presentar copia legible y completa del acta de elección con el acuse de recibido del registro ante el RAN (o la Calificación registral positiva y/o credenciales expedidas por el RAN) y el Registro de Información de los nuevos representantes, o serán dados de baja del Programa.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "condicion": "Vencimiento del periodo de gestión del comisariado",
+      "es_documento_legal": true,
+      "formato": "FO-PB-502",
+      "numeral": "8.1.1.2, inciso i), párrafo «En el caso de los núcleos agrarios...»",
+      "linea": 3003
+    },
+    {
+      "clave": "RHF-REQ-28",
+      "texto": "Restauración Forestal Integral (cualquier modalidad), si la superficie asignada es diferente a la solicitada: modificar el PTRFI a la superficie asignada y entregarlo, físico o digital actualizado, en la Delegación Regional Forestal correspondiente en un plazo de 10 días hábiles posterior a la notificación, por cualquier medio, de ser persona beneficiaria; sirve para elaborar el contrato de adhesión conforme al ajuste de actividades, mantener actualizado el expediente y dar seguimiento a las actividades.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "rfi_modalidad_uno",
+        "rfi_modalidad_dos"
+      ],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "condicion": "Cuando la superficie asignada es diferente a la solicitada",
+      "formato": "PTRFI",
+      "numeral": "8.1.1.2, inciso i), párrafo «En caso de ser asignado como persona beneficiaria del concepto Restauración Forestal Integral...»; 8.1.9 b) fr. 4",
+      "linea": 3028
+    },
+    {
+      "clave": "RHF-REQ-29",
+      "texto": "Al momento de la firma del contrato de adhesión, presentar copia legible del documento emitido por la institución bancaria vigente a nombre de la persona beneficiaria, que contenga nombre completo de la institución bancaria, número de cuenta y CLABE interbancaria, para la entrega del recurso económico mediante transferencia electrónica para las dos ministraciones. La documentación puede ser solicitada nuevamente; el cambio de cuenta se notifica por escrito.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "condicion": "Al ser asignada como persona beneficiaria, al firmar el Contrato de Adhesión",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso i), párrafo «En caso de ser asignado como persona beneficiaria, al momento de la firma...»",
+      "linea": 3034
+    },
+    {
+      "clave": "RHF-REQ-30",
+      "texto": "Núcleos agrarios, adicional al documento bancario: copia legible del contrato donde estipule que la cuenta es mancomunada entre los miembros de las autoridades vigentes.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": true,
+      "condicion": "Al firmar el Contrato de Adhesión",
+      "formato": null,
+      "numeral": "8.1.1.2, inciso i), párrafo «En caso de ser asignado como persona beneficiaria, al momento de la firma...»",
+      "linea": 3037
+    },
+    {
+      "clave": "RHF-REQ-31",
+      "texto": "Bosques de agua o Restauración Forestal Integral Modalidad uno, personas beneficiarias de años anteriores cuyos predios fueron afectados por causa natural o antropogénica (sequías prolongadas, heladas, plagas, enfermedades, incendios, deslaves, tala, etc.) con baja o nula sobrevivencia: incorporar la superficie, total o ajustada según la evaluación de sobrevivencia y/o cobertura arbórea, debidamente justificada con fotografías y acta en donde se describan los hechos.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "bosques_de_agua",
+        "rfi_modalidad_uno"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "opcional": true,
+      "condicion": "Solo si la reforestación apoyada en años anteriores se perdió por causa natural o antropogénica",
+      "formato": null,
+      "numeral": "8.1.2, inciso e); 10.1 inciso v",
+      "linea": 3049
+    },
+    {
+      "clave": "RHF-REQ-32",
+      "texto": "Opcional: carta compromiso (carta responsiva compromiso de establecimiento de la planta, sin responsabilidad para PROBOSQUE) para retirar, de manera voluntaria y bajo su responsabilidad, la planta asignada en el Vale de Planta antes de la firma del Contrato de Adhesión y del pago del recurso, una vez aprobada la solicitud por el Comité y publicados los resultados, para establecerla en temporada de lluvias.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "rfi_modalidad_dos",
+        "bosques_de_agua",
+        "preservacion_reforestaciones"
+      ],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "opcional": true,
+      "condicion": "Solo si la persona beneficiaria retira la planta antes de firmar el contrato",
+      "formato": "Carta compromiso / carta responsiva (formato no incluido en el texto)",
+      "numeral": "8.1.6, inciso g); 10.1 inciso i)",
+      "linea": 3248
+    }
+  ],
+  "reglas_generales_requisitos": [
+    {
+      "texto": "La documentación debe estar completa para que la solicitud sea atendida; la Delegación informa conforme al acuse y la persona tiene 5 días hábiles desde la recepción de la solicitud para presentar lo faltante, sin exceder la fecha límite de recepción de la Convocatoria; se genera el folio de solicitud; si no se complementa en el plazo, la solicitud se tiene por desechada.",
+      "numeral": "8.1.1.2, inciso i), párrafo «La documentación deberá estar completa...»; Convocatoria base cuarta",
+      "linea": 2986
+    },
+    {
+      "texto": "Para el cumplimiento de los requisitos de los incisos h.1) y h.2) se entrega copia simple legible de los documentos y se presenta el original para cotejo, en caso de que sea requerida.",
+      "numeral": "8.1.1.2, inciso i), párrafo «Para el cumplimiento de los requisitos contenidos en los apartados h.1) y h.2)»",
+      "linea": 3021
+    },
+    {
+      "texto": "El registro de la solicitud se hace con base en la presentación y cumplimiento de todos los requisitos referidos en la Convocatoria y en las Reglas.",
+      "numeral": "8.1.1.2, inciso i), párrafo «El registro de la solicitud...»",
+      "linea": 3023
+    },
+    {
+      "texto": "Predios que hayan presentado solicitud en otro Programa de PROBOSQUE y quieran participar en uno diferente conservan el folio ya asignado, integran la solicitud al expediente existente y lo complementan con la documentación legal que sea necesaria.",
+      "numeral": "8.1.1.2, inciso i), párrafo «Para predios que hayan presentado solicitud en algún Programa...»",
+      "linea": 3018
+    },
+    {
+      "texto": "Los representantes de los núcleos agrarios que no estén vigentes al 1 de diciembre del año fiscal, y/o los suplentes que no estén en posibilidades de recibir el recurso conforme al artículo 39 de la Ley Agraria, causan que el recurso no ejercido se cancele y se devuelva a su área de origen, sin responsabilidad para el Organismo.",
+      "numeral": "8.1.1.2, inciso i), párrafo «Los representantes de los núcleos agrarios que no estén vigentes al 01 de diciembre...»",
+      "linea": 3014
+    },
+    {
+      "texto": "Por evento, en virtud de la transferencia bancaria y/o depósitos a tarjetas bancarias, toda comisión recaudada por la institución bancaria será aportada por la persona beneficiaria.",
+      "numeral": "8.1.1.2, inciso i), último párrafo",
+      "linea": 3041
+    },
+    {
+      "texto": "Los apoyos se otorgan sin distinción de género, raza, etnia, credo religioso, condición socioeconómica, filiación política u otra, a quienes cumplan los requisitos de la Convocatoria y las Reglas.",
+      "numeral": "8.1.1.2, inciso i), párrafo «Los apoyos deberán ser otorgados sin distinción...»",
+      "linea": 3025
+    },
+    {
+      "texto": "La recepción de la solicitud no implica compromiso alguno de PROBOSQUE de otorgar los apoyos; el otorgamiento se basa en la revisión documental, técnica y jurídica y la verificación en campo, validados por el Comité. PROBOSQUE no responde por los gastos de gestión de la persona solicitante.",
+      "numeral": "Convocatoria base cuarta",
+      "linea": 766
+    },
+    {
+      "texto": "Solicitud Única, nota del apartado IV: los requisitos del 1 al 8 (identificación, CURP, Registro de Información, documento de propiedad o posesión, actas de asamblea de núcleos, constitución de personas jurídicas, representante legal) aplican para todos los programas; el punto 9 es el PTRFI (RHF-Restauración Forestal Integral).",
+      "numeral": "Manual de formatos, FO-PB-501-A hoja 2",
+      "linea": 12056
+    }
+  ],
+  "criterios_seleccion": [
+    {
+      "texto": "Se apoyará a predios con cobertura arbórea máxima del 49 %.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso a)",
+      "linea": 2809
+    },
+    {
+      "texto": "Que el predio no haya cambiado su uso del suelo de forestal a otra actividad.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso b)",
+      "linea": 2810
+    },
+    {
+      "texto": "Que la superficie solicitada sea mínima de 0.5 (media) hectárea y cuya superficie de polígono no será menor a 0.25 ha.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso c)",
+      "linea": 2811
+    },
+    {
+      "texto": "Para el concepto Preservación de reforestaciones establecidas, predios que alcancen el porcentaje mínimo de sobrevivencia en reforestaciones de hasta 3 años previos de establecimiento según su zona: mayor o igual al 70 % en zona templada; mayor o igual al 40 % en zona cálida.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso d)",
+      "linea": 2812
+    },
+    {
+      "texto": "Que la superficie solicitada se encuentre en los 125 municipios del Estado de México o en predios que espacialmente se encuentren dentro del territorio mexiquense.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso e)",
+      "linea": 2817
+    },
+    {
+      "texto": "Personas propietarias y/o poseedoras que no hayan sido sancionadas con la cancelación o suspensión de apoyos de cualquier índole y no se encuentren en el Listado de Personas Beneficiarias Incumplidas de PROBOSQUE.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso f)",
+      "linea": 2819
+    },
+    {
+      "texto": "Los predios sancionados administrativamente por infracciones a la normatividad forestal pueden participar siempre que se haga el reintegro del recurso respectivo previo a la aprobación de la Instancia Normativa.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso g)",
+      "linea": 2822
+    },
+    {
+      "texto": "Predios que cumplan los requisitos conforme a los tiempos de la Convocatoria y con las especificaciones técnicas según la información de gabinete y la verificación en campo, sin información incompleta, falsa o apócrifa.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso h)",
+      "linea": 2824
+    },
+    {
+      "texto": "Predios sin procedimiento administrativo de suspensión, revocación, nulidad u otro respecto de su autorización de aprovechamiento forestal o registro de plantación.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso i)",
+      "linea": 2827
+    },
+    {
+      "texto": "Pueden ser apoyados predios propiedad de dependencias federales, estatales o municipales que cumplan los requisitos, si hay suficiencia presupuestal; de lo contrario se incluyen en el listado de espera.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso j)",
+      "linea": 2829
+    },
+    {
+      "texto": "Si la persona solicitante ya cuenta con la autorización de su Programa de Manejo Forestal en la superficie propuesta, no podrá ser beneficiaria si desiste de su ejecución, salvo que el área técnica considere viable el desistimiento, previa opinión de la Unidad Jurídica.",
+      "puntaje": null,
+      "numeral": "8.1.1.1, inciso l)",
+      "linea": 2837
+    },
+    {
+      "texto": "Se apoyan predios bajo manejo forestal sustentable siempre que la superficie cuente con evidencia de corta en un plazo de 2 años y/o cuando la regeneración natural no sea posible; también superficies con potencial de reforestación.",
+      "puntaje": null,
+      "numeral": "10.1, inciso q)",
+      "linea": 3576
+    },
+    {
+      "texto": "Criterios de priorización (8.1.2): a) partes altas de las cuencas hidrográficas; b) visualmente donde se originen corrientes o manantiales de agua; c) áreas forestales perturbadas y/o cobertura forestal de 0 a 30 %; d) predios con acondicionamiento de suelos en el polígono a reforestar.",
+      "puntaje": null,
+      "numeral": "8.1.2, incisos a) a d)",
+      "linea": 3045
+    },
+    {
+      "texto": "Podrán solicitar Bosques de agua o RFI Modalidad uno las personas beneficiarias de años anteriores cuyos predios fueron afectados por causa natural o antropogénica con baja o nula sobrevivencia, incorporando la superficie total o ajustada, justificada con fotografías y acta.",
+      "puntaje": null,
+      "numeral": "8.1.2, inciso e)",
+      "linea": 3049
+    },
+    {
+      "texto": "Preservación: haber sido persona beneficiaria hasta tres años anteriores de programas de reforestación con fines de restauración de PROBOSQUE, cumpliendo con la totalidad de la superficie asignada; mayor porcentaje de sobrevivencia; o, solo si ya no hay predios de reforestación con fines de restauración y hay suficiencia presupuestal, haber sido beneficiaria hasta tres años anteriores de Plantaciones Sustentables cumpliendo la totalidad de la superficie.",
+      "puntaje": null,
+      "numeral": "8.1.2, incisos f), g) y h)",
+      "linea": 3062
+    },
+    {
+      "texto": "RFI Modalidad uno: que se encuentre dentro de las áreas elegibles (consultables en la página web de PROBOSQUE) y quien obtenga el puntaje o evaluación de proyecto más alto. RFI en general: quien tenga mayor superficie factible de apoyo.",
+      "puntaje": null,
+      "numeral": "8.1.2, incisos i), j) y k)",
+      "linea": 3070
+    },
+    {
+      "texto": "Predios que acrediten fehacientemente la titularidad o representación legal con documentación expedida por autoridades competentes; predios que no son propiedad de dependencias federales, estatales o municipales.",
+      "puntaje": null,
+      "numeral": "8.1.2, incisos l) y m)",
+      "linea": 3075
+    },
+    {
+      "texto": "Predios que pertenezcan a: grupo de mujeres y/o pueblos indígenas; comunidad y/o personas afromexicanas; personas con enfermedades crónico degenerativas; víctimas u ofendidas en delitos investigados o juzgados con perspectiva de género; personas repatriadas; mujeres cuidadoras de hijas e hijos menores de edad, de mujeres privadas de su libertad por resolución judicial. Sin cobertura presupuestal suficiente, la asignación se determina por la fecha de registro en el Programa.",
+      "puntaje": null,
+      "numeral": "8.1.2, inciso n)",
+      "linea": 3080
+    }
+  ],
+  "criterios_elegibilidad_tecnica": [
+    {
+      "texto": "El Diagnóstico Técnico, emitido por las Delegaciones Regionales Forestales previo al Dictamen Técnico Forestal, recoge las características y condiciones del terreno donde se comprueba la factibilidad para obtener el apoyo, mediante visitas a predios y el Sistema de Información Geográfica de PROBOSQUE; el Dictamen Técnico, emitido por el Área Responsable del Programa, evalúa el predio a partir del Diagnóstico y determina la procedencia o no de la solicitud.",
+      "numeral": "3 (Diagnóstico Técnico y Dictamen Técnico)",
+      "linea": 2595
+    },
+    {
+      "texto": "El formato Diagnóstico Técnico registra el porcentaje de cobertura arbórea (Bosques de agua, RFI Modalidad dos) o de sobrevivencia (Preservación), con base en el cual se asigna la planta nativa preferentemente, de acuerdo al tipo de vegetación.",
+      "numeral": "7.2.1.2 b), 7.2.2 b), 7.2.3 b)",
+      "linea": 2757
+    },
+    {
+      "texto": "La persona solicitante debe acudir a la visita técnica con el personal designado por las Delegaciones para delimitar el polígono, cuantificar la superficie y/o evaluar el proyecto en campo según el concepto.",
+      "numeral": "8.1.7, inciso b)",
+      "linea": 3266
+    },
+    {
+      "texto": "Tras la recepción de solicitudes se procede al levantamiento en campo de la poligonal y la recopilación de datos técnicos; las Delegaciones son quienes integran los requisitos, levantan las poligonales y recopilan los datos técnicos que fundan los dictámenes jurídico y técnico.",
+      "numeral": "10.1, incisos c) y f)",
+      "linea": 3518
+    },
+    {
+      "texto": "La superficie aprobada por el Comité se verifica en campo, se georreferencia y se acepta como dato definitivo, que se asienta en el Contrato de Adhesión.",
+      "numeral": "8.1.7, inciso g)",
+      "linea": 3288
+    },
+    {
+      "texto": "Las actividades se distribuyen en la superficie asignada dentro de los polígonos dictaminados como procedentes, respetando el área mínima que la planta requiere y las densidades de reforestación por ecosistema; en caso contrario se hace el ajuste técnico y administrativo, que no puede ser menor al 70 % de la superficie asignada. La distribución de la planta es en marco real, tresbolillo o irregular.",
+      "numeral": "10.1, inciso u)",
+      "linea": 3595
+    }
+  ],
+  "inelegibles": [
+    {
+      "texto": "Predios con cobertura arbórea mayor al 49 %.",
+      "numeral": "8.1.1.1, inciso a)",
+      "linea": 2809
+    },
+    {
+      "texto": "Predios que hayan cambiado su uso del suelo de forestal a otra actividad.",
+      "numeral": "8.1.1.1, inciso b)",
+      "linea": 2810
+    },
+    {
+      "texto": "Personas sancionadas con la cancelación o suspensión de apoyos de cualquier índole o incluidas en el Listado de Personas Beneficiarias Incumplidas.",
+      "numeral": "8.1.1.1, inciso f)",
+      "linea": 2819
+    },
+    {
+      "texto": "Predios con evidencia, mediante escrito o notificación de autoridad competente a PROBOSQUE, de conflictos o litigios de cualquier índole, o con evidencia clara en los archivos de conflictos de propiedad, posesión o representación; se pone a consideración de la Instancia Normativa.",
+      "numeral": "8.1.1.1, inciso k)",
+      "linea": 2832
+    },
+    {
+      "texto": "Áreas beneficiadas con pago de servicios ambientales (hidrológicos, captura de carbono, biodiversidad, etc.) de CONAFOR u otras instancias, exceptuando las que se suscriban en convenios entre el Comité Técnico del FIPASAHEM y los gobiernos federal, estatal, municipal y ONG.",
+      "numeral": "8.1.1.1, inciso m)",
+      "linea": 2841
+    },
+    {
+      "texto": "Núcleos agrarios que no tengan vigentes sus órganos de representación, con excepción del plazo de la Ley Agraria para los suplentes.",
+      "numeral": "8.1.1.1, inciso n)",
+      "linea": 2845
+    },
+    {
+      "texto": "Personas servidoras públicas, cónyuges, parientes consanguíneos o civiles, terceros con relaciones profesionales, laborales o de negocios, o socios o sociedades de las que formen parte.",
+      "numeral": "8.1.1.1, inciso o)",
+      "linea": 2847
+    },
+    {
+      "texto": "Personas solicitantes que hayan recibido recurso mayor a lo establecido en el contrato de adhesión en convocatorias anteriores y no lo hayan reintegrado.",
+      "numeral": "8.1.1.1, inciso p)",
+      "linea": 2859
+    },
+    {
+      "texto": "Preservación: predios con sobrevivencia menor al mínimo de su zona climática (70 % templada, 40 % cálida), salvo aprobación del Comité por causas no imputables a la persona beneficiaria.",
+      "numeral": "8.1.1.1, inciso d); Convocatoria base tercera; 9.4.3 inciso c)",
+      "linea": 2812
+    },
+    {
+      "texto": "Predios beneficiados por otro programa federal, estatal o municipal con el mismo propósito en la misma área: causa de baja a decisión de la Instancia Normativa (la persona debe informarlo en la solicitud).",
+      "numeral": "8.1.7 inciso o); 8.1.9 b) fr. 14",
+      "linea": 3313
+    }
+  ],
+  "montos": [
+    {
+      "concepto": "Restauración Forestal Integral, Modalidad uno: recurso económico anual por hectárea para obras de conservación de suelos y captación de agua y preparación del sitio (sin planta)",
+      "monto": 30000,
+      "unidad": "pesos por hectárea",
+      "modalidad": "rfi_modalidad_uno",
+      "numeral": "7.2.1.1 a); Convocatoria base tercera",
+      "linea": 2741
+    },
+    {
+      "concepto": "Restauración Forestal Integral, Modalidad dos: recurso económico anual por hectárea (reforestación obligatoria y 2 actividades alternas)",
+      "monto": 14000,
+      "unidad": "pesos por hectárea",
+      "modalidad": "rfi_modalidad_dos",
+      "numeral": "7.2.1.2 a); Convocatoria base tercera",
+      "linea": 2752
+    },
+    {
+      "concepto": "Bosques de agua: recurso económico anual por hectárea plantada",
+      "monto": 3500,
+      "unidad": "pesos por hectárea plantada",
+      "modalidad": "bosques_de_agua",
+      "numeral": "7.2.2 a); Convocatoria base tercera",
+      "linea": 2766
+    },
+    {
+      "concepto": "Preservación de reforestaciones establecidas: recurso económico anual por hectárea, con base en el porcentaje de sobrevivencia anual y la zona climática (mayor o igual al 70 % templada; mayor o igual al 40 % cálida)",
+      "monto": 3000,
+      "unidad": "pesos por hectárea",
+      "modalidad": "preservacion_reforestaciones",
+      "numeral": "7.2.3 a); Convocatoria base tercera",
+      "linea": 2777
+    },
+    {
+      "concepto": "Planta nativa preferentemente, mediante Vale de Planta canjeable en los viveros de PROBOSQUE, según tipo de vegetación y porcentaje de cobertura arbórea o de sobrevivencia del Diagnóstico Técnico (RFI Modalidad dos, Bosques de agua y Preservación; no en RFI Modalidad uno)",
+      "monto": null,
+      "unidad": "en especie (sin monto en las ROP)",
+      "numeral": "7.1 b); 7.2.1.2 b); 7.2.2 b); 7.2.3 b)",
+      "linea": 2732
+    },
+    {
+      "concepto": "Acompañamiento técnico gratuito por el personal técnico de las Delegaciones Regionales Forestales (todos los conceptos)",
+      "monto": null,
+      "unidad": "gratuito (sin costo para la persona beneficiaria)",
+      "numeral": "7.1 b); 7.2",
+      "linea": 2732
+    },
+    {
+      "concepto": "Valor de la planta no establecida: reintegro obligatorio cuando la planta asignada no fue establecida dentro de los polígonos dictaminados o en una superficie menor al 70 % de la superficie asignada, conforme al listado de precio de venta oficial autorizado por la Secretaría de Finanzas o, en su caso, al costo de producción de planta",
+      "monto": null,
+      "unidad": "según listado oficial de precios o costo de producción (monto no fijado en las ROP)",
+      "numeral": "8.1.9 c) fr. 5; 8.1.7 inciso k)",
+      "linea": 3412
+    },
+    {
+      "concepto": "Comisión bancaria por transferencia o depósito: a cargo de la persona beneficiaria",
+      "monto": null,
+      "unidad": "variable (a cargo de la persona beneficiaria)",
+      "numeral": "8.1.1.2, último párrafo",
+      "linea": 3041
+    }
+  ],
+  "ministraciones": [
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "condicion": "Posterior a la asignación del Comité y firma del Contrato de Adhesión (RFI Modalidad uno; $30,000.00 por hectárea al año).",
+      "regimen": "rfi_modalidad_uno",
+      "numeral": "7.2.1.1 a); Convocatoria base quinta (RHF y PS), actividad VII",
+      "linea": 2743
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "condicion": "A la conclusión de las actividades comprometidas en el Contrato de Adhesión, o en su caso la parte proporcional del porcentaje realizado, una vez verificado el cumplimiento (Convocatoria: «una vez verificado el cumplimiento de las actividades comprometidas»).",
+      "regimen": "rfi_modalidad_uno",
+      "numeral": "7.2.1.1 a); Convocatoria base quinta (RHF y PS), actividad VII",
+      "linea": 2744
+    },
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "condicion": "Posterior a la asignación del Comité y firma del Contrato de Adhesión (RFI Modalidad dos; $14,000.00 por hectárea al año).",
+      "regimen": "rfi_modalidad_dos",
+      "numeral": "7.2.1.2 a)",
+      "linea": 2754
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "condicion": "A la conclusión de las actividades comprometidas en el Contrato de Adhesión, o en su caso la parte proporcional del porcentaje realizado.",
+      "regimen": "rfi_modalidad_dos",
+      "numeral": "7.2.1.2 a)",
+      "linea": 2755
+    },
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "condicion": "Posterior a la asignación del Comité y firma del Contrato de Adhesión (Bosques de agua; $3,500.00 por hectárea plantada).",
+      "regimen": "bosques_de_agua",
+      "numeral": "7.2.2 a)",
+      "linea": 2767
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "condicion": "A la conclusión de las actividades comprometidas en el Contrato de Adhesión, o en su caso la parte proporcional del porcentaje realizado.",
+      "regimen": "bosques_de_agua",
+      "numeral": "7.2.2 a)",
+      "linea": 2768
+    },
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "condicion": "Posterior a la asignación del Comité y firma del Contrato de Adhesión (Preservación; $3,000.00 por hectárea con base en sobrevivencia anual y zona climática).",
+      "regimen": "preservacion_reforestaciones",
+      "numeral": "7.2.3 a)",
+      "linea": 2780
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "condicion": "A la conclusión de las actividades comprometidas en el Contrato de Adhesión, o en su caso la parte proporcional del porcentaje realizado.",
+      "regimen": "preservacion_reforestaciones",
+      "numeral": "7.2.3 a)",
+      "linea": 2781
+    }
+  ],
+  "plazos": [
+    {
+      "clave": "recepcion_solicitudes",
+      "descripcion": "Recepción y registro de solicitudes, a partir del día hábil siguiente a la publicación de la Convocatoria y hasta el 27 de marzo de 2026.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-03-27",
+      "corre_desde": "Día hábil siguiente a la publicación de la Convocatoria (27-ene-2026)",
+      "responsable": "Delegación Regional Forestal",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad I",
+      "linea": 823
+    },
+    {
+      "clave": "complemento_documentacion_faltante",
+      "descripcion": "Término para presentar la documentación faltante, siempre que no exceda la fecha límite de recepción de solicitudes; si no se complementa, la solicitud se tiene por desechada.",
+      "cantidad": 5,
+      "unidad": "dias_habiles",
+      "corre_desde": "Recepción de la solicitud",
+      "responsable": "Persona solicitante (la Delegación informa conforme al acuse)",
+      "numeral": "8.1.1.2, inciso i); Convocatoria base cuarta",
+      "linea": 2986,
+      "textual": "contará con un término de cinco días hábiles a partir de la recepción de la solicitud para la presentación de la documentación faltante, siempre y cuando este tiempo no exceda la fecha límite, establecida en la Convocatoria, para la recepción de solicitudes"
+    },
+    {
+      "clave": "aviso_faltantes_en_evaluacion",
+      "descripcion": "Si con posterioridad se determina que hay que presentar de nuevo documentación o información complementaria, se notifica a la persona solicitante dentro del plazo de la evaluación (sin número fijo de días).",
+      "cantidad": null,
+      "unidad": "plazo_de_evaluacion",
+      "corre_desde": "Durante la evaluación",
+      "responsable": "Instancia Ejecutora (Dirección de Restauración y Fomento Forestal)",
+      "numeral": "10.1, inciso e)",
+      "linea": 3526
+    },
+    {
+      "clave": "evaluacion_validacion_calificacion_campo",
+      "descripcion": "Evaluación, validación y calificación en campo de cada Programa, desde la apertura de la Convocatoria y hasta su cierre.",
+      "cantidad": null,
+      "unidad": "otro",
+      "corre_desde": "Apertura de la Convocatoria (28-ene-2026), hasta su cierre",
+      "responsable": "Delegaciones Regionales Forestales",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad II",
+      "linea": 826
+    },
+    {
+      "clave": "dictaminacion_tecnica_juridica",
+      "descripcion": "Dictaminaciones técnica y jurídica de cada Programa, desde la apertura de la Convocatoria hasta el 30 de abril de 2026.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-04-30",
+      "corre_desde": "Apertura de la Convocatoria",
+      "responsable": "Área Responsable del Programa y Unidad Jurídica",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad III",
+      "linea": 829
+    },
+    {
+      "clave": "aprobacion_solicitudes",
+      "descripcion": "Con base en la disponibilidad de presupuesto, cada Programa realiza asignaciones posteriores a la dictaminación, hasta agotar el recurso. Sin fecha límite en la Convocatoria para RHF. El fallo es inapelable.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Posterior a la dictaminación",
+      "responsable": "Comité de Admisión y Seguimiento del Programa RHF",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad IV",
+      "linea": 831
+    },
+    {
+      "clave": "publicacion_resultados",
+      "descripcion": "Posterior a la fecha de la aprobación de las solicitudes por el Comité, los resultados se publican en la página web de PROBOSQUE y están disponibles en Oficinas Centrales y Delegaciones. Sin plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Aprobación de las solicitudes por el Comité",
+      "responsable": "Instancia Ejecutora a través del Área Responsable del Programa",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad V; base sexta; 10.1 inciso h)",
+      "linea": 833
+    },
+    {
+      "clave": "firma_contrato",
+      "descripcion": "Elaboración y firma del Contrato de Adhesión: hasta los 10 días hábiles posteriores a la fecha en que sea notificada la persona beneficiaria, por cualquier medio, de que el Organismo ya cuenta con la disponibilidad del recurso económico y después de la publicación de resultados, aprobación del Comité y antes del primer pago. El numeral 8.1.9 b) fr. 5 de las ROP lo cuenta desde la notificación, por cualquier medio, de ser persona beneficiaria.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "corre_desde": "Notificación, por cualquier medio, a la persona beneficiaria (Convocatoria: de que el Organismo ya cuenta con la disponibilidad del recurso económico; ROP 8.1.9 b) fr. 5: de ser persona beneficiaria)",
+      "responsable": "Persona beneficiaria, con la Delegación Regional Forestal; contrato elaborado por el Área Responsable del Programa",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad VI; 8.1.9 b) fr. 5; 8.1.7 inciso f); 10.1 inciso k)",
+      "linea": 837,
+      "lineas_adicionales": [
+        3361,
+        3286,
+        3557
+      ]
+    },
+    {
+      "clave": "entrega_ptrfi_actualizado",
+      "descripcion": "Restauración Forestal Integral (cualquier modalidad), si la superficie asignada es distinta a la solicitada: entregar el PTRFI modificado a la superficie asignada, físico o digital, en la Delegación Regional Forestal; no entregarlo en el plazo, sin causa justificada, es causa de baja.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "corre_desde": "Notificación, por cualquier medio, de ser persona beneficiaria",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.1.2, inciso i); 8.1.9 b) fr. 4",
+      "linea": 3028,
+      "lineas_adicionales": [
+        3359
+      ]
+    },
+    {
+      "clave": "primera_ministracion",
+      "descripcion": "Pago de la primera ministración (70 %) posterior a la asignación del Comité y a la firma del Contrato de Adhesión; se emite una vez que se cuenta con el Contrato firmado y sellado (núcleos agrarios) y el oficio de solicitud de pago de la Delegación. Sin plazo en días ni fecha.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Firma del Contrato de Adhesión",
+      "responsable": "Dirección de Administración, Finanzas y de Gestión Documental (a solicitud del Área Responsable del Programa)",
+      "numeral": "7.2; Convocatoria base quinta (RHF y PS), actividad VII; 10.1 incisos l) y m)",
+      "linea": 842,
+      "lineas_adicionales": [
+        2743,
+        3561,
+        3563
+      ]
+    },
+    {
+      "clave": "segunda_ministracion",
+      "descripcion": "Pago de la segunda ministración (30 %) a la conclusión de las actividades comprometidas, o la parte proporcional del porcentaje realizado, una vez verificado el cumplimiento en campo (listado preliminar de personas que concluyeron y oficio de solicitud de pago de la Delegación). Sin plazo en días ni fecha.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Verificación del cumplimiento de las actividades comprometidas",
+      "responsable": "Dirección de Administración, Finanzas y de Gestión Documental (a solicitud del Área Responsable del Programa)",
+      "numeral": "7.2; Convocatoria base quinta (RHF y PS), actividad VII; 10.1 inciso o)",
+      "linea": 843,
+      "lineas_adicionales": [
+        3570
+      ]
+    },
+    {
+      "clave": "fecha_limite_conclusion_actividades_septiembre",
+      "descripcion": "Fecha límite para la conclusión de las actividades comprometidas en los conceptos Bosques de agua, Preservación de reforestaciones establecidas y Restauración Forestal Integral Modalidad dos: no podrá exceder el último día hábil del mes de septiembre. La fecha de 2026 es derivada (el último día hábil de septiembre de 2026 es el miércoles 30; el año no se escribe en las ROP).",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-09-30",
+      "corre_desde": "Contrato de Adhesión",
+      "responsable": "Persona beneficiaria (informa el término a las Delegaciones por cualquier medio)",
+      "numeral": "10.1, inciso t)",
+      "linea": 3588,
+      "modalidades": [
+        "rfi_modalidad_dos",
+        "bosques_de_agua",
+        "preservacion_reforestaciones"
+      ]
+    },
+    {
+      "clave": "fecha_limite_conclusion_actividades_octubre",
+      "descripcion": "Fecha límite para la conclusión de las actividades comprometidas en Restauración Forestal Integral Modalidad uno: hasta el último día hábil del mes de octubre. La fecha de 2026 es derivada (el 31-oct-2026 es sábado; el último día hábil es el viernes 30; el año no se escribe en las ROP).",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-10-30",
+      "corre_desde": "Contrato de Adhesión",
+      "responsable": "Persona beneficiaria (informa el término a las Delegaciones por cualquier medio)",
+      "numeral": "10.1, inciso t)",
+      "linea": 3589,
+      "modalidades": [
+        "rfi_modalidad_uno"
+      ]
+    },
+    {
+      "clave": "verificacion_en_campo_formato_delegacion",
+      "descripcion": "Plazo para que las Delegaciones Regionales Forestales entreguen al Área Responsable del Programa el formato de verificación de conclusión de actividades en campo: 10 días hábiles posteriores al último día hábil de la conclusión del concepto, según corresponda. Mide la entrega del formato por la Delegación, no el plazo para hacer la visita; no queda claro si «la conclusión» es la fecha límite (último día hábil de septiembre u octubre) o la fecha real en que la persona beneficiaria informa el término.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "corre_desde": "Último día hábil de la conclusión del concepto, según corresponda (septiembre u octubre)",
+      "responsable": "Delegaciones Regionales Forestales",
+      "numeral": "10.1, inciso t)",
+      "linea": 3592,
+      "textual": "La fecha límite para la entrega del formato de verificación de conclusión de actividades en campo, por parte de las Delegaciones Regionales Forestales al Área Responsable del Programa, tendrá un plazo de 10 días hábiles posteriores al último día hábil de la conclusión del concepto según corresponda"
+    },
+    {
+      "clave": "verificacion_ejecucion_actividades",
+      "descripcion": "Verificaciones parciales durante la ejecución de las actividades comprometidas en el Contrato de Adhesión, para dar acompañamiento técnico gratuito. Las Delegaciones deben acudir a todos los predios beneficiados para verificar que las acciones del Contrato se realizaron y generar el documento que lo avale.",
+      "cantidad": null,
+      "unidad": "vigencia_del_contrato",
+      "corre_desde": "Firma del Contrato de Adhesión",
+      "responsable": "Delegaciones Regionales Forestales",
+      "numeral": "Convocatoria base quinta (RHF y PS), actividad VIII; 10.1 inciso n)",
+      "linea": 846,
+      "lineas_adicionales": [
+        3566
+      ]
+    },
+    {
+      "clave": "recoger_planta_vale",
+      "descripcion": "La persona beneficiaria que recibió Vale de Planta debe recoger la planta en el vivero que le corresponda dentro del término de 15 días hábiles posteriores a la entrega del Vale de Salida de Planta o antes de la fecha de vencimiento del mismo. No depende de la entrega del 70 % del recurso económico. Vencido el vale, la planta se pone a disposición en el vivero y debe solicitarse un nuevo Vale de Planta, que se expide si hay disponibilidad de planta; si no, se adquiere con recurso propio sin responsabilidad para el Organismo.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "corre_desde": "Entrega del Vale de Salida de Planta (o fecha de vencimiento del vale, lo que ocurra antes)",
+      "responsable": "Persona beneficiaria (vivero de PROBOSQUE que le corresponda)",
+      "numeral": "8.1.7, inciso e)",
+      "linea": 3278,
+      "textual": "deberá recoger la planta en el vivero que le corresponda, dentro del término de 15 días hábiles posteriores a la entrega del Vale de Salida de Planta o antes de la fecha de vencimiento del mismo"
+    },
+    {
+      "clave": "aviso_caso_fortuito_conflicto",
+      "descripcion": "Notificar por escrito a la Instancia Normativa, por conducto de la Delegación o directamente a la Dirección de Restauración y Fomento Forestal, los conflictos por límites de tierra, representación, posesión, litigio o de cualquier índole en el predio y polígono dictaminado, así como cualquier siniestro o afectación al predio, con la documentación que lo sustente; debe hacerse además la denuncia ante la autoridad competente cuando sea por caso fortuito o fuerza mayor.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "corre_desde": "No lo precisa el texto (se entiende desde que se presenta el conflicto o siniestro)",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.7, inciso i)",
+      "linea": 3294
+    },
+    {
+      "clave": "segunda_persona_beneficiaria_interes",
+      "descripcion": "Por fallecimiento del titular, la segunda persona beneficiaria debe notificar su interés en continuar con el Programa; si no lo hace en 30 días hábiles, procede la baja.",
+      "cantidad": 30,
+      "unidad": "dias_habiles",
+      "corre_desde": "Fallecimiento del titular (el texto dice «en el término de 30 días hábiles»)",
+      "responsable": "Segunda persona beneficiaria",
+      "numeral": "8.1.9 b) fr. 10",
+      "linea": 3372
+    },
+    {
+      "clave": "vigencia_documentacion_legal_refrendo",
+      "descripcion": "Para el trámite simplificado de refrendo (Preservación y/o RFI Modalidad dos sin cambio de superficie ni de PTRFI): la documentación legal debe obrar en los archivos de PROBOSQUE por un periodo no mayor a tres años anteriores a la solicitud y estar vigente.",
+      "cantidad": 3,
+      "unidad": "anios",
+      "corre_desde": "Solicitud (hacia atrás: antigüedad de la documentación en el expediente)",
+      "responsable": "PROBOSQUE (Dirección de Restauración y Fomento Forestal)",
+      "numeral": "8.1.1.2, inciso i)",
+      "linea": 2976
+    },
+    {
+      "clave": "antiguedad_maxima_reforestacion_preservacion",
+      "descripcion": "Para Preservación de reforestaciones establecidas se incluyen predios con reforestaciones de hasta 3 años previos de establecimiento (y personas beneficiarias hasta tres años anteriores).",
+      "cantidad": 3,
+      "unidad": "anios",
+      "corre_desde": "Establecimiento de la reforestación",
+      "responsable": "Área Responsable del Programa",
+      "numeral": "8.1.1.1, inciso d); 8.1.2 incisos f) y h)",
+      "linea": 2812
+    },
+    {
+      "clave": "suplentes_nucleo_agrario",
+      "descripcion": "Núcleos agrarios con periodo de gestión concluido sin elecciones: los suplentes toman el cargo como titulares hasta por un plazo no mayor de sesenta días naturales (art. 39 Ley Agraria); después, sin acta de elección registrada, se da de baja.",
+      "cantidad": 60,
+      "unidad": "dias_naturales",
+      "corre_desde": "Fecha en que los propietarios concluyeron su periodo de gestión",
+      "responsable": "Núcleo agrario",
+      "numeral": "8.1.1.2, inciso i)",
+      "linea": 3003
+    },
+    {
+      "clave": "representantes_vigentes_1_diciembre",
+      "descripcion": "Los representantes de núcleos agrarios deben estar vigentes al 1 de diciembre del año fiscal; si no, el recurso no ejercido se cancela y se devuelve a su área de origen.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-12-01",
+      "corre_desde": "Año fiscal correspondiente",
+      "responsable": "Núcleo agrario",
+      "numeral": "8.1.1.2, inciso i)",
+      "linea": 3014
+    },
+    {
+      "clave": "vigencia_comprobantes",
+      "descripcion": "El comprobante de domicilio debe tener una vigencia no mayor a tres meses.",
+      "cantidad": 3,
+      "unidad": "meses",
+      "corre_desde": "Presentación del comprobante",
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2, inciso e)",
+      "linea": 2885
+    },
+    {
+      "clave": "arrendamiento_usufructo_maximo",
+      "descripcion": "El contrato de usufructo o arrendamiento debe estar vigente acorde a los plazos de ejecución del Programa y no exceder un plazo máximo de 5 años conforme al Código Civil del Estado de México.",
+      "cantidad": 5,
+      "unidad": "anios",
+      "corre_desde": "Contrato de usufructo o arrendamiento",
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2, inciso g.2) fr. II",
+      "linea": 2900
+    },
+    {
+      "clave": "convocatoria_sesion_comite",
+      "descripcion": "La Secretaría Técnica expide la convocatoria a sesión con 3 días hábiles de anticipación como mínimo para sesiones ordinarias y con 24 horas para extraordinarias.",
+      "cantidad": 3,
+      "unidad": "dias_habiles",
+      "cantidad_extraordinaria_horas": 24,
+      "corre_desde": "Fecha de la sesión (anticipación mínima)",
+      "responsable": "Secretaría Técnica del Comité",
+      "numeral": "9.4.2",
+      "linea": 3472
+    },
+    {
+      "clave": "acta_sesion_comite",
+      "descripcion": "El acta de la sesión del Comité, con cada acuerdo, debe ser firmada por la mayoría de los integrantes presentes con voz y voto en un plazo máximo de 10 días hábiles posteriores a la sesión.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "corre_desde": "Sesión del Comité",
+      "responsable": "Secretaría Técnica del Comité",
+      "numeral": "9.4.2",
+      "linea": 3481
+    },
+    {
+      "clave": "instalacion_comite",
+      "descripcion": "El Comité de Admisión y Seguimiento debe instalarse dentro de los 15 días hábiles siguientes a la publicación de las Reglas en la Gaceta del Gobierno.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "corre_desde": "Publicación de las Reglas (27-ene-2026)",
+      "responsable": "Comité de Admisión y Seguimiento",
+      "numeral": "Transitorio SÉPTIMO",
+      "linea": 3715
+    },
+    {
+      "clave": "lineamientos_internos_comite",
+      "descripcion": "El Comité debe emitir sus Lineamientos Internos dentro de los 15 días hábiles siguientes a su instalación.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "corre_desde": "Instalación del Comité",
+      "responsable": "Comité de Admisión y Seguimiento",
+      "numeral": "Transitorio OCTAVO",
+      "linea": 3717
+    },
+    {
+      "clave": "reintegro",
+      "descripcion": "El monto no ejercido por ajustes, bajas, cancelaciones y desistimientos debe reintegrarse de manera inmediata; los depósitos de más deben devolverse de manera obligatoria e inmediata, a la cuenta de PROBOSQUE que proporcione la Dirección de Administración, Finanzas y de Gestión Documental, en el momento en que se notifique por cualquier medio. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "inmediato",
+      "corre_desde": "Notificación de la situación a la persona beneficiaria, por cualquier medio",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.9 c); 8.1.7 incisos j) y q)",
+      "linea": 3418,
+      "lineas_adicionales": [
+        3303,
+        3317
+      ]
+    },
+    {
+      "clave": "informe_anual_comite",
+      "descripcion": "La Instancia Ejecutora informa anualmente a la Instancia Normativa de los resultados obtenidos en el Programa y presenta un informe anual de ejecución.",
+      "cantidad": null,
+      "unidad": "otro",
+      "corre_desde": "Anual (sin fecha)",
+      "responsable": "Instancia Ejecutora (Área Responsable del Programa)",
+      "numeral": "10.1 inciso w); 15",
+      "linea": 3614,
+      "lineas_adicionales": [
+        3659
+      ]
+    },
+    {
+      "clave": "segunda_convocatoria",
+      "descripcion": "Si existen recursos disponibles al término de la aprobación de solicitudes, será posible emitir una segunda convocatoria. Sin plazo.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Término de la aprobación de solicitudes",
+      "responsable": "PROBOSQUE",
+      "numeral": "Convocatoria base séptima",
+      "linea": 917
+    }
+  ],
+  "calendario_convocatoria": [
+    {
+      "evento": "Publicación de la Convocatoria y de las ROP en la Gaceta del Gobierno",
+      "inicio": "2026-01-27",
+      "fin": "2026-01-27",
+      "linea": 973
+    },
+    {
+      "evento": "Entrada en vigor (al día siguiente de su publicación)",
+      "inicio": "2026-01-28",
+      "fin": null,
+      "linea": 3707
+    },
+    {
+      "evento": "Recepción y registro de solicitudes (a partir del día hábil siguiente a la publicación)",
+      "inicio": "2026-01-28",
+      "fin": "2026-03-27",
+      "nota": "El inicio se deriva: la Convocatoria dice «a partir del día hábil siguiente» y el 28-ene-2026 es miércoles",
+      "linea": 823
+    },
+    {
+      "evento": "Dictaminación técnica y jurídica (desde la apertura de la Convocatoria hasta el 30 de abril)",
+      "inicio": "2026-01-28",
+      "fin": "2026-04-30",
+      "linea": 829
+    },
+    {
+      "evento": "Fecha límite de conclusión de actividades: Bosques de agua, Preservación y RFI Modalidad dos (último día hábil de septiembre; fecha derivada)",
+      "inicio": null,
+      "fin": "2026-09-30",
+      "linea": 3588
+    },
+    {
+      "evento": "Fecha límite de conclusión de actividades: RFI Modalidad uno (último día hábil de octubre; fecha derivada)",
+      "inicio": null,
+      "fin": "2026-10-30",
+      "linea": 3589
+    },
+    {
+      "evento": "Representantes de núcleos agrarios deben estar vigentes al 1 de diciembre",
+      "inicio": null,
+      "fin": "2026-12-01",
+      "linea": 3014
+    }
+  ],
+  "formatos": [
+    {
+      "clave": "FO-PB-501-A",
+      "nombre": "Solicitud Única (PSAHEM, RHF, PS y CC), versión 15, revisión 29-ene-2026; incluye comprobante de recepción, checklist de documentos y declaratoria de no litigio",
+      "uso": "Solicitud, registro del predio, tipo de persona, grupos prioritarios, superficie solicitada por concepto de RHF (RFI Modalidad uno y dos, Bosques de agua, Preservación por año 2023, 2024 y 2025) y comprobante de recepción",
+      "en_texto": true,
+      "linea": 11972
+    },
+    {
+      "clave": "FO-PB-502",
+      "nombre": "Registro de Información de la persona solicitante y/o beneficiaria (versión 14, revisión 22-ene-2026) con aviso de privacidad",
+      "uso": "Datos personales de la persona solicitante, de los integrantes del comisariado y de la segunda persona beneficiaria",
+      "en_texto": true,
+      "linea": 12244
+    },
+    {
+      "clave": "PTRFI",
+      "nombre": "Proyecto Técnico de Restauración Forestal Integral y Guía de contenido para su elaboración (página web de PROBOSQUE)",
+      "uso": "RFI Modalidad uno (a 5 años, en etapas anuales) y Modalidad dos (actualizado); elaborado o actualizado por la persona solicitante o un PSF con RFN; base de las actividades del Contrato de Adhesión",
+      "en_texto": false,
+      "linea": 2959
+    },
+    {
+      "clave": "",
+      "nombre": "Diagnóstico Técnico (formato de las Delegaciones Regionales Forestales)",
+      "uso": "Documento previo al Dictamen Técnico Forestal; registra cobertura arbórea o sobrevivencia, base de la asignación de planta; resultado de las visitas a predios y del SIG de PROBOSQUE",
+      "en_texto": false,
+      "linea": 2595
+    },
+    {
+      "clave": "",
+      "nombre": "Vale de Planta / Vale de Salida de Planta",
+      "uso": "Documento que otorga planta de diferentes especies a la persona beneficiaria, canjeable en los viveros de PROBOSQUE",
+      "en_texto": false,
+      "linea": 2676
+    },
+    {
+      "clave": "",
+      "nombre": "Carta compromiso / carta responsiva de establecimiento de la planta",
+      "uso": "Retiro voluntario de planta antes de la firma del Contrato de Adhesión, sin responsabilidad para PROBOSQUE",
+      "en_texto": false,
+      "linea": 3552
+    },
+    {
+      "clave": "",
+      "nombre": "Contrato de Adhesión (y Adenda)",
+      "uso": "Instrumento que suscribe cada persona beneficiaria con PROBOSQUE; fija la superficie definitiva georreferenciada y las actividades comprometidas",
+      "en_texto": false,
+      "linea": 2589
+    },
+    {
+      "clave": "",
+      "nombre": "Oficio de solicitud de pago de la Delegación Regional",
+      "uso": "Disparador de la solicitud del recurso económico (primera y segunda ministración) por el Área Responsable del Programa",
+      "en_texto": false,
+      "linea": 3561
+    },
+    {
+      "clave": "",
+      "nombre": "Formato de verificación de conclusión de actividades en campo y minutas de verificación",
+      "uso": "Lo entregan las Delegaciones al Área Responsable del Programa en 10 días hábiles posteriores a la conclusión; base de la segunda ministración",
+      "en_texto": false,
+      "linea": 3592
+    }
+  ],
+  "ptrfi": {
+    "que_es": "Proyecto Técnico de Restauración Forestal Integral",
+    "definicion_numeral": "3 (Glosario: PTRFI)",
+    "definicion_linea": 2644,
+    "quien_lo_elabora": "La persona solicitante lo proporciona, físico o digital; puede ser elaborado y ejecutado (o actualizado), debido a su complejidad, por un Prestador de Servicios Forestales (PSF) que cuente con su Registro Forestal Nacional (RFN); el listado de PSF se consulta en la página de la SEMARNAT.",
+    "quien_lo_elabora_numeral": "7.2.1.1 b), 7.2.1.2 c), 8.1.1.2 inciso i)",
+    "quien_lo_elabora_linea": 2749,
+    "cuando_se_entrega": "Con la solicitud (Solicitud Única, apartado IV punto 9). Modalidad uno: PTRFI a ejecutar durante 5 años, dividido en etapas anuales. Modalidad dos: PTRFI actualizado solo si la superficie beneficiada el año inmediato anterior no es la misma que la del PTRFI y/o hay modificaciones de actividades. Si la superficie asignada es distinta de la solicitada, se entrega modificado en 10 días hábiles posteriores a la notificación de ser persona beneficiaria.",
+    "cuando_se_entrega_numeral": "8.1.1.2 inciso i.1), i.2) y párrafo de superficie asignada; 8.1.9 b) fr. 4",
+    "cuando_se_entrega_linea": 2959,
+    "guia": "Guía de contenido para la elaboración del PTRFI, formato disponible en la página web de PROBOSQUE (no incluida en el texto)",
+    "evaluacion": "En Modalidad uno la persona beneficiaria debe acudir a la visita técnica para evaluar el proyecto en campo (8.1.7 inciso b); se prioriza a quien obtenga el puntaje o evaluación de proyecto más alto (8.1.2 inciso k); las ROP no traen la tabla de puntaje.",
+    "alcance_modalidad_uno": "Obras de conservación de suelos y captación de agua y preparación del sitio para la reforestación en una segunda etapa, sujetas a valoración y validación técnica y a las condiciones y materiales disponibles en el predio.",
+    "alcance_modalidad_dos": "Reforestación obligatoria y 2 actividades alternas, sujetas a valoración y validación técnica."
+  },
+  "vale_de_planta": {
+    "definicion": "Documento mediante el cual se otorga planta de diferentes especies a la persona beneficiaria del Programa para realizar la reforestación correspondiente.",
+    "definicion_numeral": "3 (Glosario: Vale de Planta)",
+    "definicion_linea": 2676,
+    "quien_lo_emite": "Las ROP no nombran la unidad que lo emite: dicen que «se podrá otorgar un Vale de Planta, canjeable en los viveros de PROBOSQUE» (7.1 b) y que «el Organismo lo expedirá» (8.1.7 e). La planta se produce y entrega en los Viveros Forestales de PROBOSQUE.",
+    "quien_lo_emite_numeral": "7.1 b); 8.1.7 inciso e)",
+    "quien_lo_emite_linea": 2732,
+    "a_quienes_aplica": "Todas las personas beneficiarias del Programa, con excepción del concepto Restauración Forestal Integral Modalidad uno, que no recibe planta (8.1.7 inciso d; 7.1).",
+    "vigencia": "15 días hábiles posteriores a la entrega del Vale de Salida de Planta, o antes de la fecha de vencimiento del vale; la recolección no depende de la entrega del 70 % del recurso económico.",
+    "vigencia_numeral": "8.1.7, inciso e)",
+    "vigencia_linea": 3278,
+    "reposicion": "Vencido el vale, la planta se pone a disposición en el vivero; la persona beneficiaria debe solicitar a la brevedad un nuevo Vale de Planta y el Organismo lo expedirá siempre que tenga disponibilidad de planta; si no, la adquiere con recurso propio en los viveros que considere, con las características físicas requeridas por el Programa, sin responsabilidad para el Organismo.",
+    "reposicion_numeral": "8.1.7, inciso e)",
+    "reposicion_linea": 3281,
+    "especies_y_cantidades": "Planta nativa preferentemente, de acuerdo al tipo de vegetación y al porcentaje de cobertura arbórea (o de sobrevivencia, en Preservación) obtenido en el Diagnóstico Técnico; la cantidad se otorga conforme al cuadro de 10.1 inciso s) y a la disponibilidad de planta y especies producidas por PROBOSQUE.",
+    "especies_y_cantidades_numeral": "7.2.1.2 b), 7.2.2 b), 7.2.3 b); 10.1 inciso s)",
+    "especies_y_cantidades_linea": 2757,
+    "momento_de_entrega": "Preferentemente posterior al trazo, preparación y elaboración de cepas en el polígono asignado (8.1.7 incisos d y e). De manera voluntaria y bajo su responsabilidad, mediante carta compromiso, la persona beneficiaria puede retirar la planta antes de la firma del Contrato de Adhesión y del pago, una vez aprobada la solicitud por el Comité y publicados los resultados, notificada por cualquier medio a través de la Delegación (8.1.6 inciso g; 10.1 inciso i).",
+    "salida_de_planta_del_vivero": "La planta se retira del vivero que le corresponda a la persona beneficiaria con el Vale de Salida de Planta; la redacción de las ROP alterna «Vale de Planta» y «Vale de Salida de Planta» sin distinguirlos.",
+    "salida_numeral": "8.1.7, inciso e)",
+    "salida_linea": 3278
+  },
+  "planta_por_hectarea": {
+    "texto": "La cantidad de planta se otorga con base en el cuadro de cobertura de copa y la disponibilidad de planta y especies producidas por PROBOSQUE.",
+    "numeral": "10.1, inciso s)",
+    "linea": 3580,
+    "cuadro_interpretado": [
+      {
+        "cobertura_copa": "0 a 30 %",
+        "zona": "templado",
+        "minimo": 600,
+        "maximo": 800
+      },
+      {
+        "cobertura_copa": "0 a 30 %",
+        "zona": "calido",
+        "minimo": 500,
+        "maximo": 800
+      },
+      {
+        "cobertura_copa": "31 a 49 %",
+        "zona": "templado",
+        "minimo": 250,
+        "maximo": 400
+      },
+      {
+        "cobertura_copa": "31 a 49 %",
+        "zona": "calido",
+        "minimo": 200,
+        "maximo": 400
+      }
+    ],
+    "advertencia": "Interpretación: el texto extraído (también con el PDF en modo layout) trae las celdas desordenadas («Templado 600 / Cálido 500 800 / Del 31 al 49 % Templado 250 400 Cálido 200»). Se leen los mínimos 600, 500, 250 y 200 por zona y los máximos 800 y 400 por rango de cobertura, pero hay que confirmar con el PDF original o con el cliente. Unidad no indicada en el texto (se entiende plantas por hectárea)."
+  },
+  "diagnostico_tecnico": {
+    "definicion": "Documento técnico emitido por las Delegaciones Regionales Forestales, previo al Dictamen Técnico Forestal, sobre la información de características y condiciones del terreno donde se comprueba la factibilidad para obtener el apoyo, recabada por personal técnico de las Delegaciones a través de visitas a predios y del Sistema de Información Geográfica de PROBOSQUE.",
+    "numeral": "3 (Glosario: Diagnóstico Técnico)",
+    "linea": 2595,
+    "contenido": "Porcentaje de cobertura arbórea (RFI Modalidad dos, Bosques de agua) o de sobrevivencia (Preservación), con el que se asigna la planta nativa preferentemente según el tipo de vegetación.",
+    "visita": "Visita técnica con el personal de la Delegación para delimitar el polígono, cuantificar la superficie y/o evaluar el proyecto en campo (8.1.7 inciso b, línea 3266); tras la recepción de solicitudes se levanta en campo la poligonal y se recopilan datos técnicos (10.1 inciso c, línea 3518).",
+    "relacion_con_dictamen": "El Dictamen Técnico (Área Responsable del Programa) evalúa el predio a partir de lo recabado en el Diagnóstico Técnico y determina la procedencia (glosario, línea 2602). El Dictamen Jurídico lo emite la Unidad Jurídica (línea 2599)."
+  },
+  "verificacion_en_campo": {
+    "descripcion": "Las Delegaciones Regionales Forestales acuden a todos los predios beneficiados para verificar que las acciones del Contrato de Adhesión se realizaron, generan el documento que lo avale y lo remiten al Área Responsable del Programa con copia a la Dirección de Restauración y Fomento Forestal (10.1 inciso n, línea 3566). Durante la ejecución hay verificaciones parciales de acompañamiento técnico (Convocatoria, línea 846). Con ello el Área Responsable arma el listado preliminar de personas que concluyeron actividades y, con ajustes, genera la segunda ministración (10.1 inciso o, línea 3570).",
+    "plazo_10_dias_habiles": "Los 10 días hábiles de 10.1 inciso t) (línea 3592) son el plazo para la entrega del formato de verificación de conclusión de actividades en campo por las Delegaciones al Área Responsable del Programa, contados desde el último día hábil de la conclusión del concepto (septiembre: Bosques de agua, Preservación y RFI Modalidad dos; octubre: RFI Modalidad uno). No son plazo para realizar la visita ni para la persona beneficiaria.",
+    "informe_de_termino": "La persona beneficiaria informa el término de las actividades a los titulares de las oficinas de las Delegaciones por cualquier medio (10.1 inciso t, línea 3590). Las ROP de RHF no mencionan Informe Final de Actividades.",
+    "ajuste": "Si de la verificación se observa que las actividades no se realizaron en la totalidad del predio, la superficie no trabajada se cancela, sin poder ser menor al pago de la primera ministración (8.1.9 b fr. 15, línea 3382); el ajuste no puede ser menor al 70 % de la superficie asignada (10.1 inciso u, línea 3595)."
+  },
+  "valor_planta_no_establecida": {
+    "texto": "Si de la verificación efectuada al predio se observa que la planta asignada no fue establecida dentro de los polígonos asignados y dictaminados como procedentes, o en una superficie menor al 70 % de la superficie asignada, será obligación de la persona beneficiaria reintegrar el monto económico de la misma, conforme al listado de precio de venta oficial autorizado por la Secretaría de Finanzas o, en su caso, al costo de producción de planta.",
+    "numeral": "8.1.9 c) fr. 5; 8.1.7 inciso k); 8.1.8 inciso g)",
+    "linea": 3412,
+    "destino_del_reintegro": "A la cuenta bancaria de PROBOSQUE proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental, una vez notificada la situación por cualquier medio; en caso contrario se sanciona conforme indique el Comité y se notifica a la Unidad Jurídica (8.1.9 c, línea 3386).",
+    "plazo": "No hay plazo en días; «en tiempo y forma» (8.1.7 inciso k) o de manera inmediata (8.1.9 c, línea 3418)."
+  },
+  "lista_espera": {
+    "definicion": "Relación de las personas solicitantes que, cumpliendo con los requisitos, no son sujetos de apoyo en ese momento por haberse cumplido la meta programada o por no existir suficiencia presupuestal.",
+    "definicion_numeral": "3 (Glosario: Listado de espera)",
+    "definicion_linea": 2617,
+    "uso": "Con ampliación presupuestal se asignan apoyos a solicitudes factibles sin recurso en lista de espera (7.1, línea 2736). Por desistimiento, baja, cancelación, ajuste o disminución de superficie se puede sustituir a la persona beneficiaria por personas con solicitud en espera, previa aprobación del Comité (10.2, línea 3620). Para RFI Modalidad uno la sustitución fuera de la temporada de actividades solo procede en casos especiales debidamente justificados; si no, se notifica el rechazo por falta de presupuesto (línea 3624). La Convocatoria prevé reasignar con base en la Lista de espera de cada Programa, previa autorización del Comité (base sexta, línea 909).",
+    "numeral": "7.1; 10.2; Convocatoria base sexta"
+  },
+  "derechos": [
+    {
+      "texto": "Recibir la información necesaria en tiempo y forma respecto a la aplicación de la Convocatoria y las Reglas, a través de la instancia ejecutora y del personal de las Delegaciones Regionales Forestales.",
+      "numeral": "8.1.6, inciso a)",
+      "linea": 3239
+    },
+    {
+      "texto": "Recibir de conformidad el apoyo otorgado por el Programa en caso de ser aprobado.",
+      "numeral": "8.1.6, inciso b)",
+      "linea": 3241
+    },
+    {
+      "texto": "Reserva y privacidad de su información personal conforme a la normatividad aplicable del INFOEM.",
+      "numeral": "8.1.6, inciso c)",
+      "linea": 3242
+    },
+    {
+      "texto": "Ser tratados con respeto, equidad y con base en el derecho a la no discriminación; los apoyos se otorgan sin distinción de género, raza, etnia, credo religioso, condición socioeconómica, filiación política u otra causa que implique discriminación.",
+      "numeral": "8.1.6, incisos d) y e)",
+      "linea": 3243
+    },
+    {
+      "texto": "Asociarse libremente para que, en su caso, se solicite el apoyo a través de un grupo u organización o se compartan las metas de protección y conservación de los ecosistemas forestales.",
+      "numeral": "8.1.6, inciso f)",
+      "linea": 3246
+    },
+    {
+      "texto": "De manera voluntaria y bajo su responsabilidad, mediante carta compromiso, recibir el Vale de Planta y retirar la o las especies asignadas de los viveros de PROBOSQUE para establecerlas una vez aprobado por el Comité y publicados los resultados de las personas beneficiarias asignadas con recurso; puede ser antes de la firma del Contrato de Adhesión y de la dispersión del recurso, notificado por cualquier medio a través de la Delegación. El recurso se otorga conforme a la suficiencia presupuestal.",
+      "numeral": "8.1.6, inciso g)",
+      "linea": 3248
+    }
+  ],
+  "obligaciones": [
+    {
+      "texto": "Proporcionar a PROBOSQUE documentación legible y completa, así como la información veraz y oportuna que le sea requerida.",
+      "numeral": "8.1.7, inciso a)",
+      "linea": 3256
+    },
+    {
+      "texto": "Acudir a la visita técnica con el personal designado por las Delegaciones para delimitar el polígono, cuantificar la superficie y/o evaluar el proyecto en campo, y a las visitas de verificación o seguimiento a las que sea convocada.",
+      "numeral": "8.1.7, inciso b)",
+      "linea": 3266
+    },
+    {
+      "texto": "Asistir a la capacitación gratuita en los lugares y fechas que den a conocer las Delegaciones.",
+      "numeral": "8.1.7, inciso c); 8.1.10 inciso a)",
+      "linea": 3269
+    },
+    {
+      "texto": "Todas las personas beneficiarias, con excepción de RFI Modalidad uno, pueden recibir el Vale de Planta y retirar las especies asignadas, preferentemente posterior al trazo, preparación y elaboración de cepas; si no cuentan con ella, pueden adquirirla en los viveros que consideren, con las características físicas requeridas.",
+      "numeral": "8.1.7, inciso d)",
+      "linea": 3273
+    },
+    {
+      "texto": "Recoger la planta en el vivero dentro de los 15 días hábiles posteriores a la entrega del Vale de Salida de Planta o antes de su vencimiento; vencido, solicitar a la brevedad un nuevo Vale de Planta.",
+      "numeral": "8.1.7, inciso e)",
+      "linea": 3278
+    },
+    {
+      "texto": "Suscribir en tiempo y forma el contrato de adhesión correspondiente a la aprobación por el Comité, en apego a los tiempos de la Convocatoria.",
+      "numeral": "8.1.7, inciso f)",
+      "linea": 3286
+    },
+    {
+      "texto": "Cumplir con el clausulado del contrato de adhesión; la superficie aprobada por el Comité se verifica en campo, se georreferencia y se acepta como dato definitivo asentado en el Contrato.",
+      "numeral": "8.1.7, inciso g)",
+      "linea": 3288
+    },
+    {
+      "texto": "Supervisar el desarrollo del proyecto hasta su finalización y cumplir con la superficie asignada realizando los trabajos dentro de los polígonos dictaminados como procedentes.",
+      "numeral": "8.1.7, inciso h)",
+      "linea": 3291
+    },
+    {
+      "texto": "Notificar por escrito a la Instancia Normativa, en un plazo que no deberá exceder los 15 días hábiles, los conflictos por límites de tierra, representación, posesión, litigio o de cualquier índole, y cualquier siniestro o afectación al predio, con la documentación que lo sustente.",
+      "numeral": "8.1.7, inciso i)",
+      "linea": 3294
+    },
+    {
+      "texto": "Reintegrar los recursos económicos recibidos y no aplicados, cuando se determine el incumplimiento, y reintegrar el valor monetario de la planta no establecida y otorgada por PROBOSQUE en tiempo y forma.",
+      "numeral": "8.1.7, incisos j) y k)",
+      "linea": 3303
+    },
+    {
+      "texto": "Utilizar el apoyo para los fines para los que fue otorgado.",
+      "numeral": "8.1.7, inciso l)",
+      "linea": 3309
+    },
+    {
+      "texto": "Atender, conforme a sus capacidades, de forma oportuna los incendios forestales en sus predios y realizar la denuncia correspondiente; considerar la NOM-015-SEMARNAT/SAGARPA-2007 si usa fuego en el predio.",
+      "numeral": "8.1.7, incisos m) y p)",
+      "linea": 3310
+    },
+    {
+      "texto": "Responder encuestas que aplique PROBOSQUE e informar en la solicitud si el predio se encuentra beneficiado en otro programa federal, estatal o municipal con el mismo propósito.",
+      "numeral": "8.1.7, incisos n) y o)",
+      "linea": 3312
+    },
+    {
+      "texto": "Reintegrar de manera obligatoria e inmediata los recursos depositados de más a su cuenta bancaria que no correspondan a lo asignado por el Comité y/o al Contrato de Adhesión.",
+      "numeral": "8.1.7, inciso q)",
+      "linea": 3317
+    }
+  ],
+  "causas_incumplimiento": [
+    {
+      "texto": "Incumplir con alguna de las obligaciones estipuladas en el numeral 8.1.7.",
+      "numeral": "8.1.8, inciso a)",
+      "linea": 3323
+    },
+    {
+      "texto": "Cuando se detecte que han proporcionado información falsa o apócrifa para su inscripción en el Programa.",
+      "numeral": "8.1.8, inciso b)",
+      "linea": 3324
+    },
+    {
+      "texto": "No realizar los trabajos conforme al acompañamiento técnico gratuito del personal de las Delegaciones y/o al proyecto que dio origen a su elegibilidad.",
+      "numeral": "8.1.8, inciso c)",
+      "linea": 3325
+    },
+    {
+      "texto": "Cuando no se informe de los conflictos o litigios de cualquier índole a PROBOSQUE.",
+      "numeral": "8.1.8, inciso d)",
+      "linea": 3327
+    },
+    {
+      "texto": "Utilizar los apoyos para fines distintos a los que le fueron otorgados.",
+      "numeral": "8.1.8, inciso e)",
+      "linea": 3328
+    },
+    {
+      "texto": "No cumplir con las cláusulas del Contrato de Adhesión.",
+      "numeral": "8.1.8, inciso f)",
+      "linea": 3329
+    },
+    {
+      "texto": "No establecer la totalidad de la planta dentro de los polígonos asignados y dictaminados como procedentes y en una superficie menor al 70 % de la superficie asignada, comprometiendo el área mínima que la planta requiere para su buen desarrollo, y no respetando las densidades de plantación dentro de los rangos establecidos por ecosistema.",
+      "numeral": "8.1.8, inciso g)",
+      "linea": 3338
+    },
+    {
+      "texto": "Cuando no se cumpla con las obligaciones del contrato de adhesión, la Convocatoria y las Reglas.",
+      "numeral": "8.1.8, inciso h)",
+      "linea": 3341
+    },
+    {
+      "texto": "Cuando desista posterior a la recepción del recurso económico de la primera ministración.",
+      "numeral": "8.1.8, inciso i)",
+      "linea": 3343
+    },
+    {
+      "texto": "Realizar las actividades comprometidas en una superficie fuera de los polígonos asignados y dictaminados como procedentes.",
+      "numeral": "8.1.8, inciso j)",
+      "linea": 3344
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.8, inciso k)",
+      "linea": 3346
+    }
+  ],
+  "causas_cancelacion": [
+    {
+      "texto": "Incurrir en cualquiera de las causas de incumplimiento del numeral 8.1.8.",
+      "numeral": "8.1.9 b), fr. 1",
+      "linea": 3355
+    },
+    {
+      "texto": "Existencia de conflictos o litigios de cualquier índole (representación, posesión o propiedad), determinada por PROBOSQUE o informada por la autoridad competente.",
+      "numeral": "8.1.9 b), fr. 2",
+      "linea": 3356
+    },
+    {
+      "texto": "Utilizar los apoyos para fines distintos a los que fueron otorgados.",
+      "numeral": "8.1.9 b), fr. 3",
+      "linea": 3358
+    },
+    {
+      "texto": "No entregar el PTRFI actualizado, físico o digital, en un plazo de 10 días hábiles posterior a la notificación, por cualquier medio, de ser persona beneficiaria, para la elaboración del Contrato de Adhesión, sin causa justificada.",
+      "numeral": "8.1.9 b), fr. 4",
+      "linea": 3359
+    },
+    {
+      "texto": "No acudir a la firma del Contrato de Adhesión en un plazo de 10 días hábiles posterior a la notificación, por cualquier medio, de ser persona beneficiaria, no entregar la documentación requerida para recibir el recurso económico, o no acudir a recibir el apoyo, sin causa justificada.",
+      "numeral": "8.1.9 b), fr. 5",
+      "linea": 3361
+    },
+    {
+      "texto": "Realizar actos de proselitismo con los apoyos del Programa a favor de una persona postulante a un cargo de elección popular.",
+      "numeral": "8.1.9 b), fr. 6",
+      "linea": 3364
+    },
+    {
+      "texto": "Cuando se detecte que se haya proporcionado información falsa durante la vigencia del Programa.",
+      "numeral": "8.1.9 b), fr. 7",
+      "linea": 3366
+    },
+    {
+      "texto": "No cumplir con las obligaciones que le correspondan como persona beneficiaria, establecidas en las Reglas.",
+      "numeral": "8.1.9 b), fr. 8",
+      "linea": 3367
+    },
+    {
+      "texto": "Desistimiento por escrito dirigido a la Instancia Normativa, firmado por la persona beneficiaria (en núcleos agrarios, sellado y firmado por Presidencia, Secretaría y Tesorería del comisariado), notificando los motivos.",
+      "numeral": "8.1.9 b), fr. 9",
+      "linea": 3369
+    },
+    {
+      "texto": "Por fallecimiento del titular, cuando no se notifique en el término de 30 días hábiles el interés de la segunda persona beneficiaria para continuar con el Programa.",
+      "numeral": "8.1.9 b), fr. 10",
+      "linea": 3372
+    },
+    {
+      "texto": "Negligencia o caso omiso en cuanto a los incendios forestales ocurridos en sus predios.",
+      "numeral": "8.1.9 b), fr. 11",
+      "linea": 3374
+    },
+    {
+      "texto": "Cuando no se presente el acta de elección de órganos de representación una vez transcurrido el término del artículo 39 de la Ley Agraria, inscrita o presentada ante el RAN.",
+      "numeral": "8.1.9 b), fr. 12",
+      "linea": 3375
+    },
+    {
+      "texto": "Cuando la persona tenga antecedentes de venta, intercambio, donación u otro análogo con la ayuda funcional y/o apoyo especial obtenidos en esta u otra institución.",
+      "numeral": "8.1.9 b), fr. 13",
+      "linea": 3378
+    },
+    {
+      "texto": "Ser persona beneficiaria de programas federales, estatales o municipales con el mismo propósito en la misma área, a decisión de la Instancia Normativa.",
+      "numeral": "8.1.9 b), fr. 14",
+      "linea": 3380
+    },
+    {
+      "texto": "Si de la verificación se observa que las actividades no se realizaron en la totalidad del predio, la superficie no trabajada será cancelada, misma que no podrá ser menor al pago de la primera ministración.",
+      "numeral": "8.1.9 b), fr. 15",
+      "linea": 3382
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.9 b), fr. 16",
+      "linea": 3384
+    }
+  ],
+  "sanciones": [
+    {
+      "clave": "suspension_temporal",
+      "texto": "Los apoyos pueden suspenderse temporalmente durante el periodo que determine el Comité, a través de PROBOSQUE, por incumplimiento de las condiciones que dieron origen a la elegibilidad (incluida proporcionar información falsa para ingresar al Programa), para que se subsanen las omisiones que se les informen; si no, se procede a la cancelación y baja del Programa y a la inclusión en el Listado de Personas Beneficiarias Incumplidas.",
+      "numeral": "8.1.9 a)",
+      "linea": 3348
+    },
+    {
+      "clave": "baja_del_programa",
+      "texto": "Baja del Programa por las causas del numeral 8.1.9 b) (ver causas_cancelacion).",
+      "numeral": "8.1.9 b)",
+      "linea": 3354
+    },
+    {
+      "clave": "reintegro_de_apoyos",
+      "texto": "Reintegro de los montos de las ministraciones otorgadas, o del valor de la planta no establecida dentro de los polígonos dictaminados o en una superficie menor al 70 % de la superficie asignada, a la cuenta bancaria de PROBOSQUE una vez notificada la situación; en caso contrario se sanciona conforme indique el Comité y se notifica a la Unidad Jurídica. Supuestos: incumplimiento previo acuerdo del Comité; falseamiento de información o conflictos; desistimiento habiendo recibido la ministración; actividades en menos del 70 % de la superficie asignada; planta no establecida; recurso no correspondiente al Contrato.",
+      "numeral": "8.1.9 c)",
+      "linea": 3385
+    },
+    {
+      "clave": "listado_incumplidas",
+      "texto": "Inclusión en el Listado de Personas Beneficiarias Incumplidas. Las personas incluidas pueden solicitar ser excluidas si comprueban haber cumplido las obligaciones de su año de asignación, equivalente a los recursos que les fueron ministrados, y en ningún caso pueden solicitar el pago de la ministración pendiente.",
+      "numeral": "8.1.9 c)",
+      "linea": 3392
+    }
+  ],
+  "refrendo": {
+    "descripcion": "Refrendo simplificado: quien solicite únicamente Preservación de reforestaciones establecidas y/o Restauración Forestal Integral Modalidad dos, mientras la superficie solicitada no sea diferente a la indicada en su PTRFI y/o éste no presente modificaciones con respecto al proyecto del año inmediato anterior, solo presenta la Solicitud Única, el Registro de Información y la CURP actualizada, cuando la documentación legal del predio obre en los archivos de PROBOSQUE por un periodo no mayor a tres años anteriores a la solicitud y esté vigente. Constancias de posesión, cartas poder simples, actas de asamblea de incorporación y actas de elección fenecidas deben actualizarse para el ejercicio fiscal; los poderes notariales deben estar vigentes. No aplica a RFI Modalidad uno ni a Bosques de agua.",
+    "vigencia_documentacion_legal_anios": 3,
+    "modalidades_que_aplican": [
+      "rfi_modalidad_dos",
+      "preservacion_reforestaciones"
+    ],
+    "numeral": "8.1.1.2, inciso i); 10.1 inciso d); Solicitud Única FO-PB-501-A hoja 2",
+    "linea": 2972,
+    "lineas_adicionales": [
+      3520,
+      12076
+    ]
+  },
+  "mecanica_operativa": [
+    {
+      "paso": "a",
+      "texto": "La Dirección de Administración, Finanzas y de Gestión Documental gestiona y administra los recursos económicos y emite los pagos (transferencia electrónica y/o cheques), una vez solicitados por la Dirección de Restauración y Fomento Forestal.",
+      "numeral": "10.1, inciso a)",
+      "linea": 3505
+    },
+    {
+      "paso": "b",
+      "texto": "La Unidad Jurídica dictamina la procedencia de la documentación legal, revisa el listado de personas beneficiarias incumplidas y los predios con procedimientos o sanciones administrativas y, con acuerdo del Comité, gestiona la devolución de recursos no ejercidos.",
+      "numeral": "10.1, inciso b)",
+      "linea": 3508
+    },
+    {
+      "paso": "c",
+      "texto": "Publicadas la Convocatoria y las Reglas, la Instancia Ejecutora, a través de las Delegaciones, recibe las solicitudes de manera física (solo en la Delegación que corresponda, nunca en oficinas centrales), integra los expedientes que entrega a oficinas centrales para dictaminación jurídica; después se levanta en campo la poligonal y se recopilan datos técnicos.",
+      "numeral": "10.1, inciso c)",
+      "linea": 3513
+    },
+    {
+      "paso": "d",
+      "texto": "Las áreas de la Dirección de Restauración y Fomento Forestal reciben los expedientes, revisan, registran, digitalizan e integran la documentación adicional (incluido el caso de Preservación y/o RFI Modalidad dos con PTRFI sin modificaciones) y los remiten a la Instancia Responsable.",
+      "numeral": "10.1, inciso d)",
+      "linea": 3520
+    },
+    {
+      "paso": "e",
+      "texto": "Si después se necesita documentación nueva o complementaria, se notifica a la persona solicitante dentro del plazo de la evaluación.",
+      "numeral": "10.1, inciso e)",
+      "linea": 3526
+    },
+    {
+      "paso": "f",
+      "texto": "La Instancia Ejecutora, con la Unidad Jurídica y el Área Responsable del Programa, emite los dictámenes jurídicos y técnicos y el listado preliminar de solicitudes factibles y no factibles.",
+      "numeral": "10.1, inciso f)",
+      "linea": 3537
+    },
+    {
+      "paso": "g",
+      "texto": "El Área Responsable del Programa convoca a la Instancia Normativa (Comité), que analiza, valida y, en su caso, autoriza las solicitudes factibles de apoyo.",
+      "numeral": "10.1, inciso g)",
+      "linea": 3543
+    },
+    {
+      "paso": "h",
+      "texto": "El Área Responsable del Programa tramita la publicación de resultados y la remite al área correspondiente de PROBOSQUE para su difusión.",
+      "numeral": "10.1, inciso h)",
+      "linea": 3546
+    },
+    {
+      "paso": "i",
+      "texto": "La persona beneficiaria puede retirar de manera voluntaria y bajo su responsabilidad, mediante carta compromiso, la planta asignada en el Vale de Planta en los viveros de PROBOSQUE tras la aprobación por el Comité y la publicación de resultados, antes de la firma del Contrato y del pago, firmando la carta responsiva de establecimiento sin responsabilidad para PROBOSQUE, para plantar en temporada de lluvias.",
+      "numeral": "10.1, inciso i)",
+      "linea": 3548
+    },
+    {
+      "paso": "j",
+      "texto": "La Instancia Ejecutora, con la Unidad Jurídica, revisa la fundamentación legal y valida el proyecto de Contrato de Adhesión (y Adenda).",
+      "numeral": "10.1, inciso j)",
+      "linea": 3554
+    },
+    {
+      "paso": "k",
+      "texto": "El Área Responsable del Programa elabora los Contratos de Adhesión tras la aprobación por el Comité; las personas beneficiarias los requisitan a través de las Delegaciones para firma y sello (núcleos agrarios) de las partes, en los tiempos de la Convocatoria y las Reglas.",
+      "numeral": "10.1, inciso k)",
+      "linea": 3557
+    },
+    {
+      "paso": "l",
+      "texto": "El Área Responsable del Programa genera la solicitud del recurso económico tras recibir el oficio de solicitud de pago de la Delegación.",
+      "numeral": "10.1, inciso l)",
+      "linea": 3561
+    },
+    {
+      "paso": "m",
+      "texto": "La Instancia Responsable, con la Dirección de Administración, Finanzas y de Gestión Documental, emite y entrega el recurso una vez que se cuenta con el Contrato de Adhesión firmado y sellado por todas las partes.",
+      "numeral": "10.1, inciso m)",
+      "linea": 3563
+    },
+    {
+      "paso": "n",
+      "texto": "Las Delegaciones acuden a todos los predios beneficiados para verificar que las acciones del Contrato se realizaron y generan el documento que lo avale, remitido al Área Responsable del Programa con copia a la Dirección de Restauración y Fomento Forestal.",
+      "numeral": "10.1, inciso n)",
+      "linea": 3566
+    },
+    {
+      "paso": "o",
+      "texto": "El Área Responsable del Programa realiza el listado preliminar de personas beneficiarias que concluyeron actividades, hace los ajustes necesarios y genera la segunda ministración tras recibir el oficio de solicitud de pago de la Delegación, remitiendo la solicitud de pago a la Dirección de Administración, Finanzas y de Gestión Documental.",
+      "numeral": "10.1, inciso o)",
+      "linea": 3570
+    },
+    {
+      "paso": "p",
+      "texto": "El Área Responsable del Programa emite los listados con los resultados finales y los presenta a la Instancia Normativa para su conocimiento y aprobación.",
+      "numeral": "10.1, inciso p)",
+      "linea": 3574
+    },
+    {
+      "paso": "q",
+      "texto": "Se apoyan predios bajo manejo forestal sustentable con evidencia de corta en 2 años y/o cuando la regeneración natural no sea posible, y superficies con potencial de reforestación.",
+      "numeral": "10.1, inciso q)",
+      "linea": 3576
+    },
+    {
+      "paso": "r",
+      "texto": "La superficie mínima por apoyar es de 0.5 ha, con polígonos no menores a 0.25 ha.",
+      "numeral": "10.1, inciso r)",
+      "linea": 3579
+    },
+    {
+      "paso": "s",
+      "texto": "La cantidad de planta se otorga con base en el cuadro de cobertura de copa (mínimo y máximo de plantas por zona) y la disponibilidad de planta y especies de PROBOSQUE.",
+      "numeral": "10.1, inciso s)",
+      "linea": 3580
+    },
+    {
+      "paso": "t",
+      "texto": "Fecha límite de conclusión: último día hábil de septiembre (Bosques de agua, Preservación, RFI Modalidad dos) u octubre (RFI Modalidad uno); la persona beneficiaria informa el término a las Delegaciones; las Delegaciones entregan el formato de verificación al Área Responsable en 10 días hábiles posteriores.",
+      "numeral": "10.1, inciso t)",
+      "linea": 3588
+    },
+    {
+      "paso": "u",
+      "texto": "Las actividades se distribuyen en los polígonos dictaminados respetando el área mínima y las densidades por ecosistema; de lo contrario, ajuste técnico y administrativo no menor al 70 % de la superficie asignada; el personal de la Delegación puede emitir recomendaciones y registrarlas en minutas de verificación.",
+      "numeral": "10.1, inciso u)",
+      "linea": 3595
+    },
+    {
+      "paso": "v",
+      "texto": "Pueden solicitar nuevamente el apoyo quienes en años anteriores fueron afectados por causa natural o antropogénica con baja o nula sobrevivencia y afectación al predio, previa verificación técnica de las Delegaciones.",
+      "numeral": "10.1, inciso v)",
+      "linea": 3610
+    },
+    {
+      "paso": "w",
+      "texto": "El Área Responsable del Programa informa anualmente a la Instancia Normativa de los resultados del Programa.",
+      "numeral": "10.1, inciso w)",
+      "linea": 3614
+    },
+    {
+      "paso": "x",
+      "texto": "Las nueve Delegaciones Regionales Forestales son responsables de la operación y seguimiento del Programa, coordinadas por la Coordinación de Delegaciones Regionales.",
+      "numeral": "10.1, inciso x)",
+      "linea": 3616
+    }
+  ],
+  "flujos_alternos": {
+    "A_expediente_incompleto": "Si la documentación está incompleta, la Delegación informa conforme al acuse; la persona tiene 5 días hábiles desde la recepción para completarla sin pasar de la fecha límite de recepción (27-mar-2026); si no, se desecha la solicitud (8.1.1.2 inciso i, línea 2986). Después, si hace falta documentación nueva, se notifica dentro del plazo de evaluación (10.1 inciso e, línea 3526).",
+    "B_no_factible": "El dictamen técnico y jurídico produce el listado preliminar de factibles y no factibles (10.1 inciso f, línea 3537); el Comité autoriza que los listados de aprobadas y no aprobadas se den a conocer en las Delegaciones y la página web (9.4.3 inciso b, línea 3486). Las ROP no establecen recurso ni plazo de impugnación: el fallo es inapelable (glosario, línea 2582; Convocatoria base sexta).",
+    "C_lista_espera": "Las solicitudes factibles sin recurso quedan en la lista de espera (glosario, línea 2617; 7.1, línea 2736); con ampliación presupuestal se asignan a esas solicitudes; el recurso liberado por desistimientos, ajustes y bajas puede reasignarse con autorización del Comité (8.1.9 c, línea 3418; Convocatoria base sexta, línea 909).",
+    "D_caso_fortuito": "La persona beneficiaria notifica por escrito en 15 días hábiles los conflictos o siniestros (8.1.7 inciso i, línea 3294) y denuncia ante la autoridad cuando sea por caso fortuito o fuerza mayor; la Instancia Normativa puede aprobar nuevos apoyos para recuperar la superficie dañada; si no, se sanciona. Quienes perdieron la reforestación pueden solicitar de nuevo previa verificación técnica (10.1 inciso v, línea 3610).",
+    "E_incumplimiento_reintegro": "Determinado el incumplimiento previo acuerdo del Comité, la persona beneficiaria reintegra las ministraciones recibidas o el valor de la planta no establecida a la cuenta de PROBOSQUE que indique la Dirección de Administración; si no, se sanciona y se notifica a la Unidad Jurídica; se incluye en el Listado de Personas Beneficiarias Incumplidas (8.1.9 c, línea 3385).",
+    "F_sustitucion": "Por desistimiento, baja, cancelación, ajuste, disminución de superficie u otra causal, se puede sustituir a la persona beneficiaria por personas con solicitud en espera, previa aprobación del Comité; para RFI Modalidad uno, fuera de la temporada solo en casos especiales justificados (10.2, línea 3620).",
+    "G_planta_vencida": "Si vence el Vale de Salida de Planta sin recoger la planta, ésta queda disponible en el vivero; se solicita un nuevo Vale de Planta, que se expide si hay disponibilidad; si no, se adquiere con recurso propio sin responsabilidad para el Organismo (8.1.7 inciso e, línea 3278).",
+    "H_prorroga": "Las ROP de RHF no prevén prórroga de la fecha de conclusión de las actividades; solo el ajuste de superficie (no menor al 70 %) y la nueva solicitud tras siniestro (10.1 incisos u y v)."
+  },
+  "dias_inhabiles": "Las ROP de RHF no mencionan días inhábiles ni calendario; usan «días hábiles» sin definirlos.",
+  "dudas": [
+    "INICIO DEL PLAZO DE LA FIRMA DEL CONTRATO DE ADHESIÓN (10 DÍAS HÁBILES): La Convocatoria (base quinta RHF y PS, actividad VI, línea 837) dice: «Se llevará a cabo hasta los 10 días hábiles posteriores a la fecha en que sea notificada la persona beneficiaria, por cualquier medio, que el Organismo ya cuenta con la disponibilidad del recurso económico y después de la publicación de resultados, aprobación del Comité y antes del primer pago.» El numeral 8.1.9 b) fr. 5 (línea 3361) dice: «No acudir a la firma del Contrato de Adhesión en un plazo de 10 días hábiles posterior a la notificación, por cualquier medio, de ser persona beneficiaria». Es decir: en RHF no corre desde la publicación de resultados (como en PSAHEM y CC, línea 802) sino desde una notificación, pero el hecho notificado difiere (disponibilidad del recurso frente a ser persona beneficiaria). Propuesta: parametrizar el evento de arranque como «notificación por cualquier medio» y registrar su fecha. (Convocatoria base quinta (RHF y PS), actividad VI; 8.1.9 b) fr. 5; 8.1.7 inciso f), línea 837)",
+    "INICIO DEL PLAZO DE LA DOCUMENTACIÓN FALTANTE (5 DÍAS HÁBILES): 8.1.1.2 inciso i) (líneas 2986-2990): «La documentación deberá estar completa para que la solicitud sea atendida, en su caso la Delegación Regional Forestal correspondiente informará lo conducente conforme al acuse y contará con un término de cinco días hábiles a partir de la recepción de la solicitud para la presentación de la documentación faltante, siempre y cuando este tiempo no exceda la fecha límite, establecida en la Convocatoria, para la recepción de solicitudes; generando el folio de solicitud correspondiente, en caso de no complementar la documentación faltante dentro de los plazos establecidos se tendrá por desechada su solicitud.» (Convocatoria base cuarta, líneas 761-765, igual). El plazo corre «a partir de la recepción de la solicitud» y no desde que la Delegación informa lo faltante; el sujeto de «contará» es ambiguo (la Delegación o la persona solicitante). Si la solicitud se recibe poco antes del 27-mar-2026, el plazo se acorta a la fecha límite. (8.1.1.2 inciso i); Convocatoria base cuarta, línea 2986)",
+    "VERIFICACIÓN EN CAMPO (10 DÍAS HÁBILES): 10.1 inciso t) (línea 3592): «La fecha límite para la entrega del formato de verificación de conclusión de actividades en campo, por parte de las Delegaciones Regionales Forestales al Área Responsable del Programa, tendrá un plazo de 10 días hábiles posteriores al último día hábil de la conclusión del concepto según corresponda». Mide la entrega del formato por la Delegación, no la visita ni a la persona beneficiaria. No queda claro si «la conclusión» es el último día hábil de septiembre u octubre (fecha límite) o la fecha real de término informada por la persona beneficiaria (que puede ser anterior). Las ROP de RHF no mencionan un Informe Final de Actividades. (10.1, inciso t), línea 3592)",
+    "VIGENCIA DEL VALE DE PLANTA: 8.1.7 inciso e) (línea 3278): 15 días hábiles «posteriores a la entrega del Vale de Salida de Planta o antes de la fecha de vencimiento del mismo». No se dice cuál es la fecha de vencimiento ni qué unidad emite el vale (las ROP solo dicen que «el Organismo lo expedirá»); tampoco distingue «Vale de Planta» (glosario) de «Vale de Salida de Planta». Falta el formato del vale y de la carta compromiso. (8.1.7, inciso e), línea 3278)",
+    "CUADRO DE CANTIDAD DE PLANTA POR HECTÁREA: El cuadro de 10.1 inciso s) (línea 3580) sale desordenado en el texto y en el PDF; los valores 600/800, 500, 250/400 y 200 se asignaron a zona y cobertura por interpretación. Confirmar con el documento original. No se indica la unidad. (10.1, inciso s), línea 3580)",
+    "FECHA DE VENCIMIENTO DEL CONTRATO Y VIGENCIA: Las ROP de RHF no fijan la vigencia del Contrato de Adhesión ni plazo para publicar resultados, pagar la primera o la segunda ministración o reintegrar (CC habla de vigencia del contrato; RHF solo da las fechas límite de conclusión: último día hábil de septiembre u octubre, sin año). Las fechas 2026-09-30 y 2026-10-30 son derivadas del calendario. (10.1 inciso t); Convocatoria base quinta (RHF y PS), línea 3588)",
+    "SOBREVIVENCIA: CÓMO SE MIDE Y QUÉ HACE EL SISTEMA CON ELLA: El mínimo es 70 % (templada) y 40 % (cálida) para Preservación (8.1.1.1 d, línea 2812), obtenido en el formato Diagnóstico Técnico, pero las ROP no definen método de muestreo, ni cuándo se mide ni qué se verifica al final. En la segunda ministración se verifica el «cumplimiento de las actividades» y el 70 % de la superficie, no una sobrevivencia final. (8.1.1.1 inciso d); 7.2.3, línea 2812)",
+    "VALOR DE LA PLANTA NO ESTABLECIDA: El reintegro se calcula con el listado de precio de venta oficial de la Secretaría de Finanzas o el costo de producción de planta (8.1.9 c fr. 5, línea 3412); las ROP no traen el listado ni un precio por especie. Tampoco dicen en qué momento se mide «planta no establecida» frente a la fecha de conclusión. (8.1.9 c) fr. 5, línea 3412)",
+    "PUNTAJE DE PRIORIZACIÓN Y EVALUACIÓN DEL PROYECTO: 8.1.2 inciso k) prioriza en RFI Modalidad uno al «puntaje o evaluación de proyecto más alto» (línea 3073), pero RHF no trae tabla de puntos ni criterios de evaluación del PTRFI. El orden de los criterios 8.1.2 incisos a) a o) tampoco indica ponderación. (8.1.2, inciso k), línea 3073)",
+    "SEGUNDA MINISTRACIÓN PROPORCIONAL Y PRIMERA MINISTRACIÓN EN LA CONVOCATORIA: La segunda ministración (30 %) es «a la conclusión de las actividades comprometidas ... o en su caso la parte proporcional del porcentaje realizado». No se define el cálculo proporcional ni la tolerancia, salvo el piso del 70 % de la superficie asignada para los ajustes (8.1.8 g y 10.1 u). En Convocatoria la primera ministración no menciona el 70 % para RHF (solo «la primera ministración»). (7.2; Convocatoria base quinta (RHF y PS), actividad VII, línea 842)",
+    "PLAZO DE AVISO DE CONFLICTO O SINIESTRO (15 DÍAS HÁBILES): 8.1.7 inciso i) (línea 3294) dice «en un plazo que no deberá exceder los 15 días hábiles» sin decir desde cuándo corre (desde que ocurre el conflicto o siniestro, o desde que la persona lo conoce). (8.1.7, inciso i), línea 3294)",
+    "COBERTURA ARBÓREA Y ZONA CLIMÁTICA: El criterio «cobertura arbórea máxima del 49 %» (8.1.1.1 a) y la zona climática (templada o cálida) dependen de datos que el Diagnóstico Técnico registra; las ROP no definen qué municipios o altitudes son templados o cálidos. (8.1.1.1 incisos a) y d), línea 2809)",
+    "TIPOS DE PERSONA Y DEPENDENCIAS PÚBLICAS: 8.1.1.1 inciso j) permite apoyar predios propiedad de dependencias federales, estatales o municipales (con suficiencia presupuestal, si no a lista de espera) y 8.1.2 inciso m) prioriza a los que no lo son, pero RHF no define requisitos propios para ellas; aquí solo se modelan persona física, jurídica colectiva y núcleo agrario. (8.1.1.1 inciso j); 8.1.2 inciso m), línea 2829)",
+    "FORMATOS QUE FALTAN: No están en el texto: la Guía de contenido del PTRFI, el formato Diagnóstico Técnico, el Vale de Planta y Vale de Salida de Planta, la carta compromiso de retiro de planta, el modelo de Contrato de Adhesión, el oficio de solicitud de pago y el formato de verificación de conclusión de actividades. (7.2; 8.1.7; 10.1, línea 2959)",
+    "COMITÉ DE RHF DISTINTO AL DE CC: Vocales: CONAFOR, SEMARNAT, UACh, UAEMex y Ejidos Comunes y Productores Forestales A.C. (9.4.1 c, líneas 3443-3448); el Comité de CC incluye otros colegios y asociaciones. Invitados especiales con solo voz; la Contraloría aparece como invitado «Órgano Interno de Control» y se exige su representante para el quórum (9.4.2, línea 3477: «persona representante de la Secretaría de la Contraloría»). (9.4.1 y 9.4.2, línea 3439)",
+    "ALCANCE DE LA PRESERVACIÓN DURANTE TRES AÑOS: La definición habla de «su preservación durante tres años» pero el concepto Preservación apoya reforestaciones establecidas en los tres años anteriores; las ROP no dicen cuántos años puede ser apoyado un mismo predio en Preservación ni si se renueva cada convocatoria. (1.1; 7.2.3, línea 2536)"
+  ]
+}
