@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import functools
 import json
+import os
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -35,6 +36,13 @@ class _Silencioso(SimpleHTTPRequestHandler):
 def _carpeta_capturas():
     CAPTURAS.mkdir(parents=True, exist_ok=True)
     CAPTURAS_S2.mkdir(parents=True, exist_ok=True)
+
+
+def captura(objetivo, ruta, **opciones):
+    """Guarda una captura (page o locator) solo si existe la variable de entorno CAPTURAS=1, para que
+    correr las pruebas no reescriba las capturas versionadas. La carpeta la elige cada historia."""
+    if os.environ.get("CAPTURAS") == "1":
+        objetivo.screenshot(path=str(ruta), **opciones)
 
 
 def redondeo(x):

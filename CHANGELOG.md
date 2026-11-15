@@ -20,8 +20,29 @@ de las Tablas v12, M7.2) y pérdida por incendios (HU-7.3, CF-DEV-03, M7.3).
   (70 en 2023→2024); la página dice cuántos no entran. Texto alternativo y tabla equivalente en cada
   gráfica; aviso en el periodo preliminar. Mismos colores de pérdida por incendio, otras pérdidas y
   ganancia que el resto de la página. Funciona en el sitio y en el archivo único.
+- **Pérdida por incendios** (HU-7.3): vista «Incendios» del mapa con un punto por incendio del
+  periodo (centroide en la malla, área por hectáreas quemadas en bosque; clave, fecha, municipio,
+  ubicación y hectáreas al pasar el cursor, enfocar o tocar), tarjeta «Incendios del periodo» con
+  la pérdida por incendio por año y la tabla ordenable (fecha, municipio, reportadas, quemadas en
+  bosque, sin copa al cierre; filtrable al municipio elegido). Los datos van en
+  `datos/incendios/<periodo>.json` (se piden solo al consultar; embebidos en el archivo único) y
+  `mapa_interactivo.py` los arma con `--incendios` (GeoPackage de CONAFOR; el municipio es el de
+  más superficie del polígono). Los años sin capa de CONAFOR (2025 en adelante) se señalan en la
+  capa, la tabla, las cifras, el balance y el detalle: «CONAFOR aún no publica los incendios de
+  2025»; el periodo parcial lleva †, y el que no tiene ningún incendio publicado dice «sin dato»
+  en vez de 0.
+- Las pruebas de la Calculadora solo guardan capturas con `CAPTURAS=1` (`conftest.captura`).
+- `pruebas/calculadora/test_hu_7_3_perdida_por_incendios.py` (15 pruebas) y capturas
+  `entregas/sprint_2/capturas/hu_7_3_*.png`.
 - `pruebas/calculadora/test_hu_7_2_balance_entre_dos_anios.py` (12 pruebas) y capturas en
   `entregas/sprint_2/capturas/hu_7_2_*.png` (claro, oscuro y móvil).
+
+### Corregido
+
+- Los totales de cada comparación se guardaban con un decimal y la página los volvía a redondear: el
+  balance 2023 → 2024 mostraba 473,149 ha de bosque inicial y la evolución anual, 473,148. Ahora se
+  guardan con dos decimales, como los de la serie, y una prueba comprueba que la cifra de cada año es
+  la misma en el balance y en la evolución.
 
 ## [0.8.0] - 2026-11-13
 

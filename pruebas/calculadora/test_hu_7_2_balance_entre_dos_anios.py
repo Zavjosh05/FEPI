@@ -14,7 +14,7 @@ import json
 import pandas as pd
 import pytest
 
-from conftest import ARCHIVO_UNICO, CAPTURAS_S2, DATOS, PRELIMINAR, SERIE, Registro, esperar_lista
+from conftest import captura, ARCHIVO_UNICO, CAPTURAS_S2, DATOS, PRELIMINAR, SERIE, Registro, esperar_lista
 
 BORDES = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10]
 MINIMO = 500
@@ -47,7 +47,7 @@ def _cuentas(bal):
 
 def _num(texto):
     """Número de una celda de la página: «+1,234», «−1,234» (U+2212) o «1,234»."""
-    return float(texto.replace("−", "-").replace("+", "").replace(",", ""))
+    return float(texto.replace("−", "-").replace("+", "").replace(",", "").replace("†", ""))
 
 
 def _igual(tabla, esperado):
@@ -55,6 +55,9 @@ def _igual(tabla, esperado):
     La página redondea los totales a 0.1 ha y luego a 1 ha, así que se tolera 1 ha."""
     assert [c for c, _ in tabla] == [c for c, _ in esperado]
     for (c, texto), (_, v) in zip(tabla, esperado):
+        if texto == "sin dato":  # HU-7.3: un año sin capa de CONAFOR no se presenta como cero
+            assert c == "Pérdida por incendio" and v == 0
+            continue
         assert _num(texto) == pytest.approx(v, abs=1.0), (c, texto, v)
 
 
@@ -89,6 +92,23 @@ def test_hu_7_2_balance_del_estado_coincide_con_los_csv(comparaciones):
         for corto, col in {"base": "bosque_base_ha", "inc": "perdida_incendio_ha", "otras": "otras_perdidas_ha",
                            "gan": "ganancia_ha", "actual": "bosque_actual_ha", "neto": "cambio_neto_ha"}.items():
             assert tot[corto] == pytest.approx(bal[col].sum(), abs=1.0), f"{c['id']} {corto}"
+
+
+def test_hu_7_2_el_bosque_de_cada_anio_es_el_mismo_en_el_balance_y_en_la_evolucion():
+    """La cifra de un año no cambia según la vista: el bosque inicial y final de cada comparación de la serie es,
+    hectárea por hectárea ya redondeada, el de la evolución anual (evita el doble redondeo: 473,148 y no 473,149)."""
+    indice = json.loads((DATOS / "indice.json").read_text(encoding="utf-8"))
+    por_anio = {e["anio"]: e["bosque_ha"] for e in indice["evolucion_estatal"]}
+    revisadas = 0
+    for c in indice["comparaciones"]:
+        if c.get("preliminar"):
+            continue                    # otra temporada: sus hectáreas no son las de la serie
+        ruta = next(DATOS.glob(f"comparaciones/{c['base']}_{c['actual']}*.json"))
+        tot = json.loads(ruta.read_text(encoding="utf-8"))["tot"]
+        assert round(tot["base"]) == round(por_anio[c["base"]]), ruta.name
+        assert round(tot["actual"]) == round(por_anio[c["actual"]]), ruta.name
+        revisadas += 1
+    assert revisadas >= 3
 
 
 def test_hu_7_2_el_balance_cuadra_en_el_estado_y_en_cada_municipio(comparaciones):
@@ -135,9 +155,11 @@ def test_hu_7_2_la_pagina_muestra_el_balance_del_estado_de_cada_periodo(abrir, c
         ]
         _igual(_tabla(page, "#tabla-balance"), esperado)
         # Las barras de la cascada: pérdidas hacia abajo, ganancia hacia arriba
-        barras = page.eval_on_selector_all("#cascada rect.barra-b", "rs => rs.map(r => [r.dataset.barra, Number(r.dataset.ha)])")
+        barras = page.eval_on_selector_all("#cascada rect.barra-b", "rs => rs.map(r => [r.dataset.barra, r.dataset.ha])")
+        barras = [[n, v if v == "sin dato" else float(v)] for n, v in barras]
         assert [b[0] for b in barras] == ["Incendio", "Otras pérdidas", "Ganancia", "Cambio neto"]
-        assert barras[0][1] == pytest.approx(-bal["perdida_incendio_ha"].sum(), abs=1)
+        if barras[0][1] != "sin dato":
+            assert barras[0][1] == pytest.approx(-bal["perdida_incendio_ha"].sum(), abs=1)
         assert barras[1][1] == pytest.approx(-bal["otras_perdidas_ha"].sum(), abs=1)
         assert barras[2][1] == pytest.approx(bal["ganancia_ha"].sum(), abs=1)
         assert barras[3][1] == pytest.approx(final - inicial, abs=1)
@@ -277,12 +299,12 @@ def test_hu_7_2_capturas_claro_oscuro_y_movil(browser, servidor):
         page.select_option("#desde", "2023")
         page.select_option("#hasta", "2024")
         page.wait_for_function("() => document.getElementById('balance-titulo')?.textContent.includes('2023 → 2024')")
-        page.locator("#balance").screenshot(path=str(CAPTURAS_S2 / f"hu_7_2_balance_estado{sufijo}.png"))
+        captura(page.locator("#balance"), CAPTURAS_S2 / f"hu_7_2_balance_estado{sufijo}.png")
         page.fill("#buscar", nombre)
         page.dispatch_event("#buscar", "change")
         page.wait_for_function("n => document.getElementById('balance-resumen').textContent.startsWith(n)", arg=nombre, timeout=20_000)
         page.wait_for_timeout(800)
-        page.locator("#balance").screenshot(path=str(CAPTURAS_S2 / f"hu_7_2_balance_municipio{sufijo}.png"))
+        captura(page.locator("#balance"), CAPTURAS_S2 / f"hu_7_2_balance_municipio{sufijo}.png")
         if ancho < 500:  # sin desbordar a los lados
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), "scroll horizontal en móvil"
         assert reg.errores == [], reg.errores

@@ -17,6 +17,8 @@ plantilla, el mismo código de la página y los mismos datos:
         datos/anios/AAAA.json              cifras del año por municipio y tipo de bosque
         datos/tendencias.json              tendencia de la serie por municipio y tipo
         datos/comparaciones/<id>.json      una comparación entre dos años
+        datos/incendios/<id>.json          los incendios de esa comparación, con su ubicación y fecha
+                                           (HU-7.3; solo se piden al consultar la capa o la tabla)
         datos/cuadriculas/*.png            cuadrícula de 90 m (clase x paso en gris)
 
 La página tiene:
@@ -82,6 +84,10 @@ TOTAL = "Total"  # unidad del total estatal en tendencia_*.csv
 # Clases del bosque de un año en la malla reducida: parte de la celda con bosque
 CORTES_DENSIDAD = [0.25, 0.5, 0.75]
 PASO_CLASES, PASO_PERDIDA = 50, 25
+# Incendios (HU-7.3): último año con capa de CONAFOR si no se puede leer el GeoPackage, y campos de la lista
+ULTIMO_ANIO_CONAFOR = 2024
+CAMPOS_INCENDIO = ["clave", "fecha", "municipio", "municipio_conafor", "lon", "lat", "px", "py",
+                   "poligono_ha", "quemado_ha", "en_bosque_ha", "perdido_ha"]
 
 
 def _tipos(carpeta, clave):
@@ -94,7 +100,7 @@ def _tipos(carpeta, clave):
     for _, r in t.iterrows():
         filas.setdefault(str(r["unidad"]), {})[r["tipo_bosque"]] = [round(float(r[c]), 2) for c in CAMPOS_TIPO]
     tot = t.groupby("tipo_bosque")[list(CAMPOS_TIPO)].sum()
-    tot = {tipo: [round(float(v), 1) for v in tot.loc[tipo]] for tipo in TIPOS_ORDEN if tipo in tot.index}
+    tot = {tipo: [round(float(v), 2) for v in tot.loc[tipo]] for tipo in TIPOS_ORDEN if tipo in tot.index}
     return {"filas": filas, "tot": tot}
 
 
@@ -155,7 +161,7 @@ def preparar_periodo(carpeta, clave, ancho_px):
     escenas = [escenas.get(str(base)), escenas.get(str(actual))] if escenas else \
         [_escenas(carpeta, base), _escenas(carpeta, actual)]
     cambio, f, limites, crs = leer_cambio_agregado(carpeta / f"cambio_{clave}.tif", ancho_px)
-    tot = {CAMPOS[c]: round(float(bal[c].sum()), 1) for c in CAMPOS}
+    tot = {CAMPOS[c]: round(float(bal[c].sum()), 2) for c in CAMPOS}
     filas = {str(r["unidad"]): [round(float(r[c]), 2) for c in CAMPOS] for _, r in bal.iterrows()}
 
     inc = {"n": 0}
@@ -193,12 +199,13 @@ def preparar_periodo(carpeta, clave, ancho_px):
             "umbral": round(float(bal["umbral_ndvi"].iloc[0]), 2), "escenas": escenas,
             "fuego_incompleto": any("incendios" in n for n in notas), "tiene_tipos": tipos is not None,
             "tot": tot, "filas": filas, "incendios": inc, "notas": notas, "tipos": tipos,
-            "_png": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs), "_ventana": ventana}
+            "_png": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs), "_ventana": ventana, "_inc": i}
 
 
 # Campos de una comparación que van en el índice (los demás van en su archivo)
 LIGEROS = ["id", "clave", "base", "actual", "preliminar", "serie", "etiqueta", "meses", "base_txt",
-           "actual_txt", "corto", "sufijo", "umbral", "escenas", "fuego_incompleto", "tiene_tipos"]
+           "actual_txt", "corto", "sufijo", "umbral", "escenas", "fuego_incompleto", "tiene_tipos",
+           "anios_sin_capa", "incendios_estado"]
 PESADOS = ["tot", "filas", "incendios", "notas", "tipos"]
 
 
@@ -261,7 +268,7 @@ def preparar_serie(carpeta, f):
     sd = s[s["tipo_bosque"] == TODOS].groupby("anio")[[f"{d}_ha" for d in DESTINOS]].sum(min_count=1).reindex(anios)
     destino_tot = [[_num(v, 2) for v in r] for _, r in sd.iterrows()]
     sin_enc = (s[s["tipo_bosque"] == TODOS].groupby("anio")["bosque_sin_encadenar_ha"].sum()
-               .reindex(anios).round(1).tolist() if hay_sin_enc else None)
+               .reindex(anios).round(2).tolist() if hay_sin_enc else None)
     for t in range(N):
         por_anio[t]["estado"] = {tipo: filas[t] for tipo, filas in tot.items()}
         por_anio[t]["destino_estado"] = destino_tot[t]
@@ -322,6 +329,53 @@ def preparar_unidades(ruta, campo, nombres, malla):
     return datos, {"crs": f"EPSG:{epsg}" if epsg else str(crs), "izq": izq, "arriba": arriba, "tam": tam}
 
 
+def preparar_incendios_conafor(ruta, malla, unidades, campo, claves):
+    """Ubicación de los incendios (HU-7.3): {clave: {...}} para las `claves` pedidas, y los años con capa.
+
+    Lee el GeoPackage de CONAFOR (datos/edomex/incendios_conafor_edomex.gpkg). La ubicación es el
+    centroide del polígono, en la malla de la página (px, py) y en lon/lat. El municipio es el de la
+    capa de unidades con más superficie dentro del polígono (algunos incendios tocan otro estado o
+    el límite); `municipio_conafor` es el que reportó CONAFOR."""
+    import geopandas as gpd
+    (alto, ancho), f, (izq, abajo, der, arriba), crs = malla
+    tam = 10 * f
+    g = gpd.read_file(ruta)
+    anios = sorted(int(a) for a in g["ANIO_CAPA"].dropna().unique())
+    g = g[g["CLAVEINC"].isin(set(claves))].drop_duplicates("CLAVEINC").to_crs(crs).reset_index(drop=True)
+    uni = gpd.read_file(unidades).to_crs(crs)[[campo, "geometry"]]
+    cruce = gpd.overlay(gpd.GeoDataFrame({"clave": g["CLAVEINC"]}, geometry=g.geometry, crs=crs), uni, how="intersection")
+    cruce["area"] = cruce.geometry.area
+    municipio = cruce.sort_values("area", ascending=False).drop_duplicates("clave").set_index("clave")[campo].astype(str)
+    c = g.geometry.centroid
+    # Sin superficie dentro de ninguna unidad (el polígono cae en el borde): la unidad más cercana al centroide
+    faltan = g[~g["CLAVEINC"].isin(municipio.index)]
+    if len(faltan):
+        pts = gpd.GeoDataFrame({"clave": faltan["CLAVEINC"].values}, geometry=c[faltan.index].values, crs=crs)
+        cerca = gpd.sjoin_nearest(pts, uni, how="left").drop_duplicates("clave").set_index("clave")[campo].astype(str)
+        municipio = pd.concat([municipio, cerca])
+    ll = c.to_crs(4326)
+    datos = {}
+    for k, r in g.iterrows():
+        cl = r["CLAVEINC"]
+        datos[cl] = {"municipio": municipio.get(cl), "municipio_conafor": None if pd.isna(r["MUNICIPIO"]) else str(r["MUNICIPIO"]),
+                     "lon": round(float(ll.iloc[k].x), 4), "lat": round(float(ll.iloc[k].y), 4),
+                     "px": round(float((c.iloc[k].x - izq) / tam), 1), "py": round(float((arriba - c.iloc[k].y) / tam), 1)}
+    return datos, anios
+
+
+def lista_incendios(i, ubic):
+    """Filas de incendios_<periodo>.json: una por incendio con su ubicación (si se encontró)."""
+    filas = []
+    for _, r in i.iterrows():
+        u = ubic.get(str(r["incendio"]))
+        if u is None:
+            continue
+        filas.append([str(r["incendio"]), str(r["fecha_inicio"]), u["municipio"], u["municipio_conafor"], u["lon"], u["lat"],
+                      u["px"], u["py"], round(float(r["poligono_ha"]), 2), round(float(r["quemado_dnbr_ha"]), 2),
+                      round(float(r["quemado_en_bosque_ha"]), 2), round(float(r["perdido_al_cierre_ha"]), 2)])
+    return filas
+
+
 def _validacion(carpeta):
     """Precisión y exhaustividad contra Hansen por periodo (validacion_estatal.csv), si existe."""
     if not carpeta or not (Path(carpeta) / "validacion_estatal.csv").exists():
@@ -331,7 +385,7 @@ def _validacion(carpeta):
              "exhaustividad": _num(r.get("exhaustividad"), 3)} for _, r in v.iterrows()]
 
 
-def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion):
+def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, conafor=None):
     """Todos los archivos de datos de la página: {ruta relativa a datos/: dict (JSON) o bytes (PNG)}.
     Los dos modos de salida usan exactamente estos archivos."""
     periodos, carpeta_serie = {}, None
@@ -360,8 +414,27 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion):
     nombres = sorted({n for pp in periodos for n in pp["filas"]})
     topo, georef = preparar_unidades(unidades, campo_unidad, nombres, malla)
 
+    # Incendios (HU-7.3): ubicación de cada uno, y qué años no tienen capa de CONAFOR todavía
+    ubic, anios_pub = {}, None
+    if conafor and Path(conafor).exists():
+        claves = {str(c) for pp in periodos if pp["_inc"] is not None for c in pp["_inc"]["incendio"]}
+        ubic, anios_pub = preparar_incendios_conafor(conafor, malla, unidades, campo_unidad, claves)
+    else:
+        print(f"Aviso: no se encontró {conafor}; la página no tendrá la ubicación de los incendios.")
+    ultimo = max(anios_pub) if anios_pub else ULTIMO_ANIO_CONAFOR
+
     archivos = {"municipios.topojson": topo}
     for pp in periodos:
+        # Años de la ventana del periodo sin capa de CONAFOR: sus incendios no se conocen (no son cero)
+        pp["anios_sin_capa"] = [a for a in range(pp["base"], pp["actual"] + 1) if a > ultimo]
+        pp["incendios_estado"] = ("completo" if not pp["anios_sin_capa"]
+                                  else "parcial" if pp["incendios"].get("n") else "sin_datos")
+        lista = lista_incendios(pp["_inc"], ubic) if pp["_inc"] is not None else []
+        archivos[f"incendios/{pp['id']}.json"] = {
+            "id": pp["id"], "clave": pp["clave"], "etiqueta": pp["etiqueta"], "preliminar": pp["preliminar"],
+            "estado": pp["incendios_estado"], "anios_sin_capa": pp["anios_sin_capa"], "ultimo_anio_conafor": ultimo,
+            "campos": CAMPOS_INCENDIO, "lista": lista,
+            "sin_ubicacion": (0 if pp["_inc"] is None else int(len(pp["_inc"]) - len(lista)))}
         archivos[f"comparaciones/{pp['id']}.json"] = {
             "id": pp["id"], "clave": pp["clave"], "etiqueta": pp["etiqueta"], "preliminar": pp["preliminar"],
             "campos": list(CAMPOS.values()), "campos_tipo": list(CAMPOS_TIPO.values()),
@@ -391,6 +464,7 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion):
         "minimo": BOSQUE_MINIMO_HA, "campos": list(CAMPOS.values()),
         "campos_tipo": list(CAMPOS_TIPO.values()), "tipos": TIPOS_ORDEN,
         "anios": anios, "evolucion_estatal": evolucion,
+        "conafor": {"anios": anios_pub or list(range(2019, ultimo + 1)), "ultimo": ultimo},
         "comparaciones": [{k: pp[k] for k in LIGEROS} for pp in periodos],
         "serie": serie, "validacion": _validacion(validacion),
         "pasos": {"clases": PASO_CLASES, "perdida": PASO_PERDIDA},
@@ -458,11 +532,13 @@ def main():
     p.add_argument("--fragmento", action="store_true",
                    help="con --salida: sin <html>/<head>/<body> (para publicarla como Artifact)")
     p.add_argument("--sitio", help="carpeta del sitio estático (index.html + datos/), p. ej. docs/calculadora")
+    p.add_argument("--incendios", default="datos/edomex/incendios_conafor_edomex.gpkg",
+                   help="polígonos de incendios de CONAFOR (src/descargar_capas.py), para ubicar cada incendio")
     a = p.parse_args()
     if not a.salida and not a.sitio:
         p.error("falta --salida, --sitio o los dos")
 
-    archivos = armar_datos(a.carpetas, a.unidades, a.campo_unidad, a.titulo, a.ancho_px, a.validacion)
+    archivos = armar_datos(a.carpetas, a.unidades, a.campo_unidad, a.titulo, a.ancho_px, a.validacion, a.incendios)
     idx = archivos["indice.json"]
     plantilla = (Path(__file__).resolve().parent / "plantilla_mapa.html").read_text(encoding="utf-8")
     resumen = (f"{len(idx['comparaciones'])} comparación(es)"

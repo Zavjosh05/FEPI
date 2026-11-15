@@ -307,6 +307,12 @@ En los dos:
   del Estado o del municipio elegido, y el histograma de los municipios con 500 ha o más de bosque
   inicial según su cambio neto en % (intervalos de 2 puntos, de −10 a +10, abiertos en los
   extremos), con el municipio elegido resaltado. Cada gráfica trae su tabla equivalente.
+- **Incendios** (HU-7.3, CF-DEV-03; solo en "Comparar años"): vista «Incendios» del mapa (un punto
+  por incendio, con clave, fecha, municipio y hectáreas) y tarjeta con la pérdida por incendio por
+  año y la tabla ordenable de incendios. Un año sin capa de CONAFOR se señala («CONAFOR aún no
+  publica los incendios de 2025»): el periodo parcial lleva † y el que no tiene incendios
+  publicados dice «sin dato», nunca 0. Sus datos están en `datos/incendios/<periodo>.json` y
+  `mapa_interactivo.py` los arma con `--incendios` (por defecto `datos/edomex/incendios_conafor_edomex.gpkg`).
 - **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
   por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
   años" muestra los años de la comparación elegida.
@@ -316,6 +322,11 @@ En los dos:
   (%/año); cifras al pasar el cursor; tabla ordenable; desglose por tipo de bosque.
 - **Alcances** (CF-DEV-14): qué mide, dónde, cuándo, con qué fuentes, cómo se arma la serie y qué
   no puede afirmar todavía.
+
+Pruebas de la página: `python -m pytest pruebas/calculadora -q`. Guardan capturas en
+`entregas/sprint_N/capturas/` solo si existe la variable de entorno `CAPTURAS=1`
+(`CAPTURAS=1 python -m pytest pruebas/calculadora/test_hu_7_3_perdida_por_incendios.py`), para que
+una corrida normal no reescriba las capturas versionadas.
 
 Los colores nuevos (densidad de bosque y año de pérdida) son rampas de un solo tono validadas con
 el validador del skill dataviz (`--ordinal`, contra el fondo sin bosque) en el tema claro y en el

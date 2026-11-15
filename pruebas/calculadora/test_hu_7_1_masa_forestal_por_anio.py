@@ -16,7 +16,7 @@ import re
 import pandas as pd
 import pytest
 
-from conftest import ARCHIVO_UNICO, CAPTURAS, DATOS, RAIZ, SERIE, Registro, esperar_lista, miles
+from conftest import captura, ARCHIVO_UNICO, CAPTURAS, DATOS, RAIZ, SERIE, Registro, esperar_lista, miles
 
 # Bosque del Estado en la serie 2023-2025 (resultados/edomex_serie_2023_2025/LEEME.md)
 REFERENCIA = {2023: 473_148, 2024: 467_955, 2025: 466_058}
@@ -137,8 +137,8 @@ def test_hu_7_1_pagina_carga_sin_errores_y_muestra_la_evolucion(abrir, indice):
     assert rotulos == [miles(e["bosque_ha"]) for e in indice["evolucion_estatal"]]
     # Sin municipio elegido, el detalle no tiene la gráfica (está en la evolución)
     assert page.locator("#detalle .serie-graf").count() == 0
-    page.screenshot(path=str(CAPTURAS / "hu_7_1_vista_inicial.png"), full_page=False)
-    ev.screenshot(path=str(CAPTURAS / "hu_7_1_evolucion.png"))
+    captura(page, CAPTURAS / "hu_7_1_vista_inicial.png", full_page=False)
+    captura(ev, CAPTURAS / "hu_7_1_evolucion.png")
 
 
 def test_hu_7_1_carga_diferida(abrir, indice, servidor):
@@ -170,7 +170,7 @@ def test_hu_7_1_carga_diferida(abrir, indice, servidor):
     assert f"anios/{b}.json" in reg.datos(servidor)
     assert miles(ev[b]) in page.locator("#cifras").inner_text()
     assert reg.errores == [], reg.errores
-    page.screenshot(path=str(CAPTURAS / "hu_7_1_un_anio.png"), full_page=True)
+    captura(page, CAPTURAS / "hu_7_1_un_anio.png", full_page=True)
 
 
 def test_hu_7_1_detalle_de_un_municipio_muestra_su_evolucion(abrir, indice):
@@ -189,7 +189,7 @@ def test_hu_7_1_detalle_de_un_municipio_muestra_su_evolucion(abrir, indice):
         assert r == miles(b), (a, r, b)
     assert reg.errores == [], reg.errores
     page.wait_for_timeout(800)  # termina el acercamiento
-    page.locator(".principal").screenshot(path=str(CAPTURAS / "hu_7_1_detalle_municipio.png"))
+    captura(page.locator(".principal"), CAPTURAS / "hu_7_1_detalle_municipio.png")
 
 
 def test_hu_7_1_alineacion_municipios_y_cuadricula(abrir, indice):
@@ -256,8 +256,8 @@ def test_hu_7_1_tema_oscuro(browser, servidor, indice):
     esperar_lista(page)
     assert page.evaluate("getComputedStyle(document.documentElement).colorScheme").startswith("dark")
     assert page.locator("#evolucion circle.punto").count() == len(indice["anios"])
-    page.screenshot(path=str(CAPTURAS / "hu_7_1_vista_inicial_oscuro.png"), full_page=False)
-    page.locator("#evolucion").screenshot(path=str(CAPTURAS / "hu_7_1_evolucion_oscuro.png"))
+    captura(page, CAPTURAS / "hu_7_1_vista_inicial_oscuro.png", full_page=False)
+    captura(page.locator("#evolucion"), CAPTURAS / "hu_7_1_evolucion_oscuro.png")
     assert reg.errores == [], reg.errores
     ctx.close()
 

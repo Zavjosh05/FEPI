@@ -228,6 +228,30 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 .balance summary { cursor: pointer; color: var(--accent); width: fit-content; }
 .balance details table { margin-top: 6px; }
 @media (max-width: 760px) { .balance { grid-template-columns: minmax(0, 1fr); } }
+/* Incendios (HU-7.3): capa de puntos, tabla y avisos de años sin capa de CONAFOR */
+.punto-inc { fill: var(--c-incendio); fill-opacity: .55; stroke: var(--sel); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; }
+.punto-inc:hover, .punto-inc:focus, .punto-inc.elegido { fill-opacity: .9; stroke-width: 2.4; outline: none; }
+.aviso-capa { position: absolute; left: 12px; right: 56px; top: 12px; background: var(--aviso-bg); color: var(--aviso-ink); border-radius: 8px; padding: 6px 10px; font-size: .86rem; box-shadow: 0 4px 12px rgba(0, 0, 0, .12); z-index: 2; pointer-events: none; }
+.incendios { grid-template-columns: minmax(0, 1fr); }
+.incendios .aviso { margin: 4px 0; }
+.incendios .acciones { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.incendios .acciones button { font: 600 .95rem var(--f-texto); color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 8px; padding: 7px 16px; cursor: pointer; }
+.incendios .acciones label { display: flex; gap: 6px; align-items: center; color: var(--ink-2); font-size: .92rem; }
+.incendios .por-anio td.sin-capa { color: var(--aviso-ink); background: var(--aviso-bg); text-align: left; }
+.incendios table.lista { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; min-width: 640px; }
+.incendios .lista th { position: sticky; top: 0; background: var(--surface); z-index: 1; padding: 0; text-align: right; border-bottom: 1px solid var(--line); }
+.incendios .lista th:first-child, .incendios .lista td:first-child { text-align: left; padding-left: 8px; }
+.incendios .lista th button { width: 100%; font: 600 .82rem var(--f-titulo); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); background: none; border: 0; padding: 9px 10px; text-align: inherit; cursor: pointer; white-space: nowrap; }
+.incendios .lista th[aria-sort] button { color: var(--ink); }
+.incendios .lista td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.incendios .lista td:nth-child(2) { text-align: left; }
+.incendios .lista th:nth-child(2) { text-align: left; }
+.incendios .lista tbody tr { cursor: pointer; }
+.incendios .lista tbody tr:hover, .incendios .lista tbody tr[aria-selected="true"] { background: var(--hover); }
+.incendios .lista tbody tr[aria-selected="true"] { box-shadow: inset 3px 0 0 var(--accent); }
+.incendios .desliza { max-height: 380px; }
+.incendios .tabla-detalle { overflow-x: auto; }
+.incendios .por-anio { min-width: 560px; }
 /* Carga diferida: aviso de "cargando" sobre el mapa y mensaje si un archivo falla */
 .cargando { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: .88rem; box-shadow: 0 4px 12px rgba(0, 0, 0, .1); z-index: 3; }
 .falla { background: var(--falla-bg); color: var(--falla-ink); border-radius: 8px; padding: 10px 14px; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
@@ -276,6 +300,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 
   <section class="tarjeta evolucion balance" id="balance" aria-labelledby="balance-titulo" hidden></section>
 
+  <section class="tarjeta evolucion incendios" id="incendios" aria-labelledby="incendios-titulo" hidden></section>
+
   <div class="principal">
     <div class="tarjeta mapa-tarjeta">
       <div class="barra">
@@ -294,6 +320,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
           <button type="button" id="restablecer" aria-label="Ver todo">⤢</button>
         </div>
         <div class="escala" id="escala"></div>
+        <div class="aviso-capa" id="aviso-capa" role="note" hidden></div>
         <div class="cargando" id="cargando" role="status" aria-live="polite">Cargando datos…</div>
         <div class="globo" id="globo" hidden></div>
       </div>
@@ -320,6 +347,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         <tbody id="filas"></tbody>
       </table>
     </div>
+    <p class="pie-graf" id="nota-tabla" style="margin:0;padding:8px 16px" hidden></p>
   </section>
 
   <section class="tarjeta alcances" id="alcances" aria-labelledby="alcances-titulo">
@@ -438,13 +466,24 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     : 0;
   const st = { modo: "comparar", p: inicial, t: N ? N - 1 : 0, vista: "cobertura", sel: null,
                capas: { 1: true, 2: true, 3: true, 4: true }, perd: {},
-               orden: { col: "neto", asc: true }, soloBosque: true };
+               orden: { col: "neto", asc: true }, soloBosque: true, incendios: false, ordenInc: { col: "en_bosque", asc: false } };
   const P = () => D.periodos[st.p];
   const enAnio = () => st.modo === "anio";
   const fila = (nombre, p = P()) => p.filas[nombre];
   const pct = f => (!f || f[I.base] < D.minimo) ? null : f[I.neto] / f[I.base] * 100;
   const claseCortes = (v, cortes) => { let k = 0; while (k < cortes.length && v >= cortes[k]) k++; return "k" + k; };
   const clase = f => (!f || f[I.base] < D.minimo) ? "poco" : claseCortes(pct(f), CORTES);
+
+  // ---------- Incendios: años sin capa de CONAFOR (no son cero) ----------
+  const listaAnios = a => a.length > 1 ? a.slice(0, -1).join(", ") + " y " + a[a.length - 1] : String(a[0]);
+  const sinCapaTxt = p => `CONAFOR aún no publica los incendios de ${listaAnios(p.anios_sin_capa)}`;
+  const esSinDatos = p => p.incendios_estado === "sin_datos";
+  const esParcial = p => p.incendios_estado === "parcial";
+  const incTxt = (v, p) => esSinDatos(p) ? "sin dato" : n0(v) + (esParcial(p) ? "†" : "");
+  const notaInc = p => esSinDatos(p) ? `${sinCapaTxt(p)}: la pérdida por incendio de este periodo no se conoce y no se muestra como cero.`
+    : esParcial(p) ? `† Parcial: ${sinCapaTxt(p)}; lo quemado ese año quedó dentro de “otras pérdidas”.` : "";
+
+  const sinCapaGlobal = () => sinCapaTxt({ anios_sin_capa: [...new Set(D.periodos.flatMap(p => p.anios_sin_capa))].sort() });
 
   // ---------- Serie: acceso ----------
   // S.filas[unidad][tipo][t] = [zona, bosque, inc, otras, gan, neto]; S.tend[unidad][tipo] = [ha/año, %/año]
@@ -468,6 +507,14 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const c = await leer(`comparaciones/${p.id}.json`);
     for (const k of ["tot", "filas", "incendios", "notas", "tipos"]) p[k] = c[k];
     p.cargado = true;
+  }
+  // Incendios de una comparación (HU-7.3): archivo propio, solo al consultar la capa o la tabla
+  async function cargarIncendios(i) {
+    const p = D.periodos[i];
+    if (p.inc) return;
+    const c = await leer(`incendios/${p.id}.json`);
+    const idx = Object.fromEntries(c.campos.map((k, j) => [k, j]));
+    p.inc = { ...c, lista: c.lista.map(r => Object.fromEntries(c.campos.map((k, j) => [k, r[j]]))), idx };
   }
   const aniosCargados = new Set();
   async function cargarAnio(t) {
@@ -500,6 +547,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       if (e.sel) todosLosAnios();
     } else {
       tareas.push(cargarComparacion(e.p));
+      if (e.vista === "incendios" || e.incendios) tareas.push(cargarIncendios(e.p));
       if (e.sel) { D.periodos.forEach((p, i) => tareas.push(cargarComparacion(i))); todosLosAnios(); }
     }
     return tareas;
@@ -524,7 +572,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     if (yo !== turno) return;
     ocultarFalla();
     Object.assign(st, nuevo);
-    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); pintarBalance(); } else pintarTodo();
+    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); pintarBalance(); pintarIncendios(); } else pintarTodo();
   }
 
   // ---------- Cabecera ----------
@@ -606,7 +654,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       document.getElementById("cifras").innerHTML = [
         tile(`Bosque ${a}`, nf.format(r[IS.bosque]), `ha · ${pctZona(r) == null ? "—" : nf1.format(pctZona(r)) + " %"} de la zona forestal`),
         tile(hayFlujo ? `Cambio desde ${S.anios[t - 1]}` : "Cambio", hayFlujo ? signo(r[IS.neto]) : "—", hayFlujo ? `ha · ${pctTxt(pctAnt(r))}` : "primer año de la serie"),
-        tile("Pérdida por incendio", hayFlujo ? nf.format(r[IS.inc]) : "—", hayFlujo ? (p && p.fuego_incompleto ? "ha · incompleta (ver aviso)" : "ha") : "—", "--c-incendio"),
+        tile("Pérdida por incendio", hayFlujo ? nf.format(r[IS.inc]) : "—", hayFlujo ? (p && p.incendios_estado !== "completo" ? `ha · parcial: ${sinCapaTxt(p)}` : "ha") : "—", "--c-incendio"),
         tile("Otras pérdidas", hayFlujo ? nf.format(r[IS.otras]) : "—", hayFlujo ? "ha · por verificar" : "—", "--c-otra"),
         tile("Ganancia", hayFlujo ? nf.format(r[IS.gan]) : "—", hayFlujo ? "ha" : "—", "--c-ganancia"),
         tile(`Tendencia ${S.anios[0]}–${S.anios[N - 1]}`, tn ? signo(tn[0]) : "—", tn ? `ha/año · ${pct2Txt(tn[1])}/año, ${N} años` : ""),
@@ -622,7 +670,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         tile(`Bosque ${p.base_txt}`, nf.format(tt.base), "hectáreas"),
         tile(`Bosque ${p.actual_txt}`, nf.format(tt.actual), "hectáreas"),
         tile("Cambio neto", signo(neto), `ha · ${pctTxt(neto / tt.base * 100)}`),
-        tile("Pérdida por incendio", nf.format(tt.inc), p.fuego_incompleto ? "ha · incompleta (ver aviso)" : "ha", "--c-incendio"),
+        tile("Pérdida por incendio", esSinDatos(p) ? "sin dato" : nf.format(tt.inc), esSinDatos(p) ? sinCapaTxt(p) : esParcial(p) ? `ha · parcial: ${sinCapaTxt(p)}` : "ha", "--c-incendio"),
         tile("Otras pérdidas", nf.format(tt.otras), "ha · por verificar", "--c-otra"),
         tile("Ganancia", nf.format(tt.gan), "ha", "--c-ganancia"),
       ].join("");
@@ -651,10 +699,11 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     .on("click", (e, u) => seleccionar(u.nombre, false));
   g.append("path").attr("class", "contorno").attr("d", D.contorno);
   const selPath = g.append("path").attr("class", "seleccion");
+  const capaPuntos = g.append("g").attr("class", "puntos-inc");
 
   const zoom = d3.zoom().scaleExtent([1, 40])
     .translateExtent([[-W * 0.05, -H * 0.05], [W * 1.05, H * 1.05]])
-    .on("zoom", e => { g.attr("transform", e.transform); pintarEscala(e.transform.k); ocultarGlobo(); });
+    .on("zoom", e => { g.attr("transform", e.transform); pintarEscala(e.transform.k); ocultarGlobo(); capaPuntos.selectAll("circle").attr("r", d => d.r / Math.sqrt(e.transform.k)); });
   svg.call(zoom).on("dblclick.zoom", null);
   const dur = reduceMotion ? 0 : 500;
   document.getElementById("acercar").onclick = () => svg.transition().duration(dur).call(zoom.scaleBy, 1.8);
@@ -684,7 +733,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 
   // Vistas del mapa según el modo
   const VISTAS = {
-    comparar: [["cobertura", "Cambio de cobertura"], ["neto", "Cambio neto por municipio"]],
+    comparar: [["cobertura", "Cambio de cobertura"], ["neto", "Cambio neto por municipio"], ["incendios", "Incendios"]],
     anio: [["bosque", "Bosque"], ["tendencia", "Tendencia por municipio"]],
   };
   if (S) { VISTAS.comparar.push(["perdida", "Año de pérdida"]); VISTAS.anio.push(["perdida", "Año de pérdida"]); }
@@ -692,7 +741,11 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   function pintarVistas() {
     const el = document.getElementById("vistas");
     el.innerHTML = VISTAS[st.modo].map(([v, t]) => `<button type="button" role="radio" data-vista="${v}" aria-checked="${v === st.vista}">${t}</button>`).join("");
-    el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { st.vista = b.dataset.vista; pintarVistas(); pintarCoropletas(); pintarLeyenda(); pintarRaster(); }));
+    el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      // La capa de incendios necesita su archivo: el cambio pasa por actualizar, que lo pide y luego pinta
+      if (b.dataset.vista === "incendios") { actualizar(e => { e.vista = "incendios"; }); return; }
+      st.vista = b.dataset.vista; pintarVistas(); pintarCoropletas(); pintarLeyenda(); pintarRaster(); pintarPuntos();
+    }));
   }
 
   // Rásters: vienen como PNG gris (clase x paso); se colorean con los tokens del tema
@@ -720,6 +773,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     // {clave, src, paso, colores: {valor: token o null}}
     if (st.vista === "cobertura") return { clave: `cambio_${P().id}.png`, src: urlCuadricula(`cambio_${P().id}.png`), paso: D.pasos.clases,
       colores: Object.fromEntries(CLASES.map(c => [c.k, st.capas[c.k] ? c.token : null])) };
+    if (st.vista === "incendios") return { clave: `cambio_${P().id}.png`, src: urlCuadricula(`cambio_${P().id}.png`), paso: D.pasos.clases,
+      colores: { 1: "--c-estable", 2: null, 3: null, 4: null } };
     if (st.vista === "bosque") return { clave: `bosque_${S.anios[st.t]}.png`, src: urlCuadricula(`bosque_${S.anios[st.t]}.png`), paso: D.pasos.clases,
       colores: Object.fromEntries(DENSIDAD.map(c => [c.k, c.token])) };
     if (st.vista === "perdida") return { clave: "anio_perdida.png", src: urlCuadricula("anio_perdida.png"), paso: S.paso_perdida,
@@ -894,8 +949,9 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     el.innerHTML = `<h3>${esc(st.sel)}</h3>` + (S ? graficaSerie(st.sel) : "") + `
       <h4>Comparaciones</h4>
       <div class="tabla-detalle"><table><thead><tr><th>Hectáreas</th>${cols.map(c => `<th title="${c.p.etiqueta}${c.p.preliminar ? " · preliminar" : ""}">${c.p.corto}</th>`).join("")}</tr></thead>
-      <tbody>${filas.map(([etq, campo]) => `<tr><td>${etq}</td>${cols.map(c => `<td>${c.f ? (campo === "neto" ? signo(c.f[I.neto]) : n0(c.f[I[campo]])) : "—"}</td>`).join("")}</tr>`).join("")}
+      <tbody>${filas.map(([etq, campo]) => `<tr><td>${etq}</td>${cols.map(c => `<td>${c.f ? (campo === "neto" ? signo(c.f[I.neto]) : campo === "inc" ? incTxt(c.f[I.inc], c.p) : n0(c.f[I[campo]])) : "—"}</td>`).join("")}</tr>`).join("")}
       <tr><td>Cambio neto (%)</td>${cols.map(c => `<td>${c.f && c.f[I.base] >= D.minimo ? pctTxt(pct(c.f)) : "—"}</td>`).join("")}</tr></tbody></table></div>
+      ${cols.some(c => c.p.incendios_estado !== "completo") ? `<p class="vacio">Pérdida por incendio: ${sinCapaGlobal()}. Con † es parcial; “sin dato”, no se conoce (no es cero).</p>` : ""}
       ${cols.some(c => c.p.preliminar) ? `<p class="vacio">* Preliminar, otra temporada: no se compara con las demás columnas.</p>` : ""}
       ${cols.some(c => c.f && c.f[I.base] < D.minimo) ? `<p class="vacio">Tiene menos de ${nf.format(D.minimo)} ha de bosque; el porcentaje no se calcula.</p>` : ""}
       ${seccionTipos(P().tipos && P().tipos.filas[st.sel], st.sel)}`;
@@ -953,9 +1009,10 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
                 : { base: p.tot.base, inc: p.tot.inc, otras: p.tot.otras, gan: p.tot.gan, actual: p.tot.actual, neto: p.tot.actual - p.tot.base };
     const angosta = el.clientWidth < 700, w = angosta ? 340 : 400, h = 210;
     // --- cascada ---
-    const b1 = -v.inc, b2 = b1 - v.otras, b3 = b2 + v.gan;
+    const sinInc = esSinDatos(p), valInc = sinInc ? 0 : v.inc;
+    const b1 = -valInc, b2 = b1 - v.otras, b3 = b2 + v.gan;
     const barras = [
-      { n: "Incendio", a: 0, b: b1, tok: "--c-incendio", val: -v.inc },
+      { n: "Incendio", a: 0, b: b1, tok: "--c-incendio", val: -valInc, sin: sinInc },
       { n: "Otras pérdidas", a: b1, b: b2, tok: "--c-otra", val: -v.otras },
       { n: "Ganancia", a: b2, b: b3, tok: "--c-ganancia", val: v.gan },
       { n: "Cambio neto", a: 0, b: v.neto, neto: true, val: v.neto },
@@ -965,14 +1022,14 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const lo = Math.min(...cotas), hi = Math.max(...cotas), pad = Math.max((hi - lo) * 0.14, 1);
     const y = d3.scaleLinear().domain([lo - pad, hi + pad]).range([h - m.b, m.t]);
     const x = d3.scaleBand().domain(barras.map(b => b.n)).range([m.l, w - m.r]).padding(0.28);
-    const cascada = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Balance de ${esc(quien)}, ${esc(p.etiqueta)}: bosque inicial ${n0(v.base)} hectáreas; pérdida por incendio ${n0(v.inc)}; otras pérdidas ${n0(v.otras)}; ganancia ${n0(v.gan)}; bosque final ${n0(v.actual)}; cambio neto ${signo(v.neto)} hectáreas.">
+    const cascada = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Balance de ${esc(quien)}, ${esc(p.etiqueta)}: bosque inicial ${n0(v.base)} hectáreas; pérdida por incendio ${sinInc ? "sin dato" : n0(v.inc) + (esParcial(p) ? ", parcial" : "")}; otras pérdidas ${n0(v.otras)}; ganancia ${n0(v.gan)}; bosque final ${n0(v.actual)}; cambio neto ${signo(v.neto)} hectáreas.">
       <g class="eje">${barras.map(b => `<text x="${x(b.n) + x.bandwidth() / 2}" y="${h - 14}" text-anchor="middle">${b.n}</text>`).join("")}</g>
       <line class="cero" x1="${m.l}" x2="${w - m.r}" y1="${y(0)}" y2="${y(0)}"></line>
       ${barras.map(b => {
         const y0 = Math.min(y(b.a), y(b.b)), alto = Math.max(Math.abs(y(b.a) - y(b.b)), 1.5);
         const ty = b.val >= 0 ? y0 - 6 : y0 + alto + 13;
-        return `<rect class="barra-b ${b.neto ? "barra-neto" : ""}" data-barra="${b.n}" data-ha="${Math.round(b.val)}" x="${x(b.n)}" y="${y0}" width="${x.bandwidth()}" height="${alto}" ${b.neto ? "" : `style="fill:var(${b.tok})"`}><title>${b.n}: ${signo(b.val)} ha</title></rect>
-          <text class="rotulo" x="${x(b.n) + x.bandwidth() / 2}" y="${ty}" text-anchor="middle">${signo(b.val)}</text>`;
+        return `<rect class="barra-b ${b.neto ? "barra-neto" : ""}" data-barra="${b.n}" data-ha="${b.sin ? "sin dato" : Math.round(b.val)}" x="${x(b.n)}" y="${y0}" width="${x.bandwidth()}" height="${alto}" ${b.neto ? "" : `style="fill:var(${b.tok})"`}><title>${b.n}: ${b.sin ? "sin dato" : signo(b.val) + " ha"}</title></rect>
+          <text class="rotulo" x="${x(b.n) + x.bandwidth() / 2}" y="${ty}" text-anchor="middle">${b.sin ? "sin dato" : signo(b.val) + (b.n === "Incendio" && esParcial(p) ? "†" : "")}</text>`;
       }).join("")}
     </svg>`;
     // --- histograma ---
@@ -996,14 +1053,134 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         <p id="balance-resumen">${esc(quien)}: bosque inicial ${ha(v.base)} (${p.base_txt}) → bosque final ${ha(v.actual)} (${p.actual_txt}); cambio neto ${signo(v.neto)} ha${v.base >= D.minimo ? ` (${pctTxt(v.neto / v.base * 100)})` : ""}. ${st.sel ? "Quita la selección para ver el Estado." : "Elige un municipio para ver el suyo."}</p></header>
       ${p.preliminar ? `<div class="aviso" id="balance-aviso" role="note"><p>Preliminar: es otra temporada (${esc(p.meses)}) y usa su propio umbral; estas hectáreas no se comparan con las de los balances anuales de noviembre-diciembre.</p></div>` : ""}
       <div class="grafica" id="cascada"><h3>Pérdidas y ganancia en hectáreas</h3>${cascada}
-        <p class="pie-graf">Las barras parten de cero, que es el bosque inicial; la última es el cambio neto.</p>
+        <p class="pie-graf">Las barras parten de cero, que es el bosque inicial; la última es el cambio neto. ${notaInc(p)}</p>
         <details><summary>Ver como tabla</summary><table id="tabla-balance"><thead><tr><th>Concepto</th><th>Hectáreas</th></tr></thead><tbody>
-          <tr><td>Bosque inicial</td><td>${n0(v.base)}</td></tr><tr><td>Pérdida por incendio</td><td>${signo(-v.inc)}</td></tr>
+          <tr><td>Bosque inicial</td><td>${n0(v.base)}</td></tr><tr><td>Pérdida por incendio</td><td>${sinInc ? "sin dato" : signo(-v.inc) + (esParcial(p) ? "†" : "")}</td></tr>
           <tr><td>Otras pérdidas</td><td>${signo(-v.otras)}</td></tr><tr><td>Ganancia</td><td>${signo(v.gan)}</td></tr>
           <tr><td>Bosque final</td><td>${n0(v.actual)}</td></tr><tr><td>Cambio neto</td><td>${signo(v.neto)}</td></tr></tbody></table></details></div>
       <div class="grafica" id="histograma"><h3>Municipios según su cambio neto</h3>${hist}
         <p class="pie-graf" id="hist-resumen">${pierden} pierden bosque y ${ganan} ganan, de ${hs.total} municipios con ${nf.format(D.minimo)} ha o más de bosque inicial${hs.sin ? `; los otros ${hs.sin} no entran porque tienen menos` : ""}.${infoSel}</p>
         <details><summary>Ver como tabla</summary><table id="tabla-histograma"><thead><tr><th>Cambio neto</th><th>Municipios</th></tr></thead><tbody>${hs.cuentas.map((c, k) => `<tr><td>${etqBin(k)}</td><td>${c}</td></tr>`).join("")}</tbody></table></details></div>`;
+  }
+
+  // ---------- Incendios (HU-7.3 / CF-DEV-03): capa de puntos, tarjeta con tabla ----------
+  // Cada incendio es un punto en su centroide (coordenadas de la malla), con tamaño por superficie
+  // quemada dentro del bosque. Los datos son archivos propios (incendios/<periodo>.json) que solo se
+  // piden al consultar la capa o la tabla. Un año sin capa de CONAFOR se señala; nunca se presenta como cero.
+  const h1 = v => nf1.format(v);
+  const nf4 = new Intl.NumberFormat("es-MX", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  let incSel = null;
+  function globoIncendio(e, d, foco) {
+    const otro = d.municipio_conafor && d.municipio_conafor !== d.municipio ? `<dt>Municipio (CONAFOR)</dt><dd>${esc(d.municipio_conafor)}</dd>` : "";
+    globo.innerHTML = `<b>${esc(d.clave)}</b><dl><dt>Fecha de inicio</dt><dd>${esc(d.fecha)}</dd><dt>Municipio</dt><dd>${esc(d.municipio)}</dd>${otro}
+      <dt>Ubicación</dt><dd>${nf4.format(d.lat)}, ${nf4.format(d.lon)}</dd><dt>Reportadas</dt><dd>${h1(d.poligono_ha)} ha</dd>
+      <dt>Quemadas en bosque</dt><dd>${h1(d.en_bosque_ha)} ha</dd><dt>Sin copa al cierre</dt><dd>${h1(d.perdido_ha)} ha</dd></dl>`;
+    globo.hidden = false;
+    const r = lienzo.getBoundingClientRect(), gw = globo.offsetWidth, gh = globo.offsetHeight;
+    const b = foco ? e.currentTarget.getBoundingClientRect() : null;
+    const cx = b ? b.right : e.clientX, cy = b ? b.top : e.clientY;
+    let x = cx - r.left + 14, y = cy - r.top + 14;
+    if (x + gw > r.width - 8) x = cx - r.left - gw - 14;
+    if (y + gh > r.height - 8) y = cy - r.top - gh - 14;
+    globo.style.left = Math.max(8, x) + "px"; globo.style.top = Math.max(8, y) + "px";
+  }
+  function marcarIncendio(clave, scroll) {
+    incSel = clave;
+    capaPuntos.selectAll("circle").classed("elegido", d => d.clave === clave);
+    document.querySelectorAll("#tabla-incendios tbody tr").forEach(tr => {
+      const ok = tr.dataset.clave === clave;
+      tr.setAttribute("aria-selected", String(ok));
+      if (ok && scroll) tr.scrollIntoView({ block: "nearest" });
+    });
+  }
+  function pintarPuntos() {
+    const p = enAnio() ? null : P(), ver = !!p && st.vista === "incendios" && !!p.inc;
+    const datos = ver ? p.inc.lista.filter(r => r.px != null).map(r => ({ ...r, r: Math.max(2.2, 1.7 * Math.sqrt(r.en_bosque_ha)) * W / 2400 })).sort((a, b) => b.r - a.r) : [];
+    const k = d3.zoomTransform(svg.node()).k;
+    capaPuntos.selectAll("circle").data(datos, d => d.clave).join("circle")
+      .attr("class", d => "punto-inc" + (d.clave === incSel ? " elegido" : ""))
+      .attr("cx", d => d.px).attr("cy", d => d.py).attr("r", d => d.r / Math.sqrt(k))
+      .attr("tabindex", 0).attr("role", "img")
+      .attr("data-clave", d => d.clave)
+      .attr("aria-label", d => `Incendio ${d.clave}, ${d.fecha}, ${d.municipio}: ${h1(d.poligono_ha)} ha reportadas, ${h1(d.en_bosque_ha)} ha quemadas en bosque`)
+      .on("pointerenter pointermove", (e, d) => globoIncendio(e, d))
+      .on("focus", (e, d) => globoIncendio(e, d, true))
+      .on("blur", ocultarGlobo)
+      .on("pointerleave", e => { if (e.pointerType !== "touch") ocultarGlobo(); })
+      .on("click", (e, d) => { globoIncendio(e, d); marcarIncendio(d.clave, true); });
+    capaPuntos.style("display", ver ? null : "none");
+    const aviso = document.getElementById("aviso-capa");
+    const dice = !!p && st.vista === "incendios" && p.incendios_estado !== "completo";
+    aviso.hidden = !dice;
+    if (dice) aviso.textContent = `${sinCapaTxt(p)}: ${esSinDatos(p) ? "no hay incendios que mostrar" : "los puntos no incluyen lo quemado ese año"}. No significa que no los haya habido.`;
+  }
+  const COLS_INC = [{ c: "fecha", t: "Fecha" }, { c: "municipio", t: "Municipio" }, { c: "poligono_ha", t: "Reportadas (ha)" },
+    { c: "en_bosque_ha", t: "Quemadas en bosque (ha)" }, { c: "perdido_ha", t: "Sin copa al cierre (ha)" }, { c: "clave", t: "Clave" }];
+  let soloSel = true;
+  function pintarTablaIncendios() {
+    const cont = document.getElementById("tabla-incendios-cont"), p = P();
+    if (!cont || !p.inc) return;
+    const filtrar = st.sel && soloSel;
+    const lista = p.inc.lista.filter(r => !filtrar || r.municipio === st.sel);
+    const { col, asc } = st.ordenInc;
+    lista.sort((a, b) => {
+      const va = a[col], vb = b[col], r = typeof va === "string" ? va.localeCompare(vb, "es") : va - vb;
+      return (asc ? r : -r) || a.clave.localeCompare(b.clave);
+    });
+    cont.innerHTML = `<table class="lista" id="tabla-incendios"><thead><tr>${COLS_INC.map(c => `<th scope="col" data-c="${c.c}" ${c.c === col ? `aria-sort="${asc ? "ascending" : "descending"}"` : ""}><button type="button">${c.t}</button></th>`).join("")}</tr></thead>
+      <tbody>${lista.map(r => `<tr tabindex="0" data-clave="${esc(r.clave)}" aria-selected="${r.clave === incSel}"><td>${esc(r.fecha)}</td><td>${esc(r.municipio)}</td><td>${h1(r.poligono_ha)}</td><td>${h1(r.en_bosque_ha)}</td><td>${h1(r.perdido_ha)}</td><td>${esc(r.clave)}</td></tr>`).join("")}</tbody></table>
+      ${lista.length ? "" : `<p class="vacio" style="padding:10px">No hay incendios${filtrar ? ` de ${esc(st.sel)}` : ""} en este periodo.</p>`}`;
+    document.getElementById("inc-cuenta").textContent = `${lista.length} incendio${lista.length === 1 ? "" : "s"}${filtrar ? ` de ${st.sel}` : ""}`;
+    cont.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+      const c = b.parentElement.dataset.c;
+      st.ordenInc = { col: c, asc: st.ordenInc.col === c ? !st.ordenInc.asc : ["fecha", "municipio", "clave"].includes(c) };
+      pintarTablaIncendios();
+    }));
+    cont.querySelectorAll("tbody tr").forEach(tr => {
+      const alElegir = () => {
+        marcarIncendio(tr.dataset.clave, false);
+        const d = p.inc.lista.find(r => r.clave === tr.dataset.clave);
+        if (d && d.px != null && st.vista === "incendios") zoomA([d.px - 12, d.py - 12, d.px + 12, d.py + 12]);
+      };
+      tr.addEventListener("click", alElegir);
+      tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alElegir(); } });
+    });
+  }
+  function pintarIncendios() {
+    const el = document.getElementById("incendios");
+    if (enAnio()) { el.hidden = true; return; }
+    el.hidden = false;
+    const p = P(), inc = p.incendios || {}, quien = st.sel || D.titulo, abierto = st.incendios && p.inc;
+    const resumen = esSinDatos(p) ? `${sinCapaTxt(p)}: no hay incendios de este periodo que contar.`
+      : `${nf.format(inc.n || 0)} incendios del periodo: CONAFOR reporta ${ha(inc.poligono || 0)} de polígonos; ${ha(inc.quemado || 0)} tienen dNBR ≥ 0.27, ${ha(inc.en_bosque || 0)} dentro del bosque, y ${ha(inc.perdido || 0)} de bosque quedaron sin copa al cierre.`;
+    let anios = "", tabla = "";
+    if (abierto) {
+      const lista = p.inc.lista.filter(r => !st.sel || r.municipio === st.sel);
+      const etqAnio = a => a + (p.preliminar ? p.sufijo : p.actual - p.base === 0 ? "" : a === p.base ? " (nov-dic)" : a === p.actual ? " (ene-oct)" : "");
+      const filas = d3.range(p.base, p.actual + 1).map(a => {
+        if (p.anios_sin_capa.includes(a)) return `<tr data-anio="${a}" data-sin-capa="1"><td>${etqAnio(a)}</td><td class="sin-capa" colspan="4">CONAFOR aún no publica los incendios de ${a}</td></tr>`;
+        const r = lista.filter(x => x.fecha.slice(0, 4) === String(a));
+        const suma = k => r.reduce((t, x) => t + x[k], 0);
+        return `<tr data-anio="${a}"><td>${etqAnio(a)}</td><td>${r.length}</td><td>${h1(suma("poligono_ha"))}</td><td>${h1(suma("en_bosque_ha"))}</td><td>${h1(suma("perdido_ha"))}</td></tr>`;
+      }).join("");
+      anios = `<div class="grafica"><h3>Pérdida por incendio por año · ${esc(quien)}</h3>
+        <div class="tabla-detalle"><table class="por-anio" id="tabla-incendios-anio"><thead><tr><th>Año</th><th>Incendios</th><th>Reportadas (ha)</th><th>Quemadas en bosque (ha)</th><th>Sin copa al cierre (ha)</th></tr></thead><tbody>${filas}</tbody></table></div>
+        <p class="pie-graf">Por año de inicio del incendio. ${st.sel ? "Los incendios se asignan al municipio con más superficie del polígono, así que pueden diferir un poco de la columna Incendio de la tabla de municipios, que sale del balance por píxel. " : ""}La pérdida por incendio de cada municipio y periodo está en su detalle y en la tabla de municipios.</p></div>`;
+      tabla = `<div class="grafica"><h3 id="inc-cuenta"></h3>
+        ${st.sel ? `<label class="pie-graf"><input type="checkbox" id="inc-solo-sel" ${soloSel ? "checked" : ""}> Solo los de ${esc(st.sel)}</label>` : ""}
+        <div class="desliza" id="tabla-incendios-cont"></div></div>`;
+    }
+    el.innerHTML = `<header><h2 id="incendios-titulo">Incendios del periodo · ${esc(p.etiqueta)}${p.preliminar ? " (preliminar)" : ""}</h2><p id="incendios-resumen">${resumen}</p></header>
+      ${p.incendios_estado !== "completo" ? `<div class="aviso" id="incendios-aviso" role="note"><p><strong>${sinCapaTxt(p)}.</strong> ${esSinDatos(p) ? "Por eso este periodo no trae incendios y su pérdida por incendio no se conoce (no es cero)." : "La pérdida por incendio de este periodo es parcial: no incluye lo quemado ese año, que quedó dentro de “otras pérdidas”."}</p></div>` : ""}
+      <div class="acciones"><button type="button" id="inc-abrir" aria-expanded="${!!abierto}">${abierto ? "Ocultar la tabla de incendios" : "Ver los incendios y su tabla"}</button>
+        <span class="pie-graf">También en el mapa: vista «Incendios».</span></div>
+      ${abierto ? `<div style="display:grid;gap:16px">${anios}${tabla}</div>` : ""}`;
+    document.getElementById("inc-abrir").addEventListener("click", () => actualizar(e => { e.incendios = !e.incendios; }));
+    if (abierto) {
+      const chk = document.getElementById("inc-solo-sel");
+      if (chk) chk.addEventListener("change", () => { soloSel = chk.checked; pintarTablaIncendios(); });
+      pintarTablaIncendios();
+    }
   }
 
   // ---------- Leyenda ----------
@@ -1046,6 +1223,13 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         st.perd[inp.dataset.t] = inp.checked; pintarLeyenda(); pintarRaster();
       }));
       nota.textContent = `“Perdido en ${S.anios[1]}” = era bosque en noviembre-diciembre de ${S.anios[0]} y ya no en el de ${S.anios[1]} (por incendio u otra causa). ${celdas} toma el año más reciente de pérdida que tenga, así que se ven más grandes de lo que son; las hectáreas son las del periodo. Sale de la serie nov-dic.`;
+    } else if (st.vista === "incendios") {
+      const p = P();
+      titulo.textContent = "Incendios";
+      ul.innerHTML = `<li><svg class="muestra" viewBox="0 0 16 12" aria-hidden="true"><circle cx="8" cy="6" r="5" style="fill:var(--c-incendio);fill-opacity:.55;stroke:var(--sel)"></circle></svg>Un incendio del periodo<span class="cifra-ha">${nf.format((p.incendios || {}).n || 0)}</span></li>
+        <li><span class="muestra" style="background:var(--c-estable)"></span>Bosque que sigue en pie</li>
+        <li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin bosque o fuera de la zona forestal</li>`;
+      nota.textContent = `Cada punto es el centroide del polígono de CONAFOR; su área es proporcional a las hectáreas quemadas dentro del bosque. Pasa el cursor o toca un punto para ver su clave, fecha, municipio y hectáreas.${p.incendios_estado !== "completo" ? " " + sinCapaTxt(p) + "." : ""}`;
     } else if (st.vista === "neto") {
       titulo.textContent = "Cambio neto";
       choro(ETQ_NETO, cuenta(n => clase(fila(n))), "Cambio neto de cada municipio como porcentaje de su bosque inicial. El número a la derecha es cuántos municipios hay en cada clase.");
@@ -1068,7 +1252,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   };
   const enc = document.getElementById("encabezados");
   function pintarEncabezados() {
-    enc.innerHTML = COLS[st.modo].map(col => `<th scope="col" data-c="${col.c}"><button type="button">${col.t}${col.c === "bosque" ? " " + S.anios[st.t] : ""}</button></th>`).join("");
+    enc.innerHTML = COLS[st.modo].map(col => `<th scope="col" data-c="${col.c}"><button type="button">${col.t}${col.c === "bosque" ? " " + S.anios[st.t] : ""}${col.c === "inc" && !enAnio() && P().incendios_estado !== "completo" ? "†" : ""}</button></th>`).join("");
     enc.querySelectorAll("th").forEach(th => th.querySelector("button").addEventListener("click", () => {
       const c = th.dataset.c;
       st.orden = { col: c, asc: st.orden.col === c ? !st.orden.asc : ["nombre", "neto", "pct", "pant", "tend", "ptend"].includes(c) };
@@ -1107,7 +1291,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       ? x => `<td>${num(x.v.zona)}</td><td>${num(x.v.bosque)}</td><td>${x.v.pzona == null ? "—" : nf1.format(x.v.pzona) + " %"}</td>
           <td>${x.v.neto == null ? "—" : signo(x.v.neto)}</td><td>${pctTxt(x.v.pant)}</td><td>${x.v.tend == null ? "—" : signo(x.v.tend)}</td>
           <td>${x.v.ptend == null ? "—" : `<span class="chip" style="background:var(--div-${claseTend(x.nombre).slice(1)})"></span>${pct2Txt(x.v.ptend)}`}</td>`
-      : x => `<td>${n0(x.v.base)}</td><td>${n0(x.v.inc)}</td><td>${n0(x.v.otras)}</td><td>${n0(x.v.gan)}</td>
+      : x => `<td>${n0(x.v.base)}</td><td>${incTxt(x.v.inc, P())}</td><td>${n0(x.v.otras)}</td><td>${n0(x.v.gan)}</td>
           <td>${n0(x.v.actual)}</td><td>${signo(x.v.neto)}</td>
           <td>${x.v.pct == null ? "—" : `<span class="chip" style="background:var(--div-${clase(x.f).slice(1)})"></span>${pctTxt(x.v.pct)}`}</td>`;
     const tb = document.getElementById("filas");
@@ -1116,6 +1300,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       tr.addEventListener("click", () => seleccionar(tr.dataset.n, true));
       tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); seleccionar(tr.dataset.n, true); } });
     });
+    const nt = document.getElementById("nota-tabla"), txt = enAnio() ? "" : notaInc(P());
+    nt.hidden = !txt; nt.textContent = txt;
     document.getElementById("tabla-titulo").textContent = enAnio() ? `Municipios · ${S.anios[st.t]}` : `Municipios · ${P().etiqueta}${P().preliminar ? " (preliminar)" : ""}`;
   }
 
@@ -1157,8 +1343,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   }
   let pintado = false;
   function pintarTodo() {
-    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarBalance(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
-    marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPie();
+    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarBalance(); pintarIncendios(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
+    marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPuntos(); pintarPie();
     pintado = true;
   }
 
@@ -1174,7 +1360,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       ["Qué mide", `<p>La superficie con cobertura arbórea (hectáreas) dentro de la zona forestal: un píxel de 10 m cuenta como bosque si su NDVI es de ${nf2.format(umbral)} o más. De un año a otro separa la pérdida por incendio (dentro de un polígono de CONAFOR con dNBR ≥ 0.27), las otras pérdidas y la ganancia. No mide biomasa, carbono, densidad del arbolado ni especies.</p>`],
       ["Dónde", `<p>${esc(D.titulo)}, por municipio, dentro de la zona forestal de INEGI Serie VII${zona}: bosques, selva baja caducifolia, matorrales y vegetación secundaria arbórea${S && S.clases ? ` (claves ${esc(S.clases)})` : ""}. Fuera de esa zona no se cuenta bosque.</p>`],
       ["Cuándo", `<p>Un compuesto de noviembre-diciembre por año (${anios.join(", ")}): sin lluvias, con las parcelas secas y antes de la temporada de incendios. Los incendios de cada periodo van del 1 de noviembre al 31 de octubre.${pre.length ? ` Además, un preliminar ${pre.map(p => `${p.meses} ${p.base} → ${p.actual}`).join("; ")}, de otra temporada, que no se compara con los anteriores.` : ""}</p>`],
-      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta 2024.</li><li>Uso de suelo y vegetación Serie VII de INEGI y límites municipales (IDEFOR).</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
+      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta ${D.conafor.ultimo}.</li><li>Uso de suelo y vegetación Serie VII de INEGI y límites municipales (IDEFOR).</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
     ];
     if (S) {
       const sin = S.sin_encadenar;
@@ -1187,7 +1373,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       `La causa de las “otras pérdidas”: pueden ser tala, plaga, sequía, cambio de uso, caída de hojas o ruido. Ninguna se ha verificado en campo.${val.length ? ` Contra Hansen GFC coinciden poco (precisión ${val.map(v => `${v.periodo.replace("_", "→")}: ${nf.format(v.precision * 100)} %`).join(", ")}, tomando Hansen como referencia).` : ""}`,
       `Que la selva baja caducifolia haya perdido cobertura: en noviembre-diciembre ya empieza a tirar las hojas, así que parte de sus “otras pérdidas” puede ser solo la temporada.`,
       `El uso al que pasó el terreno perdido (agrícola, pecuario, urbano u otro) con certeza: lo estima un clasificador entrenado con la Serie VII, que es anterior a 2023${exact.length ? `; su acuerdo con datos reservados de la misma Serie VII es de ${exact.map(([k, v]) => `${nf.format(v.global * 100)} % (kappa ${nf2.format(v.kappa)}) en ${k.slice(-4)}`).join(" y ")}` : ""}.`,
-      `La pérdida por incendio de 2025: CONAFOR todavía no publica sus polígonos, así que lo quemado en 2025 aparece como “otras pérdidas”.`,
+      (() => { const sin = [...new Set(D.periodos.flatMap(p => p.anios_sin_capa))].sort(); return sin.length ? `La pérdida por incendio de ${listaAnios(sin)}: CONAFOR todavía no publica sus polígonos, así que lo quemado ese año aparece como “otras pérdidas” y la página lo señala como parcial o sin dato, nunca como cero.` : null; })(),
       `La recuperación por reforestación de los programas (PS, RHF, CC): faltan sus polígonos con año de plantación y sobrevivencia. Una plantación tarda años en verse desde el satélite.`,
       S ? `Una tendencia firme: con ${N} años, la pendiente es casi el cambio total entre ${N - 1}; hacen falta más años para separarla de la variación de un año a otro.` : null,
       `Cambios menores a una fracción de hectárea, ni la degradación bajo el dosel: el píxel es de 10 m y el NDVI ve sobre todo la copa.`,
