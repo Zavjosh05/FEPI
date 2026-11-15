@@ -107,7 +107,7 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     exp.refresh_from_db()
     sesion.refresh_from_db()
     assert exp.estado.clave == "aprobada" and sesion.autoriza_publicacion and acta.archivo
-    assert en_bandeja_de(exp, usuarios) == set()                   # espera al módulo M3 (sprint 2)
+    assert en_bandeja_de(exp, usuarios) == {"dir_drff"}            # el área responsable publica (M3)
 
     # --- M2.4 Sesión de seguimiento: el acuerdo llega al área que debe cumplirlo -------------------
     seg = sesiones.crear_sesion(comite, cc, TipoSesion.SEGUIMIENTO, fecha_sesion(8), "Sala de juntas",

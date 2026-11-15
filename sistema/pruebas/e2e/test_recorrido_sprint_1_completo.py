@@ -286,7 +286,7 @@ def test_sprint_1_una_solicitud_recorre_todo_por_la_interfaz(datos_e2e, page, li
     page.click(f"[data-listado=beneficiaria] a:has-text('{folio}')")
     page.wait_for_url("**pestana=dictamenes")
     estado_exp("Aprobada")
-    fuera_de_bandeja(folio)                                  # espera al módulo M3 (sprint 2)
+    fuera_de_bandeja(folio)                                  # sigue en la Dirección, que publica (M3)
 
     # ---- 8. Comprobación final como Delegación: estado, bitácora completa y acuse en PDF ------------------
     relevo("del_amecameca")

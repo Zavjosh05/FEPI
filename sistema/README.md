@@ -122,7 +122,7 @@ sistema/
 └── pruebas/           pytest (test_nucleo_*, test_hu_1_*, test_hu_2_*, fixtures_m2.py) y e2e/ (Playwright)
 ```
 
-## Estados del trámite (sprint 1)
+## Estados del trámite (sprints 1 y 2)
 
 Los estados y las transiciones son datos (`datos/flujo_tramite.json`, editables en el admin). El único
 punto del código que cambia un estado es `Expediente.cambiar_estado(destino, usuario, motivo)`: valida
@@ -148,13 +148,53 @@ stateDiagram-v2
     no_factible --> [*]
 ```
 
+Sprint 2 (tabla lista; las acciones las construyen las historias HU-3.x y HU-5.x). En M5 el expediente
+recorre los estados de pago una vez por ministración.
+
+```mermaid
+stateDiagram-v2
+    aprobada --> publicada: Dirección publica (HU-3.1)
+    publicada --> notificada: Delegación notifica con acuse (HU-3.1)
+    notificada --> contrato_elaborado: Dirección elabora (HU-3.2)
+    contrato_elaborado --> contrato_en_delegacion: Dirección envía (HU-3.2)
+    contrato_en_delegacion --> contratada: Delegación registra la firma (HU-3.3)
+    publicada --> sin_firma_en_plazo: Dirección, plazo vencido (D)
+    notificada --> sin_firma_en_plazo
+    contrato_elaborado --> sin_firma_en_plazo
+    contrato_en_delegacion --> sin_firma_en_plazo
+    sin_firma_en_plazo --> recurso_liberado: Secretaría Técnica, acuerdo del Comité (D)
+    contratada --> vale_entregado: Delegación, PS y RHF (HU-3.4)
+    vale_entregado --> planta_entregada: vivero (HU-3.4)
+    planta_entregada --> ministracion_solicitada: Dirección (HU-5.1)
+    contratada --> ministracion_solicitada: Dirección (HU-5.1)
+    ministracion_solicitada --> contratada: Administración y Finanzas devuelve (motivo)
+    ministracion_solicitada --> pagada: Administración y Finanzas, salvo PSAHEM (HU-5.2)
+    pagada --> ministracion_solicitada: siguiente ministración
+    ministracion_solicitada --> remitida_fiduciaria: Administración y Finanzas, PSAHEM (HU-5.2)
+    remitida_fiduciaria --> cheque_emitido: Fiduciaria (HU-5.3)
+    cheque_emitido --> cheque_enviado: Fiduciaria envía a la Delegación (HU-5.3)
+    cheque_enviado --> cheque_entregado: Delegación entrega (HU-5.3)
+    cheque_entregado --> ministracion_solicitada: siguiente ministración
+    recurso_liberado --> [*]
+```
+
 | Estado | Bandeja (quién lo atiende) | También lo consultan |
 | --- | --- | --- |
 | `recibida`, `faltantes` | Delegación | Dirección del programa |
 | `enviada_direccion` | Dirección del programa | — |
 | `validada` (en dictamen) | Dirección (si le falta el técnico) y Unidad Jurídica (si le falta el jurídico) | Secretaría Técnica |
 | `dictaminada` | Secretaría Técnica del Comité | Unidad Jurídica |
-| `aprobada`, `lista_espera`, `no_factible` | — (M3 en el sprint 2) | Unidad Jurídica, Secretaría Técnica |
+| `aprobada` | Dirección (publica, M3) | Unidad Jurídica, Secretaría Técnica |
+| `lista_espera`, `no_factible` | — | Unidad Jurídica, Secretaría Técnica |
+| `publicada`, `contrato_en_delegacion` | Delegación (notifica y cita; recaba la firma) | Unidad Jurídica |
+| `notificada`, `contrato_elaborado` | Dirección (elabora y envía el contrato) | Unidad Jurídica |
+| `sin_firma_en_plazo` | Dirección y Secretaría Técnica (recurso por liberar) | Unidad Jurídica |
+| `contratada`, `planta_entregada`, `pagada`, `cheque_entregado` | Dirección (solicita la ministración) | Administración y Finanzas, Jurídica, vivero, Fiduciaria según el estado |
+| `vale_entregado` | Vivero (PS y RHF) | — |
+| `ministracion_solicitada` | Administración y Finanzas | Unidad Jurídica |
+| `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
+| `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
+| `recurso_liberado` | — (final) | Unidad Jurídica, Secretaría Técnica |
 
 Una Delegación solo ve sus expedientes; una Dirección, los de los programas de los que es Instancia
 Ejecutora; las demás unidades, los estados que atienden o consultan. Además, cada unidad ve en su bandeja

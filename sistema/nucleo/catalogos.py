@@ -127,13 +127,16 @@ def cargar_flujo(ruta=None):
     estados = {e.clave: e for e in Estado.objects.all()}
     vigentes = []
     for t in datos["transiciones"]:
-        programa = Programa.objects.get(clave=t["programa"]) if t.get("programa") else None
-        transicion, _ = Transicion.objects.update_or_create(
-            programa=programa, origen=estados[t["origen"]], destino=estados[t["destino"]],
-            tipo_unidad=t["tipo_unidad"],
-            defaults={"accion": t["accion"], "requiere_motivo": t.get("requiere_motivo", False)},
-        )
-        vigentes.append(transicion.pk)
+        # «programa»: uno; «programas»: lista (una transición por programa); ninguno: todos.
+        claves = t.get("programas") or ([t["programa"]] if t.get("programa") else [None])
+        for clave in claves:
+            programa = Programa.objects.get(clave=clave) if clave else None
+            transicion, _ = Transicion.objects.update_or_create(
+                programa=programa, origen=estados[t["origen"]], destino=estados[t["destino"]],
+                tipo_unidad=t["tipo_unidad"],
+                defaults={"accion": t["accion"], "requiere_motivo": t.get("requiere_motivo", False)},
+            )
+            vigentes.append(transicion.pk)
     # Las transiciones que ya no están en el archivo dejan de estar permitidas.
     Transicion.objects.exclude(pk__in=vigentes).delete()
 
