@@ -94,8 +94,8 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-07 | HU-5.1 Solicitud de pago | S2-05 | Pendiente | |
 | S2-08 | HU-5.2 Pago de la ministración | S2-07 | Pendiente | |
 | S2-09 | HU-5.3 Entrega de cheques (PSAHEM) | S2-08 | Pendiente | |
-| S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | Por verificar | `9254478` |
-| S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | En curso | |
+| S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | Hecho | `9254478` |
+| S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | Hecho | `5bfa706` |
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
 | S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Pendiente | |
 | S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Pendiente | |
