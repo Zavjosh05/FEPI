@@ -62,6 +62,11 @@ class Vencimiento:
         return self.vencimiento is not None
 
     @property
+    def nombre(self):
+        """Nombre legible del uso (P-19): el de ``datos/sistema.json`` o, si falta, la clave sin guiones bajos."""
+        return self.config.get("nombre") or self.uso.replace("_", " ").capitalize()
+
+    @property
     def nombre_evento(self):
         return NOMBRES_EVENTO.get(self.evento, self.evento.replace("_", " "))
 

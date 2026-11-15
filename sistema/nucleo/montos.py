@@ -41,6 +41,7 @@ class MontoAprobado:
     regimen: str = ""
     ministraciones: list = field(default_factory=list)
     nota: str = ""
+    regimen_nombre: str = ""
 
     @property
     def sin_dinero(self):
@@ -87,6 +88,17 @@ def regimen_de_pago(expediente, superficie):
     return regimenes.pop() if len(regimenes) == 1 else ""
 
 
+def nombre_regimen(expediente, regimen):
+    """Nombre legible del régimen de pago (P-19): el de la modalidad, el de ``nombres_regimen`` o la clave."""
+    if not regimen:
+        return ""
+    propio = datos_sistema().get("nombres_regimen", {}).get(regimen)
+    if propio:
+        return propio
+    modalidad = expediente.ejercicio.modalidades.filter(clave=regimen).first()
+    return modalidad.nombre if modalidad else regimen.replace("_", " ").capitalize()
+
+
 def ministraciones(expediente, total, regimen):
     reglas = list(expediente.ejercicio.ministraciones.filter(regimen=regimen).order_by("numero"))
     if total == 0 or not reglas:
@@ -112,12 +124,13 @@ def monto_aprobado(expediente, superficie=None, condiciones=()):
     if concepto is None or concepto.monto is None:
         nota = (f"Concepto sin recurso económico: {concepto.unidad}." if concepto else
                 "Las reglas no traen un monto por hectárea para esta modalidad.")
-        return MontoAprobado(superficie, Decimal("0"), Decimal("0"), concepto, regimen_de_pago(expediente, superficie),
-                             [], nota)
+        regimen = regimen_de_pago(expediente, superficie)
+        return MontoAprobado(superficie, Decimal("0"), Decimal("0"), concepto, regimen, [], nota,
+                             nombre_regimen(expediente, regimen))
     total = (superficie * concepto.monto).quantize(CENTAVO, rounding=ROUND_HALF_UP)
     regimen = regimen_de_pago(expediente, superficie)
     return MontoAprobado(superficie, concepto.monto, total, concepto, regimen,
-                         ministraciones(expediente, total, regimen))
+                         ministraciones(expediente, total, regimen), regimen_nombre=nombre_regimen(expediente, regimen))
 
 
 SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado"}

@@ -226,7 +226,7 @@ def datos_del_contrato(expediente, folio, ahora):
         # solo para el PDF (no se guardan en el JSON del contrato)
         "_detalle": [{"numero": x.numero, "porcentaje": f"{x.porcentaje.normalize():f}", "importe": formato_moneda(x.importe),
                       "condicion": x.condicion} for x in m.ministraciones],
-        "_regimen": m.regimen,
+        "_regimen": m.regimen_nombre or m.regimen,
     }
 
 

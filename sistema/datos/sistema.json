@@ -43,35 +43,41 @@
   "plazos_del_sistema": {
     "vigencia_refrendo": "vigencia_documentacion_legal_refrendo"
   },
+  "nombres_regimen": {
+    "nota": "Nombre legible de los regímenes de pago que no son una modalidad (los de modalidad usan el nombre de la modalidad).",
+    "pago_unico_hasta_5_ha": "Pago único (superficie de hasta 5 ha)",
+    "dos_ministraciones_mas_de_5_ha": "Dos ministraciones, 70 % y 30 % (más de 5 ha)",
+    "dos_ministraciones": "Dos ministraciones, 70 % y 30 %"
+  },
   "usos_de_plazo": {
     "nota": "Qué plazo de las reglas usa el sistema para cada cosa y qué evento lo arranca, por programa (nucleo/plazos.py). por_omision vale para todos; cada programa cambia solo lo suyo (false = el programa no tiene ese plazo). Eventos: recepcion_solicitud, aviso_direccion, notificacion_persona (con tipo_notificacion), y los hitos que registran los módulos (publicacion_resultados, firma_contrato, entrega_vale, entrega_cheque, solicitud_pago_fiduciaria…). Si el evento no ha ocurrido, el vencimiento queda «sin fecha todavía».",
     "por_omision": {
-      "faltantes_ventanilla": {"plazo": "complemento_documentacion_faltante", "evento": "recepcion_solicitud", "tope": {"plazo": "recepcion_solicitudes"}, "nota": "ROP 8.1.1.2 (requisitos generales): 5 días hábiles a partir de la recepción, sin exceder la fecha límite de recepción de la Convocatoria; si no se complementa, la solicitud se tendrá por desechada (R-12)."},
-      "faltantes_direccion": {"plazo": "complemento_documentacion_faltante", "evento": "aviso_direccion", "decision_propia": true, "nota": "Las ROP (10.1) dicen que la Dirección notifica los faltantes dentro del plazo de evaluación, sin número de días. Decisión propia: se dan los mismos 5 días hábiles del complemento, contados desde el aviso (R-12; por decidir con el cliente)."},
-      "firma_programada": {"plazo": "firma_contrato", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Fecha programada de firma: sirve para citar y alertar a la Delegación (R-03)."},
-      "firma_liberacion": {"plazo": "firma_contrato", "evento": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Vencimiento para liberar el recurso: el contrato queda «sin firma en plazo» al vencer, contado desde la notificación con acuse (la baja es una sanción, R-03)."}
+      "faltantes_ventanilla": {"nombre": "Complemento de documentación faltante (ventanilla)", "plazo": "complemento_documentacion_faltante", "evento": "recepcion_solicitud", "tope": {"plazo": "recepcion_solicitudes"}, "nota": "ROP 8.1.1.2 (requisitos generales): 5 días hábiles a partir de la recepción, sin exceder la fecha límite de recepción de la Convocatoria; si no se complementa, la solicitud se tendrá por desechada (R-12)."},
+      "faltantes_direccion": {"nombre": "Complemento de documentación faltante (aviso de la Dirección)", "plazo": "complemento_documentacion_faltante", "evento": "aviso_direccion", "decision_propia": true, "nota": "Las ROP (10.1) dicen que la Dirección notifica los faltantes dentro del plazo de evaluación, sin número de días. Decisión propia: se dan los mismos 5 días hábiles del complemento, contados desde el aviso (R-12; por decidir con el cliente)."},
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "plazo": "firma_contrato", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Fecha programada de firma: sirve para citar y alertar a la Delegación (R-03)."},
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "plazo": "firma_contrato", "evento": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Vencimiento para liberar el recurso: el contrato queda «sin firma en plazo» al vencer, contado desde la notificación con acuse (la baja es una sanción, R-03)."}
     },
     "CC": {
-      "firma_programada": {"evento": "publicacion_resultados"},
-      "firma_liberacion": {"evento": "notificacion_persona"}
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "publicacion_resultados"},
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"}
     },
     "PS": {
-      "firma_programada": {"evento": "notificacion_persona", "nota": "En PS la Convocatoria cuenta la firma desde la notificación de que hay recurso (R-13)."},
-      "firma_liberacion": {"evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "En PS la causa de baja (8.1.9 b) inciso d) la cuenta desde la publicación de resultados (R-13); las reasignadas, desde su notificación."},
-      "cita_firma": {"plazo": "cita_firma_contrato", "evento": "publicacion_resultados", "nota": "La Delegación notifica y cita a firma dentro de 5 días hábiles desde la publicación (PS 10.1 h)."},
-      "recoger_planta": {"plazo": "recoger_planta_vivero", "evento": "entrega_vale", "unidad": "dias_naturales", "nota": "Las ROP dicen «30 días» sin precisar: se toman naturales (lectura literal, R-13; por decidir)."}
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "nota": "En PS la Convocatoria cuenta la firma desde la notificación de que hay recurso (R-13)."},
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "En PS la causa de baja (8.1.9 b) inciso d) la cuenta desde la publicación de resultados (R-13); las reasignadas, desde su notificación."},
+      "cita_firma": {"nombre": "Cita a firma por la Delegación", "plazo": "cita_firma_contrato", "evento": "publicacion_resultados", "nota": "La Delegación notifica y cita a firma dentro de 5 días hábiles desde la publicación (PS 10.1 h)."},
+      "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vivero", "evento": "entrega_vale", "unidad": "dias_naturales", "nota": "Las ROP dicen «30 días» sin precisar: se toman naturales (lectura literal, R-13; por decidir)."}
     },
     "RHF": {
-      "firma_programada": {"evento": "notificacion_persona", "nota": "En RHF la Convocatoria y 8.1.9 b) fr. 5 cuentan desde la notificación (R-15)."},
-      "firma_liberacion": {"evento": "notificacion_persona"},
-      "recoger_planta": {"plazo": "recoger_planta_vale", "evento": "entrega_vale"},
-      "ptrfi_actualizado": {"plazo": "entrega_ptrfi_actualizado", "evento": "notificacion_persona", "tipo_notificacion": "resultados"}
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "nota": "En RHF la Convocatoria y 8.1.9 b) fr. 5 cuentan desde la notificación (R-15)."},
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"},
+      "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vale", "evento": "entrega_vale"},
+      "ptrfi_actualizado": {"nombre": "Entrega del PTRFI actualizado", "plazo": "entrega_ptrfi_actualizado", "evento": "notificacion_persona", "tipo_notificacion": "resultados"}
     },
     "PSA": {
-      "firma_programada": {"evento": "publicacion_resultados"},
-      "firma_liberacion": {"evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "Las ROP de PSAHEM no fijan otro evento: la Convocatoria cuenta desde la publicación (por confirmar con el cliente)."},
-      "instruccion_pago_fiduciaria": {"plazo": "instruccion_pago_fiduciaria", "evento": "solicitud_pago_fiduciaria", "nota": "5 días hábiles para que la Secretaría Técnica solicite el pago a la Fiduciaria desde que recibe la solicitud del área (R-14)."},
-      "cobro_cheque": {"plazo": "cobro_cheque", "evento": "entrega_cheque", "decision_propia": true, "nota": "Las ROP no dicen desde cuándo corren los 3 meses; se cuentan desde la entrega del cheque a la persona (R-14)."}
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "publicacion_resultados"},
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "Las ROP de PSAHEM no fijan otro evento: la Convocatoria cuenta desde la publicación (por confirmar con el cliente)."},
+      "instruccion_pago_fiduciaria": {"nombre": "Instrucción de pago a la Fiduciaria", "plazo": "instruccion_pago_fiduciaria", "evento": "solicitud_pago_fiduciaria", "nota": "5 días hábiles para que la Secretaría Técnica solicite el pago a la Fiduciaria desde que recibe la solicitud del área (R-14)."},
+      "cobro_cheque": {"nombre": "Cobro del cheque", "plazo": "cobro_cheque", "evento": "entrega_cheque", "decision_propia": true, "nota": "Las ROP no dicen desde cuándo corren los 3 meses; se cuentan desde la entrega del cheque a la persona (R-14)."}
     }
   }
 }

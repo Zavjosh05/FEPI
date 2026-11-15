@@ -27,7 +27,7 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
     assert "HU-5.3 Entrega de cheques" in html and 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    assert "firma_programada" in html and "sin fecha todavía" in html
+    assert "Fecha programada de firma del contrato" in html and "sin fecha todavía" in html
     assert "Ver lo que sigue: publicación y contrato" in html  # siguiente paso de lo aprobado
 
 
