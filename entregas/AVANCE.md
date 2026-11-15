@@ -5,8 +5,8 @@ El porqué de cada decisión está en [BITACORA.md](BITACORA.md).
 
 ## Siguiente paso
 
-> **Esperar la indicación de Joshua para iniciar el sprint 2.** Empieza por subir la rama `prototipos`
-> al repositorio remoto (tarea S2-00) y sigue con las reglas de PS, RHF y PSAHEM (S2-01a, b y c).
+> **Sprint 2 en curso** (autorizado por Joshua el 14-nov). Seguir la tabla del sprint 2 en orden: la
+> primera tarea que no esté en «Hecho» es la que sigue.
 
 ## Cómo retomar un trabajo interrumpido
 
@@ -60,7 +60,7 @@ anterior. La Calculadora se prueba aparte, con el entorno de Python del reposito
 | Revisión | Diagrama del modelo de datos y prueba del recorrido completo | Hecho | `68dc445` |
 | Revisión | Bitácora de decisiones y este tablero | Hecho | `9b4a013` |
 
-Pruebas al cierre: 127 del sistema (121 antes de los ajustes) y 15 de la Calculadora, todas en verde. Capturas en
+Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el recorrido completo por la interfaz) y 15 de la Calculadora, todas en verde. Capturas en
 `sprint_1/capturas/` (49).
 
 ### Ajustes tras la revisión del 14-nov
@@ -73,6 +73,7 @@ Pruebas al cierre: 127 del sistema (121 antes de los ajustes) y 15 de la Calcula
 | A-4 | Montos con separador de miles (P-05) | Hecho | `045feb7` |
 | A-5 | Capturas solo cuando se piden (P-06) | Hecho | `045feb7` |
 | A-6 | Pruebas rápidas separadas de las de navegador (P-07) | Hecho | `045feb7` |
+| A-7 | Recorrido completo por la interfaz, con una sola solicitud y cambio de usuario en cada relevo (P-09) | Hecho | `450a5ac` |
 
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — sin empezar
 
