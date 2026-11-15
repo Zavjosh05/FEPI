@@ -10,12 +10,12 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from nucleo import dias_habiles
+from nucleo import dias_habiles, notificaciones
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import datos_sistema
 from nucleo.models import (
-    Documento, Estado, Evento, Expediente, Municipio, Persona, Predio, TipoDocumento, TipoUnidad,
-    puede_ver_expediente,
+    Documento, Estado, Evento, Expediente, MedioNotificacion, Municipio, Persona, Predio, TipoDocumento,
+    TipoNotificacion, TipoUnidad, puede_ver_expediente,
 )
 
 from . import geometria
@@ -430,7 +430,11 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
             detalle=[d for d in detalle if d["estado"].startswith("Faltante")],
         )
         val.acuse = acuse
-        val.save(update_fields=["acuse"])
+        val.notificacion = notificaciones.emitir_notificacion(
+            expediente, TipoNotificacion.FALTANTES, "Aviso de faltantes", usuario, acuse_envio=acuse, fecha_hora=ahora,
+            datos={"validacion": val.pk, "fecha_limite": limite.isoformat()},
+        )
+        val.save(update_fields=["acuse", "notificacion"])
         expediente.cambiar_estado("faltantes", usuario, tipo_evento="aviso_faltantes", acuse=acuse,
                                   descripcion=f"Aviso de faltantes ({len(faltantes)}) con fecha límite {limite:%d/%m/%Y}.",
                                   datos={"fecha_limite": limite.isoformat()})
@@ -441,31 +445,24 @@ def aviso_vigente(expediente):
     return expediente.validaciones.filter(resultado=ResultadoValidacion.FALTANTES).first()
 
 
-def registrar_notificacion(usuario, validacion):
+def registrar_notificacion(usuario, validacion, medio=MedioNotificacion.PERSONAL, fecha_hora=None):
     """La Delegación registra que notificó el aviso de faltantes a la persona solicitante."""
+    """Usa el servicio general del núcleo (``nucleo.notificaciones``)."""
     exp = validacion.expediente
     _exigir_unidad(usuario, TipoUnidad.DELEGACION)
     _exigir_acceso(usuario, exp)
     if validacion.notificado_en:
         raise ValidationError("El aviso ya se notificó.")
-    ahora = timezone.now()
-    with transaction.atomic():
-        acuse = emitir_acuse(
-            exp, "notificacion_faltantes", "Acuse de notificación del aviso de faltantes", usuario,
-            [("Aviso", validacion.acuse.folio if validacion.acuse else "—"),
-             ("Fecha y hora de la notificación", fmt_fecha_hora(ahora)),
-             ("Fecha límite para entregar", f"{validacion.fecha_limite:%d/%m/%Y}")],
-            destinatario=exp.solicitante.nombre,
-            detalle=[{"clave": r.requisito.clave, "texto": r.requisito.titulo, "estado": "Faltante"}
-                     for r in validacion.faltantes.select_related("requisito")],
-        )
-        validacion.notificado_en = ahora
-        validacion.notificado_por = usuario
-        validacion.acuse_notificacion = acuse
-        validacion.save(update_fields=["notificado_en", "notificado_por", "acuse_notificacion"])
-        Evento.registrar(exp, usuario, "notificacion", "Aviso de faltantes notificado a la persona solicitante.",
-                         acuse=acuse)
-    return acuse
+    if validacion.notificacion is None:
+        raise ValidationError("El aviso no tiene notificación pendiente.")
+    return notificaciones.registrar_notificacion(
+        usuario, validacion.notificacion, medio=medio, fecha_hora=fecha_hora,
+        titulo_acuse="Acuse de notificación del aviso de faltantes",
+        renglones=[("Fecha límite para entregar", f"{validacion.fecha_limite:%d/%m/%Y}")],
+        detalle=[{"clave": r.requisito.clave, "texto": r.requisito.titulo, "estado": "Faltante"}
+                 for r in validacion.faltantes.select_related("requisito")],
+        descripcion="Aviso de faltantes notificado a la persona solicitante.",
+    )
 
 
 def plazo_recepcion(expediente):

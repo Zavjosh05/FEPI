@@ -10,6 +10,8 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
 - MENU: dicts ``{"nombre", "url", "tipos": [tipos de unidad] | None}`` para la barra superior.
 - REVISIONES_PLAZO: funciones ``(fecha) -> int`` que corre ``manage.py revisar_plazos``.
 - DEMOS: funciones ``() -> int`` que agregan datos de demostración (``manage.py cargar_demo``).
+- AL_NOTIFICAR: funciones ``(notificacion) -> None`` que corren cuando la Delegación registra que
+  notificó a la persona (``nucleo.notificaciones.registrar_notificacion``).
 """
 
 FILTROS_BANDEJA = []
@@ -18,3 +20,4 @@ PESTANAS_EXPEDIENTE = []
 MENU = []
 REVISIONES_PLAZO = []
 DEMOS = []
+AL_NOTIFICAR = []

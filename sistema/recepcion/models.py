@@ -9,7 +9,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from nucleo.models import Acuse, Documento, Expediente, Persona, Requisito
+from nucleo.models import Acuse, Documento, Expediente, Notificacion, Persona, Requisito
 
 
 class EstadoRevision(models.TextChoices):
@@ -125,10 +125,10 @@ class Validacion(models.Model):
     fecha_limite = models.DateField(null=True, blank=True)
     plazo_aplicado = models.CharField(max_length=300, blank=True)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    notificado_en = models.DateTimeField(null=True, blank=True, help_text="Notificación por conducto de la Delegación.")
-    notificado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
-                                       related_name="+")
-    acuse_notificacion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    notificacion = models.OneToOneField(
+        Notificacion, null=True, blank=True, on_delete=models.SET_NULL, related_name="validacion",
+        help_text="Aviso de faltantes: su notificación por conducto de la Delegación (núcleo).",
+    )
     vencimiento_avisado = models.BooleanField(default=False)
     history = HistoricalRecords()
 
@@ -139,3 +139,16 @@ class Validacion(models.Model):
 
     def __str__(self):
         return f"{self.expediente.folio} · {self.get_resultado_display()}"
+
+    # Compatibilidad con las pantallas de M1: la notificación vive en el núcleo.
+    @property
+    def notificado_en(self):
+        return self.notificacion.notificada_en if self.notificacion_id else None
+
+    @property
+    def notificado_por(self):
+        return self.notificacion.notificada_por if self.notificacion_id else None
+
+    @property
+    def acuse_notificacion(self):
+        return self.notificacion.acuse_notificacion if self.notificacion_id else None

@@ -281,6 +281,19 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   Los acuerdos todavía no ejecutan nada en otros módulos: `dictamen.seguimiento.RECEPTORES` es el punto
   de conexión (tipo de acuerdo → funciones) para pagos (M5) y seguimiento (M6).
 
+### Base de M3 (Publicación y contrato) y M5 (Pagos)
+
+- **Notificaciones en el núcleo.** `nucleo.Notificacion` y `nucleo/notificaciones.py` son la única forma de
+  notificar a la persona por conducto de la Delegación (faltantes, resultados, cita a firma, omisiones,
+  devoluciones; `TipoNotificacion`). Dos momentos, cada uno con fecha, hora, acuse y renglón de bitácora:
+  `emitir_notificacion(expediente, tipo, asunto, usuario, acuse_envio=None, …)` (la unidad que decide la
+  manda a la Delegación; si no trae acuse propio se emite uno) y `registrar_notificacion(usuario_delegacion,
+  notificacion, medio, fecha_hora=None)` (solo la Delegación de la notificación; fecha no futura ni anterior
+  al envío). `pendientes_de_notificar(delegacion)` y `ultima_notificada(expediente, tipo)` sirven a bandejas
+  y plazos; `extensiones.AL_NOTIFICAR` avisa a los módulos. Cada módulo guarda una referencia a la suya: M1
+  lo hace en `Validacion.notificacion` (la migración `recepcion/0002` pasó los avisos existentes al núcleo;
+  `Validacion.notificado_en`, `notificado_por` y `acuse_notificacion` quedan como propiedades).
+
 ## Diferencias con la especificación (mandan las ROP)
 
 - La especificación pide asignar municipios a Delegaciones de forma provisional; las ROP y la

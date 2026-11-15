@@ -129,3 +129,10 @@ class AcuseAdmin(admin.ModelAdmin):
 class EventoAdmin(admin.ModelAdmin):
     list_display = ["fecha_hora", "expediente", "tipo", "usuario", "descripcion"]
     list_filter = ["tipo"]
+
+
+@admin.register(models.Notificacion)
+class NotificacionAdmin(SimpleHistoryAdmin):
+    list_display = ["expediente", "tipo", "asunto", "delegacion", "enviada_en", "notificada_en", "medio"]
+    list_filter = ["tipo", "medio", "delegacion"]
+    search_fields = ["expediente__folio", "asunto"]
