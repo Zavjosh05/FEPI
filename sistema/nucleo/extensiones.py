@@ -14,6 +14,8 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   notificó a la persona (``nucleo.notificaciones.registrar_notificacion``).
 - EVENTOS_PLAZO: ``{evento: fn(expediente, config) -> datetime | None}`` para eventos de arranque de
   plazo que no se registran como ``Hito`` (``nucleo.plazos``). Lo normal es registrar un Hito.
+- SUPERFICIE_APROBADA: funciones ``(expediente) -> Decimal | None`` con la superficie que cuenta para el
+  monto (``nucleo.montos``); la primera que no dé None gana (M2: la superficie factible del dictamen).
 """
 
 FILTROS_BANDEJA = []
@@ -24,3 +26,4 @@ REVISIONES_PLAZO = []
 DEMOS = []
 AL_NOTIFICAR = []
 EVENTOS_PLAZO = {}
+SUPERFICIE_APROBADA = []

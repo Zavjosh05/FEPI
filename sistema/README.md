@@ -355,6 +355,17 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   Si el evento ocurrió después del tope (por ejemplo, una solicitud de demostración recibida después del
   27-mar-2026), no se topa: se marca `evento_despues_del_tope` y el acuse lo avisa. M1 ya usa el servicio
   (acuse de recepción, aviso de faltantes, revisión de plazos).
+- **Monto aprobado.** `nucleo.montos.monto_aprobado(expediente, superficie=None, condiciones=())` devuelve
+  `MontoAprobado` (`superficie_ha`, `monto_ha`, `total`, `regimen`, `ministraciones` con número, porcentaje,
+  importe y condición). Superficie: la que se pase o la factible del dictamen técnico
+  (`extensiones.SUPERFICIE_APROBADA`, la registra M2) o la solicitada. Monto por hectárea: el de la modalidad
+  del expediente o, si no tiene propio, el general del ejercicio; un concepto sin dinero da 0 sin
+  ministraciones (PS, navideñas). `MontoApoyo.modalidad` se llena al cargar las reglas: con la clave del
+  archivo o, en PS, por el inicio del concepto (`ajustes_reglas.PS.modalidad_de_montos`). Los montos con
+  `requiere` (FSC en PSAHEM) cuentan solo con esa condición. El régimen de pago sale de
+  `ajustes_reglas.<CLAVE>.regimen_pago`: CC por superficie (100 % hasta 5 ha; 70 y 30 arriba), PS y RHF por
+  modalidad, PSAHEM fijo (70 y 30). La última ministración absorbe el redondeo. La propuesta de listados
+  del Comité (HU-2.3) ya usa este servicio.
 
 ## Diferencias con la especificación (mandan las ROP)
 

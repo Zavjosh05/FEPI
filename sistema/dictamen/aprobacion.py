@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
+from nucleo import montos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
 from nucleo.templatetags.moneda import formato_moneda
@@ -35,10 +36,9 @@ def clave_orden(expediente):
 
 
 def monto_por_hectarea(ejercicio):
-    for m in ejercicio.montos.all():
-        if m.monto is not None and "hect" in m.unidad.lower():
-            return m.monto
-    return None
+    """Solo para mostrar el monto de referencia en pantalla; el monto de cada solicitud lo calcula
+    ``nucleo.montos.monto_aprobado`` según su modalidad."""
+    return montos.monto_por_hectarea_referencia(ejercicio)
 
 
 def candidatas(sesion):
@@ -57,7 +57,6 @@ def proponer_listados(usuario, sesion, presupuesto=None):
     if presupuesto is not None:
         sesion.presupuesto = presupuesto
         sesion.save(update_fields=["presupuesto"])
-    monto_ha = monto_por_hectarea(sesion.ejercicio)
     factibles, no_factibles = [], []
     for exp in candidatas(sesion):
         (factibles if resultado_combinado(exp)[0] == "factible" else no_factibles).append(exp)
@@ -68,7 +67,7 @@ def proponer_listados(usuario, sesion, presupuesto=None):
         orden = {ResultadoListado.BENEFICIARIA: 0, ResultadoListado.LISTA_ESPERA: 0}
         for exp in factibles:
             superficie = exp.dictamen_tecnico.superficie_factible_ha or exp.superficie_solicitada_ha or Decimal("0")
-            monto = (superficie * monto_ha).quantize(Decimal("0.01")) if monto_ha is not None else None
+            monto = montos.monto_aprobado(exp, superficie).total
             if disponible is None or (monto is not None and monto <= disponible):
                 resultado = ResultadoListado.BENEFICIARIA
                 if disponible is not None:

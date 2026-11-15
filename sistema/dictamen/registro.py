@@ -31,6 +31,14 @@ def contexto_pestana(request, exp):
     return contexto_dictamenes(request, exp)
 
 
+def superficie_factible(exp):
+    """Superficie que cuenta para el monto: la factible del dictamen técnico (nucleo.montos)."""
+    from .models import DictamenTecnico
+
+    d = DictamenTecnico.objects.filter(expediente=exp).only("superficie_factible_ha").first()
+    return d.superficie_factible_ha if d else None
+
+
 def revisar_plazos(hoy):
     from .tecnico import revisar_plazos_dictamen
 
@@ -51,6 +59,7 @@ def registrar():
         {"nombre": "Incumplidas", "url": "dictamen:incumplidas", "tipos": [T.JURIDICA, T.DIRECCION, T.SECRETARIA_COMITE]},
     ])
     extensiones.REVISIONES_PLAZO.append(revisar_plazos)
+    extensiones.SUPERFICIE_APROBADA.append(superficie_factible)
     extensiones.DEMOS.append(cargar_demo)
 
 

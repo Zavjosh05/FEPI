@@ -309,7 +309,8 @@ class Formato(models.Model):
 
 
 class MontoApoyo(models.Model):
-    """Esquema listo para el sprint 2 (contratos y pagos)."""
+    """Monto de un concepto de apoyo. Modalidad vacía = vale para todas las modalidades del ejercicio.
+    El cálculo del monto de un expediente está en ``nucleo.montos``."""
 
     ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, related_name="montos")
     concepto = models.TextField()
@@ -317,6 +318,8 @@ class MontoApoyo(models.Model):
     unidad = models.CharField(max_length=120, blank=True)
     modalidad = models.ForeignKey(Modalidad, null=True, blank=True, on_delete=models.SET_NULL)
     fundamento = models.CharField(max_length=200, blank=True)
+    datos = models.JSONField(default=dict, blank=True,
+                             help_text="Campos adicionales del archivo de reglas (requiere, superficie mínima…).")
 
     class Meta:
         verbose_name = "monto de apoyo"

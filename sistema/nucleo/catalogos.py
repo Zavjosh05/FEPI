@@ -248,11 +248,17 @@ def cargar_reglas_programa(ruta, sistema=None):
             Formato.objects.create(ejercicio=ejercicio, clave=f.get("clave") or "", nombre=f["nombre"][:300],
                                    uso=f.get("uso", ""), linea_rop=f.get("linea"), orden=i)
         ejercicio.montos.all().delete()
+        # La modalidad del monto viene del archivo de reglas o, si no la trae, de ajustes_reglas
+        # (prefijo del concepto -> modalidad); sin ninguna, el monto vale para todas.
+        por_prefijo = ajustes.get("modalidad_de_montos", {})
         for m in datos.get("montos", []):
+            clave_mod = m.get("modalidad") or next(
+                (mod for prefijo, mod in por_prefijo.items() if m["concepto"].startswith(prefijo)), None)
             MontoApoyo.objects.create(
                 ejercicio=ejercicio, concepto=m["concepto"],
                 monto=Decimal(str(m["monto"])) if m.get("monto") is not None else None,
-                unidad=(m.get("unidad") or "")[:120], fundamento=_numeral(m),
+                unidad=(m.get("unidad") or "")[:120], fundamento=_numeral(m), modalidad=modalidades.get(clave_mod),
+                datos={k: v for k, v in m.items() if k not in {"concepto", "monto", "unidad", "modalidad", "numeral"}},
             )
         ejercicio.ministraciones.all().delete()
         for m in datos.get("ministraciones", []):

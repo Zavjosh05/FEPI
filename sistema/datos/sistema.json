@@ -25,7 +25,19 @@
       "modalidades_no_seleccionables": ["pago_unico_hasta_5_ha", "dos_ministraciones_mas_de_5_ha", "refrendo"],
       "requisitos_sin_documento": ["CC-REQ-01", "CC-REQ-03"],
       "nota_requisitos_sin_documento": "CC-REQ-01 (ser persona física o jurídico colectiva propietaria o poseedora…) y CC-REQ-03 (designar a la segunda persona beneficiaria, que se anota en la Solicitud Única) son condiciones que se revisan, no documentos aparte: se marcan como cumplidos sin archivo.",
-      "nota": "En CC las «modalidades» del archivo de reglas incluyen regímenes de pago (dependen de la superficie aprobada) y el refrendo, que el sistema maneja como casilla del expediente. Al registrar solo se eligen los tipos de superficie."
+      "nota": "En CC las «modalidades» del archivo de reglas incluyen regímenes de pago (dependen de la superficie aprobada) y el refrendo, que el sistema maneja como casilla del expediente. Al registrar solo se eligen los tipos de superficie.",
+      "regimen_pago": {"por_superficie": {"umbral_ha": "umbral_pago_unico_ha", "hasta": "pago_unico_hasta_5_ha", "mas_de": "dos_ministraciones_mas_de_5_ha"}, "nota": "Pago único del 100 % si la superficie aprobada es de 5 ha o menos; si es mayor, 70 % y 30 % (CC 7.2)."}
+    },
+    "PS": {
+      "modalidad_de_montos": {"Concepto I. Apoyo": "plantacion_forestal_comercial", "Concepto II. Apoyo": "mantenimiento_plantaciones", "Concepto III. Mantenimiento": "mantenimiento_navidenas"},
+      "nota_montos": "Los montos de PS no traen la modalidad; se asignan por el inicio del concepto (I plantación $10,000/ha, II mantenimiento $5,000/ha, III navideñas sin recurso económico). Las filas de planta y acompañamiento valen para todas y no llevan dinero.",
+      "regimen_pago": {"por_modalidad": true}
+    },
+    "RHF": {
+      "regimen_pago": {"por_modalidad": true}
+    },
+    "PSA": {
+      "regimen_pago": {"fijo": "dos_ministraciones"}
     }
   },
   "plazos_del_sistema": {
