@@ -120,6 +120,18 @@ def monto_aprobado(expediente, superficie=None, condiciones=()):
                          ministraciones(expediente, total, regimen))
 
 
+SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado"}
+ORDEN_APROBADA = 50  # Estado.orden de «aprobada» en datos/flujo_tramite.json
+
+
+def monto_si_aprobado(expediente):
+    """El monto aprobado si el expediente ya es de una persona beneficiaria (de «aprobada» en adelante)."""
+    estado = expediente.estado
+    if estado.orden < ORDEN_APROBADA or estado.clave in SIN_APOYO:
+        return None
+    return monto_aprobado(expediente)
+
+
 def monto_por_hectarea_referencia(ejercicio):
     """Primer monto por hectárea del ejercicio, solo para mostrar en pantalla (no para calcular)."""
     for m in ejercicio.montos.all():

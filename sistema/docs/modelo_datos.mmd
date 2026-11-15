@@ -3,10 +3,11 @@ erDiagram
   Acuse |o--o{ DictamenJuridico : acuse
   Acuse |o--o{ DictamenTecnico : acuse
   Acuse |o--o{ Evento : acuse
+  Acuse |o--o{ Notificacion : acuse_envio
+  Acuse |o--o{ Notificacion : acuse_notificacion
   Acuse |o--o{ SesionComite : acuse_acta
   Acuse |o--o{ SesionComite : acuse_convocatoria
   Acuse |o--o{ Validacion : acuse
-  Acuse |o--o{ Validacion : acuse_notificacion
   Documento |o--o{ RevisionRequisito : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Formato : ejercicio
@@ -25,6 +26,8 @@ erDiagram
   Expediente |o--o{ Acuse : expediente
   Expediente ||--o{ Documento : expediente
   Expediente ||--o{ Evento : expediente
+  Expediente ||--o{ Hito : expediente
+  Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Poligono : expediente
   Expediente ||--o{ ResolucionSesion : expediente
   Expediente ||--o{ RevisionRequisito : expediente
@@ -35,6 +38,8 @@ erDiagram
   Modalidad |o--o{ MontoApoyo : modalidad
   Municipio |o--o{ PredioSancionado : municipio
   Municipio ||--o{ Predio : municipio
+  Notificacion ||--o| Validacion : notificacion
+  Persona |o--o{ Notificacion : destinatario
   Persona |o--o{ PersonaIncumplida : persona
   Persona |o--o{ Poligono : prestador
   Persona ||--o{ Expediente : solicitante
@@ -56,9 +61,11 @@ erDiagram
   Unidad |o--o{ Documento : unidad
   Unidad |o--o{ Evento : unidad
   Unidad |o--o{ Municipio : delegacion
+  Unidad |o--o{ Notificacion : unidad_origen
   Unidad |o--o{ Usuario : unidad
   Unidad ||--o{ Acuerdo : unidad_responsable
   Unidad ||--o{ Expediente : delegacion
+  Unidad ||--o{ Notificacion : delegacion
   Unidad }o--o{ Programa : programas
   Validacion }o--o{ RevisionRequisito : faltantes
   Acuerdo {
@@ -267,6 +274,16 @@ erDiagram
     int linea_rop
     int orden
   }
+  Hito {
+    int id PK
+    int expediente_id FK
+    texto clave
+    fecha_hora fecha_hora
+    int usuario_id FK
+    texto referencia
+    json datos
+    fecha_hora registrado_en
+  }
   Ministracion {
     int id PK
     int ejercicio_id FK
@@ -294,6 +311,7 @@ erDiagram
     texto unidad
     int modalidad_id FK
     texto fundamento
+    json datos
   }
   Municipio {
     int id PK
@@ -301,6 +319,24 @@ erDiagram
     texto nombre UK
     geom_multipoligono geom
     int delegacion_id FK
+  }
+  Notificacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto asunto
+    int destinatario_id FK
+    int enviada_por_id FK
+    int unidad_origen_id FK
+    int delegacion_id FK
+    fecha_hora enviada_en
+    int acuse_envio_id FK
+    fecha_hora notificada_en
+    int notificada_por_id FK
+    texto medio
+    int acuse_notificacion_id FK
+    texto observaciones
+    json datos
   }
   Persona {
     int id PK
@@ -440,8 +476,6 @@ erDiagram
     fecha fecha_limite
     texto plazo_aplicado
     int acuse_id FK
-    fecha_hora notificado_en
-    int notificado_por_id FK
-    int acuse_notificacion_id FK
+    int notificacion_id FK
     bool vencimiento_avisado
   }

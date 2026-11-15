@@ -1,0 +1,28 @@
+{% load moneda %}
+<div class="alert alert-info small" data-prueba="por-construir">
+  <strong>{{ titulo }}.</strong> Esta pestaña la llenarán las historias del sprint 2:
+  <ul class="mb-0 mt-1">{% for clave, nombre, que in historias %}<li><strong>{{ clave }} {{ nombre }}</strong>: {{ que }}.</li>{% endfor %}</ul>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="titulo-seccion">Monto aprobado</div>
+    {% if monto %}
+    <div data-prueba="monto-aprobado">{{ monto.superficie_ha|floatformat:"-4" }} ha × {{ monto.monto_ha|moneda }} = <strong>{{ monto.total|moneda }}</strong>
+      {% if monto.regimen %}<span class="small text-secondary">· régimen {{ monto.regimen }}</span>{% endif %}</div>
+    {% if monto.nota %}<div class="small text-secondary">{{ monto.nota }}</div>{% endif %}
+    <table class="table table-sm small mt-2">
+      <thead class="table-light"><tr><th>Ministración</th><th>%</th><th>Importe</th><th>Condición</th></tr></thead>
+      <tbody>{% for m in monto.ministraciones %}<tr><td>{{ m.numero }}</td><td>{{ m.porcentaje|floatformat:"-2" }}</td><td class="text-nowrap">{{ m.importe|moneda }}</td><td>{{ m.condicion|truncatechars:160 }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-secondary">Sin ministraciones (concepto sin recurso económico).</td></tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="small text-secondary">El monto se calcula cuando el Comité aprueba la solicitud.</div>{% endif %}
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="titulo-seccion">Plazos de esta etapa</div>
+    <table class="table table-sm small" data-prueba="plazos-etapa">
+      <thead class="table-light"><tr><th>Plazo</th><th>Vence</th></tr></thead>
+      <tbody>{% for v in vencimientos %}<tr><td>{{ v.uso }}<div class="text-secondary">{{ v.texto_plazo }} · {{ v.fundamento|truncatechars:80 }}</div></td><td>{{ v.texto }}</td></tr>
+      {% empty %}<tr><td colspan="2" class="text-secondary">Sin plazos configurados para este programa.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</div>

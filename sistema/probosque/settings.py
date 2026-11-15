@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "nucleo",
     "recepcion",
     "dictamen",
+    "contrato",
+    "pagos",
 ]
 
 MIDDLEWARE = [

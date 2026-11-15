@@ -9,5 +9,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("recepcion/", include("recepcion.urls")),
     path("dictamen/", include("dictamen.urls")),
+    path("contrato/", include("contrato.urls")),
+    path("pagos/", include("pagos.urls")),
     path("", include("nucleo.urls")),
 ]

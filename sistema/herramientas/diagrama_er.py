@@ -47,7 +47,7 @@ def nombre(modelo):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--apps", nargs="+", default=["nucleo", "recepcion", "dictamen"])
+    p.add_argument("--apps", nargs="+", default=["nucleo", "recepcion", "dictamen", "contrato", "pagos"])
     p.add_argument("--resumen", action="store_true", help="Solo la llave, las llaves foráneas y hasta 6 campos más.")
     p.add_argument("--entidades", nargs="+", help="Dibuja solo estas entidades (para un diagrama por área).")
     p.add_argument("--max-campos", type=int, default=6, help="Campos que no son llave en el resumen.")

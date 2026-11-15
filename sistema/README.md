@@ -94,6 +94,10 @@ Predio Agua Blanca (refrendo, con cambio de lugar del polígono) y La Joya Alta 
 lista de espera y Cerro de la Cruz no factible (su titular, Rogelio Bautista Núñez, está en el Listado
 de Incumplidas). La sesión de seguimiento SO-CC-2026-02 tiene tres acuerdos (uno cumplido; dos
 pendientes en las bandejas de la Dirección y de la Unidad Jurídica).
+Para las historias de M3 y M5 hay además dos solicitudes aprobadas de cada uno de PS (Plantación Los Pinos,
+Rancho La Huerta), RHF (Barranca Honda, Ojo de Agua) y PSAHEM (Bosque El Zarco, Monte La Loma), cada programa
+con su sesión de aprobación y su acta (`contrato/demo.py`). `cargar_demo` carga antes las reglas de los cuatro
+programas si faltan.
 
 ## Estructura
 
@@ -111,6 +115,9 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
+├── contrato/, pagos/  apps M3 y M5, vacías pero listas: models/ (paquete, un módulo por historia), vistas/,
+│                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
+│                      RHF y PSAHEM)
 ├── plantillas/        base.html
 ├── estaticos/         css, js del mapa y vendor/ (Bootstrap 5.3.9, htmx 2.0.11, Leaflet 1.9.4,
 │                      Leaflet-Geoman 2.20.6; sin CDN)
@@ -389,6 +396,26 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   `Content-Disposition: attachment`); la descarga se prueba con Playwright
   (`pruebas/e2e/test_recorrido_tropiezos_s2.py`, capturas `s2_02_*` en `entregas/sprint_2/capturas/`).
 
+### Cómo se engancha una historia nueva a `contrato` o `pagos`
+
+1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
+   `contrato/models/firma.py` para HU-3.3), importado en `models/__init__.py`, y su migración propia:
+   `python manage.py makemigrations contrato -n hu_3_3_firma`.
+2. **Servicios, vistas, formularios y plantillas** por historia, como en `dictamen` (`contrato/firma.py`,
+   `contrato/vistas/firma.py`, `contrato/formularios/firma.py`, `templates/contrato/firma/`), con sus rutas en
+   `urls.py` (prefijos `/contrato/` y `/pagos/`).
+3. **Enganche al núcleo** en `registro.py`: la pestaña «Contrato» o «Pagos» ya existe y hoy dice qué historia
+   la llenará, con el monto aprobado y los plazos de la etapa; cada historia agrega su contexto en
+   `vistas/comun.py` y lo que necesite en `nucleo/extensiones.py` (`FILTROS_BANDEJA`, `PANELES_BANDEJA`, `MENU`,
+   `REVISIONES_PLAZO`, `SIGUIENTES_PASOS`, `AL_NOTIFICAR`, `EVENTOS_PLAZO`, `DEMOS`).
+4. **Lo que ya da el núcleo y no se duplica:** estados con `Expediente.cambiar_estado` (la tabla ya tiene los
+   de M3 y M5), notificaciones con `nucleo.notificaciones`, vencimientos con `nucleo.plazos.vencimiento` y los
+   eventos con `plazos.registrar_hito` (`publicacion_resultados`, `firma_contrato`, `entrega_vale`,
+   `solicitud_pago_fiduciaria`, `entrega_cheque`), monto y ministraciones con `nucleo.montos.monto_aprobado`,
+   acuses con `nucleo.acuses.emitir_acuse`.
+5. **Pruebas** `pruebas/test_hu_3_x.py` / `test_hu_5_x.py` y su recorrido en `pruebas/e2e/`; capturas del
+   sprint 2 con `-e CAPTURAS_DIR=/entregas/sprint_2/capturas`.
+
 ## Diferencias con la especificación (mandan las ROP)
 
 - La especificación pide asignar municipios a Delegaciones de forma provisional; las ROP y la
@@ -427,7 +454,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
+  dictamen; contrato y pagos aún sin tablas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
 - `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de

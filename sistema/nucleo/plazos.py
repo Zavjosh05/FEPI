@@ -214,6 +214,8 @@ def vencimiento(expediente, uso, fecha_evento=None):
     return res
 
 
-def vencimientos(expediente):
-    """Todos los usos configurados para el programa del expediente, con su vencimiento."""
-    return {u: vencimiento(expediente, u) for u in usos_configurados(expediente.programa.clave)}
+def vencimientos(expediente, usos=None):
+    """Los usos pedidos (o todos los del programa) que el programa tiene, con su vencimiento."""
+    configurados = usos_configurados(expediente.programa.clave)
+    usos = configurados if usos is None else [u for u in usos if u in configurados]
+    return {u: vencimiento(expediente, u) for u in usos}

@@ -2,7 +2,7 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-33 tablas propias en tres apps (`nucleo`, `recepcion`, `dictamen`) sobre PostgreSQL + PostGIS. El diagrama
+35 tablas propias en tres apps (`nucleo`, `recepcion`, `dictamen`; `contrato` y `pagos` aún sin tablas) sobre PostgreSQL + PostGIS. El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
 Para leerlo: `||--o{` es «uno a muchos» obligatorio, `|o--o{` «uno a muchos» opcional, `||--o|` «uno a uno»
@@ -52,6 +52,8 @@ erDiagram
     bool vigente
     texto fuente
     texto archivo_reglas
+    fecha_hora reglas_cargadas
+    json datos
   }
   Estado {
     int id PK
@@ -60,6 +62,8 @@ erDiagram
     texto descripcion
     texto tipo_unidad_bandeja
     texto visible_para
+    texto flujo_alterno
+    bool final
   }
   Formato {
     int id PK
@@ -68,6 +72,7 @@ erDiagram
     texto nombre
     texto uso
     int linea_rop
+    int orden
   }
   Ministracion {
     int id PK
@@ -76,6 +81,7 @@ erDiagram
     decimal porcentaje
     texto regimen
     texto condicion
+    texto fundamento
   }
   Modalidad {
     int id PK
@@ -84,6 +90,8 @@ erDiagram
     texto nombre
     texto descripcion
     texto fundamento
+    bool seleccionable
+    int orden
   }
   MontoApoyo {
     int id PK
@@ -93,6 +101,7 @@ erDiagram
     texto unidad
     int modalidad_id FK
     texto fundamento
+    json datos
   }
   Municipio {
     int id PK
@@ -108,6 +117,8 @@ erDiagram
     texto descripcion
     int cantidad
     texto unidad
+    fecha fecha_fin
+    texto corre_desde
   }
   Programa {
     int id PK
@@ -123,6 +134,8 @@ erDiagram
     texto texto
     bool aplica_en_refrendo
     bool es_documento_legal
+    bool requiere_documento
+    bool opcional
   }
   TipoPersona {
     int id PK
@@ -148,6 +161,8 @@ erDiagram
     texto tipo
     texto sede
     texto domicilio
+    texto telefono
+    bool asignacion_confirmada
   }
   Usuario {
     int id PK
@@ -161,12 +176,16 @@ erDiagram
 
 El expediente único por predio: la solicitud, la revisión de cada requisito con su documento, los
 polígonos (el vigente y los anteriores), la validación con su aviso de faltantes, los acuses y la bitácora.
+La notificación por conducto de la Delegación (`Notificacion`, con el envío y la notificación a la persona) y
+los hitos que arrancan plazos (`Hito`: publicación, firma, entrega del Vale o del cheque) son del núcleo y
+los usan todos los módulos.
 
 ```mermaid
 erDiagram
   Acuse |o--o{ Evento : acuse
+  Acuse |o--o{ Notificacion : acuse_envio
+  Acuse |o--o{ Notificacion : acuse_notificacion
   Acuse |o--o{ Validacion : acuse
-  Acuse |o--o{ Validacion : acuse_notificacion
   Documento |o--o{ RevisionRequisito : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Requisito : ejercicio
@@ -176,10 +195,14 @@ erDiagram
   Expediente |o--o{ Acuse : expediente
   Expediente ||--o{ Documento : expediente
   Expediente ||--o{ Evento : expediente
+  Expediente ||--o{ Hito : expediente
+  Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Poligono : expediente
   Expediente ||--o{ RevisionRequisito : expediente
   Expediente ||--o{ Validacion : expediente
   Municipio ||--o{ Predio : municipio
+  Notificacion ||--o| Validacion : notificacion
+  Persona |o--o{ Notificacion : destinatario
   Persona |o--o{ Poligono : prestador
   Persona ||--o{ Expediente : solicitante
   Persona ||--o{ Predio : titular
@@ -191,7 +214,9 @@ erDiagram
   Unidad |o--o{ Documento : unidad
   Unidad |o--o{ Evento : unidad
   Unidad |o--o{ Municipio : delegacion
+  Unidad |o--o{ Notificacion : unidad_origen
   Unidad ||--o{ Expediente : delegacion
+  Unidad ||--o{ Notificacion : delegacion
   Validacion }o--o{ RevisionRequisito : faltantes
   Acuse {
     int id PK
@@ -202,6 +227,8 @@ erDiagram
     texto titulo
     fecha_hora fecha_hora
     int unidad_id FK
+    texto destinatario
+    json contenido
   }
   Documento {
     int id PK
@@ -219,6 +246,8 @@ erDiagram
     bool vigente
     texto fuente
     texto archivo_reglas
+    fecha_hora reglas_cargadas
+    json datos
   }
   Estado {
     int id PK
@@ -227,6 +256,8 @@ erDiagram
     texto descripcion
     texto tipo_unidad_bandeja
     texto visible_para
+    texto flujo_alterno
+    bool final
   }
   Evento {
     int id PK
@@ -239,6 +270,7 @@ erDiagram
     int estado_destino_id FK
     texto motivo
     int acuse_id FK
+    json datos
   }
   Expediente {
     int id PK
@@ -252,6 +284,17 @@ erDiagram
     int delegacion_id FK
     int estado_id FK
     fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
+  }
+  Hito {
+    int id PK
+    int expediente_id FK
+    texto clave
+    fecha_hora fecha_hora
+    texto referencia
+    json datos
+    fecha_hora registrado_en
   }
   Municipio {
     int id PK
@@ -260,12 +303,29 @@ erDiagram
     geom_multipoligono geom
     int delegacion_id FK
   }
+  Notificacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto asunto
+    int destinatario_id FK
+    int unidad_origen_id FK
+    int delegacion_id FK
+    fecha_hora enviada_en
+    int acuse_envio_id FK
+    fecha_hora notificada_en
+    texto medio
+    int acuse_notificacion_id FK
+    texto observaciones
+  }
   Persona {
     int id PK
     texto tipo
     texto nombre
     texto curp
     texto rfc
+    texto rfn
+    texto representante
   }
   Predio {
     int id PK
@@ -284,6 +344,8 @@ erDiagram
     texto texto
     bool aplica_en_refrendo
     bool es_documento_legal
+    bool requiere_documento
+    bool opcional
   }
   Unidad {
     int id PK
@@ -292,6 +354,8 @@ erDiagram
     texto tipo
     texto sede
     texto domicilio
+    texto telefono
+    bool asignacion_confirmada
   }
   Poligono {
     int id PK
@@ -301,6 +365,8 @@ erDiagram
     texto levantado_por
     int prestador_id FK
     texto responsable
+    fecha fecha_levantamiento
+    texto origen
     int anterior_id FK
   }
   RevisionRequisito {
@@ -312,6 +378,7 @@ erDiagram
     bool en_archivo_probosque
     fecha fecha_documento
     texto observaciones
+    fecha_hora revisado_en
   }
   Validacion {
     int id PK
@@ -320,8 +387,10 @@ erDiagram
     fecha_hora fecha_hora
     texto observaciones
     json detalle
+    fecha fecha_limite
+    texto plazo_aplicado
     int acuse_id FK
-    int acuse_notificacion_id FK
+    int notificacion_id FK
   }
 ```
 
@@ -357,6 +426,8 @@ erDiagram
     texto descripcion
     int unidad_responsable_id FK
     int ministracion
+    texto periodo
+    texto estado
   }
   DictamenJuridico {
     int id PK
@@ -373,6 +444,8 @@ erDiagram
     texto motivo
     decimal superficie_factible_ha
     json verificacion
+    json analisis
+    fecha fecha_limite
   }
   DocumentoSesion {
     int id PK
@@ -388,6 +461,8 @@ erDiagram
     texto rfc
     int persona_id FK
     texto programa
+    texto motivo
+    texto acuerdo
   }
   PredioSancionado {
     int id PK
@@ -396,6 +471,8 @@ erDiagram
     texto tipo
     texto descripcion
     texto autoridad
+    fecha fecha
+    bool reintegro_realizado
   }
   ResolucionSesion {
     int id PK
@@ -405,6 +482,8 @@ erDiagram
     texto resultado_propuesto
     int orden
     int orden_propuesto
+    decimal monto
+    json criterios
   }
   SesionComite {
     int id PK
@@ -413,6 +492,8 @@ erDiagram
     texto caracter
     texto numero
     fecha_hora fecha_hora
+    texto lugar
+    texto orden_del_dia
   }
   Ejercicio {
     int id PK
@@ -420,6 +501,8 @@ erDiagram
     bool vigente
     texto fuente
     texto archivo_reglas
+    fecha_hora reglas_cargadas
+    json datos
   }
   Expediente {
     int id PK
@@ -432,6 +515,8 @@ erDiagram
     decimal superficie_solicitada_ha
     int delegacion_id FK
     fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
   }
   Persona {
     int id PK
@@ -439,6 +524,8 @@ erDiagram
     texto nombre
     texto curp
     texto rfc
+    texto rfn
+    texto representante
   }
   Predio {
     int id PK
@@ -456,5 +543,14 @@ erDiagram
     texto tipo
     texto sede
     texto domicilio
+    texto telefono
+    bool asignacion_confirmada
   }
 ```
+
+## 4. Publicación y contrato (M3) y pagos (M5)
+
+Las apps `contrato` y `pagos` existen sin tablas: cada historia (HU-3.1 a HU-3.4, HU-5.1 a HU-5.3) agrega su
+módulo en `models/` con su migración, y al hacerlo se vuelve a generar este documento agregando aquí su
+diagrama (`--entidades` con sus modelos y `Expediente`). Lo que ya usan del núcleo: `Notificacion`, `Hito`,
+`MontoApoyo` (con su modalidad) y `Ministracion`.
