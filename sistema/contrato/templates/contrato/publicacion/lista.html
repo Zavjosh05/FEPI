@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Publicación de resultados{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Publicación de resultados</h1>
+  <div class="small text-secondary">El área responsable del programa publica los listados que el Comité autorizó en su acta (HU-3.1). Desde la publicación corren los plazos de cita y de firma.</div>
+</div>
+<div class="tarjeta mb-3" data-prueba="por-publicar">
+  <div class="titulo-seccion">Listados autorizados por publicar ({{ por_publicar|length }})</div>
+  {% include "contrato/publicacion/_tabla_sesiones.html" with sesiones=por_publicar vacio="No hay listados autorizados por publicar." %}
+</div>
+{% if sin_autorizacion %}
+<div class="tarjeta mb-3" data-prueba="sin-autorizacion">
+  <div class="titulo-seccion">Actas que no autorizaron la publicación ({{ sin_autorizacion|length }})</div>
+  <div class="small text-secondary mb-2">Sin la autorización del Comité no se publica.</div>
+  {% include "contrato/publicacion/_tabla_sesiones.html" with sesiones=sin_autorizacion vacio="" %}
+</div>
+{% endif %}
+<div class="tarjeta" data-prueba="publicadas">
+  <div class="titulo-seccion">Publicados ({{ publicadas|length }})</div>
+  {% include "contrato/publicacion/_tabla_sesiones.html" with sesiones=publicadas vacio="Todavía no se publica ningún listado." %}
+</div>
+{% endblock %}

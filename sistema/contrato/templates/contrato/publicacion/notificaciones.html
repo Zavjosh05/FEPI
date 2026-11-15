@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Notificaciones{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Notificaciones por conducto de la Delegación</h1>
+  <div class="small text-secondary">{% if es_delegacion %}Avisos que la Delegación debe entregar a las personas. Al registrar la entrega queda la fecha y hora de la notificación, el medio y su acuse; los plazos corren desde esa notificación.{% else %}Avisos enviados a las Delegaciones y su estado de entrega.{% endif %}</div>
+</div>
+<div class="btn-group mb-3" role="group" aria-label="Filtro">
+  <a class="btn btn-outline-primary {% if ver == 'pendientes' %}active{% endif %}" href="?ver=pendientes">Por entregar <span class="badge text-bg-light border ms-1">{{ total_pendientes }}</span></a>
+  <a class="btn btn-outline-primary {% if ver == 'entregadas' %}active{% endif %}" href="?ver=entregadas">Entregadas</a>
+  <a class="btn btn-outline-primary {% if ver == 'todas' %}active{% endif %}" href="?ver=todas">Todas <span class="badge text-bg-light border ms-1">{{ total }}</span></a>
+</div>
+<div class="tarjeta" id="tabla-notificaciones" data-prueba="notificaciones">
+{% include "contrato/publicacion/_filas_notificaciones.html" with volver=volver %}
+</div>
+{% endblock %}

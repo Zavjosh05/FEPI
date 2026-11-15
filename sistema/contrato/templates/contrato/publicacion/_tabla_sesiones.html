@@ -1,0 +1,18 @@
+{% if sesiones %}
+<div class="table-responsive">
+<table class="table table-sm small align-middle mb-0">
+  <thead class="table-light"><tr><th>Sesión</th><th>Programa</th><th>Acta</th><th>Publicación</th><th></th></tr></thead>
+  <tbody>
+  {% for s in sesiones %}
+  <tr>
+    <td class="fw-semibold">{{ s.numero }}</td>
+    <td>{{ s.ejercicio.programa.nombre }} {{ s.ejercicio.anio }}</td>
+    <td class="text-nowrap">{{ s.acta_fecha|date:"d/m/Y H:i" }} h</td>
+    <td>{% if s.publicacion %}{{ s.publicacion.publicada_en|date:"d/m/Y H:i" }} h{% else %}—{% endif %}</td>
+    <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:publicacion' s.pk %}">{% if s.publicacion %}Ver{% elif s.autoriza_publicacion %}Revisar y publicar{% else %}Ver{% endif %}</a></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% elif vacio %}<div class="small text-secondary">{{ vacio }}</div>{% endif %}

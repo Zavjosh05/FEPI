@@ -1,0 +1,37 @@
+{% if filas %}
+<div class="table-responsive">
+<table class="table table-sm small align-middle mb-0">
+  <thead class="table-light"><tr><th>Solicitud</th><th>Aviso</th><th>Envío a la Delegación</th><th>Notificación a la persona</th><th>Plazo</th></tr></thead>
+  <tbody>
+  {% for f in filas %}{% with n=f.n %}
+  <tr data-notificacion="{{ n.pk }}" data-tipo="{{ n.tipo }}">
+    <td class="text-nowrap"><a href="{% url 'recepcion:expediente' n.expediente.folio %}?pestana=contrato">{{ n.expediente.folio }}</a>
+      <div class="text-secondary">{{ n.expediente.predio.nombre }} · {{ n.expediente.predio.municipio.nombre }}</div></td>
+    <td><strong>{{ n.get_tipo_display }}</strong><div class="text-secondary">{{ n.asunto }}</div>
+      <div class="text-secondary">Persona: {{ n.destinatario.nombre }} · {{ n.delegacion.nombre }}</div></td>
+    <td class="text-nowrap">{{ n.enviada_en|date:"d/m/Y H:i:s" }} h{% if n.acuse_envio %}<div><a href="{% url 'nucleo:acuse' n.acuse_envio.folio %}" target="_blank">{{ n.acuse_envio.folio }}</a></div>{% endif %}</td>
+    <td>
+      {% if n.notificada_en %}
+      <div class="text-nowrap" data-prueba="notificada">{{ n.notificada_en|date:"d/m/Y H:i:s" }} h</div>
+      <div class="text-secondary">{{ n.get_medio_display }}{% if n.notificada_por %} · {{ n.notificada_por.get_full_name|default:n.notificada_por.username }}{% endif %}</div>
+      {% if n.acuse_notificacion %}<a href="{% url 'nucleo:acuse' n.acuse_notificacion.folio %}" target="_blank">{{ n.acuse_notificacion.folio }}</a>{% endif %}
+      {% elif f.puede_entregar %}
+      <details>
+        <summary class="btn btn-sm btn-outline-primary">Registrar entrega</summary>
+        <form method="post" action="{% url 'contrato:notificacion_entregar' n.pk %}" class="mt-2" style="min-width: 15rem">
+          {% csrf_token %}<input type="hidden" name="volver" value="{{ volver }}">
+          {% include "recepcion/_campo.html" with campo=f.form.medio %}
+          {% include "recepcion/_campo.html" with campo=f.form.fecha_hora %}
+          {% include "recepcion/_campo.html" with campo=f.form.observaciones %}
+          <button class="btn btn-sm btn-primary" type="submit">Registrar notificación</button>
+        </form>
+      </details>
+      {% else %}<span class="badge text-bg-warning">Por notificar</span>{% endif %}
+    </td>
+    <td>{% if f.vencimiento %}{{ f.vencimiento.texto|truncatechars:90 }}<div><span class="badge {% if f.vencimiento.estado == 'vencido' %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ f.vencimiento.estado }}</span></div>{% else %}<span class="text-secondary">—</span>{% endif %}</td>
+  </tr>
+  {% endwith %}{% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}<div class="small text-secondary">No hay notificaciones en esta vista.</div>{% endif %}

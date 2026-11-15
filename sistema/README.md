@@ -7,7 +7,8 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
-jurídico, HU-2.3 Sesión de aprobación y HU-2.4 Sesiones de seguimiento.
+jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
+notificaciones.
 
 ## Cómo levantar
 
@@ -96,7 +97,11 @@ de Incumplidas). La sesión de seguimiento SO-CC-2026-02 tiene tres acuerdos (un
 pendientes en las bandejas de la Dirección y de la Unidad Jurídica).
 Para las historias de M3 y M5 hay además dos solicitudes aprobadas de cada uno de PS (Plantación Los Pinos,
 Rancho La Huerta), RHF (Barranca Honda, Ojo de Agua) y PSAHEM (Bosque El Zarco, Monte La Loma), cada programa
-con su sesión de aprobación y su acta (`contrato/demo.py`). `cargar_demo` carga antes las reglas de los cuatro
+con su sesión de aprobación y su acta (`contrato/demo.py`). PS y RHF ya publicaron sus resultados (HU-3.1, a
+distintas horas): en PS la Delegación notificó el resultado y la cita de Plantación Los Pinos (la otra queda
+publicada, por notificar) y en RHF solo el resultado de Barranca Honda; PSAHEM y CC tienen el acta que autoriza
+publicar, para mostrar la pantalla «Publicación de resultados». La página pública de resultados está en
+`/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
 ## Estructura
@@ -115,7 +120,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── contrato/, pagos/  apps M3 y M5, vacías pero listas: models/ (paquete, un módulo por historia), vistas/,
+├── contrato/, pagos/  apps M3 (HU-3.1 hecha) y M5 (vacía): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
 ├── plantillas/        base.html
@@ -395,6 +400,37 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   bandeja vacía invita a ver «Todos los míos». Acuses y documentos se ven o se descargan (`?descargar=1`,
   `Content-Disposition: attachment`); la descarga se prueba con Playwright
   (`pruebas/e2e/test_recorrido_tropiezos_s2.py`, capturas `s2_02_*` en `entregas/sprint_2/capturas/`).
+
+### M3 · HU-3.1 Publicación y notificaciones
+
+- **Organización.** `contrato/models/publicacion.py` (migración `0001_hu_3_1_publicacion`), servicio
+  `contrato/publicacion.py`, vistas `vistas/publicacion.py`, formularios y `templates/contrato/publicacion/`. Los
+  avisos no tienen modelo propio: son `nucleo.Notificacion` (`nucleo.notificaciones`).
+- **Publicar.** `publicacion.publicar(usuario, sesion)`: solo la Dirección Instancia Ejecutora del programa, solo
+  una sesión de aprobación **con acta que autorizó la publicación** (no antes del acta, una sola vez por sesión).
+  Deja `Publicacion` (fecha y hora, quién, dónde, acuse en PDF), un renglón publicado por solicitud
+  (`ResultadoPublicado`, copia de lo que ve el público), el hito `publicacion_resultados` de cada expediente (arranca
+  los plazos de firma y de cita, R-03), el cambio `aprobada → publicada` de las personas beneficiarias (lista de
+  espera y no factibles no cambian de estado) y, por cada solicitud, el aviso del resultado a la Delegación.
+- **Fecha de la convocatoria (R-05).** Las ROP no fijan fecha ni días para publicar (plazo `publicacion_resultados`
+  sin número en CC, PS, RHF y PSAHEM): la publicación dice «Sin fecha en las reglas». Si un programa la trae (cantidad
+  en días o fecha límite), se compara y se guarda `dentro_de_fecha`; se prueba cambiando el plazo.
+- **Avisos y entrega.** Cada aviso tiene dos momentos con fecha, hora y acuse: envío a la Delegación (la publicación)
+  y notificación a la persona (la Delegación registra la entrega con el medio; `publicacion.registrar_entrega`).
+  Al notificar el resultado de una persona beneficiaria el expediente pasa a `notificada`
+  (`extensiones.AL_NOTIFICAR`). En **PS** se envía además la **cita a firma**, con el plazo de 5 días hábiles de la
+  Delegación desde la publicación (10.1 inciso h, `cita_firma_contrato`). `publicacion.enviar_aviso` deja listos
+  los tipos «omisión» y «devolución» (y cualquier otro) para el sprint 3.
+- **Página pública** `/contrato/resultados/` y `/contrato/resultados/<programa>/<año>/`, sin iniciar sesión: listados
+  publicados con búsqueda por folio. Muestra folio, predio, municipio y resultado; el nombre **solo** en el listado de
+  personas beneficiarias (el padrón que mandan publicar las ROP, CC 9.4.3 fr. III); nunca CURP, RFC ni documentos.
+  Solo existe para lo ya publicado (si no, 404).
+- **Pantallas.** «Publicación de resultados» (Dirección; Secretaría Técnica y Jurídica consultan), «Notificaciones»
+  (Delegación entrega; Dirección ve el estado), paneles en las bandejas, siguiente paso en el expediente y la
+  pestaña «Contrato».
+- **Pendientes.** Los resultados de quienes pasan de la lista de espera a beneficiarias por acuerdo del Comité
+  (reasignación) se publicarán con HU-3.3 (flujo alterno D); la publicación en la Gaceta (PSAHEM) no se modela: el
+  lugar de publicación es un texto.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

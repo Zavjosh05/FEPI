@@ -13,3 +13,5 @@ registrar ``publicacion_resultados``, ``firma_contrato`` y ``entrega_vale`` como
 ministraciones (``nucleo.montos``), estados (``datos/flujo_tramite.json``, siempre con
 ``Expediente.cambiar_estado``) y acuses (``nucleo.acuses.emitir_acuse``).
 """
+
+from .publicacion import Publicacion, ResultadoPublicado  # noqa: E402,F401

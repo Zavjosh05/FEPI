@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block titulo %}Publicación {{ sesion.numero }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ sesion.ejercicio.programa.nombre }} {{ sesion.ejercicio.anio }}</div>
+    <h1 class="h4 mb-0">Publicación de resultados · sesión {{ sesion.numero }}</h1>
+    <div class="small">Acta del {{ sesion.acta_fecha|date:"d/m/Y H:i" }} h ·
+      {% if sesion.autoriza_publicacion %}<span class="badge text-bg-success">El Comité autorizó la publicación</span>{% else %}<span class="badge text-bg-danger">El acta no autorizó la publicación</span>{% endif %}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'contrato:publicaciones' %}">Volver a la lista</a>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-xl-7">
+    {% for clave, nombre, filas in listados %}
+    <div class="tarjeta mb-3" data-listado="{{ clave }}">
+      <div class="titulo-seccion mb-1">{{ nombre }} <span class="badge text-bg-light border">{{ filas|length }}</span></div>
+      <table class="table table-sm small align-middle mb-0">
+        <thead class="table-light"><tr><th>Lugar</th><th>Folio</th><th>Predio · municipio</th>{% if clave == "beneficiaria" %}<th>Persona beneficiaria</th>{% endif %}</tr></thead>
+        <tbody>
+        {% for r in filas %}<tr><td>{{ r.orden|default:"—" }}</td><td class="text-nowrap">{{ r.expediente.folio }}</td><td>{{ r.expediente.predio.nombre }} · {{ r.expediente.predio.municipio.nombre }}</td>{% if clave == "beneficiaria" %}<td>{{ r.expediente.solicitante.nombre }}</td>{% endif %}</tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">Sin solicitudes.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+    <div class="small text-secondary">En la publicación solo se muestran folio, predio, municipio y resultado; el nombre de la persona solo en el listado de personas beneficiarias (el padrón que mandan publicar las ROP). No se publican CURP, RFC ni documentos.</div>
+  </div>
+  <div class="col-12 col-xl-5">
+    {% if pub %}
+    <div class="tarjeta mb-3 border-success" data-prueba="publicada">
+      <div class="titulo-seccion mb-1">Publicada</div>
+      <div>Fecha y hora: <strong>{{ pub.publicada_en|date:"d/m/Y H:i:s" }} h</strong></div>
+      <div>Por: {{ pub.publicada_por.get_full_name|default:pub.publicada_por.username }} · {{ pub.publicada_por.unidad.nombre }}</div>
+      <div>Acuse: <a href="{% url 'nucleo:acuse' pub.acuse.folio %}" target="_blank">{{ pub.acuse.folio }}</a></div>
+      <div class="small mt-1">{{ pub.lugares }}</div>
+      <div class="mt-2" data-prueba="situacion-fecha"><span class="badge {% if pub.dentro_de_fecha is None %}text-bg-secondary{% elif pub.dentro_de_fecha %}text-bg-success{% else %}text-bg-danger{% endif %}">Fecha de la convocatoria</span> {{ pub.situacion_fecha }}</div>
+      <div class="small mt-2"><a href="{% url 'contrato:resultados_programa' pub.ejercicio.programa.clave pub.ejercicio.anio %}">Ver la página pública de resultados</a></div>
+    </div>
+    <div class="tarjeta" data-prueba="avisos-enviados">
+      <div class="titulo-seccion mb-1">Avisos enviados a las Delegaciones</div>
+      <table class="table table-sm small align-middle mb-0">
+        <thead class="table-light"><tr><th>Solicitud</th><th>Aviso</th><th>Envío</th><th>Notificada</th></tr></thead>
+        <tbody>
+        {% for n in notificaciones %}
+        <tr><td class="text-nowrap">{{ n.expediente.folio }}</td><td>{{ n.get_tipo_display }}</td>
+          <td class="text-nowrap">{{ n.enviada_en|date:"d/m/Y H:i" }}{% if n.acuse_envio %}<div><a href="{% url 'nucleo:acuse' n.acuse_envio.folio %}" target="_blank">{{ n.acuse_envio.folio }}</a></div>{% endif %}</td>
+          <td class="text-nowrap">{% if n.notificada_en %}{{ n.notificada_en|date:"d/m/Y H:i" }}{% else %}<span class="text-warning-emphasis">Por notificar</span>{% endif %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="tarjeta" data-prueba="publicar">
+      <div class="titulo-seccion mb-1">Publicar los listados</div>
+      <div class="small mb-2" data-prueba="fecha-convocatoria">
+        {% if limite %}Fecha que marca la convocatoria: <strong>{{ limite|date:"d/m/Y" }}</strong> ({{ fundamento }}).{% else %}<strong>Sin fecha en las reglas:</strong> las ROP no fijan fecha ni días para publicar los resultados (R-05); se registra la fecha y hora reales.{% endif %}</div>
+      {% if puede_publicar %}
+      <form method="post" id="form-publicar">
+        {% csrf_token %}
+        {% include "recepcion/_campo.html" with campo=form.lugares %}
+        <div class="small text-secondary mb-2">Al publicar: queda la fecha y hora y su acuse; cada solicitud recibe el hito «publicación de resultados» y las aprobadas pasan a «publicada»; se envía a cada Delegación el aviso del resultado (en PS, también la cita a firma).</div>
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Publicar los listados</button></div>
+      </form>
+      {% elif not sesion.autoriza_publicacion %}<div class="alert alert-warning small mb-0">El acta no autorizó la publicación: no se puede publicar.</div>
+      {% else %}<div class="small text-secondary">La publicación la hace el área responsable del programa.</div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

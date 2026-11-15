@@ -4,14 +4,21 @@ Cada historia agrega aquí lo suyo (filtros y paneles de bandeja, menú, revisi�
 receptores de notificación y datos de demostración), igual que ``dictamen/registro.py``.
 """
 from nucleo import extensiones
+from nucleo.models import TipoUnidad
 
+# Historias de la pestaña «Contrato» que todavía no se construyen (la plantilla dice cuál las llenará).
 HISTORIAS = [
     ("HU-3.1", "Publicación y notificaciones", "publica los listados y envía los avisos por conducto de la Delegación"),
     ("HU-3.2", "Elaboración del contrato", "elabora el contrato sobre el modelo validado por la Unidad Jurídica"),
     ("HU-3.3", "Firma del contrato", "cita a la persona, recaba su firma y señala lo que no se firmó en plazo"),
     ("HU-3.4", "Entrega de planta", "valida el Vale de Planta y registra la salida por especie y cantidad"),
 ]
+HISTORIAS_CONSTRUIDAS = {"HU-3.1"}
 USOS_DE_PLAZO = ["cita_firma", "firma_programada", "firma_liberacion", "ptrfi_actualizado", "recoger_planta"]
+
+
+def historias_pendientes():
+    return [h for h in HISTORIAS if h[0] not in HISTORIAS_CONSTRUIDAS]
 
 
 def contexto_pestana(request, exp):
@@ -21,24 +28,66 @@ def contexto_pestana(request, exp):
 
 
 def siguiente_paso(usuario, exp):
-    """Mientras HU-3.1 no exista, lo aprobado lleva a la pestaña que dice qué sigue (P-17)."""
+    """Siguiente paso de M3 en el expediente (P-13 y P-17)."""
     from django.urls import reverse
 
-    from nucleo.models import TipoUnidad
+    from . import publicacion
 
-    if exp.estado.clave == "aprobada" and usuario.tipo_unidad == TipoUnidad.DIRECCION:
+    estado, tipo = exp.estado.clave, usuario.tipo_unidad
+    if estado == "aprobada" and tipo == TipoUnidad.DIRECCION:
+        sesion = publicacion.sesion_de_expediente(exp)
+        if sesion is not None:
+            return {"texto": "Publicar los resultados", "url": reverse("contrato:publicacion", args=[sesion.pk]),
+                    "ayuda": f"Sesión {sesion.numero}: el acta autoriza la publicación." if sesion.autoriza_publicacion
+                    else f"Sesión {sesion.numero}: el acta no autorizó la publicación."}
         return {"texto": "Ver lo que sigue: publicación y contrato",
-                "url": reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=contrato",
-                "ayuda": "La publicación de resultados la construye HU-3.1."}
+                "url": reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=contrato"}
+    if estado == "publicada" and tipo == TipoUnidad.DELEGACION:
+        return {"texto": "Notificar a la persona beneficiaria", "url": reverse("contrato:notificaciones"),
+                "ayuda": "Registre la fecha, la hora y el medio de la notificación."}
     return None
+
+
+def panel_por_publicar(request):
+    from . import publicacion
+
+    if request.user.tipo_unidad != TipoUnidad.DIRECCION:
+        return None
+    sesiones = list(publicacion.sesiones_por_publicar(request.user))
+    if not sesiones:
+        return None
+    return {"plantilla": "contrato/publicacion/_panel_publicar.html", "contexto": {"sesiones": sesiones}}
+
+
+def panel_por_notificar(request):
+    from . import publicacion
+
+    if request.user.tipo_unidad != TipoUnidad.DELEGACION:
+        return None
+    pendientes = publicacion.por_entregar(request.user)
+    total = pendientes.count()
+    if not total:
+        return None
+    return {"plantilla": "contrato/publicacion/_panel_notificar.html",
+            "contexto": {"total": total, "notificaciones": list(pendientes.order_by("enviada_en")[:6])}}
 
 
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
+    from . import publicacion
+
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "contrato", "nombre": "Contrato",
                                             "plantilla": "contrato/pestana_contrato.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
+    extensiones.PANELES_BANDEJA.extend([panel_por_publicar, panel_por_notificar])
+    extensiones.AL_NOTIFICAR.append(publicacion.al_notificar)
+    T = TipoUnidad
+    extensiones.MENU.extend([
+        {"nombre": "Publicación de resultados", "url": "contrato:publicaciones",
+         "tipos": [T.DIRECCION, T.SECRETARIA_COMITE, T.JURIDICA]},
+        {"nombre": "Notificaciones", "url": "contrato:notificaciones", "tipos": [T.DELEGACION, T.DIRECCION]},
+    ])
     extensiones.DEMOS.append(cargar_demo)
 
 

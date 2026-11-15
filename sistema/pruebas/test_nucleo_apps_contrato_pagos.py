@@ -34,10 +34,13 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
 def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     call_command("cargar_demo")
     call_command("cargar_demo")  # idempotente
+    # PS y RHF ya publicaron (HU-3.1); PSAHEM sigue con sus dos aprobadas por publicar.
+    estados = {"PS": {"notificada", "publicada"}, "RHF": {"notificada", "publicada"}, "PSA": {"aprobada"}}
     for clave in ("PS", "RHF", "PSA"):
-        aprobadas = Expediente.objects.filter(ejercicio__programa__clave=clave, estado__clave="aprobada")
-        assert aprobadas.count() == 2, clave
-        for exp in aprobadas:
+        expedientes = Expediente.objects.filter(ejercicio__programa__clave=clave, resoluciones_comite__resultado="beneficiaria")
+        assert expedientes.count() == 2, clave
+        assert {e.estado.clave for e in expedientes} == estados[clave], clave
+        for exp in expedientes:
             m = montos.monto_aprobado(exp)
             assert m.total > 0 and m.ministraciones and exp.resoluciones_comite.get().monto == m.total
     assert Expediente.objects.filter(ejercicio__programa__clave="CC", estado__clave="aprobada").count() >= 2

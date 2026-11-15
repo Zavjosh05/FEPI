@@ -21,6 +21,8 @@
       <input type="hidden" name="next" value="{{ next }}">
       <button class="btn btn-primary w-100" type="submit">Entrar</button>
     </form>
+    <hr>
+    <p class="small mb-0" data-prueba="enlace-resultados">¿Es una persona solicitante? <a href="{% url 'contrato:resultados' %}">Consulte los resultados publicados</a>; no necesita iniciar sesión.</p>
   </div>
 </div>
 {% endblock %}

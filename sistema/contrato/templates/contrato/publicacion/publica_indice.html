@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Resultados publicados{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-1">Resultados de los programas de PROBOSQUE</h1>
+  <div class="text-secondary small">Listados de solicitudes que el Comité de cada programa aprobó y autorizó publicar. No necesita iniciar sesión. Busque por el folio de su solicitud (el que aparece en su acuse de recepción).</div>
+</div>
+<div class="tarjeta" data-prueba="indice-publico">
+  {% for p in publicaciones %}
+  {% ifchanged p.ejercicio_id %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom">
+    <div><a class="fw-semibold" href="{% url 'contrato:resultados_programa' p.ejercicio.programa.clave p.ejercicio.anio %}">{{ p.ejercicio.programa.nombre }} {{ p.ejercicio.anio }}</a>
+      <div class="small text-secondary">Última publicación: {{ p.publicada_en|date:"d/m/Y H:i" }} h</div></div>
+    <a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:resultados_programa' p.ejercicio.programa.clave p.ejercicio.anio %}">Ver listados</a>
+  </div>
+  {% endifchanged %}
+  {% empty %}
+  <div class="text-secondary">Todavía no se publican resultados.</div>
+  {% endfor %}
+</div>
+<div class="mt-3"><a href="{% url 'nucleo:entrar' %}">Iniciar sesión (personal de PROBOSQUE)</a></div>
+{% endblock %}

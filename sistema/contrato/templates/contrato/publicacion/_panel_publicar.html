@@ -1,0 +1,6 @@
+<div class="tarjeta mb-3 border-primary" data-prueba="panel-por-publicar">
+  <div class="titulo-seccion">Listados autorizados por publicar ({{ panel.sesiones|length }})</div>
+  <ul class="small mb-0">{% for s in panel.sesiones %}
+    <li><a href="{% url 'contrato:publicacion' s.pk %}">Sesión {{ s.numero }}</a> · {{ s.ejercicio.programa.clave }} {{ s.ejercicio.anio }} · acta del {{ s.acta_fecha|date:"d/m/Y" }}</li>
+  {% endfor %}</ul>
+</div>
