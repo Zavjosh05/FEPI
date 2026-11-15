@@ -87,10 +87,10 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-01b | Reglas de Restauración Hidrológico-Forestal (`reglas/RHF.json`) | — (en paralelo) | Hecho | `ef3e66d` |
 | S2-01c | Reglas de PSAHEM (`reglas/PSA.json`) | — (en paralelo) | Hecho | `a8dad5c` |
 | S2-02 | Base de M3 y M5: notificaciones en el núcleo, montos y ministraciones, evento que arranca cada plazo, estados nuevos | S2-01 | Hecho | `47cc5ee` a `2fa15a7` (7 commits) |
-| S2-03 | HU-3.1 Publicación y notificaciones | S2-02 | En curso | |
-| S2-04 | HU-3.2 Elaboración del contrato (modelo validado por Jurídico) | S2-02 | En curso | |
-| S2-05 | HU-3.3 Firma del contrato | S2-04 | Pendiente | |
-| S2-06 | HU-3.4 Entrega de planta (PS y RHF) | S2-05 | Pendiente | |
+| S2-03 | HU-3.1 Publicación y notificaciones | S2-02 | Hecho | `4fbf940` |
+| S2-04 | HU-3.2 Elaboración del contrato (modelo validado por Jurídico) | S2-02 | Hecho | `e9a1f2c` |
+| S2-05 | HU-3.3 Firma del contrato | S2-04 | En curso | |
+| S2-06 | HU-3.4 Entrega de planta (PS y RHF) | S2-05 | En curso | |
 | S2-07 | HU-5.1 Solicitud de pago | S2-05 | Pendiente | |
 | S2-08 | HU-5.2 Pago de la ministración | S2-07 | Pendiente | |
 | S2-09 | HU-5.3 Entrega de cheques (PSAHEM) | S2-08 | Pendiente | |

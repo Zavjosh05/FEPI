@@ -1,20 +1,25 @@
 erDiagram
   Acuerdo }o--o{ Expediente : expedientes
+  Acuse |o--o{ Contrato : acuse_envio
   Acuse |o--o{ DictamenJuridico : acuse
   Acuse |o--o{ DictamenTecnico : acuse
   Acuse |o--o{ Evento : acuse
   Acuse |o--o{ Notificacion : acuse_envio
   Acuse |o--o{ Notificacion : acuse_notificacion
+  Acuse |o--o{ Publicacion : acuse
   Acuse |o--o{ SesionComite : acuse_acta
   Acuse |o--o{ SesionComite : acuse_convocatoria
   Acuse |o--o{ Validacion : acuse
+  Contrato ||--o{ Adendum : contrato
   Documento |o--o{ RevisionRequisito : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Formato : ejercicio
   Ejercicio ||--o{ Ministracion : ejercicio
   Ejercicio ||--o{ Modalidad : ejercicio
+  Ejercicio ||--o{ ModeloContrato : ejercicio
   Ejercicio ||--o{ MontoApoyo : ejercicio
   Ejercicio ||--o{ Plazo : ejercicio
+  Ejercicio ||--o{ Publicacion : ejercicio
   Ejercicio ||--o{ Requisito : ejercicio
   Ejercicio ||--o{ SesionComite : ejercicio
   Ejercicio ||--o{ TipoPersona : ejercicio
@@ -30,12 +35,15 @@ erDiagram
   Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Poligono : expediente
   Expediente ||--o{ ResolucionSesion : expediente
+  Expediente ||--o{ ResultadoPublicado : expediente
   Expediente ||--o{ RevisionRequisito : expediente
   Expediente ||--o{ Validacion : expediente
+  Expediente ||--o| Contrato : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
   Modalidad |o--o{ Expediente : modalidad
   Modalidad |o--o{ MontoApoyo : modalidad
+  ModeloContrato ||--o{ VersionModelo : modelo
   Municipio |o--o{ PredioSancionado : municipio
   Municipio ||--o{ Predio : municipio
   Notificacion ||--o| Validacion : notificacion
@@ -49,6 +57,7 @@ erDiagram
   Predio ||--o{ Expediente : predio
   Programa |o--o{ Transicion : programa
   Programa ||--o{ Ejercicio : programa
+  Publicacion ||--o{ ResultadoPublicado : publicacion
   Requisito |o--o{ Documento : requisito
   Requisito ||--o{ RevisionRequisito : requisito
   Requisito }o--o{ Modalidad : modalidades
@@ -56,6 +65,7 @@ erDiagram
   SesionComite ||--o{ Acuerdo : sesion
   SesionComite ||--o{ DocumentoSesion : sesion
   SesionComite ||--o{ ResolucionSesion : sesion
+  SesionComite ||--o| Publicacion : sesion
   TipoPersona ||--o{ Expediente : tipo_persona
   Unidad |o--o{ Acuse : unidad
   Unidad |o--o{ Documento : unidad
@@ -68,6 +78,81 @@ erDiagram
   Unidad ||--o{ Notificacion : delegacion
   Unidad }o--o{ Programa : programas
   Validacion }o--o{ RevisionRequisito : faltantes
+  VersionModelo |o--o{ Adendum : version_modelo
+  VersionModelo ||--o{ Contrato : version_modelo
+  Adendum {
+    int id PK
+    int contrato_id FK
+    int version_modelo_id FK
+    texto motivo
+    fecha plazo_original
+    fecha plazo_nuevo
+    archivo archivo
+    int creado_por_id FK
+    fecha_hora creado_en
+  }
+  Contrato {
+    int id PK
+    int expediente_id FK
+    texto folio UK
+    int version_modelo_id FK
+    texto tipo
+    texto texto
+    json datos
+    archivo archivo
+    texto huella
+    int elaborado_por_id FK
+    fecha_hora elaborado_en
+    int rehechos
+    texto estado
+    int enviado_por_id FK
+    fecha_hora enviado_en
+    int acuse_envio_id FK
+  }
+  ModeloContrato {
+    int id PK
+    int ejercicio_id FK
+    texto tipo
+    texto nombre
+    bool es_base
+    int creado_por_id FK
+    fecha_hora creado_en
+  }
+  Publicacion {
+    int id PK
+    int sesion_id FK
+    int ejercicio_id FK
+    fecha_hora publicada_en
+    int publicada_por_id FK
+    int acuse_id FK
+    texto lugares
+    fecha fecha_limite
+    bool dentro_de_fecha
+    texto fundamento_fecha
+  }
+  ResultadoPublicado {
+    int id PK
+    int publicacion_id FK
+    int expediente_id FK
+    texto resultado
+    int orden
+    texto folio
+    texto predio
+    texto municipio
+    texto persona
+  }
+  VersionModelo {
+    int id PK
+    int modelo_id FK
+    int numero
+    texto texto
+    texto estado
+    int creada_por_id FK
+    fecha_hora creada_en
+    int revisada_por_id FK
+    fecha_hora revisada_en
+    texto observaciones
+  }
   Acuerdo {
     int id PK
     int sesion_id FK
