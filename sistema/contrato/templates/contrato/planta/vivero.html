@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Planta del vivero{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Salida de planta</h1>
+  <div class="small text-secondary">Valide el Vale de Planta antes de entregar la planta: solo es válido un vale vigente, y solo por la especie y la cantidad autorizadas.</div>
+</div>
+<div class="tarjeta mb-3">
+  <form method="get" class="d-flex flex-wrap gap-2 align-items-end" id="form-validar">
+    <div><label class="form-label small mb-0" for="folio">Folio del vale</label><input class="form-control" id="folio" name="folio" value="{{ folio }}" placeholder="VP-PS-2026-0001"></div>
+    <button class="btn btn-primary" type="submit">Validar el vale</button>
+  </form>
+  {% if mensaje %}<div class="alert alert-danger small mt-3 mb-0" data-prueba="vale-no-valido">{{ mensaje }}</div>{% endif %}
+</div>
+<div class="tarjeta mb-3" data-prueba="por-surtir">
+  <div class="titulo-seccion">Vales vigentes por surtir ({{ por_surtir|length }})</div>
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Vale</th><th>Persona · predio</th><th>Vigente hasta</th><th>Por entregar</th><th></th></tr></thead>
+    <tbody>{% for v in por_surtir %}<tr><td class="fw-semibold">{{ v.folio }}</td><td>{{ v.expediente.solicitante.nombre }}<div class="text-secondary">{{ v.expediente.predio.nombre }}</div></td>
+      <td>{{ v.vence_el|date:"d/m/Y"|default:"—" }}</td><td>{% for r in v.renglones.all %}{{ r.especie.nombre }}: {{ r.pendiente }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+      <td class="text-end"><a class="btn btn-sm btn-primary" href="{% url 'contrato:vale' v.folio %}">Entregar planta</a></td></tr>
+    {% empty %}<tr><td colspan="5" class="text-secondary">No hay vales vigentes por surtir.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+<div class="tarjeta" data-prueba="otros-vales">
+  <div class="titulo-seccion">Surtidos, vencidos y repuestos</div>
+  <ul class="small mb-0">{% for v in otros %}<li><a href="{% url 'contrato:vale' v.folio %}">{{ v.folio }}</a> · {{ v.expediente.solicitante.nombre }} {% include "contrato/planta/_situacion.html" with situacion=v.situacion %}</li>{% empty %}<li class="text-secondary">Ninguno.</li>{% endfor %}</ul>
+</div>
+{% endblock %}

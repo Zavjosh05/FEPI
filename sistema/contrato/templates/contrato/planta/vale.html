@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block titulo %}Vale {{ vale.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">Vale de Planta {{ vale.folio }} {% include "contrato/planta/_situacion.html" %}</h1>
+    <div class="small">{{ exp.folio }} · {{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'contrato:vale_pdf' vale.folio %}" target="_blank">Ver el vale en PDF</a>
+    {% if not es_vivero %}<a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=contrato">Ver expediente</a>{% else %}<a class="btn btn-outline-secondary btn-sm" href="{% url 'contrato:vivero' %}">Volver a la bandeja</a>{% endif %}
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <div class="tarjeta" data-prueba="datos-vale">
+      <table class="table table-sm small mb-2">
+        <tr><th>Vivero</th><td>{{ vale.vivero.nombre }}</td></tr>
+        <tr><th>Entregado</th><td>{{ vale.entregado_en|date:"d/m/Y H:i:s" }} h{% if vale.acuse %} · <a href="{% url 'nucleo:acuse' vale.acuse.folio %}" target="_blank">{{ vale.acuse.folio }}</a>{% endif %}</td></tr>
+        <tr><th>Vigencia</th><td data-prueba="vigencia">{% if vale.vence_el %}hasta el <strong>{{ vale.vence_el|date:"d/m/Y" }}</strong>{% else %}sin fecha{% endif %}<div class="text-secondary">{{ vale.vigencia_texto }}</div></td></tr>
+        {% if vale.anticipado %}<tr><th>Carta compromiso</th><td>Entregado antes de la firma del contrato{% if vale.carta_compromiso %} · <a href="{% url 'contrato:vale_carta' vale.folio %}" target="_blank">ver carta</a>{% endif %}</td></tr>{% endif %}
+        {% if vale.repone %}<tr><th>Repone al vale</th><td><a href="{% url 'contrato:vale' vale.repone.folio %}">{{ vale.repone.folio }}</a> (solo lo no entregado)</td></tr>{% endif %}
+        {% if vale.motivo_ajuste %}<tr><th>Ajuste</th><td>{{ vale.motivo_ajuste }} (propuesta: {{ vale.propuesta_total }})</td></tr>{% endif %}
+      </table>
+      {% include "contrato/planta/_tabla_renglones.html" %}
+      {% if puede_reponer %}<a class="btn btn-sm btn-primary mt-2" href="{% url 'contrato:vale_emitir' exp.folio %}">Reponer el vale</a>{% endif %}
+      {% if sin_reposicion %}<div class="alert alert-warning small mt-2 mb-0" data-prueba="sin-reposicion">Vale vencido, no válido. {{ cfg.reposicion_texto }}</div>{% endif %}
+      {% if situacion == "vencido" and not sin_reposicion and es_vivero %}<div class="alert alert-warning small mt-2 mb-0">Vale vencido, no válido: la persona debe solicitar a la Delegación un nuevo vale.</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-7">
+    {% if puede_salida %}
+    <div class="tarjeta mb-3">
+      <div class="titulo-seccion mb-1">Registrar la salida de planta</div>
+      <div class="small text-secondary mb-2">El vale es válido (vigente hasta el {{ vale.vence_el|date:"d/m/Y" }}). Puede haber salidas parciales; no se entrega más de lo autorizado por especie.</div>
+      <form method="post" action="{% url 'contrato:vale_salida' vale.folio %}" id="form-salida">{% csrf_token %}
+        <div class="row g-2"><div class="col-12 col-md-6">{% include "recepcion/_campo.html" with campo=form_salida.especie %}</div>
+          <div class="col-12 col-md-6">{% include "recepcion/_campo.html" with campo=form_salida.cantidad %}</div></div>
+        {% include "recepcion/_campo.html" with campo=form_salida.fecha_hora %}
+        {% include "recepcion/_campo.html" with campo=form_salida.observaciones %}
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar la salida</button></div>
+      </form>
+    </div>
+    {% elif es_vivero %}
+    <div class="alert alert-secondary small" data-prueba="sin-salida">{% if situacion == "surtido" %}El vale ya se surtió completo.{% else %}Este vale no es válido para entregar planta.{% endif %}</div>
+    {% endif %}
+    <div class="tarjeta" data-prueba="salidas">
+      <div class="titulo-seccion mb-1">Salidas de planta ({{ salidas|length }})</div>
+      {% if salidas %}<table class="table table-sm small mb-0"><thead class="table-light"><tr><th>Fecha y hora</th><th>Especie</th><th>Cantidad</th><th>Acuse</th></tr></thead>
+        <tbody>{% for s in salidas %}<tr><td class="text-nowrap">{{ s.salido_en|date:"d/m/Y H:i" }} h</td><td>{{ s.renglon.especie }}</td><td>{{ s.cantidad }}</td><td>{% if s.acuse %}<a href="{% url 'nucleo:acuse' s.acuse.folio %}" target="_blank">{{ s.acuse.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody></table>
+      {% else %}<div class="small text-secondary">Todavía no hay salidas.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

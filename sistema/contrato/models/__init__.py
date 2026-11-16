@@ -19,3 +19,4 @@ from .contratos import (  # noqa: E402,F401
     Adendum, Contrato, EstadoContrato, EstadoVersion, ModeloContrato, TipoModelo, VersionModelo,
 )
 from .firma import ElementoFormalizacion, FirmaContrato, Firmante, SinFirma  # noqa: E402,F401
+from .planta import Especie, RenglonVale, SalidaPlanta, ValePlanta, Vivero  # noqa: E402,F401

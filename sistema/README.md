@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato y HU-3.3 Firma del contrato.
+notificaciones, HU-3.2 Elaboración del contrato y HU-3.3 Firma del contrato y HU-3.4 Entrega de planta.
 
 ## Cómo levantar
 
@@ -82,7 +82,7 @@ Contraseña de prueba para todos: **`Probosque2026`** (solo para demostración; 
 | `juridica` | Unidad Jurídica | Dictamen jurídico, Listado de Personas Beneficiarias Incumplidas y predios sancionados. |
 | `comite` | Secretaría Técnica del Comité | Sesiones: convocatoria, documentos, listados, acta, acuerdos. |
 | `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | (Sprint 2.) |
-| `vivero` | Vivero (demostración) | (Sprint 2.) |
+| `vivero` | Vivero (demostración) | Valida el Vale de Planta y registra las salidas de planta (HU-3.4). |
 | `fiduciaria` | Fiduciaria | Ve en su bandeja las instrucciones de pago del Comité (PSAHEM). |
 | `admin` | — (superusuario) | Admin de Django para catálogos: `/admin/`. |
 
@@ -505,6 +505,40 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   sin firma con la acción de liberar; «Registrar la firma» (formulario con la verificación y los elementos del programa);
   pestaña «Contrato» con la firma, sus puntos, los archivos y el señalamiento; paneles en las bandejas de la Delegación y de
   la Dirección y siguiente paso en el expediente.
+
+### M3 · HU-3.4 Entrega de planta
+
+- **Organización.** `contrato/models/planta.py` (migración `0004_hu_3_4_planta`: `Especie`, `Vivero`, `ValePlanta`, `RenglonVale`,
+  `SalidaPlanta`), servicio `contrato/planta.py`, vistas `vistas/planta.py`, formularios y `templates/contrato/planta/`. Las reglas
+  por programa (reposición, carta compromiso, planta por hectárea, modalidades sin planta) están en `datos/contrato.json` →
+  `vale_de_planta`; los catálogos de demostración, en `catalogos_planta` (se mantienen en el admin).
+- **Vale de Planta (solo PS y RHF).** `planta.emitir_vale`: la Delegación del expediente lo entrega con especie(s) y cantidad
+  (se propone la planta por hectárea de las reglas por la superficie aprobada, `planta.propuesta`; un ajuste exige motivo), el
+  vivero que entrega, fecha y hora de entrega, acuse, PDF con su vigencia y el hito `entrega_vale`, que arranca el plazo
+  `recoger_planta`. Con el contrato firmado el estado pasa de `contratada` a `vale_entregado`. **Antes de la firma** se exige la
+  carta compromiso (archivo; PS 8.1.6 inciso f, línea 5908; RHF 8.1.6 inciso g, línea 3248) y el estado no cambia; al firmar,
+  `planta.al_firmar` (enganchado a `extensiones.AL_FIRMAR`) deja el expediente en `vale_entregado` o, si el vivero ya lo surtió,
+  en `planta_entregada` (transición nueva `contratada → planta_entregada` para la Delegación). RHF modalidad uno no recibe
+  planta (8.1.7 inciso d; 7.1) y CC, MFS, PEG y PSA no usan Vale.
+- **Vigencia desde las reglas.** `plazos.vencimiento(exp, "recoger_planta", fecha_evento=entrega)`: PS, 30 días naturales desde la
+  entrega del vale (8.1.7 inciso e, línea 5931; el texto no dice hábiles o naturales, R-13); RHF, 15 días hábiles (8.1.7 inciso e,
+  líneas 3278 y 3279). Situación del vale: vigente, surtido, vencido o repuesto. **Un vale vencido no es válido**: el vivero no
+  registra salida con él.
+- **Reposición (dato por programa).** RHF sí: «vencido el vale… deberá solicitar a la brevedad un nuevo Vale… el Organismo lo
+  expedirá siempre y cuando tenga disponibilidad de planta» (8.1.7 inciso e, líneas 3280 a 3283): el vale nuevo referencia al
+  anterior, solo cubre lo no entregado por especie y pide confirmar la disponibilidad. PS no la prevé: el texto de 8.1.7 inciso e
+  (líneas 5931 y 5932) solo fija los 30 días; la pantalla lo dice citando la regla y queda como duda para el cliente (R-13).
+- **Salida de planta del vivero.** `planta.validar_vale` y `planta.registrar_salida`: solo el personal del vivero del vale
+  (unidad ligada al `Vivero`), con especie, cantidad, fecha y hora y acuse; hay salidas parciales y nunca más de lo autorizado
+  por especie; no antes de la entrega del vale ni en el futuro. Al completarse, `vale_entregado → planta_entregada`.
+- **Pantallas.** «Vales» (Delegación y Dirección): contratos firmados por entregar vale, vencidos y emitidos; emisión y
+  reposición; detalle del vale con sus salidas y el PDF; «Planta» (vivero): validar un vale por su folio, vales vigentes por
+  surtir y registro de salidas; sección en la pestaña «Contrato» y paneles en las bandejas de la Delegación y del vivero. Con
+  esta historia la pestaña ya no dice qué historia la llenará.
+- **Demostración.** Sobre el segundo lote de HU-3.3: Mirador de los Pinos (PS) con vale vigente y dos salidas parciales; Ladera
+  Verde (PS) con vale vencido sin reposición; Arroyo Claro (RHF) con vale vigente y salida parcial; Cerro Gordo (RHF) con vale
+  vencido (salida parcial) y su vale de reposición por lo no entregado. El vencimiento se simula corriendo hacia atrás las
+  fechas del vale.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

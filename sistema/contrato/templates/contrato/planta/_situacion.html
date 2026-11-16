@@ -1,0 +1,4 @@
+{% if situacion == "vigente" %}<span class="badge text-bg-success" data-situacion="vigente">Vigente</span>
+{% elif situacion == "surtido" %}<span class="badge text-bg-primary" data-situacion="surtido">Surtido</span>
+{% elif situacion == "repuesto" %}<span class="badge text-bg-secondary" data-situacion="repuesto">Repuesto</span>
+{% else %}<span class="badge text-bg-danger" data-situacion="vencido">Vencido · no válido</span>{% endif %}

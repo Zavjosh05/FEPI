@@ -1,7 +1,7 @@
 """Rutas del módulo; cada historia (HU-3.x) agrega las suyas con su vista en vistas/<historia>.py."""
 from django.urls import path
 
-from .vistas import contratos, firma, publicacion
+from .vistas import contratos, firma, planta, publicacion
 
 app_name = "contrato"
 
@@ -28,4 +28,12 @@ urlpatterns = [
     path("contratos/<str:folio>/firmar/", firma.firmar, name="firmar"),
     path("contratos/<str:folio>/liberar/", firma.liberar, name="liberar"),
     path("contratos/<str:folio>/firmado/<str:clave>/", firma.archivo_firmado, name="firma_archivo"),
+    # HU-3.4: entrega de planta
+    path("vales/", planta.lista, name="vales"),
+    path("vales/emitir/<str:folio>/", planta.emitir, name="vale_emitir"),
+    path("vales/<str:folio>/", planta.detalle, name="vale"),
+    path("vales/<str:folio>/pdf/", planta.pdf, name="vale_pdf"),
+    path("vales/<str:folio>/carta/", planta.carta, name="vale_carta"),
+    path("vales/<str:folio>/salida/", planta.salida, name="vale_salida"),
+    path("vivero/", planta.vivero, name="vivero"),
 ]

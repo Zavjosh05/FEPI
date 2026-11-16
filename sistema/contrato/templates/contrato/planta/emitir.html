@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}Vale de Planta {{ exp.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">{% if reposicion %}Reponer{% else %}Entregar{% endif %} el Vale de Planta del expediente {{ exp.folio }}</h1>
+    <div class="small">{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }} · {{ exp.modalidad.nombre|default:"—" }}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ destino }}">Ver expediente</a>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="tarjeta mb-3" data-prueba="propuesta-planta">
+      <div class="titulo-seccion mb-1">Planta propuesta</div>
+      {% if repone %}<div class="small">Repone al vale {{ repone.folio }}: solo lo no entregado ({{ repone.total_pendiente }} piezas).</div>
+      {% elif propuesta.total %}<div><strong>{{ propuesta.total }}</strong> piezas <span class="small text-secondary">({{ propuesta.piezas_por_ha }} por hectárea × {{ propuesta.superficie_ha|floatformat:"-4" }} ha aprobadas)</span></div>
+      <div class="small text-secondary">{{ propuesta.texto }}</div>
+      {% else %}<div class="small text-secondary">{{ propuesta.texto|default:"Las reglas no dan una cantidad por hectárea para esta modalidad: capture la cantidad." }}</div>{% endif %}
+    </div>
+    <div class="tarjeta" data-prueba="vigencia-vale">
+      <div class="titulo-seccion mb-1">Vigencia</div>
+      <div class="small">{{ vigencia.texto_plazo }} desde la entrega del vale{% if vigencia.vencimiento %} (si se entrega hoy: hasta el <strong>{{ vigencia.vencimiento|date:"d/m/Y" }}</strong>){% endif %}.</div>
+      <div class="small text-secondary mt-1">{{ cfg.vigencia_texto }}</div>
+      {% if reposicion %}<div class="small text-secondary mt-1">{{ cfg.reposicion_texto }}</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-8">
+    <div class="tarjeta">
+      {% if not situacion.puede %}
+      <div class="alert alert-warning small mb-0" data-prueba="sin-vale">{{ situacion.motivo }}</div>
+      {% elif sin_catalogo %}
+      <div class="alert alert-warning small mb-0">Faltan especies o viveros en el catálogo (admin).</div>
+      {% else %}
+      <form method="post" enctype="multipart/form-data" id="form-vale">
+        {% csrf_token %}
+        {% include "recepcion/_campo.html" with campo=form.vivero %}
+        <div class="titulo-seccion mb-1">Especie y cantidad autorizadas</div>
+        <div class="row g-2 mb-3" data-prueba="especies">{% for c in form.campos_especies %}<div class="col-6 col-md-4">{% include "recepcion/_campo.html" with campo=c %}</div>{% endfor %}</div>
+        {% include "recepcion/_campo.html" with campo=form.motivo_ajuste %}
+        {% include "recepcion/_campo.html" with campo=form.fecha_hora %}
+        {% if anticipado %}<div class="alert alert-info small">El contrato aún no se firma: el Vale se entrega de manera voluntaria y bajo responsabilidad de la persona, con <strong>carta compromiso</strong> ({{ cfg.carta_compromiso }}).</div>
+        {% include "recepcion/_campo.html" with campo=form.carta_compromiso %}{% endif %}
+        {% if reposicion %}<div class="form-check mb-3">{{ form.planta_disponible }}<label class="form-check-label" for="{{ form.planta_disponible.id_for_label }}">{{ form.planta_disponible.label }}</label><div class="form-text">{{ form.planta_disponible.help_text }}</div></div>{% endif %}
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">{% if reposicion %}Reponer el vale{% else %}Entregar el vale{% endif %}</button></div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

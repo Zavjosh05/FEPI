@@ -11,7 +11,7 @@ from nucleo.models import Ejercicio
 
 from .fixtures_m2 import documento_sesion
 
-__all__ = ["aprobadas", "notificadas", "en_delegacion", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
+__all__ = ["aprobadas", "notificadas", "en_delegacion", "contratadas", "catalogo_planta", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
            "SOLICITUDES_M3"]
 
 # programa: (usuario Delegación, municipio, predio, persona, modalidad, hectáreas)
@@ -159,3 +159,29 @@ def contrato_manual(usuarios):
         exp.refresh_from_db()
         return exp
     return _crear
+
+
+@pytest.fixture
+def contratadas(en_delegacion, usuarios):
+    """``contratadas("PS", cuantas=1)`` → (sesión, [expedientes]) con el contrato firmado (estado ``contratada``)."""
+    from contrato import firma
+    from nucleo.demo import archivo_demo
+
+    def _crear(programa="PS", cuantas=1, **kw):
+        sesion, exps = en_delegacion(programa, cuantas=cuantas, **kw)
+        for e in exps:
+            firma.registrar_firma(delegado_de(usuarios, e), e, None, "persona", e.solicitante.nombre,
+                                  archivo_demo("firmado.pdf"), [p["clave"] for p in firma.puntos_de_verificacion(e)])
+            e.refresh_from_db()
+        return sesion, exps
+    return _crear
+
+
+@pytest.fixture
+def catalogo_planta(catalogos):
+    """Especies y viveros de demostración; devuelve ``(vivero_con_usuario, {nombre: especie})``."""
+    from contrato import planta
+    from contrato.models import Especie, Vivero
+
+    planta.cargar_catalogo()
+    return Vivero.objects.get(clave="VIV-DEMO-01"), {e.nombre: e for e in Especie.objects.all()}

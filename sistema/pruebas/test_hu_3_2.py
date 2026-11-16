@@ -291,5 +291,4 @@ def test_hu_3_2_ya_no_figura_como_pendiente_en_la_pestana(notificadas, usuarios,
     sesion, (exp,) = notificadas("RHF")
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    pendientes = html.split('data-prueba="por-construir"')[-1]
-    assert "HU-3.2" not in pendientes and "HU-3.3" not in pendientes and "HU-3.4 Entrega de planta" in pendientes
+    assert 'data-prueba="por-construir"' not in html  # ya no queda ninguna historia de M3 por construir

@@ -1,0 +1,4 @@
+<table class="table table-sm small mb-1">
+  <thead class="table-light"><tr><th>Especie</th><th>Autorizada</th><th>Entregada</th><th>Por entregar</th></tr></thead>
+  <tbody>{% for r in vale.renglones.all %}<tr data-especie="{{ r.especie.nombre }}"><td>{{ r.especie }}</td><td>{{ r.cantidad }}</td><td>{{ r.entregada }}</td><td>{{ r.pendiente }}</td></tr>{% endfor %}</tbody>
+</table>

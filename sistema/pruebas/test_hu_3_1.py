@@ -277,7 +277,7 @@ def test_hu_3_1_pestana_contrato_muestra_lo_publicado_y_lo_notificado(aprobadas,
     html = client.get(f"/recepcion/expediente/{exps[0].folio}/?pestana=contrato").content.decode()
     assert 'data-prueba="resultado-publicado"' in html and 'data-prueba="notificaciones-exp"' in html
     assert "Cita a firma del contrato" in html and "Resultados (persona beneficiaria)" in html
-    assert "HU-3.1" not in html.split('data-prueba="por-construir"')[-1]   # ya no figura como pendiente
+    assert 'data-prueba="por-construir"' not in html   # ya no queda nada por construir en M3
 
 
 def test_hu_3_1_actas_sin_autorizacion_se_ven_pero_no_se_publican(aprobadas, usuarios, client, contrasena):

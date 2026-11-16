@@ -1,0 +1,20 @@
+<div class="titulo-seccion mt-3">Entrega de planta (HU-3.4)</div>
+{% if not aplica_vale %}
+<div class="small text-secondary" data-prueba="sin-planta">{{ razon_sin_vale }}</div>
+{% else %}
+{% for f in vales %}{% with vale=f.v situacion=f.situacion %}
+<div class="tarjeta mb-3" data-prueba="vale" data-folio="{{ vale.folio }}">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div><strong><a href="{% url 'contrato:vale' vale.folio %}">{{ vale.folio }}</a></strong> {% include "contrato/planta/_situacion.html" %}
+      <div class="small">Entregado el {{ vale.entregado_en|date:"d/m/Y H:i" }} h · {{ vale.vivero.nombre }} · vigencia {% if vale.vence_el %}hasta el <strong>{{ vale.vence_el|date:"d/m/Y" }}</strong>{% else %}sin fecha{% endif %}{% if vale.anticipado %} · antes de la firma (carta compromiso){% endif %}{% if vale.repone %} · repone al {{ vale.repone.folio }}{% endif %}</div></div>
+    <a class="btn btn-sm btn-outline-primary align-self-start" href="{% url 'contrato:vale_pdf' vale.folio %}" target="_blank">Ver el vale en PDF</a>
+  </div>
+  {% include "contrato/planta/_tabla_renglones.html" %}
+  {% if vale.salidas.all %}<ul class="small mb-0" data-prueba="salidas-vale">{% for s in vale.salidas.all %}<li>{{ s.salido_en|date:"d/m/Y H:i" }} h · {{ s.renglon.especie.nombre }} × {{ s.cantidad }}{% if s.acuse %} · <a href="{% url 'nucleo:acuse' s.acuse.folio %}" target="_blank">{{ s.acuse.folio }}</a>{% endif %}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% endwith %}{% empty %}
+<div class="small text-secondary mb-2">Todavía no hay Vale de Planta. {% if vigencia_vale %}Al entregarlo correrá: {{ vigencia_vale.texto_plazo }}.{% endif %}</div>
+{% endfor %}
+{% if puede_emitir_vale %}<a class="btn btn-sm btn-primary" href="{% url 'contrato:vale_emitir' exp.folio %}">{% if tipo_emision == "reposicion" %}Reponer el vale{% else %}Entregar el Vale de Planta{% endif %}</a>
+{% elif motivo_sin_emitir and vales %}<div class="small text-secondary" data-prueba="motivo-sin-vale">{{ motivo_sin_emitir }}</div>{% endif %}
+{% endif %}

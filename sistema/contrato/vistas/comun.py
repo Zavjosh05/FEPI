@@ -22,6 +22,7 @@ def contexto_contrato(request, exp):
     """Cada historia (HU-3.x) suma aquí lo suyo a la pestaña."""
     from .contratos import contexto_contrato_exp
     from .firma import contexto_firma_exp
+    from .planta import contexto_planta_exp
     from .publicacion import contexto_publicacion
 
     contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
@@ -29,4 +30,5 @@ def contexto_contrato(request, exp):
     contexto.update(contexto_publicacion(request, exp))
     contexto.update(contexto_contrato_exp(request, exp))
     contexto.update(contexto_firma_exp(request, exp))
+    contexto.update(contexto_planta_exp(request, exp))
     return contexto

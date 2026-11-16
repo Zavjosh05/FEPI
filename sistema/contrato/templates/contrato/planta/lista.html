@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titulo %}Vales de Planta{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Vales de Planta</h1>
+  <div class="small text-secondary">PS y RHF. El vale tiene vigencia (PS, 30 días; RHF, 15 días hábiles); uno vencido no es válido. {% if es_delegacion %}La Delegación entrega el vale y, donde las ROP lo prevén (RHF), lo repone.{% endif %}</div>
+</div>
+{% if es_delegacion %}
+<div class="tarjeta mb-3" data-prueba="por-entregar-vale">
+  <div class="titulo-seccion">Con contrato firmado y sin vale ({{ por_entregar|length }})</div>
+  {% if por_entregar %}<ul class="small mb-0">{% for e in por_entregar %}<li><a href="{% url 'contrato:vale_emitir' e.folio %}">{{ e.folio }}</a> · {{ e.solicitante.nombre }} · {{ e.predio.nombre }}</li>{% endfor %}</ul>
+  {% else %}<div class="small text-secondary">No hay expedientes por entregar vale.</div>{% endif %}
+</div>
+{% endif %}
+<div class="tarjeta mb-3" data-prueba="vales-vencidos">
+  <div class="titulo-seccion">Vales vencidos ({{ por_reponer|length }})</div>
+  {% if por_reponer %}<ul class="small mb-0">{% for v in por_reponer %}<li><a href="{% url 'contrato:vale' v.folio %}">{{ v.folio }}</a> · {{ v.expediente.solicitante.nombre }} · venció el {{ v.vence_el|date:"d/m/Y" }} · por entregar {{ v.total_pendiente }} piezas</li>{% endfor %}</ul>
+  {% else %}<div class="small text-secondary">No hay vales vencidos.</div>{% endif %}
+</div>
+<div class="tarjeta" data-prueba="vales">
+  <div class="titulo-seccion">Vales emitidos ({{ vales|length }})</div>
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Vale</th><th>Persona · predio</th><th>Vivero</th><th>Vigencia</th><th>Entregado / autorizado</th><th>Situación</th></tr></thead>
+    <tbody>{% for v in vales %}<tr><td class="fw-semibold"><a href="{% url 'contrato:vale' v.folio %}">{{ v.folio }}</a></td>
+      <td>{{ v.expediente.solicitante.nombre }}<div class="text-secondary">{{ v.expediente.predio.nombre }}</div></td><td>{{ v.vivero.nombre }}</td>
+      <td class="text-nowrap">{{ v.vence_el|date:"d/m/Y"|default:"—" }}</td><td>{{ v.total_entregado }} / {{ v.total_autorizado }}</td>
+      <td>{% include "contrato/planta/_situacion.html" with situacion=v.situacion %}</td></tr>
+    {% empty %}<tr><td colspan="6" class="text-secondary">Todavía no hay vales.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

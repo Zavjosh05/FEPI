@@ -15,15 +15,20 @@ HU-3.3: un segundo lote por programa (PS y RHF, con su propia sesión de aprobac
 en plazo (la firma, con su verificación, deja el expediente en «contratada») y uno sin firma al vencer el plazo, señalado
 por ``revisar_plazos`` y por liberar. Los de HU-3.2 siguen igual (Plantación Los Pinos queda por firmar en la
 Delegación). Para vencer el plazo sin esperar días, la demostración corre hacia atrás las fechas de la publicación y de la
-notificación del contrato que queda sin firma (calendario simulado)."""
+notificación del contrato que queda sin firma (calendario simulado).
+
+HU-3.4: catálogos de especies y viveros y, sobre los contratos firmados del segundo lote, Vales de Planta: en PS uno
+vigente con salidas parciales (Mirador de los Pinos) y uno vencido, no válido y sin reposición en PS (Ladera Verde); en RHF
+uno vigente con una salida parcial (Arroyo Claro) y uno vencido con salida parcial que ya tiene su vale de reposición por
+lo no entregado (Cerro Gordo). Peña Blanca (RFI Modalidad uno) no recibe planta."""
 from datetime import timedelta
 
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 
-from contrato import contratos, firma, publicacion
-from contrato.models import Contrato, ModeloContrato, Publicacion, TipoModelo
+from contrato import contratos, firma, planta, publicacion
+from contrato.models import Contrato, Especie, ModeloContrato, Publicacion, TipoModelo, ValePlanta, Vivero
 from dictamen import aprobacion, juridico, sesiones, tecnico
 from dictamen.demo import _validada
 from dictamen.models import SesionComite, TipoSesion
@@ -69,6 +74,7 @@ def cargar_demo():
     creadas += _publicaciones(u)
     creadas += _contratos(u)
     creadas += _firmas(u)
+    creadas += _vales(u)
     return creadas
 
 
@@ -221,3 +227,59 @@ def _firmas(u):
                 firma.revisar_firmas(timezone.localdate())
                 hechas += 1
     return hechas
+
+
+# ----------------------------------------------------------------------------- HU-3.4
+def _vencer_vale(vale, dias=40):
+    """Calendario simulado: el vale se entregó hace ``dias`` días y ya pasó su vigencia."""
+    ahora = timezone.now()
+    vale.entregado_en = ahora - timedelta(days=dias)
+    vale.vence_el = timezone.localdate() - timedelta(days=dias // 4)
+    vale.save(update_fields=["entregado_en", "vence_el"])
+    vale.salidas.update(salido_en=ahora - timedelta(days=dias - 1))
+    vale.expediente.hitos.filter(clave="entrega_vale", referencia=vale.folio).update(fecha_hora=vale.entregado_en)
+
+
+def _vales(u):
+    """HU-3.4: catálogos y vales (vigentes, vencido, con salidas parciales y una reposición); idempotente."""
+    planta.cargar_catalogo()
+    if ValePlanta.objects.exists():
+        return 0
+    vivero = Vivero.objects.filter(unidad__isnull=False).first()
+    if vivero is None:
+        return 0
+    esp = {e.nombre: e for e in Especie.objects.all()}
+    usuario_vivero = u["vivero"]
+
+    def exp_de(predio):
+        return Expediente.objects.filter(predio__nombre=predio, estado__clave="contratada").first()
+
+    def vale(predio, renglones):
+        exp = exp_de(predio)
+        if exp is None:
+            return None
+        return planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp[n], c) for n, c in renglones],
+                                  motivo_ajuste="Ajuste de demostración a la disponibilidad del vivero.")
+
+    hechos = 0
+    v = vale("Mirador de los Pinos", [("Pino patula", 3000), ("Oyamel", 2500)])
+    if v:
+        planta.registrar_salida(usuario_vivero, v, esp["Pino patula"], 1200, observaciones="Primera entrega (demostración).")
+        planta.registrar_salida(usuario_vivero, v, esp["Oyamel"], 500)
+        hechos += 1
+    v = vale("Ladera Verde", [("Pino moctezuma", 3300)])
+    if v:
+        _vencer_vale(v)
+        hechos += 1
+    v = vale("Arroyo Claro", [("Oyamel", 1400), ("Encino", 1000)])
+    if v:
+        planta.registrar_salida(usuario_vivero, v, esp["Oyamel"], 700)
+        hechos += 1
+    v = vale("Cerro Gordo", [("Pino moctezuma", 1800)])
+    if v:
+        planta.registrar_salida(usuario_vivero, v, esp["Pino moctezuma"], 600)
+        _vencer_vale(v, 25)
+        exp = v.expediente
+        planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp["Pino moctezuma"], 1200)], planta_disponible=True)
+        hechos += 1
+    return hechos

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ vale.folio }}</title>
+<style>
+  @page { size: letter; margin: 2cm; @bottom-center { content: "{{ vale.folio }} · página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; color: #1d1d1d; line-height: 1.45; }
+  .encabezado { border-bottom: 2px solid #1f5130; padding-bottom: 6px; margin-bottom: 14px; }
+  .encabezado .org { font-size: 9pt; color: #1f5130; font-weight: bold; }
+  .encabezado h1 { font-size: 15pt; margin: 4px 0 0 0; }
+  .folio { float: right; text-align: right; font-size: 9pt; }
+  .folio strong { font-size: 12pt; display: block; }
+  .vigencia { border: 2px solid #1f5130; padding: 8px; margin: 12px 0; font-size: 11pt; text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 9pt; }
+  th { background: #eef3ef; }
+  .datos th { width: 32%; background: none; font-weight: normal; color: #444; }
+  .firmas td { border: none; width: 50%; text-align: center; padding-top: 40px; }
+  .firmas span { border-top: 1px solid #333; display: inline-block; width: 82%; padding-top: 3px; font-size: 8.5pt; }
+  .pie { margin-top: 16px; font-size: 7.5pt; color: #666; }
+</style>
+</head>
+<body>
+  <div class="encabezado">
+    <div class="folio">Folio<strong>{{ vale.folio }}</strong>{{ fecha|date:"d/m/Y H:i" }} h</div>
+    <div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+    <h1>Vale de Planta</h1>
+  </div>
+  <div class="vigencia">{% if vale.vence_el %}Vigente hasta el <strong>{{ vale.vence_el|date:"d/m/Y" }}</strong>{% else %}Sin fecha de vigencia en las reglas{% endif %}<br><span style="font-size:8.5pt">{{ plazo_texto }}</span></div>
+  <table class="datos">
+    <tr><th>Solicitud</th><td>{{ exp.folio }} · {{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }}</td></tr>
+    <tr><th>Persona beneficiaria</th><td>{{ exp.solicitante.nombre }}</td></tr>
+    <tr><th>Predio</th><td>{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }}</td></tr>
+    <tr><th>Vivero que entrega</th><td>{{ vale.vivero.nombre }}</td></tr>
+    <tr><th>Entrega el vale</th><td>{{ exp.delegacion.nombre }}</td></tr>
+    {% if vale.repone %}<tr><th>Repone al vale</th><td>{{ vale.repone.folio }} (solo lo no entregado)</td></tr>{% endif %}
+    {% if vale.anticipado %}<tr><th>Entrega anticipada</th><td>Antes de la firma del contrato, con carta compromiso.</td></tr>{% endif %}
+  </table>
+  <table>
+    <thead><tr><th>Especie</th><th>Cantidad autorizada (piezas)</th></tr></thead>
+    <tbody>{% for r in renglones %}<tr><td>{{ r.especie }}</td><td>{{ r.cantidad }}</td></tr>{% endfor %}
+    <tr><th>Total</th><th>{{ total }}</th></tr></tbody>
+  </table>
+  <table class="firmas"><tr><td><span>Por PROBOSQUE<br>{{ exp.delegacion.nombre }}</span></td><td><span>La persona beneficiaria<br>{{ exp.solicitante.nombre }}</span></td></tr></table>
+  <div class="pie">Un vale vencido no es válido: el vivero no entrega planta con él. Documento generado por el Sistema de programas de PROBOSQUE.</div>
+</body>
+</html>
