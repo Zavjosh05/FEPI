@@ -109,8 +109,10 @@ def test_nucleo_psahem_paga_con_cheque_de_la_fiduciaria(aprobada, usuarios):
         _pasar(exp, destino, u[quien])
     with pytest.raises(TransicionNoPermitida):  # en PSAHEM no paga Administración y Finanzas directamente
         exp.cambiar_estado("pagada", u["finanzas"])
+    with pytest.raises(TransicionNoPermitida):  # ni la remite: se la solicita a la Fiduciaria la Secretaría Técnica (R-16)
+        exp.cambiar_estado("remitida_fiduciaria", u["finanzas"])
     pasos = [
-        ("remitida_fiduciaria", "finanzas", {"fiduciaria"}),
+        ("remitida_fiduciaria", "comite", {"fiduciaria"}),  # R-16: la solicita la Secretaría Técnica (ROP PSAHEM 10.1 fr. X)
         ("cheque_emitido", "fiduciaria", {"fiduciaria"}),
         ("cheque_enviado", "fiduciaria", {"del_amecameca"}),
         ("cheque_entregado", "del_amecameca", {"dir_drff"}),

@@ -1,0 +1,57 @@
+{% load moneda %}
+{% for r in m.revisiones %}
+<div class="small mt-1" data-prueba="revision-m{{ m.numero }}"><span class="badge text-bg-{% if r.resultado == 'aceptada' %}success{% else %}danger{% endif %}">{{ r.get_resultado_display }}</span>
+  por Administración y Finanzas el {{ r.revisada_en|date:"d/m/Y H:i" }} h (envío {{ r.envio }}){% if r.observaciones %}: <em>{{ r.observaciones }}</em>{% endif %}{% if r.acuse %} · acuse <a href="{% url 'nucleo:acuse' r.acuse.folio %}" target="_blank">{{ r.acuse.folio }}</a>{% endif %}</div>
+{% endfor %}
+{% if m.pago %}
+<div class="alert alert-success small py-2 mt-2 mb-0" data-prueba="pago-m{{ m.numero }}">
+  <strong>Pagada</strong> el <strong data-prueba="fecha-pago">{{ m.pago.fecha_pago|date:"d/m/Y" }}</strong> · {{ m.pago.importe|moneda }} · {{ m.pago.get_tipo_display }} · referencia {{ m.pago.referencia }}{% if m.pago.motivo_cheque %} · motivo del cheque: {{ m.pago.motivo_cheque }}{% endif %}
+  · pago de la solicitud {{ m.pago.solicitud.folio }}{% if m.pago.acuse %} · acuse <a href="{% url 'nucleo:acuse' m.pago.acuse.folio %}" target="_blank">{{ m.pago.acuse.folio }}</a>{% endif %}
+  {% if m.pago.aviso %}<div>Aviso de pago a la persona por la Delegación: {% if m.pago.aviso.notificada_en %}notificada el {{ m.pago.aviso.notificada_en|date:"d/m/Y H:i" }} h{% else %}por notificar{% endif %}.</div>{% endif %}
+</div>
+{% endif %}
+{% if m.remision %}
+<div class="alert alert-info small py-2 mt-2 mb-0" data-prueba="remision-m{{ m.numero }}">
+  <strong>Pago solicitado a la Fiduciaria</strong> por la Secretaría Técnica el <strong data-prueba="fecha-remision">{{ m.remision.remitida_en|date:"d/m/Y H:i" }} h</strong>
+  · plazo hasta el {{ m.remision.vence_el|date:"d/m/Y" }} {% if m.remision.en_plazo %}<span class="badge text-bg-success">en plazo</span>{% else %}<span class="badge text-bg-danger">fuera de plazo</span>{% endif %}
+  {% if m.remision.oficio %} · {{ m.remision.oficio }}{% endif %}{% if m.remision.acuse %} · acuse <a href="{% url 'nucleo:acuse' m.remision.acuse.folio %}" target="_blank">{{ m.remision.acuse.folio }}</a>{% endif %}
+</div>
+{% endif %}
+{% if m.espera_remision %}
+<div class="small text-secondary mt-2" data-prueba="espera-remision">Aceptada por Administración y Finanzas: la Secretaría Técnica del Comité Técnico solicita el pago a la Fiduciaria dentro del plazo de 5 días hábiles (ROP PSAHEM 10.1 fr. X).</div>
+{% endif %}
+
+{% if m.puede_revisar %}
+<form method="post" action="{% url 'pagos:revisar' m.solicitud.pk %}" class="mt-2" data-prueba="form-revision-m{{ m.numero }}">{% csrf_token %}
+  <div class="small mb-1">Revise que los soportes estén completos: solo se paga lo que está comprobado.</div>
+  <textarea class="form-control form-control-sm mb-2" name="observaciones" rows="2" placeholder="Observaciones (obligatorias al devolver)" aria-label="Observaciones"></textarea>
+  <div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-sm btn-success" type="submit" name="resultado" value="aceptada">Aceptar la solicitud</button>
+    <button class="btn btn-sm btn-outline-danger" type="submit" name="resultado" value="devuelta">Devolver con observaciones</button>
+  </div>
+</form>
+{% endif %}
+
+{% if m.puede_pagar %}
+<form method="post" action="{% url 'pagos:pagar' m.solicitud.pk %}" class="mt-2" data-prueba="form-pago-m{{ m.numero }}">{% csrf_token %}
+  <div class="titulo-seccion mb-1">Registrar el pago de la ministración {{ m.numero }}</div>
+  <div class="row g-2">
+    <div class="col-12 col-md-3">{% include "recepcion/_campo.html" with campo=m.form_pago.tipo %}</div>
+    <div class="col-12 col-md-3">{% include "recepcion/_campo.html" with campo=m.form_pago.referencia %}</div>
+    <div class="col-6 col-md-3">{% include "recepcion/_campo.html" with campo=m.form_pago.fecha_pago %}</div>
+    <div class="col-6 col-md-3">{% include "recepcion/_campo.html" with campo=m.form_pago.importe %}</div>
+    <div class="col-12">{% include "recepcion/_campo.html" with campo=m.form_pago.motivo_cheque %}</div>
+  </div>
+  <button class="btn btn-sm btn-primary" type="submit">Registrar el pago</button>
+</form>
+{% endif %}
+
+{% if m.puede_remitir %}
+<form method="post" action="{% url 'pagos:remitir' m.solicitud.pk %}" class="mt-2" data-prueba="form-remision-m{{ m.numero }}">{% csrf_token %}
+  <div class="titulo-seccion mb-1">Solicitar el pago a la Fiduciaria</div>
+  <div class="small text-secondary mb-1">ROP PSAHEM 10.1 fr. X (líneas 2290 a 2292): a través de la Secretaría Técnica, en un máximo de 5 días hábiles desde que recibe la solicitud del área.</div>
+  <div class="row g-2"><div class="col-12 col-md-5">{% include "recepcion/_campo.html" with campo=m.form_remision.oficio %}</div>
+    <div class="col-12 col-md-7">{% include "recepcion/_campo.html" with campo=m.form_remision.observaciones %}</div></div>
+  <button class="btn btn-sm btn-primary" type="submit">Solicitar el pago a la Fiduciaria</button>
+</form>
+{% endif %}

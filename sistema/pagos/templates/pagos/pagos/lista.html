@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Pago de ministraciones{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Pago de ministraciones</h1>
+  <div class="small text-secondary">{% if es_af %}Administración y Finanzas revisa cada solicitud (la acepta o la devuelve con observaciones) y registra el pago; en PSAHEM la acepta y la Secretaría Técnica solicita el pago a la Fiduciaria.{% elif es_st %}La Secretaría Técnica solicita a la Fiduciaria el pago de las solicitudes aceptadas, en un máximo de 5 días hábiles desde que las recibe del área (ROP PSAHEM 10.1 fr. X).{% else %}Estado del pago de las solicitudes de los expedientes que atiende su unidad.{% endif %}</div>
+</div>
+
+{% if es_af %}
+{% include "pagos/pagos/_tabla.html" with titulo="Solicitudes por revisar" clave="por-revisar" filas=por_revisar accion="Revisar" %}
+{% include "pagos/pagos/_tabla.html" with titulo="Aceptadas por pagar" clave="por-pagar" filas=por_pagar accion="Registrar el pago" %}
+{% include "pagos/pagos/_tabla.html" with titulo="PSAHEM: aceptadas, por solicitar a la Fiduciaria (Secretaría Técnica)" clave="aceptadas-psa" filas=aceptadas_psa accion="Ver" %}
+{% endif %}
+{% if es_st %}
+{% include "pagos/pagos/_tabla.html" with titulo="Aceptadas por solicitar a la Fiduciaria" clave="por-remitir" filas=por_remitir accion="Solicitar el pago" %}
+{% include "pagos/pagos/_tabla.html" with titulo="Recibidas del área, en revisión de Administración y Finanzas" clave="en-revision" filas=en_revision_psa accion="Ver" %}
+{% endif %}
+{% include "pagos/pagos/_tabla.html" with titulo="Devueltas al área responsable" clave="devueltas" filas=devueltas accion="Ver" %}
+
+<div class="tarjeta mb-3" data-prueba="pagos-registrados">
+  <div class="titulo-seccion">Pagos registrados ({{ pagos|length }})</div>
+  {% if pagos %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Ministración</th><th>Importe</th><th>Forma de pago</th><th>Fecha del pago</th><th>Acuse</th></tr></thead>
+    <tbody>{% for p in pagos %}<tr data-folio="{{ p.expediente.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'pagos:expediente' p.expediente.folio %}">{{ p.solicitud.folio }}</a></td>
+      <td>{{ p.expediente.solicitante.nombre }}<div class="text-secondary">{{ p.expediente.predio.nombre }}</div></td>
+      <td>{{ p.ministracion }}</td><td class="text-nowrap">{{ p.importe|moneda }}</td><td>{{ p.get_tipo_display }} · {{ p.referencia }}</td>
+      <td class="text-nowrap">{{ p.fecha_pago|date:"d/m/Y" }}</td><td>{% if p.acuse %}<a href="{% url 'nucleo:acuse' p.acuse.folio %}" target="_blank">{{ p.acuse.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todavía no hay pagos registrados.</div>{% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="remisiones-fiduciaria">
+  <div class="titulo-seccion">Pagos solicitados a la Fiduciaria ({{ remisiones|length }})</div>
+  {% if remisiones %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Ministración</th><th>Fecha y hora de la remisión</th><th>Plazo</th><th>Acuse</th></tr></thead>
+    <tbody>{% for r in remisiones %}<tr data-folio="{{ r.expediente.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'pagos:expediente' r.expediente.folio %}">{{ r.solicitud.folio }}</a></td>
+      <td>{{ r.expediente.solicitante.nombre }}<div class="text-secondary">{{ r.expediente.predio.nombre }}</div></td>
+      <td>{{ r.ministracion }}</td><td class="text-nowrap">{{ r.remitida_en|date:"d/m/Y H:i" }} h</td>
+      <td>{% if r.en_plazo %}<span class="badge text-bg-success">en plazo</span>{% else %}<span class="badge text-bg-danger">fuera de plazo</span>{% endif %} hasta {{ r.vence_el|date:"d/m/Y" }}</td>
+      <td>{% if r.acuse %}<a href="{% url 'nucleo:acuse' r.acuse.folio %}" target="_blank">{{ r.acuse.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todavía no se solicita ningún pago a la Fiduciaria.</div>{% endif %}
+</div>
+{% endblock %}

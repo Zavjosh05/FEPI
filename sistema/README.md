@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta y HU-5.1 Solicitud de pago.
+notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago y HU-5.2 Pago de la ministración.
 
 ## Cómo levantar
 
@@ -80,8 +80,8 @@ Contraseña de prueba para todos: **`Probosque2026`** (solo para demostración; 
 | `dir_drff` | Dirección de Restauración y Fomento Forestal | Instancia Ejecutora de CC, MFS, PS, RHF y PSA: valida o avisa faltantes, dictamen técnico, listado preliminar, cumple acuerdos. |
 | `dir_dpf` | Dirección de Protección Forestal | Instancia Ejecutora de PEG (dictamen técnico; validación de reportes). |
 | `juridica` | Unidad Jurídica | Dictamen jurídico, Listado de Personas Beneficiarias Incumplidas y predios sancionados. |
-| `comite` | Secretaría Técnica del Comité | Sesiones: convocatoria, documentos, listados, acta, acuerdos. |
-| `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | (Sprint 2.) |
+| `comite` | Secretaría Técnica del Comité | Sesiones: convocatoria, documentos, listados, acta, acuerdos; en PSAHEM, solicita a la Fiduciaria el pago de las solicitudes aceptadas (HU-5.2). |
+| `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | Revisa las solicitudes de pago (acepta o devuelve) y registra los pagos (HU-5.2). |
 | `vivero` | Vivero (demostración) | Valida el Vale de Planta y registra las salidas de planta (HU-3.4). |
 | `fiduciaria` | Fiduciaria | Ve en su bandeja las instrucciones de pago del Comité (PSAHEM). |
 | `admin` | — (superusuario) | Admin de Django para catálogos: `/admin/`. |
@@ -128,7 +128,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 hecha): models/ (paquete, un módulo por historia), vistas/,
+├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 y HU-5.2 hechas): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
 ├── plantillas/        base.html
@@ -190,7 +190,7 @@ stateDiagram-v2
     ministracion_solicitada --> contratada: Administración y Finanzas devuelve (motivo)
     ministracion_solicitada --> pagada: Administración y Finanzas, salvo PSAHEM (HU-5.2)
     pagada --> ministracion_solicitada: siguiente ministración
-    ministracion_solicitada --> remitida_fiduciaria: Administración y Finanzas, PSAHEM (HU-5.2)
+    ministracion_solicitada --> remitida_fiduciaria: Secretaría Técnica del Comité, PSAHEM, con la solicitud aceptada (HU-5.2, R-16)
     remitida_fiduciaria --> cheque_emitido: Fiduciaria (HU-5.3)
     cheque_emitido --> cheque_enviado: Fiduciaria envía a la Delegación (HU-5.3)
     cheque_enviado --> cheque_entregado: Delegación entrega (HU-5.3)
@@ -211,7 +211,7 @@ stateDiagram-v2
 | `sin_firma_en_plazo` | Dirección y Secretaría Técnica (recurso por liberar) | Unidad Jurídica |
 | `contratada`, `planta_entregada`, `pagada`, `cheque_entregado` | Dirección (solicita la ministración) | Administración y Finanzas, Jurídica, vivero, Fiduciaria según el estado |
 | `vale_entregado` | Vivero (PS y RHF) | — |
-| `ministracion_solicitada` | Administración y Finanzas | Unidad Jurídica |
+| `ministracion_solicitada` | Administración y Finanzas (en PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica) | Unidad Jurídica, Secretaría Técnica (PSAHEM) |
 | `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
 | `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
 | `recurso_liberado` | — (final) | Unidad Jurídica, Secretaría Técnica |
@@ -571,6 +571,42 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   documento de cada uno), «Pagos» en el menú (solicitudes por emitir oficio, por solicitar, por enviar, en trámite y pagadas), paneles en
   las bandejas de la Delegación y del área responsable y siguiente paso en el expediente.
 - **PEG.** Sin reglas: `datos/pagos.json` solo fija que su pago es un «depósito» (HU-5.2).
+
+### M5 · HU-5.2 Pago de la ministración
+
+- **Organización.** `pagos/models/pagos.py` (migración `0002_hu_5_2_pagos`: `RevisionSolicitud`, `Pago`, `RemisionFiduciaria`; y
+  `nucleo/0007_tipo_notificacion_pago`, el tipo de notificación «Aviso de pago»), servicio `pagos/pagos.py`, vistas
+  `vistas/pagos.py`, formularios y `templates/pagos/pagos/`. Las acciones se hacen en la pestaña «Pagos» del expediente y en la pantalla
+  «Pagos» del menú de Administración y Finanzas y de la Secretaría Técnica.
+- **Revisión.** `pagos.revisar_solicitud`: solo Administración y Finanzas, solo una solicitud enviada. **Acepta** (vuelve a comprobar los
+  soportes y el importe: se paga solo lo comprobado) o **devuelve** con observaciones obligatorias (acuse; el expediente vuelve a
+  `contratada`, queda en la bandeja del área, que la corrige y la reenvía; se conserva cada revisión).
+- **Pago.** `pagos.registrar_pago`: referencia, fecha y un importe **igual al solicitado**; transferencia (CC, MFS, PS, RHF), depósito
+  (Guardabosques: el tipo de pago es un dato de `datos/pagos.json`; se prueba con un programa mínimo en fixtures, sin pantalla propia) o
+  cheque solo como caso excepcional con su motivo. El pago cuelga de la solicitud **aceptada** (`Pago.solicitud` es uno a uno: no se paga
+  dos veces la misma ministración); no puede ser futuro ni anterior al envío de la solicitud. Deja acuse, el hito `pago_ministracion`, el
+  estado `pagada` y el **aviso de pago** a la persona por conducto de la Delegación (`nucleo.notificaciones`, tipo `pago`), que lo entrega
+  desde «Notificaciones».
+- **PSAHEM y R-16: quién remite a la Fiduciaria.** El registro R-14 dice que el pago se solicita a la Fiduciaria a través de la Secretaría
+  Técnica del Comité Técnico en 5 días hábiles desde que recibe la solicitud del área; la historia lo pone en Administración y
+  Finanzas. Las ROP de PSAHEM dicen las dos cosas en lugares distintos: 10.1 fr. X (líneas 2288 a 2292) manda que los pagos del 70 % y
+  del 30 % «se solicitarán a la Fiduciaria a través de la Secretaría Técnica del Comité Técnico del FIPASAHEM, en un plazo máximo de
+  5 días hábiles, a partir de la recepción de la solicitud presentada por el área operativa del Programa», y 10.1 fr. XIV (líneas
+  2321 a 2323) hace a Administración y Finanzas «responsable de la administración de los recursos económicos, así como de solicitar
+  ante la Fiduciaria la emisión de los pagos, una vez solicitados» por la Dirección. Se resolvió así: **remite la Secretaría Técnica**
+  (la fr. X es la regla operativa y la única con plazo y con canal) **después de que Administración y Finanzas acepta la solicitud**
+  (fr. XIV: comprueba lo solicitado y administra el recurso). Se cambió en `datos/flujo_tramite.json` la unidad de la transición
+  `ministracion_solicitada → remitida_fiduciaria` (de `admin_finanzas` a `secretaria_comite`) y `ministracion_solicitada` es visible para
+  la Secretaría Técnica; en la bandeja de Administración y Finanzas una solicitud de PSAHEM ya aceptada deja de estar «por atender».
+  Queda como duda para el cliente si la fr. XIV quiere decir que Administración y Finanzas firma el oficio a la Fiduciaria.
+- **Fecha de remisión y plazo.** `pagos.remitir_a_fiduciaria` (solo PSAHEM, solo una solicitud aceptada, una vez): fecha y hora de la
+  remisión, oficio opcional, acuse, el hito `remision_fiduciaria` y el estado `remitida_fiduciaria`. El hito `solicitud_pago_fiduciaria`
+  (HU-5.1) es el que arranca el plazo: `plazo_remision` da el vencimiento de los 5 días hábiles (`instruccion_pago_fiduciaria`,
+  visible en la pestaña y en la bandeja) y la remisión guarda si fue «en plazo» o «fuera de plazo» (se acepta igual, queda señalada).
+  `revisar_plazos` anota una vez en la bitácora las solicitudes cuyo plazo venció sin remisión.
+- **Pantallas.** «Pagos» (Administración y Finanzas y Secretaría Técnica): por revisar, aceptadas por pagar o por solicitar a la
+  Fiduciaria, devueltas, pagos registrados y remisiones; paneles en las bandejas; siguiente paso en el expediente (revisar, registrar el
+  pago, solicitar a la Fiduciaria, notificar el pago).
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

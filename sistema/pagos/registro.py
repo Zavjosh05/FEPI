@@ -3,6 +3,7 @@
 Cada historia agrega aquí lo suyo (filtros y paneles de bandeja de Delegación, área responsable, Administración y Finanzas y
 Fiduciaria, menú, revisión de plazos, siguiente paso, receptores de acuerdos del Comité), igual que ``contrato/registro.py``.
 """
+from django.db.models import Q
 from django.urls import reverse
 
 from nucleo import extensiones
@@ -13,7 +14,7 @@ HISTORIAS = [
     ("HU-5.2", "Pago de la ministración", "Administración y Finanzas paga o, en PSAHEM, remite a la Fiduciaria"),
     ("HU-5.3", "Entrega de cheques", "la Fiduciaria emite y envía los cheques; la Delegación los entrega (PSAHEM)"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-5.1"}
+HISTORIAS_CONSTRUIDAS = {"HU-5.1", "HU-5.2"}
 USOS_DE_PLAZO = ["instruccion_pago_fiduciaria", "cobro_cheque"]
 
 
@@ -33,10 +34,26 @@ def _pestana(exp):
 
 def siguiente_paso(usuario, exp):
     """Siguiente paso de M5 en el expediente."""
-    from . import solicitudes
+    from . import pagos, solicitudes
 
     estado, tipo = exp.estado.clave, usuario.tipo_unidad
     firmado = getattr(exp, "firma_contrato", None) is not None
+    if estado == "ministracion_solicitada":
+        sol = exp.solicitudes_pago.exclude(estado__in=("borrador", "devuelta", "pagada")).order_by("-ministracion").first()
+        if sol is not None and tipo == TipoUnidad.ADMIN_FINANZAS and sol.estado == "enviada":
+            return {"texto": f"Revisar la solicitud de pago de la ministración {sol.ministracion}", "url": _pestana(exp),
+                    "ayuda": "Acéptela si sus soportes están completos o devuélvala con observaciones."}
+        if sol is not None and tipo == TipoUnidad.ADMIN_FINANZAS and sol.estado == "aceptada" and not pagos.es_fiduciaria(exp):
+            return {"texto": f"Registrar el pago de la ministración {sol.ministracion}", "url": _pestana(exp),
+                    "ayuda": "Referencia, fecha del pago e importe igual al solicitado."}
+        if sol is not None and tipo == TipoUnidad.SECRETARIA_COMITE and sol.estado == "aceptada" and pagos.es_fiduciaria(exp):
+            return {"texto": "Solicitar el pago a la Fiduciaria", "url": _pestana(exp),
+                    "ayuda": "En un máximo de 5 días hábiles desde que recibió la solicitud del área (ROP PSAHEM 10.1 fr. X)."}
+    if estado == "pagada" and tipo == TipoUnidad.DELEGACION:
+        aviso = exp.notificaciones.filter(tipo="pago", notificada_en__isnull=True, delegacion=usuario.unidad).first()
+        if aviso is not None:
+            return {"texto": "Notificar el pago a la persona beneficiaria", "url": reverse("contrato:notificaciones"),
+                    "ayuda": "Registre la fecha, la hora y el medio de la notificación."}
     if tipo == TipoUnidad.DELEGACION and firmado and getattr(exp, "oficio_pago", None) is None and estado not in (
             "sin_firma_en_plazo", "recurso_liberado"):
         return {"texto": "Emitir el oficio de solicitud de pago", "url": _pestana(exp),
@@ -44,7 +61,9 @@ def siguiente_paso(usuario, exp):
     if tipo == TipoUnidad.DIRECCION and estado in solicitudes.ESTADOS_PARA_SOLICITAR:
         fila = solicitudes.siguiente_por_solicitar(exp)
         if fila is not None and fila["puede"]:
-            return {"texto": f"Solicitar la ministración {fila['numero']}", "url": _pestana(exp),
+            devuelta = fila["solicitud"] is not None and fila["solicitud"].estado == "devuelta"
+            return {"texto": (f"Corregir y reenviar la ministración {fila['numero']}" if devuelta
+                              else f"Solicitar la ministración {fila['numero']}"), "url": _pestana(exp),
                     "ayuda": ("Falta " + ", ".join(s["nombre"].lower() for s in fila["faltan"]) + "."
                               if fila["faltan"] else "Soportes completos: se puede enviar a Administración y Finanzas.")}
     return None
@@ -84,16 +103,70 @@ def panel_por_solicitar(request):
         "enlace": reverse("pagos:solicitudes"), "accion": "Abrir las solicitudes de pago"}}
 
 
+def panel_por_revisar(request):
+    from . import pagos
+
+    if request.user.tipo_unidad != TipoUnidad.ADMIN_FINANZAS:
+        return None
+    revisar, pagar = pagos.por_revisar(request.user), pagos.por_pagar(request.user)
+    paneles = []
+    for clave, titulo, lista, ayuda in (
+            ("panel-por-revisar", "Solicitudes de pago por revisar", revisar,
+             "Acéptelas si sus soportes están completos o devuélvalas al área responsable con observaciones."),
+            ("panel-por-pagar", "Solicitudes aceptadas por pagar", pagar, "Registre la referencia, la fecha y el importe del pago.")):
+        if lista:
+            filas = [{"url": reverse("pagos:expediente", args=[s.expediente.folio]), "texto": s.folio,
+                      "detalle": f"{s.expediente.solicitante.nombre} · ${s.importe:,.2f}"} for s in lista[:6]]
+            paneles.append({"clave": clave, "titulo": titulo, "total": len(lista), "filas": filas, "ayuda": ayuda,
+                            "enlace": reverse("pagos:pagos"), "accion": "Abrir el pago de ministraciones"})
+    return {"plantilla": "pagos/_paneles.html", "contexto": {"paneles": paneles}} if paneles else None
+
+
+def panel_por_remitir(request):
+    from . import pagos
+
+    if request.user.tipo_unidad != TipoUnidad.SECRETARIA_COMITE:
+        return None
+    pendientes = pagos.por_remitir(request.user)
+    if not pendientes:
+        return None
+    from . import solicitudes
+
+    filas = []
+    for s in pendientes[:6]:
+        v = solicitudes.plazo_remision(s)
+        filas.append({"url": reverse("pagos:expediente", args=[s.expediente.folio]), "texto": s.folio,
+                      "detalle": f"{s.expediente.solicitante.nombre} · plazo hasta {v.vencimiento:%d/%m/%Y}"
+                                 + (f" ({v.estado()})" if v.estado() != "en plazo" else "")})
+    return {"plantilla": "pagos/_panel.html", "contexto": {
+        "clave": "panel-por-remitir", "titulo": "Pagos por solicitar a la Fiduciaria", "total": len(pendientes), "filas": filas,
+        "ayuda": "Solicitudes aceptadas por Administración y Finanzas: 5 días hábiles desde que el área las envió.",
+        "enlace": reverse("pagos:pagos"), "accion": "Abrir el pago de ministraciones"}}
+
+
+def filtro_admin_finanzas(usuario, qs):
+    """En PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica: deja de estar por atender en Administración y Finanzas."""
+    if usuario.tipo_unidad != TipoUnidad.ADMIN_FINANZAS:
+        return qs
+    return qs.exclude(Q(ejercicio__programa__clave="PSA", estado__clave="ministracion_solicitada",
+                        solicitudes_pago__estado="aceptada"))
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "pagos", "nombre": "Pagos",
                                             "plantilla": "pagos/pestana_pagos.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
-    extensiones.PANELES_BANDEJA.extend([panel_oficios_por_emitir, panel_por_solicitar])
+    from . import pagos
+
+    extensiones.PANELES_BANDEJA.extend([panel_oficios_por_emitir, panel_por_solicitar, panel_por_revisar, panel_por_remitir])
+    extensiones.FILTROS_BANDEJA.append(filtro_admin_finanzas)
+    extensiones.REVISIONES_PLAZO.append(pagos.revisar_remisiones)
     T = TipoUnidad
-    extensiones.MENU.append({"nombre": "Pagos", "url": "pagos:solicitudes",
-                             "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA, T.ADMIN_FINANZAS]})
+    extensiones.MENU.extend([
+        {"nombre": "Pagos", "url": "pagos:solicitudes", "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Pagos", "url": "pagos:pagos", "tipos": [T.ADMIN_FINANZAS, T.SECRETARIA_COMITE]}])
     extensiones.DEMOS.append(cargar_demo)
 
 

@@ -1,0 +1,15 @@
+{% load moneda %}
+<div class="tarjeta mb-3" data-prueba="solicitudes-{{ clave }}">
+  <div class="titulo-seccion">{{ titulo }} ({{ filas|length }})</div>
+  {% if filas %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Ministración</th><th>Importe</th><th>Enviada</th><th></th></tr></thead>
+    <tbody>{% for s in filas %}{% with e=s.expediente %}
+    <tr data-folio="{{ e.folio }}" data-ministracion="{{ s.ministracion }}"><td class="fw-semibold text-nowrap">{{ s.folio }}</td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td>{{ s.ministracion }} ({{ s.porcentaje|floatformat:"-2" }} %)</td><td class="text-nowrap">{{ s.importe|moneda }}</td>
+      <td class="text-nowrap">{{ s.enviada_en|date:"d/m/Y H:i" }} h{% if s.acuse_envio %} · <a href="{% url 'nucleo:acuse' s.acuse_envio.folio %}" target="_blank">{{ s.acuse_envio.folio }}</a>{% endif %}</td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'pagos:expediente' e.folio %}">{{ accion }}</a></td></tr>
+    {% endwith %}{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguna.</div>{% endif %}
+</div>

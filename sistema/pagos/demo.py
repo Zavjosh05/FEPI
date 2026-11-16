@@ -7,6 +7,10 @@ donde las reglas lo piden: solicitudes enviadas a Administración y Finanzas, un
 firmado al que todavía le falta el oficio (con la solicitud incompleta). En PSAHEM, la instrucción de pago del Comité Técnico
 (acuerdo de seguimiento) es el soporte que completa la primera ministración.
 
+HU-5.2: Administración y Finanzas revisa las solicitudes enviadas: devuelve una con observaciones (CC), acepta y paga las de
+``pagada`` (transferencia en CC y PS; cheque excepcional con su motivo en RHF), acepta la de ``aceptada`` (PSAHEM, por solicitar a la
+Fiduciaria) y, en PSAHEM, la Secretaría Técnica solicita a la Fiduciaria el pago de las demás (``remitida`` en adelante).
+
 Cada solicitud lleva su ``destino``: lo que las historias HU-5.2 y HU-5.3 hacen después con ella (devolver, pagar, remitir a la
 Fiduciaria, emitir y entregar el cheque); cada historia agrega su paso al final de ``cargar_demo``.
 """
@@ -26,7 +30,8 @@ from nucleo import dias_habiles
 from nucleo.demo import _pdf_demo, archivo_demo
 from nucleo.models import Ejercicio, Expediente, Unidad, Usuario
 
-from . import solicitudes
+from . import pagos, solicitudes
+from .models import EstadoSolicitud, SolicitudPago
 
 # programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, destino)]
 # destino: sin_oficio · por_enviar · enviada · devuelta · pagada · (PSAHEM) aceptada · remitida · cheque_emitido ·
@@ -50,6 +55,7 @@ LOTES = {
             ("del_toluca", "Ocoyoacac", "Loma Verde", "Efraín Rojas Soto", "cuenca_alta", 15, "cheque_por_vencer")],
 }
 SIN_COMPROBANTE = ("sin_oficio",)
+DESTINOS = {fila[2]: fila[6] for plan in LOTES.values() for fila in plan}
 
 
 def _ejercicio(clave):
@@ -135,6 +141,34 @@ def _tramitar(u, exp, destino, clave):
     solicitudes.enviar_solicitud(drff, exp, 1, "Solicitud de demostración.")
 
 
+def _revisiones(u):
+    """HU-5.2: revisión de Administración y Finanzas, pagos y remisión a la Fiduciaria de las solicitudes enviadas."""
+    af, st = u["finanzas"], u["comite"]
+    hechas = 0
+    for sol in SolicitudPago.objects.filter(estado=EstadoSolicitud.ENVIADA, ministracion=1).select_related(
+            "expediente__predio", "expediente__ejercicio__programa"):
+        destino = DESTINOS.get(sol.expediente.predio.nombre)
+        if destino == "devuelta":
+            pagos.revisar_solicitud(af, sol, "devuelta", "El comprobante de la cuenta bancaria no es legible; la Delegación debe "
+                                                         "recabar uno nuevo y el área reenviar la solicitud.")
+        elif destino in ("pagada", "aceptada", "remitida", "cheque_emitido", "cheque_enviado", "cheque_entregado",
+                         "cheque_por_vencer"):
+            pagos.revisar_solicitud(af, sol, "aceptada", "Soportes completos.")
+            if destino == "pagada":
+                excepcional = sol.expediente.programa.clave == "RHF"
+                pagos.registrar_pago(
+                    af, sol, f"{'CHQ' if excepcional else 'SPEI'}-{sol.pk:06d}", timezone.localdate(),
+                    tipo="cheque_excepcional" if excepcional else None,
+                    motivo_cheque="La persona beneficiaria no cuenta con la cuenta bancaria vigente (demostración)."
+                    if excepcional else "")
+            elif destino != "aceptada":
+                pagos.remitir_a_fiduciaria(st, sol, f"ST-FIPASAHEM/{sol.pk:03d}/2026", "Con la instrucción del Comité Técnico.")
+        else:
+            continue
+        hechas += 1
+    return hechas
+
+
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -151,4 +185,5 @@ def cargar_demo():
                 _planta_completa(u, exp)
             _tramitar(u, exp, destino, clave)
             hechas += 1
+    hechas += _revisiones(u)
     return hechas

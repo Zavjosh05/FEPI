@@ -20,9 +20,11 @@ def expediente_visible(request, folio):
 
 def contexto_pagos(request, exp):
     """Cada historia (HU-5.x) suma aquí lo suyo a la pestaña."""
+    from .pagos import contexto_pagos_exp
     from .solicitudes import contexto_solicitudes_exp
 
     contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
                 "vencimientos": list(plazos.vencimientos(exp, USOS_DE_PLAZO).values())}
     contexto.update(contexto_solicitudes_exp(request, exp))
+    contexto_pagos_exp(request, exp, contexto)
     return contexto

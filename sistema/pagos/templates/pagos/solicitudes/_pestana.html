@@ -64,6 +64,7 @@
     <div class="small text-secondary" data-prueba="motivo-sin-solicitar">{{ m.motivo }}</div>
     {% if m.faltan and m.numero > 1 %}<div class="small text-danger" data-prueba="faltan-soportes-m{{ m.numero }}">Faltan soportes: {% for s in m.faltan %}{{ s.nombre|lower }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
   {% endif %}
+  {% include "pagos/pagos/_en_ministracion.html" %}
 </div>
 {% empty %}
 <div class="small text-secondary">Las ministraciones se solicitan cuando el Comité aprueba la solicitud y el contrato está firmado.</div>

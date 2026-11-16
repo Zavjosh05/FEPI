@@ -1,15 +1,18 @@
 """Fixtures del módulo M5 (HU-5.x): expedientes con el contrato firmado y sus soportes de pago."""
+from decimal import Decimal
+
 import pytest
 
+from contrato import firma
 from dictamen import seguimiento, sesiones
 from dictamen.models import TipoSesion
-from nucleo.models import Unidad
-from pagos import solicitudes
+from nucleo.models import Ministracion, MontoApoyo, Unidad
+from pagos import pagos, solicitudes
 
 from .fixtures_m2 import documento_sesion, fecha_sesion
 from .fixtures_m3 import SOLICITUDES_M3, delegado_de
 
-__all__ = ["con_soportes", "instruir_pago", "solicitada"]
+__all__ = ["con_soportes", "instruir_pago", "solicitada", "aceptada", "peg_contratado"]
 
 
 def instruir_pago(usuarios, expediente, ministracion=1):
@@ -54,6 +57,39 @@ def solicitada(con_soportes, usuarios):
     def _crear(programa="CC", **kw):
         exp = con_soportes(programa, **kw)
         solicitudes.enviar_solicitud(usuarios["dir_drff"], exp, 1)
+        exp.refresh_from_db()
+        return exp
+    return _crear
+
+
+@pytest.fixture
+def aceptada(solicitada, usuarios):
+    """``aceptada("CC")`` → ``(expediente, solicitud)`` con la primera ministración aceptada por Administración y Finanzas."""
+
+    def _crear(programa="CC", **kw):
+        exp = solicitada(programa, **kw)
+        sol = exp.solicitudes_pago.get(ministracion=1)
+        pagos.revisar_solicitud(usuarios["finanzas"], sol, "aceptada")
+        sol.refresh_from_db()
+        return exp, sol
+    return _crear
+
+
+@pytest.fixture
+def peg_contratado(peg, contrato_manual, usuarios, pdf):
+    """Guardabosques (PEG, sin archivo de reglas) con su contrato firmado, un monto de 5,000 por hectárea y cuatro
+    ministraciones de 25 %: sirve para probar el tipo de pago «depósito»."""
+
+    def _crear():
+        MontoApoyo.objects.create(ejercicio=peg, concepto="Apoyo al Guardabosque (prueba)", monto=Decimal("5000"),
+                                  unidad="por hectárea")
+        for n in range(1, 5):
+            Ministracion.objects.create(ejercicio=peg, numero=n, porcentaje=Decimal("25"), regimen="anual")
+        exp = contrato_manual(peg, direccion="dir_dpf", modalidad=None)
+        firma.registrar_firma(
+            delegado_de(usuarios, exp), exp, None, "persona", "Guardabosque", pdf("firmado.pdf"),
+            [p["clave"] for p in firma.puntos_de_verificacion(exp)],
+            {"credencial_guardabosque": {"archivo": pdf("credencial.pdf"), "dato": "CRED-0001"}})
         exp.refresh_from_db()
         return exp
     return _crear

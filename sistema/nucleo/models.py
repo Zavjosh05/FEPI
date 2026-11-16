@@ -659,6 +659,7 @@ class TipoNotificacion(models.TextChoices):
     CITA_FIRMA = "cita_firma", "Cita a firma del contrato"
     OMISION = "omision", "Omisión o incumplimiento"
     DEVOLUCION = "devolucion", "Devolución o reintegro"
+    PAGO = "pago", "Aviso de pago (ministración)"
     OTRO = "otro", "Otra notificación"
 
 
