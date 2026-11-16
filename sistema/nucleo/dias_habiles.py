@@ -8,6 +8,8 @@ Reglas (documentadas en el README):
   el vencimiento pasa al siguiente día hábil.
 """
 import calendar
+import threading
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 
 from django.utils import timezone
@@ -23,9 +25,29 @@ def _como_fecha(valor):
     return valor
 
 
+_memoria = threading.local()
+
+
+@contextmanager
+def inhabiles_en_memoria():
+    """Dentro del bloque, los días inhábiles se leen de la base una sola vez (las listas largas calculan un vencimiento por
+    renglón y consultaban el catálogo en cada uno). Al salir se vuelve a consultar la base."""
+    from .models import DiaInhabil
+
+    anterior = getattr(_memoria, "fechas", None)
+    _memoria.fechas = set(DiaInhabil.objects.values_list("fecha", flat=True))
+    try:
+        yield
+    finally:
+        _memoria.fechas = anterior
+
+
 def dias_inhabiles(desde=None, hasta=None):
     from .models import DiaInhabil
 
+    memoria = getattr(_memoria, "fechas", None)
+    if memoria is not None:
+        return {f for f in memoria if (desde is None or f >= desde) and (hasta is None or f <= hasta)}
     qs = DiaInhabil.objects.all()
     if desde:
         qs = qs.filter(fecha__gte=desde)
@@ -70,13 +92,14 @@ def sumar_dias_habiles(inicio, dias):
     return fecha
 
 
-def dias_habiles_entre(inicio, fin):
+def dias_habiles_entre(inicio, fin, inhabiles=None):
     """Días hábiles después de ``inicio`` y hasta ``fin`` (inclusive). Negativo si fin < inicio."""
     inicio, fin = _como_fecha(inicio), _como_fecha(fin)
     signo = 1
     if fin < inicio:
         inicio, fin, signo = fin, inicio, -1
-    inhabiles = dias_inhabiles(inicio, fin)
+    if inhabiles is None:
+        inhabiles = dias_inhabiles(inicio, fin)
     n = 0
     fecha = inicio
     while fecha < fin:

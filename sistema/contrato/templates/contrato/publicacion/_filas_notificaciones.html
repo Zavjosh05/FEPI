@@ -28,7 +28,7 @@
       </details>
       {% else %}<span class="badge text-bg-warning">Por notificar</span>{% endif %}
     </td>
-    <td>{% if f.vencimiento %}{{ f.vencimiento.texto|truncatechars:90 }}<div><span class="badge {% if f.vencimiento.estado == 'vencido' %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ f.vencimiento.estado }}</span></div>{% else %}<span class="text-secondary">—</span>{% endif %}</td>
+    <td>{% if f.vencimiento %}{{ f.vencimiento.texto|truncatechars:90 }}<div><span class="badge {% if f.estado == 'vencido' %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ f.estado }}</span></div>{% else %}<span class="text-secondary">—</span>{% endif %}</td>
   </tr>
   {% endwith %}{% endfor %}
   </tbody>

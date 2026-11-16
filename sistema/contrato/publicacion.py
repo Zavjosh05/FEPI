@@ -95,6 +95,21 @@ def por_entregar(usuario):
     return notificaciones_visibles(usuario).filter(delegacion=usuario.unidad, notificada_en__isnull=True)
 
 
+def vencimientos_de(notificaciones):
+    """``{pk: Vencimiento}`` de las notificaciones que tienen plazo (hoy la cita a firma de PS), con una sola consulta de
+    los hitos de publicación en lugar de una por renglón."""
+    citas = [n for n in notificaciones if n.tipo == TipoNotificacion.CITA_FIRMA]
+    if not citas:
+        return {}
+    from nucleo.models import Hito
+
+    publicaciones = {}
+    for h in Hito.objects.filter(clave="publicacion_resultados", expediente_id__in={n.expediente_id for n in citas})             .order_by("fecha_hora", "id"):
+        publicaciones[h.expediente_id] = h.fecha_hora            # el más reciente de cada expediente
+    return {n.pk: plazos.vencimiento(n.expediente, "cita_firma", fecha_evento=publicaciones.get(n.expediente_id)) if
+            n.expediente_id in publicaciones else vencimiento_de(n) for n in citas}
+
+
 def vencimiento_de(notificacion):
     """Plazo en que la Delegación debe entregarla (hoy solo la cita a firma de PS), o None."""
     if notificacion.tipo == TipoNotificacion.CITA_FIRMA:

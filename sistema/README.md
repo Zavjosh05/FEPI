@@ -53,7 +53,7 @@ invocaciones simultáneas chocarían en los nombres de las bases de prueba.
 
 | Qué | Comando | Antes (serie) | Ahora |
 |---|---|---|---|
-| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador" -n 4` | 365 pruebas, 4 min 24 s | 1 min 50 s (`-n 2`: 2 min 40 s; `-n auto` = 12: 2 min 14 s) |
+| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador" -n 4` (añadir `and not volumen` para excluir la prueba de volumen) | 365 pruebas, 4 min 24 s | 1 min 50 s (`-n 2`: 2 min 40 s; `-n auto` = 12: 2 min 14 s) |
 | Recorridos de navegador | `... pruebas pytest -m navegador -n 3` | 31 pruebas, 4 min 14 s | 2 min 31 s (`-n 2`: 2 min 58 s) |
 | Todo (rápidas, y luego navegador) | `docker compose --profile pruebas run --rm pruebas` | 396 pruebas, ~8 min 40 s | 4 min 46 s a 5 min 3 s (tres repeticiones, todas en verde) |
 | **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | ~14 min | 8 min 10 s (364 pasaron y 1 se omite por diseño) |
@@ -707,6 +707,28 @@ servicio recibe la firma el último día y la rechaza al siguiente), cita a firm
 días hábiles), remisión a la Fiduciaria (5 días hábiles), cobro del cheque (3 meses; entregado el 30-nov vence el 1-mar-2027),
 convocatoria del Comité (3 días hábiles de anticipación) y dictaminación (30-jun en CC); con fines de semana y días inhábiles
 (2-mar, 16-mar, Jueves y Viernes Santo, 1-may, 16-sep, 2 y 16-nov) en medio. No encontraron ningún cálculo incorrecto.
+
+### Generador de datos y prueba de volumen (G-02)
+
+`manage.py generar_datos --programa CC --n 200 --semilla 7` (o `--programa todos`; `--pdf-real` usa WeasyPrint) crea solicitudes con
+los servicios del sistema (`nucleo/generador.py`), repartidas entre las Delegaciones con usuario (Amecameca, Toluca y Valle de
+Bravo) y sus municipios, los tipos de persona y las modalidades del programa, y con el reloj simulado en el calendario de la
+Convocatoria (registro del 29-ene al 25-mar, dictámenes en abril y mayo, sesión del Comité en julio o agosto). Distribución fija:
+12 % recibidas con la revisión a medias, 10 % recibidas completas con polígono, 12 % enviadas a la Dirección, 10 % con aviso de
+faltantes, 14 % validadas, 12 % dictaminadas por llevar a sesión y 30 % aprobadas por una sesión con acta y publicadas (con sus
+avisos por notificar). **La misma semilla da los mismos datos** (se prueba); repetir la corrida no duplica. Por omisión usa el PDF
+ligero de las pruebas: **200 solicitudes de CC tardan 37 s (0.19 s cada una)**; 50 de cada programa, 8 s por programa. No corre en
+`docker compose up`; en Docker: `docker compose --profile pruebas run --rm pruebas sh -c "python manage.py migrate && python
+manage.py generar_datos --programa todos --n 200 --semilla 7"` (con la base del servicio `bd`).
+
+`pruebas/test_nucleo_volumen.py` (marca `volumen`; ~1 min; se excluye con `-m "not volumen"`) genera ~270 solicitudes y compara el
+número de consultas de 26 pantallas (bandejas, «Todos los míos», listado preliminar, sesiones, publicación, notificaciones, firmas,
+vales, pagos, cheques y la página pública) con 36 y con 276 solicitudes: no puede crecer más de 3 consultas ni pasar de 45. Se encontró y
+corrigió una consulta por renglón en **Notificaciones** (9 consultas con 6 renglones, 27 con 41; ahora 9 y 9: plazos del ejercicio
+con `prefetch_related`, hitos de publicación en una consulta y `dias_habiles.inhabiles_en_memoria()` para los vencimientos de la
+lista). Se limitaron las tablas que crecían sin tope: el listado preliminar muestra 300 renglones (el CSV trae todos) y la página
+pública, 250 por listado (con aviso y búsqueda por folio); la bandeja ya tenía su tope de 300. Las pantallas de contratos, firmas,
+vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la publicación).
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

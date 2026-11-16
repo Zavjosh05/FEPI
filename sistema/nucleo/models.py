@@ -168,6 +168,11 @@ class Ejercicio(models.Model):
         return self.reglas_cargadas is not None
 
     def plazo(self, clave):
+        """El plazo de las reglas con esa clave. Si los plazos del ejercicio se trajeron con ``prefetch_related("plazos")``
+        no hace otra consulta (las listas largas lo hacen para no consultar una vez por renglón)."""
+        traidos = getattr(self, "_prefetched_objects_cache", {}).get("plazos")
+        if traidos is not None:
+            return next((p for p in traidos if p.clave == clave), None)
         return self.plazos.filter(clave=clave).first()
 
 

@@ -16,7 +16,7 @@
   {% if folio %}<a class="btn btn-outline-secondary" href="{% url 'contrato:resultados_programa' ejercicio.programa.clave ejercicio.anio %}">Ver todo</a>{% endif %}
 </form>
 {% if folio and not total %}<div class="alert alert-warning" data-prueba="sin-resultados">No hay una solicitud publicada con el folio «{{ folio }}». Verifique el folio o consulte en su Delegación Regional Forestal.</div>{% endif %}
-{% for clave, nombre, filas in listados %}{% if filas or not folio %}
+{% for clave, nombre, filas, omitidas in listados %}{% if filas or not folio %}
 <div class="tarjeta mb-3" data-listado="{{ clave }}">
   <div class="titulo-seccion mb-1">{{ nombre }} <span class="badge text-bg-light border">{{ filas|length }}</span></div>
   <div class="table-responsive">
@@ -26,6 +26,7 @@
     {% for r in filas %}
     <tr data-folio="{{ r.folio }}">{% if clave != "no_factible" %}<td>{{ r.orden|default:"—" }}</td>{% endif %}<td class="text-nowrap fw-semibold">{{ r.folio }}</td><td>{{ r.predio }}</td><td>{{ r.municipio }}</td>{% if clave == "beneficiaria" %}<td>{{ r.persona }}</td>{% endif %}</tr>
     {% empty %}<tr><td colspan="5" class="text-secondary">Sin solicitudes en este listado.</td></tr>{% endfor %}
+    {% if omitidas %}<tr data-prueba="listado-recortado"><td colspan="5" class="text-secondary">Se muestran los primeros {{ filas|length }}; hay {{ omitidas }} más. Busque su folio arriba para ver su resultado.</td></tr>{% endif %}
     </tbody>
   </table>
   </div>

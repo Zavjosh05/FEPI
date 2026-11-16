@@ -93,14 +93,14 @@ class Vencimiento:
             texto += f", sin pasar del {self.tope:%d/%m/%Y}"
         return texto + ")"
 
-    def estado(self, hoy=None):
+    def estado(self, hoy=None, inhabiles=None):
         """«sin fecha todavía», «en plazo», «por vencer» (5 días hábiles o menos) o «vencido»."""
         if not self.tiene_fecha:
             return SIN_FECHA
         hoy = hoy or timezone.localdate()
         if hoy > self.vencimiento:
             return "vencido"
-        return "por vencer" if dias_habiles.dias_habiles_entre(hoy, self.vencimiento) <= 5 else "en plazo"
+        return "por vencer" if dias_habiles.dias_habiles_entre(hoy, self.vencimiento, inhabiles) <= 5 else "en plazo"
 
 
 # ----------------------------------------------------------------------------- configuración

@@ -68,6 +68,9 @@ def mapa(request, folio):
     })
 
 
+LIMITE_LISTADO = 300      # renglones que muestra la pantalla; el CSV trae todo el listado
+
+
 @login_required
 def listado(request):
     if request.user.tipo_unidad not in (TipoUnidad.DIRECCION, TipoUnidad.JURIDICA, TipoUnidad.SECRETARIA_COMITE) \
@@ -81,5 +84,7 @@ def listado(request):
         respuesta["Content-Disposition"] = f'attachment; filename="listado_preliminar_{ejercicio}.csv"'.replace(" ", "_")
         return respuesta
     resumen = {k: sum(1 for f in filas if f["resultado"] == k) for k in ("factible", "no_factible", "pendiente")}
+    total = len(filas)
     return render(request, "dictamen/tecnico/listado.html",
-                  {"filas": filas, "ejercicios": ejercicios, "ejercicio": ejercicio, "resumen": resumen})
+                  {"filas": filas[:LIMITE_LISTADO], "ejercicios": ejercicios, "ejercicio": ejercicio, "resumen": resumen,
+                   "total_filas": total, "recortado": total > LIMITE_LISTADO, "limite": LIMITE_LISTADO})

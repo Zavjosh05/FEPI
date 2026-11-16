@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from dictamen.models import ResultadoListado
-from nucleo import plazos
+from nucleo import dias_habiles, plazos
 from nucleo.models import Ejercicio, Notificacion, TipoUnidad
 
 from .. import publicacion
@@ -78,11 +78,14 @@ def bandeja_notificaciones(request):
     if request.user.tipo_unidad == TipoUnidad.DELEGACION:
         pendientes = pendientes.filter(delegacion=request.user.unidad)
     qs = {"pendientes": pendientes, "entregadas": todas.filter(notificada_en__isnull=False)}.get(ver, todas)
-    filas = [{"n": n, "vencimiento": publicacion.vencimiento_de(n),
-              "puede_entregar": request.user.tipo_unidad == TipoUnidad.DELEGACION
-              and request.user.unidad_id == n.delegacion_id and n.notificada_en is None,
-              "abierta": str(n.pk) == aviso,
-              "form": EntregaForm(prefix=f"n{n.pk}")} for n in qs.order_by("-enviada_en", "-id")[:200]]
+    visibles = list(qs.order_by("-enviada_en", "-id").prefetch_related("expediente__ejercicio__plazos")[:200])
+    with dias_habiles.inhabiles_en_memoria():     # los vencimientos de la lista no consultan el catálogo por renglón
+        citas = publicacion.vencimientos_de(visibles)
+        filas = [{"n": n, "vencimiento": citas.get(n.pk), "estado": citas[n.pk].estado() if n.pk in citas else "",
+                  "puede_entregar": request.user.tipo_unidad == TipoUnidad.DELEGACION
+                  and request.user.unidad_id == n.delegacion_id and n.notificada_en is None,
+                  "abierta": str(n.pk) == aviso,
+                  "form": EntregaForm(prefix=f"n{n.pk}")} for n in visibles]
     return render(request, "contrato/publicacion/notificaciones.html", {
         "filas": filas, "ver": ver, "total_pendientes": pendientes.count(), "total": todas.count(),
         "es_delegacion": request.user.tipo_unidad == TipoUnidad.DELEGACION, "volver": f"?ver={ver}",
@@ -134,6 +137,9 @@ def resultados(request):
                   {"publicaciones": publicacion.publicaciones_publicas()})
 
 
+LIMITE_PUBLICO = 250
+
+
 def resultados_programa(request, clave, anio):
     """Listados publicados de un programa y ejercicio; busca por folio. Solo datos publicables."""
     ejercicio = get_object_or_404(Ejercicio.objects.select_related("programa"), programa__clave=clave.upper(), anio=anio)
@@ -142,8 +148,9 @@ def resultados_programa(request, clave, anio):
         raise Http404("Este programa aún no publica resultados.")
     folio = request.GET.get("folio", "").strip()
     renglones = list(publicacion.renglones_publicos(ejercicio, folio))
-    listados = [(clave_l, nombre, [r for r in renglones if r.resultado == clave_l])
-                for clave_l, nombre in ResultadoListado.choices]
+    completos = [(clave_l, nombre, [r for r in renglones if r.resultado == clave_l]) for clave_l, nombre in ResultadoListado.choices]
+    # Cada listado muestra a lo más LIMITE_PUBLICO renglones; el resto se encuentra buscando por folio
+    listados = [(c, n, filas[:LIMITE_PUBLICO], max(len(filas) - LIMITE_PUBLICO, 0)) for c, n, filas in completos]
     return render(request, "contrato/publicacion/publica_programa.html", {
         "ejercicio": ejercicio, "publicaciones": publicaciones, "listados": listados, "folio": folio,
         "total": len(renglones),

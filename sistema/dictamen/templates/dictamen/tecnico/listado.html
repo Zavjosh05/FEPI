@@ -20,7 +20,8 @@
   <span class="badge text-bg-light border">{{ resumen.pendiente }} pendientes</span></div>
 <div class="tarjeta p-0">
   <div class="table-responsive">
-  <table class="table table-sm table-hover mb-0 small" id="tabla-listado">
+  {% if recortado %}<div class="alert alert-info small py-2" data-prueba="listado-recortado">Se muestran los primeros {{ limite }} de {{ total_filas }} renglones; el archivo CSV trae el listado completo.</div>{% endif %}
+<table class="table table-sm table-hover mb-0 small" id="tabla-listado">
     <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Predio</th><th class="d-none d-md-table-cell">Persona solicitante</th><th>Técnico</th><th>Jurídico</th><th>Resultado</th><th class="d-none d-lg-table-cell">Estado</th></tr></thead>
     <tbody>
     {% for f in filas %}
