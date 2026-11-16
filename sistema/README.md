@@ -42,13 +42,27 @@ Servicios de `docker-compose.yml`:
 Desde `sistema/` (en este equipo, dentro de WSL: `wsl -e bash -lc "cd /mnt/c/.../FEPI/sistema && <comando>"`).
 Docker Compose acepta argumentos para el servicio `pruebas`; al terminar, `docker compose down`.
 
-| Qué | Comando | Tiempo medido |
-|---|---|---|
-| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador"` | 351 pruebas, ~3 min 30 s (antes 11 min 37 s) |
-| Una historia | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~10–25 s |
-| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 380 pruebas, ~7 min 30 s (antes 366 en 13 min 40 s; los 12 recorridos del menú suman ~1 min) |
-| **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | 380 pruebas, ~14 min (13 min 46 s medidos con 368) |
-| Todo y regenerar capturas | `docker compose --profile pruebas run --rm -e CAPTURAS=1 pruebas` | igual que «todo» |
+**En paralelo (pytest-xdist 3.8.0).** La batería corre por omisión en paralelo: pytest-django crea una base por proceso
+(`test_probosque_gw0`, `gw1`…) y cada proceso carga sus catálogos y su carpeta temporal de archivos, así que los folios
+consecutivos, los acuses y los archivos no se mezclan entre procesos. El comando sin argumentos del servicio `pruebas`
+ejecuta `docker/pruebas.sh`, en dos pasos: (1) las rápidas con `-n 4` y (2) los recorridos de navegador con `-n 3` (cada
+proceso abre su Chromium; WSL dispone de unos 7 GB). Se separan porque las pruebas de navegador (`live_server`) vacían la base
+al terminar cada una y, mezcladas con las rápidas en el mismo proceso, obligarían a recargar los catálogos en cada prueba. Para
+cambiar los procesos: `-e PRUEBAS_N=2 -e PRUEBAS_N_NAVEGADOR=0` (0 = en serie). **Un solo comando de Docker a la vez**: dos
+invocaciones simultáneas chocarían en los nombres de las bases de prueba.
+
+| Qué | Comando | Antes (serie) | Ahora |
+|---|---|---|---|
+| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador" -n 4` | 365 pruebas, 4 min 24 s | 1 min 50 s (`-n 2`: 2 min 40 s; `-n auto` = 12: 2 min 14 s) |
+| Recorridos de navegador | `... pruebas pytest -m navegador -n 3` | 31 pruebas, 4 min 14 s | 2 min 31 s (`-n 2`: 2 min 58 s) |
+| Todo (rápidas, y luego navegador) | `docker compose --profile pruebas run --rm pruebas` | 396 pruebas, ~8 min 40 s | 4 min 46 s a 5 min 3 s (tres repeticiones, todas en verde) |
+| **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | ~14 min | 8 min 10 s (364 pasaron y 1 se omite por diseño) |
+| Todo y regenerar capturas | `docker compose --profile pruebas run --rm -e CAPTURAS=1 -e CAPTURAS_DIR=/entregas/sprint_2/capturas pruebas` | igual que «todo» | igual que «todo» |
+| Una historia o un archivo (en serie) | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~10–25 s | igual |
+| **Depurar en serie** | `... pruebas pytest -n 0 ...` (o `-e PRUEBAS_N=0 -e PRUEBAS_N_NAVEGADOR=0` para todo) | | |
+
+Sin intermitencias en tres repeticiones de la configuración elegida (`-n 4` y `-n 3`); los recorridos de navegador corren en paralelo sin fallas, así que no se dejaron en serie. Con argumentos, el servicio corre `pytest` tal cual (en serie salvo que se dé `-n`). Las capturas las escribe cada prueba con su
+propio nombre, así que dos procesos no pisan el mismo archivo.
 
 **PDF ligero (P-22).** Cada acuse, contrato, vale u oficio pasa por `nucleo.acuses._pdf`, y WeasyPrint tarda de 4 a 8 s por
 documento; casi todas las pruebas arman expedientes completos y generaban decenas. Por omisión, la fixture automática

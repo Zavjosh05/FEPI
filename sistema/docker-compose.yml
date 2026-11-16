@@ -95,6 +95,8 @@ services:
       context: .
       target: pruebas
     image: probosque-sistema-pruebas:0.1
+    # Sin argumentos: rápidas en paralelo y luego los recorridos de navegador (ver docker/pruebas.sh). Con argumentos, pytest tal cual.
+    command: ["sh", "/app/docker/pruebas.sh"]
     environment:
       <<: *entorno
       DJANGO_DEBUG: "0"
