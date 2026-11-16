@@ -26,7 +26,8 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
     assert "Entrega de planta (HU-3.4)" in html and 'data-prueba="por-construir"' not in html and "El monto se calcula cuando el Comité" in html
     Expediente.objects.filter(pk=exp.pk).update(estado=Estado.objects.get(clave="aprobada"))
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
-    assert "HU-5.3 Entrega de cheques" in html and 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
+    assert 'data-prueba="por-construir"' not in html and "Solicitud de pago (HU-5.1)" in html  # M5 completo
+    assert 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
     assert "Fecha programada de firma del contrato" in html and "sin fecha todavía" in html
     assert "Ver lo que sigue: publicación y contrato" in html  # siguiente paso de lo aprobado
@@ -36,7 +37,7 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     call_command("cargar_demo")
     call_command("cargar_demo")  # idempotente
     from pagos.demo import LOTES
-    from pagos.models import EstadoSolicitud, OficioPago, Pago, RemisionFiduciaria, SolicitudPago
+    from pagos.models import Cheque, EstadoSolicitud, OficioPago, Pago, RemisionFiduciaria, SolicitudPago
 
     # Lote de pagos (HU-5.1): expedientes propios de M5, aparte de los de M3 que siguen como estaban.
     nuevos = [fila[2] for plan in LOTES.values() for fila in plan]
@@ -84,4 +85,12 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     assert all(p.solicitud == p.solicitud.expediente.solicitudes_pago.get() and p.fecha_pago and p.aviso for p in Pago.objects.all())
     assert estado["Ejido La Joya"] == "aceptada"
     assert RemisionFiduciaria.objects.count() == 5 and all(r.acuse and r.remitida_en and r.en_plazo for r in RemisionFiduciaria.objects.all())
-    assert {Expediente.objects.get(predio__nombre=n).estado.clave for n in ("Bosque Los Cedros", "Paraje Las Ánimas")} == {"remitida_fiduciaria"}
+    # HU-5.3: la Fiduciaria emite el cheque de las remitidas; en cada punto del camino hasta la entrega (y uno por vencer).
+    de = {n: Expediente.objects.get(predio__nombre=n).estado.clave for n in (
+        "Bosque Los Cedros", "Paraje Las Ánimas", "Monte Alto", "Cerro del Venado", "Loma Verde")}
+    assert de == {"Bosque Los Cedros": "remitida_fiduciaria", "Paraje Las Ánimas": "cheque_emitido", "Monte Alto": "cheque_enviado",
+                  "Cerro del Venado": "cheque_entregado", "Loma Verde": "cheque_entregado"}
+    assert Cheque.objects.count() == 4 and Cheque.objects.filter(enviado_en__isnull=False).count() == 3
+    assert Cheque.objects.filter(entregado_en__isnull=False).count() == 2
+    assert all(c.persona == c.expediente.solicitante and c.ministracion == 1 for c in Cheque.objects.all())
+    assert Expediente.objects.get(predio__nombre="Loma Verde").eventos.filter(tipo="cheque_por_vencer").count() == 1

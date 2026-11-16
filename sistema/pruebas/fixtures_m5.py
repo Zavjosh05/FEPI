@@ -12,7 +12,7 @@ from pagos import pagos, solicitudes
 from .fixtures_m2 import documento_sesion, fecha_sesion
 from .fixtures_m3 import SOLICITUDES_M3, delegado_de
 
-__all__ = ["con_soportes", "instruir_pago", "solicitada", "aceptada", "peg_contratado"]
+__all__ = ["con_soportes", "instruir_pago", "solicitada", "aceptada", "peg_contratado", "remitida", "entregado"]
 
 
 def instruir_pago(usuarios, expediente, ministracion=1):
@@ -92,4 +92,32 @@ def peg_contratado(peg, contrato_manual, usuarios, pdf):
             {"credencial_guardabosque": {"archivo": pdf("credencial.pdf"), "dato": "CRED-0001"}})
         exp.refresh_from_db()
         return exp
+    return _crear
+
+
+@pytest.fixture
+def remitida(aceptada, usuarios):
+    """``remitida()`` → ``(expediente, solicitud)`` de PSAHEM con el pago ya solicitado a la Fiduciaria por la Secretaría Técnica."""
+
+    def _crear(**kw):
+        exp, sol = aceptada("PSA", **kw)
+        pagos.remitir_a_fiduciaria(usuarios["comite"], sol)
+        sol.refresh_from_db()
+        exp.refresh_from_db()
+        return exp, sol
+    return _crear
+
+
+@pytest.fixture
+def entregado(remitida, usuarios):
+    """``entregado()`` → ``(expediente, cheque)`` con el cheque emitido, enviado y entregado a la persona."""
+    from pagos import cheques
+
+    def _crear(**kw):
+        exp, sol = remitida(**kw)
+        c = cheques.emitir_cheque(usuarios["fiduciaria"], sol, "CHQ-0001")
+        cheques.enviar_a_delegacion(usuarios["fiduciaria"], c)
+        c = cheques.registrar_entrega(delegado_de(usuarios, exp), c, exp.solicitante.nombre)
+        exp.refresh_from_db()
+        return exp, c
     return _crear

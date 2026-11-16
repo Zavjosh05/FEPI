@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago y HU-5.2 Pago de la ministración.
+notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques.
 
 ## Cómo levantar
 
@@ -83,7 +83,7 @@ Contraseña de prueba para todos: **`Probosque2026`** (solo para demostración; 
 | `comite` | Secretaría Técnica del Comité | Sesiones: convocatoria, documentos, listados, acta, acuerdos; en PSAHEM, solicita a la Fiduciaria el pago de las solicitudes aceptadas (HU-5.2). |
 | `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | Revisa las solicitudes de pago (acepta o devuelve) y registra los pagos (HU-5.2). |
 | `vivero` | Vivero (demostración) | Valida el Vale de Planta y registra las salidas de planta (HU-3.4). |
-| `fiduciaria` | Fiduciaria | Ve en su bandeja las instrucciones de pago del Comité (PSAHEM). |
+| `fiduciaria` | Fiduciaria | PSAHEM: ve lo remitido por la Secretaría Técnica, emite el cheque de cada ministración y lo envía a la Delegación (HU-5.3). |
 | `admin` | — (superusuario) | Admin de Django para catálogos: `/admin/`. |
 
 Solicitudes de demostración (CC 2026): Los Ocotes (recibida, revisión a medias), Ejido San Rafael
@@ -128,7 +128,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 y HU-5.2 hechas): models/ (paquete, un módulo por historia), vistas/,
+├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 a 5.3): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
 ├── plantillas/        base.html
@@ -607,6 +607,26 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pantallas.** «Pagos» (Administración y Finanzas y Secretaría Técnica): por revisar, aceptadas por pagar o por solicitar a la
   Fiduciaria, devueltas, pagos registrados y remisiones; paneles en las bandejas; siguiente paso en el expediente (revisar, registrar el
   pago, solicitar a la Fiduciaria, notificar el pago).
+
+### M5 · HU-5.3 Entrega de cheques (PSAHEM)
+
+- **Organización.** `pagos/models/cheques.py` (migración `0003_hu_5_3_cheques`: `Cheque`), servicio `pagos/cheques.py`, vistas
+  `vistas/cheques.py`, formularios y `templates/pagos/cheques/`. Acciones en la pestaña «Pagos» del expediente y en «Cheques» del menú
+  (Fiduciaria, Delegación y Administración y Finanzas).
+- **Emisión.** `cheques.emitir_cheque`: solo la Fiduciaria y solo de una solicitud ya remitida (antes ni la ve): número de cheque
+  (único), importe igual al solicitado y fecha de emisión; el cheque queda ligado a la persona beneficiaria, a la solicitud y a la
+  ministración (70 % o 30 %) y es **uno por persona y ministración**. Estado `cheque_emitido`.
+- **Envío.** `enviar_a_delegacion`: fecha y hora, acuse y estado `cheque_enviado` (bandeja de la Delegación del expediente). Genera el
+  aviso de que el pago está listo, que la Delegación notifica a la persona (teléfono, medios electrónicos o visita; ROP 10.1 fr. X).
+- **Entrega.** `registrar_entrega`: solo la Delegación del cheque; fecha y hora (no futura ni antes del envío), quién recibe y acuse; hito
+  `entrega_cheque`; la ministración queda pagada (`cheque_entregado`) y el área puede solicitar la siguiente.
+- **Cobro en 3 meses.** El plazo `cobro_cheque` de las reglas (3 meses, ROP 8.1.7 fr. XVI, líneas 2069 y 2070) corre desde la entrega
+  (decisión de R-14); el vencimiento se muestra en la pestaña y en «Cheques». `registrar_cobro` (Fiduciaria o la Delegación del
+  cheque) lo marca cobrado; uno vencido ya no se cobra. `revisar_plazos` (`cheques.revisar_cobros`) deja un aviso en la bitácora, una
+  vez por situación, de los entregados sin cobro **por vencer** (5 días hábiles o menos) o **vencidos**, y hay un panel en las bandejas.
+  Solo es aviso: la baja por cheque vencido (8.1.9, fr. VII) es del sprint 3.
+- **Demostración.** En PSAHEM, cheque emitido (Paraje Las Ánimas), enviado (Monte Alto), entregado (Cerro del Venado) y entregado hace
+  casi 3 meses, por vencer sin cobro (Loma Verde; calendario simulado); Bosque Los Cedros espera su cheque.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

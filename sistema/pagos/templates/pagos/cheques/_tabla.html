@@ -1,0 +1,12 @@
+{% load moneda %}
+<div class="tarjeta mb-3" data-prueba="cheques-{{ clave }}">
+  <div class="titulo-seccion">{{ titulo }} ({{ filas|length }})</div>
+  {% if filas %}<div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Cheque</th><th>Persona · predio</th><th>Ministración</th><th>Importe</th><th>Envío</th><th>Entrega</th><th>Situación</th></tr></thead>
+    <tbody>{% for c in filas %}<tr data-folio="{{ c.expediente.folio }}"><td class="fw-semibold"><a href="{% url 'pagos:expediente' c.expediente.folio %}">{{ c.numero }}</a></td>
+      <td>{{ c.persona.nombre }}<div class="text-secondary">{{ c.expediente.predio.nombre }} · {{ c.delegacion.nombre }}</div></td>
+      <td>{{ c.ministracion }}</td><td class="text-nowrap">{{ c.importe|moneda }}</td>
+      <td class="text-nowrap">{% if c.enviado_en %}{{ c.enviado_en|date:"d/m/Y H:i" }} h{% else %}—{% endif %}</td>
+      <td class="text-nowrap">{% if c.entregado_en %}{{ c.entregado_en|date:"d/m/Y H:i" }} h{% else %}—{% endif %}</td><td>{{ c.situacion }}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguno.</div>{% endif %}
+</div>

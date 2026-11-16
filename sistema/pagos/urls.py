@@ -1,7 +1,7 @@
 """Rutas del módulo; cada historia (HU-5.x) agrega las suyas con su vista en vistas/<historia>.py."""
 from django.urls import path
 
-from .vistas import pagos, solicitudes
+from .vistas import cheques, pagos, solicitudes
 
 app_name = "pagos"
 
@@ -20,4 +20,10 @@ urlpatterns = [
     path("solicitud-pago/<int:pk>/revisar/", pagos.revisar, name="revisar"),
     path("solicitud-pago/<int:pk>/pagar/", pagos.pagar, name="pagar"),
     path("solicitud-pago/<int:pk>/remitir/", pagos.remitir, name="remitir"),
+    # HU-5.3: entrega de cheques
+    path("cheques/", cheques.lista, name="cheques"),
+    path("cheques/solicitud/<int:pk>/emitir/", cheques.emitir, name="cheque_emitir"),
+    path("cheques/<int:pk>/enviar/", cheques.enviar, name="cheque_enviar"),
+    path("cheques/<int:pk>/entregar/", cheques.entregar, name="cheque_entregar"),
+    path("cheques/<int:pk>/cobro/", cheques.cobro, name="cheque_cobro"),
 ]

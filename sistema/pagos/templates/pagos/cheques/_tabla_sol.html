@@ -1,0 +1,11 @@
+{% load moneda %}
+<div class="tarjeta mb-3" data-prueba="cheques-{{ clave }}">
+  <div class="titulo-seccion">{{ titulo }} ({{ filas|length }})</div>
+  {% if filas %}<div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Importe</th><th>Remitida a la Fiduciaria</th><th></th></tr></thead>
+    <tbody>{% for s in filas %}<tr data-folio="{{ s.expediente.folio }}"><td class="fw-semibold">{{ s.folio }}</td>
+      <td>{{ s.expediente.solicitante.nombre }}<div class="text-secondary">{{ s.expediente.predio.nombre }}</div></td><td>{{ s.importe|moneda }}</td>
+      <td>{{ s.remision.remitida_en|date:"d/m/Y H:i" }} h</td>
+      <td class="text-end"><a class="btn btn-sm btn-primary" href="{% url 'pagos:expediente' s.expediente.folio %}">Emitir el cheque</a></td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguno.</div>{% endif %}
+</div>

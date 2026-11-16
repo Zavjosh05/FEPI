@@ -11,6 +11,10 @@ HU-5.2: Administración y Finanzas revisa las solicitudes enviadas: devuelve una
 ``pagada`` (transferencia en CC y PS; cheque excepcional con su motivo en RHF), acepta la de ``aceptada`` (PSAHEM, por solicitar a la
 Fiduciaria) y, en PSAHEM, la Secretaría Técnica solicita a la Fiduciaria el pago de las demás (``remitida`` en adelante).
 
+HU-5.3: la Fiduciaria emite el cheque de las solicitudes remitidas; uno queda emitido (Paraje Las Ánimas), otro enviado a la
+Delegación (Monte Alto), otro entregado a la persona (Cerro del Venado) y otro entregado hace casi 3 meses, por vencer sin cobro
+(Loma Verde; calendario simulado). ``revisar_cobros`` deja el aviso en la bitácora.
+
 Cada solicitud lleva su ``destino``: lo que las historias HU-5.2 y HU-5.3 hacen después con ella (devolver, pagar, remitir a la
 Fiduciaria, emitir y entregar el cheque); cada historia agrega su paso al final de ``cargar_demo``.
 """
@@ -28,9 +32,9 @@ from dictamen.demo import _validada
 from dictamen.models import SesionComite, TipoSesion
 from nucleo import dias_habiles
 from nucleo.demo import _pdf_demo, archivo_demo
-from nucleo.models import Ejercicio, Expediente, Unidad, Usuario
+from nucleo.models import Ejercicio, Expediente, Hito, Unidad, Usuario
 
-from . import pagos, solicitudes
+from . import cheques, pagos, solicitudes
 from .models import EstadoSolicitud, SolicitudPago
 
 # programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, destino)]
@@ -169,6 +173,31 @@ def _revisiones(u):
     return hechas
 
 
+def _cheques(u):
+    """HU-5.3: cheques emitidos, enviados y entregados de las solicitudes remitidas a la Fiduciaria."""
+    fid = u["fiduciaria"]
+    hechas = 0
+    for sol in SolicitudPago.objects.filter(estado=EstadoSolicitud.REMITIDA, cheque__isnull=True).select_related(
+            "expediente__predio"):
+        destino = DESTINOS.get(sol.expediente.predio.nombre)
+        if destino not in ("cheque_emitido", "cheque_enviado", "cheque_entregado", "cheque_por_vencer"):
+            continue
+        cheque = cheques.emitir_cheque(fid, sol, f"FIPASAHEM-{sol.pk:06d}")
+        if destino != "cheque_emitido":
+            cheques.enviar_a_delegacion(fid, cheque)
+        if destino in ("cheque_entregado", "cheque_por_vencer"):
+            cheque = cheques.registrar_entrega(_delegacion(u, sol.expediente), cheque, sol.expediente.solicitante.nombre)
+        if destino == "cheque_por_vencer":  # calendario simulado: se entregó hace casi 3 meses
+            antes = timezone.now() - timedelta(days=88)
+            cheque.entregado_en = antes
+            cheque.vence_cobro = cheques.vencimiento_cobro(cheque).vencimiento
+            cheque.save(update_fields=["entregado_en", "vence_cobro"])
+            Hito.objects.filter(expediente=sol.expediente, clave="entrega_cheque").update(fecha_hora=antes)
+            cheques.revisar_cobros(timezone.localdate())
+        hechas += 1
+    return hechas
+
+
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -186,4 +215,5 @@ def cargar_demo():
             _tramitar(u, exp, destino, clave)
             hechas += 1
     hechas += _revisiones(u)
+    hechas += _cheques(u)
     return hechas

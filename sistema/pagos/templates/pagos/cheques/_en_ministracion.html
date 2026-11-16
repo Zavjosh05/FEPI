@@ -1,0 +1,27 @@
+{% load moneda %}
+{% if m.cheque %}{% with c=m.cheque %}
+<div class="alert alert-info small py-2 mt-2 mb-0" data-prueba="cheque-m{{ m.numero }}">
+  <div><strong>Cheque {{ c.numero }}</strong> · {{ c.importe|moneda }} · a nombre de {{ c.persona.nombre }} · ministración {{ c.ministracion }} · <span data-prueba="situacion-cheque">{{ c.situacion }}</span></div>
+  <div>Emitido el {{ c.emitido_en|date:"d/m/Y" }}{% if c.acuse_emision %} · acuse <a href="{% url 'nucleo:acuse' c.acuse_emision.folio %}" target="_blank">{{ c.acuse_emision.folio }}</a>{% endif %}</div>
+  {% if c.enviado %}<div data-prueba="envio-cheque">Enviado a {{ c.delegacion.nombre }} el <strong>{{ c.enviado_en|date:"d/m/Y H:i" }} h</strong>{% if c.acuse_envio %} · acuse <a href="{% url 'nucleo:acuse' c.acuse_envio.folio %}" target="_blank">{{ c.acuse_envio.folio }}</a>{% endif %}</div>{% endif %}
+  {% if c.entregado %}<div data-prueba="entrega-cheque">Entregado el <strong>{{ c.entregado_en|date:"d/m/Y H:i" }} h</strong> a {{ c.recibe_nombre }}{% if c.acuse_entrega %} · acuse <a href="{% url 'nucleo:acuse' c.acuse_entrega.folio %}" target="_blank">{{ c.acuse_entrega.folio }}</a>{% endif %}</div>
+  <div data-prueba="cobro-cheque">{% if c.cobrado %}Cobrado el {{ c.cobrado_en|date:"d/m/Y" }}.{% else %}Debe cobrarlo a más tardar el <strong>{{ c.vence_cobro|date:"d/m/Y" }}</strong> (3 meses desde la entrega){% if m.vence_cobro %} · {{ m.vence_cobro.estado }}{% endif %}.{% endif %}</div>{% endif %}
+</div>
+{% if m.puede_enviar %}<form method="post" action="{% url 'pagos:cheque_enviar' c.pk %}" class="mt-2">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Enviar el cheque a la Delegación</button></form>{% endif %}
+{% if m.puede_entregar %}
+<form method="post" action="{% url 'pagos:cheque_entregar' c.pk %}" class="mt-2" data-prueba="form-entrega-m{{ m.numero }}">{% csrf_token %}
+  <div class="titulo-seccion mb-1">Registrar la entrega del cheque</div>
+  <div class="row g-2"><div class="col-12 col-md-6">{% include "recepcion/_campo.html" with campo=m.form_entrega.recibe_nombre %}</div>
+    <div class="col-12 col-md-6">{% include "recepcion/_campo.html" with campo=m.form_entrega.entregado_en %}</div></div>
+  <button class="btn btn-sm btn-primary" type="submit">Registrar la entrega</button></form>{% endif %}
+{% if m.puede_cobrar %}
+<form method="post" action="{% url 'pagos:cheque_cobro' c.pk %}" class="mt-2 d-flex gap-2 align-items-end" data-prueba="form-cobro-m{{ m.numero }}">{% csrf_token %}
+  <div>{{ m.form_cobro.fecha_cobro }}</div><button class="btn btn-sm btn-outline-success" type="submit">Registrar que fue cobrado</button></form>{% endif %}
+{% endwith %}{% elif m.puede_emitir %}
+<form method="post" action="{% url 'pagos:cheque_emitir' m.solicitud.pk %}" class="mt-2" data-prueba="form-emision-m{{ m.numero }}">{% csrf_token %}
+  <div class="titulo-seccion mb-1">Emitir el cheque de la ministración {{ m.numero }}</div>
+  <div class="row g-2"><div class="col-12 col-md-4">{% include "recepcion/_campo.html" with campo=m.form_emision.numero %}</div>
+    <div class="col-6 col-md-4">{% include "recepcion/_campo.html" with campo=m.form_emision.importe %}</div>
+    <div class="col-6 col-md-4">{% include "recepcion/_campo.html" with campo=m.form_emision.fecha_emision %}</div></div>
+  <button class="btn btn-sm btn-primary" type="submit">Emitir el cheque</button></form>
+{% endif %}

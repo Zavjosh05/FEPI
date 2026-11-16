@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Cheques de PSAHEM{% endblock %}
+{% block contenido %}
+<div class="mb-3"><h1 class="h4 mb-0">Cheques de PSAHEM</h1>
+  <div class="small text-secondary">La Fiduciaria emite el cheque de cada ministración y lo envía a la Delegación, que lo entrega a la persona beneficiaria; desde la entrega tiene 3 meses para cobrarlo.</div></div>
+{% include "pagos/cheques/_tabla_sol.html" with titulo="Pagos remitidos por emitir su cheque" clave="por-emitir" filas=por_emitir %}
+{% include "pagos/cheques/_tabla.html" with titulo="Cheques por enviar a la Delegación" clave="por-enviar" filas=por_enviar %}
+{% include "pagos/cheques/_tabla.html" with titulo="Cheques por entregar a la persona beneficiaria" clave="por-entregar" filas=por_entregar %}
+<div class="tarjeta mb-3" data-prueba="cheques-por-cobrar">
+  <div class="titulo-seccion">Entregados sin cobro ({{ por_cobrar|length }})</div>
+  {% if por_cobrar %}<table class="table table-sm small"><thead class="table-light"><tr><th>Cheque</th><th>Persona</th><th>Entregado</th><th>Vence el cobro</th><th>Situación</th></tr></thead>
+    <tbody>{% for f in por_cobrar %}<tr data-folio="{{ f.cheque.expediente.folio }}"><td><a href="{% url 'pagos:expediente' f.cheque.expediente.folio %}">{{ f.cheque.numero }}</a></td><td>{{ f.cheque.persona.nombre }}</td>
+      <td>{{ f.cheque.entregado_en|date:"d/m/Y H:i" }} h</td><td>{{ f.vencimiento.vencimiento|date:"d/m/Y" }}</td>
+      <td><span class="badge text-bg-{% if f.estado == 'vencido' %}danger{% elif f.estado == 'por vencer' %}warning{% else %}secondary{% endif %}">{{ f.estado }}</span></td></tr>{% endfor %}</tbody></table>
+  {% else %}<div class="small text-secondary">Ninguno.</div>{% endif %}
+</div>
+{% include "pagos/cheques/_tabla.html" with titulo="Todos los cheques" clave="todos" filas=cheques %}
+{% endblock %}

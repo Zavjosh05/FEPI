@@ -14,7 +14,7 @@ HISTORIAS = [
     ("HU-5.2", "Pago de la ministración", "Administración y Finanzas paga o, en PSAHEM, remite a la Fiduciaria"),
     ("HU-5.3", "Entrega de cheques", "la Fiduciaria emite y envía los cheques; la Delegación los entrega (PSAHEM)"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-5.1", "HU-5.2"}
+HISTORIAS_CONSTRUIDAS = {"HU-5.1", "HU-5.2", "HU-5.3"}
 USOS_DE_PLAZO = ["instruccion_pago_fiduciaria", "cobro_cheque"]
 
 
@@ -49,6 +49,15 @@ def siguiente_paso(usuario, exp):
         if sol is not None and tipo == TipoUnidad.SECRETARIA_COMITE and sol.estado == "aceptada" and pagos.es_fiduciaria(exp):
             return {"texto": "Solicitar el pago a la Fiduciaria", "url": _pestana(exp),
                     "ayuda": "En un máximo de 5 días hábiles desde que recibió la solicitud del área (ROP PSAHEM 10.1 fr. X)."}
+    if tipo == TipoUnidad.FIDUCIARIA and estado == "remitida_fiduciaria":
+        return {"texto": "Emitir el cheque", "url": _pestana(exp),
+                "ayuda": "Número de cheque, importe igual al solicitado y fecha de emisión."}
+    if tipo == TipoUnidad.FIDUCIARIA and estado == "cheque_emitido":
+        return {"texto": "Enviar el cheque a la Delegación", "url": _pestana(exp),
+                "ayuda": "Queda la fecha y la hora del envío y el aviso a la persona por la Delegación."}
+    if tipo == TipoUnidad.DELEGACION and estado == "cheque_enviado":
+        return {"texto": "Registrar la entrega del cheque", "url": _pestana(exp),
+                "ayuda": "Quién recibe, fecha y hora; desde la entrega corren 3 meses para cobrarlo."}
     if estado == "pagada" and tipo == TipoUnidad.DELEGACION:
         aviso = exp.notificaciones.filter(tipo="pago", notificada_en__isnull=True, delegacion=usuario.unidad).first()
         if aviso is not None:
@@ -144,6 +153,58 @@ def panel_por_remitir(request):
         "enlace": reverse("pagos:pagos"), "accion": "Abrir el pago de ministraciones"}}
 
 
+def _panel_cheques(request, clave, titulo, filas_de, ayuda):
+    lista = filas_de(request.user)
+    if not lista:
+        return None
+    filas = []
+    for x in lista[:6]:
+        exp = x.expediente
+        filas.append({"url": reverse("pagos:expediente", args=[exp.folio]), "texto": exp.folio,
+                      "detalle": f"{exp.solicitante.nombre} · ministración {x.ministracion}"})
+    return {"plantilla": "pagos/_panel.html", "contexto": {
+        "clave": clave, "titulo": titulo, "total": len(lista), "filas": filas, "ayuda": ayuda,
+        "enlace": reverse("pagos:cheques"), "accion": "Abrir los cheques"}}
+
+
+def panel_cheques_por_emitir(request):
+    from . import cheques
+
+    return _panel_cheques(request, "panel-cheques-por-emitir", "Pagos remitidos por emitir su cheque", cheques.por_emitir,
+                          "La Secretaría Técnica ya solicitó el pago a la Fiduciaria.")
+
+
+def panel_cheques_por_enviar(request):
+    from . import cheques
+
+    return _panel_cheques(request, "panel-cheques-por-enviar", "Cheques por enviar a la Delegación", cheques.por_enviar,
+                          "Quedan con fecha y hora de envío y su acuse.")
+
+
+def panel_cheques_por_entregar(request):
+    from . import cheques
+
+    return _panel_cheques(request, "panel-cheques-por-entregar", "Cheques por entregar a las personas beneficiarias",
+                          cheques.por_entregar, "Registre quién recibe y la fecha y hora de la entrega.")
+
+
+def panel_cheques_por_vencer(request):
+    from . import cheques
+
+    if request.user.tipo_unidad not in (TipoUnidad.FIDUCIARIA, TipoUnidad.DELEGACION, TipoUnidad.DIRECCION):
+        return None
+    alertas = [f for f in cheques.por_cobrar(request.user) if f["estado"] in ("por vencer", "vencido")]
+    if not alertas:
+        return None
+    filas = [{"url": reverse("pagos:expediente", args=[f["cheque"].expediente.folio]), "texto": f["cheque"].numero,
+              "detalle": f"{f['cheque'].persona.nombre} · {f['estado']} ({f['vencimiento'].vencimiento:%d/%m/%Y})"}
+             for f in alertas[:6]]
+    return {"plantilla": "pagos/_panel.html", "contexto": {
+        "clave": "panel-cheques-por-vencer", "titulo": "Cheques entregados por vencer o vencidos sin cobro",
+        "total": len(alertas), "filas": filas, "ayuda": "Tienen 3 meses desde la entrega para cobrarse (solo aviso; la baja es del sprint 3).",
+        "enlace": reverse("pagos:cheques"), "accion": "Abrir los cheques"}}
+
+
 def filtro_admin_finanzas(usuario, qs):
     """En PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica: deja de estar por atender en Administración y Finanzas."""
     if usuario.tipo_unidad != TipoUnidad.ADMIN_FINANZAS:
@@ -158,15 +219,18 @@ def registrar():
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "pagos", "nombre": "Pagos",
                                             "plantilla": "pagos/pestana_pagos.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
-    from . import pagos
+    from . import cheques, pagos
 
-    extensiones.PANELES_BANDEJA.extend([panel_oficios_por_emitir, panel_por_solicitar, panel_por_revisar, panel_por_remitir])
+    extensiones.PANELES_BANDEJA.extend([panel_oficios_por_emitir, panel_por_solicitar, panel_por_revisar, panel_por_remitir,
+                                        panel_cheques_por_emitir, panel_cheques_por_enviar, panel_cheques_por_entregar,
+                                        panel_cheques_por_vencer])
     extensiones.FILTROS_BANDEJA.append(filtro_admin_finanzas)
-    extensiones.REVISIONES_PLAZO.append(pagos.revisar_remisiones)
+    extensiones.REVISIONES_PLAZO.extend([pagos.revisar_remisiones, cheques.revisar_cobros])
     T = TipoUnidad
     extensiones.MENU.extend([
         {"nombre": "Pagos", "url": "pagos:solicitudes", "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA]},
-        {"nombre": "Pagos", "url": "pagos:pagos", "tipos": [T.ADMIN_FINANZAS, T.SECRETARIA_COMITE]}])
+        {"nombre": "Pagos", "url": "pagos:pagos", "tipos": [T.ADMIN_FINANZAS, T.SECRETARIA_COMITE]},
+        {"nombre": "Cheques", "url": "pagos:cheques", "tipos": [T.FIDUCIARIA, T.DELEGACION, T.ADMIN_FINANZAS]}])
     extensiones.DEMOS.append(cargar_demo)
 
 

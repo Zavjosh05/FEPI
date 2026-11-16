@@ -15,3 +15,4 @@ como hitos), las notificaciones y los acuses. Los acuerdos del Comité de instru
 """
 from .solicitudes import ComprobanteCuenta, EstadoSolicitud, OficioPago, SolicitudPago  # noqa: F401
 from .pagos import Pago, RemisionFiduciaria, ResultadoRevision, RevisionSolicitud, TipoPagoRegistrado  # noqa: E402,F401
+from .cheques import Cheque  # noqa: E402,F401
