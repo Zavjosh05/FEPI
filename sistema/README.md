@@ -1,6 +1,6 @@
 # Sistema de programas de PROBOSQUE
 
-Prototipo del sprint 1 (módulos M1, Recepción y expediente, y M2, Dictamen y Comité) del sistema que lleva el trámite de los
+Prototipo de los sprints 1 y 2 (módulos M1, Recepción y expediente; M2, Dictamen y Comité; M3, Publicación y contrato, y M5, Pagos) del sistema que lleva el trámite de los
 seis programas de apoyo de PROBOSQUE: Capturando Carbono (CC), Manejo Forestal Sustentable (MFS),
 Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), PSAHEM (PSA) y
 Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG existen en el catálogo sin archivo de reglas.
@@ -46,8 +46,8 @@ Docker Compose acepta argumentos para el servicio `pruebas`; al terminar, `docke
 |---|---|---|
 | Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador"` | 351 pruebas, ~3 min 30 s (antes 11 min 37 s) |
 | Una historia | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~10–25 s |
-| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 368 pruebas, ~6 min 30 s (antes 13 min 40 s) |
-| **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | 368 pruebas, ~13 min 45 s |
+| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 380 pruebas, ~7 min 30 s (antes 366 en 13 min 40 s; los 12 recorridos del menú suman ~1 min) |
+| **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | 380 pruebas, ~14 min (13 min 46 s medidos con 368) |
 | Todo y regenerar capturas | `docker compose --profile pruebas run --rm -e CAPTURAS=1 pruebas` | igual que «todo» |
 
 **PDF ligero (P-22).** Cada acuse, contrato, vale u oficio pasa por `nucleo.acuses._pdf`, y WeasyPrint tarda de 4 a 8 s por
@@ -73,7 +73,7 @@ necesidades se leen de
 Reglas de Operación 2026 al que remiten los numerales y las líneas de `reglas/*.json`.
 
 Cada criterio de aceptación tiene al menos una prueba con el ID de su historia en el nombre
-(`pruebas/test_hu_1_1.py` … `test_hu_2_4.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
+(`pruebas/test_hu_1_1.py` … `test_hu_5_3.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
 Los recorridos de Playwright están en `pruebas/e2e/` (uno por historia; los de M2 en archivos
 `test_recorrido_hu_2_*.py`) y corren con Chromium en español de México (`--lang=es-MX`, zona horaria de
 la Ciudad de México). PEG, que no tiene archivo de reglas, se prueba con fixtures
@@ -145,12 +145,14 @@ sistema/
 ├── plantillas/        base.html
 ├── estaticos/         css, js del mapa y vendor/ (Bootstrap 5.3.9, htmx 2.0.11, Leaflet 1.9.4,
 │                      Leaflet-Geoman 2.20.6; sin CDN)
-├── reglas/            CC.json, catalogos.json, indice_rop.json (extraídos de las ROP; no se editan a mano)
-├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json,
-│                      dias_inhabiles_2026.json
+├── reglas/            CC.json, PS.json, RHF.json, PSA.json, catalogos.json, indice_rop.json (extraídos de las ROP;
+│                      no se editan a mano)
+├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json, contrato.json,
+│                      pagos.json, dias_inhabiles_2026.json
 ├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
-├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON)
-└── pruebas/           pytest (test_nucleo_*, test_hu_1_*, test_hu_2_*, fixtures_m2.py) y e2e/ (Playwright)
+├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación)
+├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON) y diagrama_er.py
+└── pruebas/           pytest (test_nucleo_*, test_hu_1_* a test_hu_5_*, recorrido completo, fixtures_m2/m3/m5.py) y e2e/ (Playwright)
 ```
 
 ## Estados del trámite (sprints 1 y 2)
@@ -195,6 +197,7 @@ stateDiagram-v2
     contrato_en_delegacion --> sin_firma_en_plazo
     sin_firma_en_plazo --> recurso_liberado: Secretaría Técnica, acuerdo del Comité (D)
     contratada --> vale_entregado: Delegación, PS y RHF (HU-3.4)
+    contratada --> planta_entregada: Delegación, si el vivero ya surtió el vale (HU-3.4)
     vale_entregado --> planta_entregada: vivero (HU-3.4)
     planta_entregada --> ministracion_solicitada: Dirección (HU-5.1)
     contratada --> ministracion_solicitada: Dirección (HU-5.1)
@@ -233,7 +236,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 
 ## Decisiones tomadas
 
-- **Reglas como datos.** `cargar_reglas` lee `reglas/<CLAVE>.json` (hoy solo `CC.json`): tipos de
+- **Reglas como datos.** `cargar_reglas` lee `reglas/<CLAVE>.json` (hoy CC, PS, RHF y PSA): tipos de
   persona, modalidades, requisitos (con bandera de documento legal, `aplica_en_refrendo`, opcional y
   condición), plazos (cantidad + unidad; admite `cantidad: null` y unidades como `fecha_limite`),
   formatos, montos y ministraciones (estas dos quedan listas para el sprint 2). Las claves que el
@@ -700,7 +703,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen; contrato y pagos aún sin tablas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
+  dictamen, contrato y pagos: 56 tablas, cinco áreas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
 - `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de

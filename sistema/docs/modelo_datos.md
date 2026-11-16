@@ -2,7 +2,7 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-35 tablas propias en tres apps (`nucleo`, `recepcion`, `dictamen`; `contrato` y `pagos` aún sin tablas) sobre PostgreSQL + PostGIS. El diagrama
+56 tablas propias en cinco apps (`nucleo`, `recepcion`, `dictamen`, `contrato` y `pagos`) sobre PostgreSQL + PostGIS. El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
 Para leerlo: `||--o{` es «uno a muchos» obligatorio, `|o--o{` «uno a muchos» opcional, `||--o|` «uno a uno»
@@ -548,9 +548,270 @@ erDiagram
   }
 ```
 
-## 4. Publicación y contrato (M3) y pagos (M5)
+## 4. Publicación y contrato (M3)
 
-Las apps `contrato` y `pagos` existen sin tablas: cada historia (HU-3.1 a HU-3.4, HU-5.1 a HU-5.3) agrega su
-módulo en `models/` con su migración, y al hacerlo se vuelve a generar este documento agregando aquí su
-diagrama (`--entidades` con sus modelos y `Expediente`). Lo que ya usan del núcleo: `Notificacion`, `Hito`,
-`MontoApoyo` (con su modalidad) y `Ministracion`.
+La publicación de resultados de una sesión de aprobación con acta (`Publicacion`, con un `ResultadoPublicado` por solicitud: lo que
+ve el público), el modelo de contrato por programa con sus versiones validadas por la Unidad Jurídica (`ModeloContrato`,
+`VersionModelo`), el contrato elaborado por solicitud (`Contrato`, con su huella y su `Adendum` para ampliar plazos), la firma
+con sus elementos de formalización y el señalamiento de las que vencen sin firma (`FirmaContrato`, `ElementoFormalizacion`,
+`SinFirma`) y el Vale de Planta con sus renglones y las salidas del vivero (`ValePlanta`, `RenglonVale`, `SalidaPlanta`, con los
+catálogos `Especie` y `Vivero`). Los avisos a la persona no tienen tabla propia: son `Notificacion` del núcleo, igual que los hitos
+que arrancan los plazos.
+
+```mermaid
+erDiagram
+  Contrato ||--o{ Adendum : contrato
+  Contrato ||--o| FirmaContrato : contrato
+  Especie ||--o{ RenglonVale : especie
+  Expediente ||--o{ Notificacion : expediente
+  Expediente ||--o{ ResultadoPublicado : expediente
+  Expediente ||--o{ ValePlanta : expediente
+  Expediente ||--o| Contrato : expediente
+  Expediente ||--o| FirmaContrato : expediente
+  Expediente ||--o| SinFirma : expediente
+  FirmaContrato ||--o{ ElementoFormalizacion : firma
+  ModeloContrato ||--o{ VersionModelo : modelo
+  Publicacion ||--o{ ResultadoPublicado : publicacion
+  RenglonVale ||--o{ SalidaPlanta : renglon
+  ValePlanta |o--o{ ValePlanta : repone
+  ValePlanta ||--o{ RenglonVale : vale
+  ValePlanta ||--o{ SalidaPlanta : vale
+  VersionModelo |o--o{ Adendum : version_modelo
+  VersionModelo ||--o{ Contrato : version_modelo
+  Vivero ||--o{ ValePlanta : vivero
+  Adendum {
+    int id PK
+    int contrato_id FK
+    int version_modelo_id FK
+    texto motivo
+    fecha plazo_original
+    fecha plazo_nuevo
+    archivo archivo
+  }
+  Contrato {
+    int id PK
+    int expediente_id FK
+    texto folio UK
+    int version_modelo_id FK
+    texto tipo
+    texto texto
+    json datos
+    archivo archivo
+  }
+  ElementoFormalizacion {
+    int id PK
+    int firma_id FK
+    texto clave
+    texto nombre
+    texto dato_etiqueta
+    texto dato
+  }
+  Especie {
+    int id PK
+    texto nombre UK
+    texto nombre_cientifico
+    bool activa
+  }
+  FirmaContrato {
+    int id PK
+    int contrato_id FK
+    int expediente_id FK
+    fecha_hora firmado_en
+    texto firmante
+    texto firmante_nombre
+    archivo archivo
+  }
+  ModeloContrato {
+    int id PK
+    texto tipo
+    texto nombre
+    bool es_base
+    fecha_hora creado_en
+  }
+  Publicacion {
+    int id PK
+    fecha_hora publicada_en
+    texto lugares
+    fecha fecha_limite
+    bool dentro_de_fecha
+  }
+  RenglonVale {
+    int id PK
+    int vale_id FK
+    int especie_id FK
+    int cantidad
+  }
+  ResultadoPublicado {
+    int id PK
+    int publicacion_id FK
+    int expediente_id FK
+    texto resultado
+    int orden
+    texto folio
+    texto predio
+  }
+  SalidaPlanta {
+    int id PK
+    int renglon_id FK
+    int vale_id FK
+    int cantidad
+    fecha_hora salido_en
+    fecha_hora registrada_en
+    texto observaciones
+  }
+  SinFirma {
+    int id PK
+    int expediente_id FK
+    fecha vencio_el
+    fecha_hora senalado_en
+    texto motivo
+    fecha_hora liberado_en
+  }
+  ValePlanta {
+    int id PK
+    texto folio UK
+    int expediente_id FK
+    int vivero_id FK
+    fecha_hora entregado_en
+    fecha vence_el
+    texto vigencia_texto
+    bool anticipado
+    int repone_id FK
+  }
+  VersionModelo {
+    int id PK
+    int modelo_id FK
+    int numero
+    texto texto
+    texto estado
+    fecha_hora creada_en
+  }
+  Vivero {
+    int id PK
+    texto clave UK
+    texto nombre
+    texto municipio
+    bool activo
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+  }
+  Notificacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto asunto
+    fecha_hora enviada_en
+    fecha_hora notificada_en
+  }
+```
+
+## 5. Pagos (M5)
+
+El oficio de la Delegación y el comprobante de la cuenta bancaria (`OficioPago`, `ComprobanteCuenta`), la solicitud de cada
+ministración con su lista de soportes (`SolicitudPago`), la revisión de Administración y Finanzas, que acepta o devuelve
+(`RevisionSolicitud`), el pago registrado (`Pago`, uno por solicitud aceptada), la remisión a la Fiduciaria en PSAHEM
+(`RemisionFiduciaria`) y el cheque de cada ministración (`Cheque`). El aviso de pago a la persona es una `Notificacion`
+del núcleo.
+
+```mermaid
+erDiagram
+  Expediente ||--o{ Cheque : expediente
+  Expediente ||--o{ ComprobanteCuenta : expediente
+  Expediente ||--o{ Notificacion : expediente
+  Expediente ||--o{ Pago : expediente
+  Expediente ||--o{ RemisionFiduciaria : expediente
+  Expediente ||--o{ SolicitudPago : expediente
+  Expediente ||--o| OficioPago : expediente
+  Notificacion |o--o{ Cheque : aviso
+  Notificacion |o--o{ Pago : aviso
+  RemisionFiduciaria ||--o| Cheque : remision
+  SolicitudPago ||--o{ RevisionSolicitud : solicitud
+  SolicitudPago ||--o| Cheque : solicitud
+  SolicitudPago ||--o| Pago : solicitud
+  SolicitudPago ||--o| RemisionFiduciaria : solicitud
+  Expediente {
+    int id PK
+    texto folio UK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+  }
+  Notificacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto asunto
+    fecha_hora enviada_en
+    fecha_hora notificada_en
+  }
+  Cheque {
+    int id PK
+    int solicitud_id FK
+    int remision_id FK
+    int expediente_id FK
+    int ministracion
+    texto numero UK
+    decimal importe
+    fecha emitido_en
+    fecha_hora registrado_en
+    int aviso_id FK
+  }
+  ComprobanteCuenta {
+    int id PK
+    int expediente_id FK
+    archivo archivo
+    texto descripcion
+    texto huella
+    fecha_hora subido_en
+  }
+  OficioPago {
+    int id PK
+    int expediente_id FK
+    texto folio UK
+    fecha_hora emitido_en
+    archivo archivo
+    texto huella
+  }
+  Pago {
+    int id PK
+    int solicitud_id FK
+    int expediente_id FK
+    int ministracion
+    decimal importe
+    texto tipo
+    texto referencia
+    int aviso_id FK
+  }
+  RemisionFiduciaria {
+    int id PK
+    int solicitud_id FK
+    int expediente_id FK
+    int ministracion
+    fecha_hora remitida_en
+    fecha_hora recibida_en
+    fecha vence_el
+  }
+  RevisionSolicitud {
+    int id PK
+    int solicitud_id FK
+    texto resultado
+    int envio
+    texto observaciones
+    fecha_hora revisada_en
+  }
+  SolicitudPago {
+    int id PK
+    int expediente_id FK
+    int ministracion
+    decimal porcentaje
+    decimal importe
+    texto tipo_pago
+  }
+```
