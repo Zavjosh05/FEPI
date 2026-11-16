@@ -89,11 +89,11 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-02 | Base de M3 y M5: notificaciones en el núcleo, montos y ministraciones, evento que arranca cada plazo, estados nuevos | S2-01 | Hecho | `47cc5ee` a `2fa15a7` (7 commits) |
 | S2-03 | HU-3.1 Publicación y notificaciones | S2-02 | Hecho | `4fbf940` |
 | S2-04 | HU-3.2 Elaboración del contrato (modelo validado por Jurídico) | S2-02 | Hecho | `e9a1f2c` |
-| S2-05 | HU-3.3 Firma del contrato | S2-04 | En curso | |
-| S2-06 | HU-3.4 Entrega de planta (PS y RHF) | S2-05 | En curso | |
-| S2-07 | HU-5.1 Solicitud de pago | S2-05 | Pendiente | |
-| S2-08 | HU-5.2 Pago de la ministración | S2-07 | Pendiente | |
-| S2-09 | HU-5.3 Entrega de cheques (PSAHEM) | S2-08 | Pendiente | |
+| S2-05 | HU-3.3 Firma del contrato | S2-04 | Hecho | `d877a63` |
+| S2-06 | HU-3.4 Entrega de planta (PS y RHF) | S2-05 | Hecho | `d5698c8` |
+| S2-07 | HU-5.1 Solicitud de pago | S2-05 | En curso | |
+| S2-08 | HU-5.2 Pago de la ministración | S2-07 | En curso | |
+| S2-09 | HU-5.3 Entrega de cheques (PSAHEM) | S2-08 | En curso | |
 | S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | Hecho | `9254478` |
 | S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | Hecho | `5bfa706` |
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
