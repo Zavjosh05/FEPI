@@ -102,8 +102,9 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | Hecho | `5bfa706` |
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
 | S2-13a | Cierre técnico: acortar la batería (P-20), menú por módulo (P-21), modelo de datos y README al día | S2-09 | Hecho | `88d9f93`, `f24d627`, `c94a5c9` |
-| S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Pendiente | |
-| S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | En curso | |
+| S2-13b | Tropiezos de interfaz del recorrido del sprint 2 (P-23 a P-31) | S2-14 | En curso | |
+| S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | En curso | |
+| S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Hecho | `62b5ae4` (servicios), `38e7e6a` (interfaz) |
 | S2-15 | Resumen en PDF del sprint 2 (`sprint_2/Resumen_sprint_2.pdf`) | S2-14 | Pendiente | |
 
 ## Sprint 3 · Ejecución, seguimiento y cierre (M4, M6; M7.4 y M7.5) — sin empezar
