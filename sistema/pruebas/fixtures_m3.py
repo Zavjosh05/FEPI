@@ -11,7 +11,8 @@ from nucleo.models import Ejercicio
 
 from .fixtures_m2 import documento_sesion
 
-__all__ = ["aprobadas", "notificadas", "modelo_validado", "delegado_de", "SOLICITUDES_M3"]
+__all__ = ["aprobadas", "notificadas", "en_delegacion", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
+           "SOLICITUDES_M3"]
 
 # programa: (usuario Delegación, municipio, predio, persona, modalidad, hectáreas)
 SOLICITUDES_M3 = {
@@ -90,4 +91,71 @@ def modelo_validado(usuarios):
         m = contratos.registrar_modelo(usuarios["dir_drff"], ejercicio, tipo, nombre, texto)
         contratos.validar_version(usuarios["juridica"], m.vigente, "Conforme.")
         return m
+    return _crear
+
+
+@pytest.fixture
+def en_delegacion(notificadas, modelo_validado, usuarios):
+    """``en_delegacion("PS", cuantas=1)`` → (sesión, [expedientes]) con el contrato elaborado y enviado a la Delegación
+    (estado ``contrato_en_delegacion``, listos para la firma de HU-3.3)."""
+    from contrato import contratos
+
+    def _crear(programa="PS", cuantas=1, **kw):
+        sesion, exps = notificadas(programa, cuantas=cuantas, **kw)
+        modelo = modelo_validado(exps[0].ejercicio)
+        for e in exps:
+            contratos.enviar_a_delegacion(usuarios["dir_drff"], contratos.elaborar_contrato(usuarios["dir_drff"], e, modelo))
+            e.refresh_from_db()
+        return sesion, exps
+    return _crear
+
+
+@pytest.fixture
+def mfs(catalogos):
+    """MFS 2026 sin archivo de reglas: tipo de persona, un requisito y el plazo de firma de 10 días hábiles."""
+    from nucleo.models import Plazo
+
+    from .fixtures_m2 import _reglas_minimas
+
+    ej = _reglas_minimas("MFS", catalogos)
+    Plazo.objects.get_or_create(ejercicio=ej, clave="firma_contrato", defaults={
+        "descripcion": "Firma del contrato", "cantidad": 10, "unidad": "dias_habiles", "fundamento": "prueba"})
+    return ej
+
+
+@pytest.fixture
+def contrato_manual(usuarios):
+    """``contrato_manual(ejercicio, direccion="dir_drff", **kw)`` → expediente de un programa sin reglas completas
+    (MFS, PEG) en ``contrato_en_delegacion``, con su contrato ya enviado. Se arma directo en la base."""
+    from django.core.files.base import ContentFile
+    from django.utils import timezone
+
+    from contrato.models import Contrato, EstadoContrato
+    from nucleo.demo import _pdf_demo
+    from nucleo.models import Estado
+    from nucleo.plazos import registrar_hito
+
+    from .fixtures_m2 import registrar_validada
+
+    def _crear(ejercicio, direccion="dir_drff", nombre="Predio M3", **kw):
+        exp = registrar_validada(usuarios, ejercicio, direccion=direccion, nombre=nombre, **kw)
+        from contrato.models import EstadoVersion, ModeloContrato, TipoModelo, VersionModelo
+        from nucleo.models import Expediente
+        modelo, _ = ModeloContrato.objects.get_or_create(
+            ejercicio=ejercicio, tipo=TipoModelo.CONTRATO_ADHESION, nombre="Modelo de prueba",
+            defaults={"creado_por": usuarios[direccion]})
+        VersionModelo.objects.get_or_create(modelo=modelo, numero=1, defaults={
+            "texto": "Contrato de prueba", "estado": EstadoVersion.VALIDADA, "creada_por": usuarios[direccion],
+            "revisada_por": usuarios["juridica"], "revisada_en": timezone.now()})
+        Expediente.objects.filter(pk=exp.pk).update(estado=Estado.objects.get(clave="contrato_en_delegacion"))
+        ahora = timezone.now()
+        contrato = Contrato(expediente=exp, folio=f"CTO-{ejercicio.programa.clave}-2026-0001",
+                            version_modelo=modelo.vigente, tipo=modelo.tipo, texto="Contrato de prueba",
+                            elaborado_por=usuarios[direccion], enviado_por=usuarios[direccion],
+                            enviado_en=ahora - timedelta(minutes=30), estado=EstadoContrato.ENVIADO)
+        contrato.archivo.save("contrato.pdf", ContentFile(_pdf_demo("Contrato")), save=False)
+        contrato.save()
+        registrar_hito(exp, "publicacion_resultados", usuarios[direccion], ahora - timedelta(days=2))
+        exp.refresh_from_db()
+        return exp
     return _crear

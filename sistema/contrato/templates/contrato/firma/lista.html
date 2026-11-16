@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block titulo %}Firma de contratos{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Firma de contratos</h1>
+  <div class="small text-secondary">{% if es_delegacion %}Contratos que la Delegación cita, recaba firmados y verifica. Cada contrato tiene dos fechas: la programada de firma y el vencimiento para liberar el recurso; al vencer este sin firma, el contrato queda señalado y el área responsable confirma la liberación.{% else %}Contratos en firma y lo que quedó sin firma en plazo.{% endif %}</div>
+</div>
+
+{% if es_area or sin_firma %}
+<div class="tarjeta mb-3 {% if sin_firma %}border-danger{% endif %}" data-prueba="sin-firma">
+  <div class="titulo-seccion">Sin firma en plazo · recurso por liberar ({{ sin_firma|length }})</div>
+  {% if sin_firma %}
+  <div class="small mb-2">Venció el plazo para firmar. Liberar el recurso no es automático: lo confirma el área responsable con un motivo. La reasignación a la lista de espera es por acuerdo del Comité (sprint 3).</div>
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Venció</th><th>Señalado</th>{% if es_area %}<th>Liberar el recurso</th>{% endif %}</tr></thead>
+    <tbody>{% for f in sin_firma %}{% with e=f.s.expediente %}
+    <tr data-folio="{{ e.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' e.folio %}?pestana=contrato">{{ e.folio }}</a></td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td class="text-nowrap">{{ f.s.vencio_el|date:"d/m/Y" }}</td><td class="text-nowrap">{{ f.s.senalado_en|date:"d/m/Y H:i" }} h</td>
+      {% if es_area %}<td><form method="post" action="{% url 'contrato:liberar' e.folio %}" class="d-flex gap-2">{% csrf_token %}
+        <input type="hidden" name="prefijo" value="{{ f.prefijo }}"><input type="hidden" name="volver" value="{% url 'contrato:firmas' %}">
+        <input class="form-control form-control-sm" name="{{ f.prefijo }}-motivo" placeholder="Motivo" required aria-label="Motivo de la liberación">
+        <button class="btn btn-sm btn-danger text-nowrap" type="submit">Liberar el recurso</button></form></td>{% endif %}</tr>
+    {% endwith %}{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ningún contrato está señalado sin firma en plazo.</div>{% endif %}
+</div>
+{% endif %}
+
+<div class="tarjeta mb-3" data-prueba="por-firmar">
+  <div class="titulo-seccion">Contratos por firmar ({{ por_firmar|length }})</div>
+  {% if por_firmar %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Contrato</th><th>Fecha programada</th><th>Vence para liberar el recurso</th><th>Días hábiles</th>{% if es_delegacion %}<th></th>{% endif %}</tr></thead>
+    <tbody>{% for f in por_firmar %}{% with e=f.exp %}
+    <tr data-folio="{{ e.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' e.folio %}?pestana=contrato">{{ e.folio }}</a></td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td class="text-nowrap">{{ f.contrato.folio }}<div><a href="{% url 'contrato:contrato_pdf' e.folio %}" target="_blank">Ver PDF</a></div></td>
+      <td class="text-nowrap">{% if f.programada and f.programada.tiene_fecha %}{{ f.programada.vencimiento|date:"d/m/Y" }}{% else %}<span class="text-secondary">sin fecha</span>{% endif %}</td>
+      <td class="text-nowrap">{% if f.liberacion and f.liberacion.tiene_fecha %}{{ f.liberacion.vencimiento|date:"d/m/Y" }}{% else %}<span class="text-secondary">sin fecha</span>{% endif %}</td>
+      <td>{% if f.faltan is None %}—{% elif f.faltan < 0 %}<span class="badge text-bg-danger">vencido</span>{% elif f.faltan <= 3 %}<span class="badge text-bg-warning">{{ f.faltan }}</span>{% else %}{{ f.faltan }}{% endif %}</td>
+      {% if es_delegacion %}<td class="text-end"><a class="btn btn-sm btn-primary text-nowrap" href="{% url 'contrato:firmar' e.folio %}">Registrar la firma</a></td>{% endif %}</tr>
+    {% endwith %}{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">No hay contratos esperando la firma.</div>{% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="firmados">
+  <div class="titulo-seccion">Contratos firmados ({{ firmados|length }})</div>
+  {% if firmados %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Firma</th><th>Situación</th><th>Acuse</th></tr></thead>
+    <tbody>{% for f in firmados %}{% with e=f.expediente %}
+    <tr><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' e.folio %}?pestana=contrato">{{ e.folio }}</a></td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td class="text-nowrap">{{ f.firmado_en|date:"d/m/Y H:i" }} h</td>
+      <td>{% if f.en_fecha_programada %}<span class="badge text-bg-success">En la fecha programada</span>{% else %}<span class="badge text-bg-warning">Fuera de la fecha programada</span>{% endif %}</td>
+      <td>{% if f.acuse %}<a href="{% url 'nucleo:acuse' f.acuse.folio %}" target="_blank">{{ f.acuse.folio }}</a>{% endif %}</td></tr>
+    {% endwith %}{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todavía no hay contratos firmados.</div>{% endif %}
+</div>
+
+{% if liberados %}
+<div class="tarjeta mb-3" data-prueba="liberados">
+  <div class="titulo-seccion">Recurso liberado</div>
+  <ul class="small mb-0">{% for s in liberados %}<li><a href="{% url 'recepcion:expediente' s.expediente.folio %}?pestana=contrato">{{ s.expediente.folio }}</a> · {{ s.liberado_en|date:"d/m/Y H:i" }} h · {{ s.motivo_liberacion }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+{% endblock %}

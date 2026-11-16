@@ -9,20 +9,26 @@ quedan con el acta que autoriza publicar, para mostrar la pantalla de publicaci�
 HU-3.2: PS y RHF tienen un modelo de Contrato de Adhesión validado por la Unidad Jurídica; CC, PS y PSAHEM tienen
 además la plantilla base («BORRADOR – modelo por validar») por validar. El contrato de Plantación Los Pinos (PS)
 está elaborado y enviado a la Delegación; el de Barranca Honda (RHF), elaborado y por enviar; Ojo de Agua (RHF)
-está notificada y por elaborar."""
+está notificada y por elaborar.
+
+HU-3.3: un segundo lote por programa (PS y RHF, con su propia sesión de aprobación y publicación) con contratos firmados
+en plazo (la firma, con su verificación, deja el expediente en «contratada») y uno sin firma al vencer el plazo, señalado
+por ``revisar_plazos`` y por liberar. Los de HU-3.2 siguen igual (Plantación Los Pinos queda por firmar en la
+Delegación). Para vencer el plazo sin esperar días, la demostración corre hacia atrás las fechas de la publicación y de la
+notificación del contrato que queda sin firma (calendario simulado)."""
 from datetime import timedelta
 
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 
-from contrato import contratos, publicacion
+from contrato import contratos, firma, publicacion
 from contrato.models import Contrato, ModeloContrato, Publicacion, TipoModelo
 from dictamen import aprobacion, juridico, sesiones, tecnico
 from dictamen.demo import _validada
 from dictamen.models import SesionComite, TipoSesion
 from nucleo.demo import _pdf_demo
-from nucleo.models import Ejercicio, Expediente, Usuario
+from nucleo.models import Ejercicio, Expediente, Hito, Notificacion, Usuario
 
 # programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas)]
 SOLICITUDES = {
@@ -62,6 +68,7 @@ def cargar_demo():
                                   momento=fecha + timedelta(minutes=30))
     creadas += _publicaciones(u)
     creadas += _contratos(u)
+    creadas += _firmas(u)
     return creadas
 
 
@@ -137,3 +144,80 @@ def _contratos(u):
                                       observaciones="Notificado por correo electrónico (demostración).")
         hechos += 1
     return hechos
+
+
+# ----------------------------------------------------------------------------- HU-3.3
+# programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, destino)]; destino:
+# «firmado» (contrato firmado en plazo), «sin_firma» (vence sin firma y queda señalado) o «sin_planta» (firmado).
+LOTE_FIRMAS = {
+    "PS": [("del_amecameca", "Amecameca", "Mirador de los Pinos", "Hilda Maldonado Cruz", "plantacion_forestal_comercial", 5, "firmado"),
+           ("del_toluca", "Zinacantepec", "Ladera Verde", "Octavio Rangel Mena", "plantacion_forestal_comercial", 3, "firmado"),
+           ("del_valle", "Amanalco", "Cañada Seca", "Mireya Solís Ibarra", "mantenimiento_plantaciones", 2, "sin_firma")],
+    "RHF": [("del_amecameca", "Ozumba", "Arroyo Claro", "Esteban Quiroz Lara", "bosques_de_agua", 4, "firmado"),
+            ("del_valle", "Amanalco", "Cerro Gordo", "Carmen Téllez Roa", "rfi_modalidad_dos", 3, "firmado"),
+            ("del_toluca", "Zinacantepec", "Peña Blanca", "Ignacio Lugo Ferrer", "rfi_modalidad_uno", 2, "sin_planta")],
+}
+
+
+def _envejecer(exp, dias):
+    """Calendario simulado: la publicación y la notificación del resultado fueron hace ``dias`` días."""
+    Hito.objects.filter(expediente=exp, clave="publicacion_resultados").update(fecha_hora=timezone.now() - timedelta(days=dias))
+    Notificacion.objects.filter(expediente=exp, tipo="resultados").update(
+        notificada_en=timezone.now() - timedelta(days=dias), enviada_en=timezone.now() - timedelta(days=dias + 1))
+
+
+def _firmar_demo(u, exp, pdf=None):
+    """Registra la firma con todos los puntos verificados (y la formalización propia si la hubiera)."""
+    from nucleo.demo import archivo_demo
+
+    elementos = {e["clave"]: {"archivo": archivo_demo(f"{e['clave']}.pdf"), "dato": "RFN-DEMO" if e.get("dato") else ""}
+                 for e in firma.formalizacion_propia(exp)["elementos"]}
+    return firma.registrar_firma(
+        _delegacion(u, exp), exp, None, "persona", exp.solicitante.nombre, archivo_demo(f"contrato_firmado_{exp.folio}.pdf"),
+        [p["clave"] for p in firma.puntos_de_verificacion(exp)], elementos, "Firmó en la Delegación (demostración).")
+
+
+def _firmas(u):
+    """HU-3.3: segundo lote de PS y RHF con contratos firmados y uno señalado sin firma (idempotente)."""
+    hechas = 0
+    drff, uj, st = u["dir_drff"], u["juridica"], u["comite"]
+    for clave, solicitudes in LOTE_FIRMAS.items():
+        ejercicio = Ejercicio.objects.filter(programa__clave=clave, reglas_cargadas__isnull=False).order_by("-anio").first()
+        if ejercicio is None or Expediente.objects.filter(ejercicio=ejercicio, predio__nombre=solicitudes[0][2]).exists():
+            continue
+        exps = []
+        for usuario, municipio, predio, persona, modalidad, ha, destino in solicitudes:
+            exp = _validada(u[usuario], drff, ejercicio, municipio, predio, persona, modalidad, ha)
+            tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
+            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
+            exps.append((exp, destino))
+        fecha = timezone.localtime(timezone.now()) - timedelta(hours=1)
+        sesion = sesiones.crear_sesion(
+            st, ejercicio, TipoSesion.APROBACION, fecha, "Sala de juntas de PROBOSQUE, Metepec",
+            "\n".join(["Lista de asistencia y declaración de quórum", "Presentación del listado preliminar",
+                       "Aprobación de los listados", "Autorización de la publicación de resultados"]))
+        sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo(f"Listado preliminar {clave} (segundo lote)"),
+                                                           name="listado_preliminar.pdf"), "Listado preliminar")
+        sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
+        aprobacion.proponer_listados(st, sesion)
+        aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.", momento=fecha + timedelta(minutes=20))
+        sesion.refresh_from_db()
+        pub = publicacion.publicar(drff, sesion, momento=_despues(sesion.acta_fecha, 10))
+        modelo = contratos.modelos_elegibles(exps[0][0])[0]
+        for exp, destino in exps:
+            publicacion.registrar_entrega(_delegacion(u, exp), exp.notificaciones.get(tipo="resultados"), "personal",
+                                          fecha_hora=_despues(pub.publicada_en, 15), observaciones="Entregado (demostración).")
+            exp.refresh_from_db()
+            if destino == "sin_firma":
+                continue
+            contrato = contratos.elaborar_contrato(drff, exp, modelo)
+            contratos.enviar_a_delegacion(drff, contrato)
+            exp.refresh_from_db()
+            _firmar_demo(u, exp)
+            hechas += 1
+        for exp, destino in exps:
+            if destino == "sin_firma":
+                _envejecer(exp, 40)
+                firma.revisar_firmas(timezone.localdate())
+                hechas += 1
+    return hechas

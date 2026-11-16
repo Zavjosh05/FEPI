@@ -1,0 +1,9 @@
+{# Las dos fechas de la firma (R-03): programada y vencimiento para liberar el recurso #}
+<div class="small" data-prueba="fechas-firma">
+  <div><span class="text-secondary">Fecha programada de firma:</span>
+    {% if programada and programada.tiene_fecha %}<strong>{{ programada.vencimiento|date:"d/m/Y" }}</strong>{% else %}<span class="text-secondary">sin fecha todavía</span>{% endif %}</div>
+  <div><span class="text-secondary">Vencimiento para liberar el recurso:</span>
+    {% if liberacion and liberacion.tiene_fecha %}<strong>{{ liberacion.vencimiento|date:"d/m/Y" }}</strong>
+      {% if faltan is not None %}<span class="badge {% if faltan < 0 %}text-bg-danger{% elif faltan <= 3 %}text-bg-warning{% else %}text-bg-light border{% endif %}" data-prueba="dias-que-faltan">{% if faltan < 0 %}vencido{% elif faltan == 0 %}vence hoy{% else %}faltan {{ faltan }} día{{ faltan|pluralize }} háb.{% endif %}</span>{% endif %}
+    {% else %}<span class="text-secondary">sin fecha todavía</span>{% endif %}</div>
+</div>

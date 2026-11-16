@@ -1,0 +1,8 @@
+<div class="tarjeta mb-3 border-warning" data-prueba="panel-por-firmar">
+  <div class="titulo-seccion">Contratos por firmar ({{ panel.total }})</div>
+  <div class="small mb-2">Cada contrato tiene su fecha programada y su vencimiento para liberar el recurso.</div>
+  <ul class="small mb-2">{% for f in panel.filas %}
+    <li><a href="{% url 'contrato:firmar' f.exp.folio %}">{{ f.exp.folio }}</a> · {{ f.exp.solicitante.nombre }} · vence {% if f.liberacion and f.liberacion.tiene_fecha %}{{ f.liberacion.vencimiento|date:"d/m/Y" }}{% else %}sin fecha{% endif %}{% if f.faltan is not None and f.faltan < 0 %} <span class="badge text-bg-danger">vencido</span>{% endif %}</li>
+  {% endfor %}</ul>
+  <a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:firmas' %}">Abrir los contratos por firmar</a>
+</div>

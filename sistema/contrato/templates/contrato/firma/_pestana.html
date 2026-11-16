@@ -1,0 +1,41 @@
+<div class="titulo-seccion mt-3">Firma del contrato (HU-3.3)</div>
+{% if firma %}
+<div class="tarjeta mb-3" data-prueba="firma-contrato">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+      <div><strong>Contrato firmado</strong> el <strong data-prueba="fecha-firma">{{ firma.firmado_en|date:"d/m/Y H:i" }} h</strong>
+        {% if firma.en_fecha_programada %}<span class="badge text-bg-success" data-prueba="situacion-firma">En la fecha programada</span>{% else %}<span class="badge text-bg-warning" data-prueba="situacion-firma">Fuera de la fecha programada</span>{% endif %}
+        <span class="badge text-bg-success">Dentro del plazo</span></div>
+      <div class="small">Firma: {{ firma.get_firmante_display|lower }} · {{ firma.firmante_nombre }} · registrada por {{ firma.registrada_por.get_full_name|default:firma.registrada_por.username }} el {{ firma.registrada_en|date:"d/m/Y H:i" }} h{% if firma.acuse %} · acuse <a href="{% url 'nucleo:acuse' firma.acuse.folio %}" target="_blank">{{ firma.acuse.folio }}</a>{% endif %}</div>
+      <div class="small text-secondary">Fecha programada: {{ firma.fecha_programada|date:"d/m/Y"|default:"sin fecha" }} · vencimiento para liberar el recurso: {{ firma.fecha_liberacion|date:"d/m/Y"|default:"sin fecha" }}</div>
+      <ul class="small mb-1 mt-1" data-prueba="verificacion-firma">{% for p in firma.verificacion %}<li>{{ p.texto }}: <strong>{% if p.cumple %}verificado{% else %}no cumple{% endif %}</strong></li>{% endfor %}</ul>
+      {% for e in firma.elementos.all %}<div class="small" data-prueba="elemento-formalizacion"><strong>{{ e.nombre }}</strong>{% if e.dato %} · {{ e.dato_etiqueta }}: {{ e.dato }}{% endif %} · <a href="{% url 'contrato:firma_archivo' exp.folio e.clave %}" target="_blank">ver archivo</a></div>{% endfor %}
+    </div>
+    <div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:firma_archivo' exp.folio 'contrato' %}" target="_blank">Ver el contrato firmado</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'contrato:firma_archivo' exp.folio 'contrato' %}?descargar=1">Descargar</a></div>
+  </div>
+</div>
+{% elif sin_firma %}
+<div class="tarjeta mb-3 border-danger" data-prueba="sin-firma-exp">
+  <div><span class="badge text-bg-danger">Sin firma en plazo</span> {% if sin_firma.liberado %}<span class="badge text-bg-dark">Recurso liberado</span>{% endif %}</div>
+  <div class="small mt-1">{{ sin_firma.motivo }}</div>
+  <div class="small text-secondary">Señalado el {{ sin_firma.senalado_en|date:"d/m/Y H:i" }} h.</div>
+  {% if sin_firma.liberado %}
+  <div class="small mt-1" data-prueba="liberacion">Recurso liberado el <strong>{{ sin_firma.liberado_en|date:"d/m/Y H:i" }} h</strong> por {{ sin_firma.liberado_por.get_full_name|default:sin_firma.liberado_por.username }}: {{ sin_firma.motivo_liberacion }}{% if sin_firma.acuse_liberacion %} · acuse <a href="{% url 'nucleo:acuse' sin_firma.acuse_liberacion.folio %}" target="_blank">{{ sin_firma.acuse_liberacion.folio }}</a>{% endif %}</div>
+  {% elif puede_liberar %}
+  <form method="post" action="{% url 'contrato:liberar' exp.folio %}" class="d-flex flex-wrap gap-2 mt-2" id="form-liberar">{% csrf_token %}
+    <input type="hidden" name="prefijo" value="pestana"><input type="hidden" name="volver" value="{% url 'recepcion:expediente' exp.folio %}?pestana=contrato">
+    <input class="form-control form-control-sm w-auto flex-grow-1" name="pestana-motivo" placeholder="Motivo de la liberación del recurso" required aria-label="Motivo">
+    <button class="btn btn-sm btn-danger" type="submit">Liberar el recurso</button></form>
+  <div class="small text-secondary mt-1">Liberar el recurso lo confirma una persona del área responsable; la reasignación a la lista de espera es por acuerdo del Comité (sprint 3).</div>
+  {% else %}<div class="small text-secondary mt-1">El área responsable confirma la liberación del recurso; no es automática.</div>{% endif %}
+</div>
+{% elif contrato and contrato.enviado %}
+<div class="tarjeta mb-3" data-prueba="por-firmar-exp">
+  {% include "contrato/firma/_fechas.html" with programada=fecha_programada liberacion=fecha_liberacion faltan=faltan_firma %}
+  {% if formalizacion.elementos %}<div class="small text-secondary mt-1">En {{ exp.ejercicio.programa.clave }} la firma se completa con: {% for e in formalizacion.elementos %}{{ e.nombre }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
+  {% if puede_firmar %}<a class="btn btn-sm btn-primary mt-2" href="{% url 'contrato:firmar' exp.folio %}">Registrar la firma</a>{% endif %}
+</div>
+{% else %}
+<div class="small text-secondary">La firma se registra cuando el contrato llega a la Delegación.</div>
+{% endif %}

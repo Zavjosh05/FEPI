@@ -3,6 +3,7 @@ import pytest
 from django.apps import apps
 from django.core.management import call_command
 
+from contrato.models import FirmaContrato, SinFirma
 from nucleo import extensiones, montos
 from nucleo.models import Estado, Expediente
 
@@ -22,7 +23,7 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
     exp = nueva_solicitud(superficie_solicitada_ha=6)
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    assert "HU-3.3 Firma del contrato" in html and "El monto se calcula cuando el Comité" in html
+    assert "HU-3.4 Entrega de planta" in html and "HU-3.3 Firma del contrato" not in html and "El monto se calcula cuando el Comité" in html
     Expediente.objects.filter(pk=exp.pk).update(estado=Estado.objects.get(clave="aprobada"))
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
     assert "HU-5.3 Entrega de cheques" in html and 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
@@ -34,13 +35,21 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
 def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     call_command("cargar_demo")
     call_command("cargar_demo")  # idempotente
-    # PS y RHF ya publicaron (HU-3.1) y tienen contratos en distintos puntos (HU-3.2); PSAHEM sigue con sus dos aprobadas por publicar.
-    estados = {"PS": {"contrato_en_delegacion", "publicada"}, "RHF": {"contrato_elaborado", "notificada"}, "PSA": {"aprobada"}}
+    # Primer lote (HU-3.1 y HU-3.2): PS y RHF ya publicaron y tienen contratos en distintos puntos; PSAHEM sigue con sus
+    # dos aprobadas por publicar. Segundo lote (HU-3.3): tres más en PS y en RHF, con contratos firmados y uno sin firma.
+    estados = {"PS": {"contrato_en_delegacion", "publicada", "contratada", "sin_firma_en_plazo"},
+               "RHF": {"contrato_elaborado", "notificada", "contratada"}, "PSA": {"aprobada"}}
+    cuantos = {"PS": 5, "RHF": 5, "PSA": 2}
     for clave in ("PS", "RHF", "PSA"):
         expedientes = Expediente.objects.filter(ejercicio__programa__clave=clave, resoluciones_comite__resultado="beneficiaria")
-        assert expedientes.count() == 2, clave
+        assert expedientes.count() == cuantos[clave], clave
         assert {e.estado.clave for e in expedientes} == estados[clave], clave
         for exp in expedientes:
             m = montos.monto_aprobado(exp)
             assert m.total > 0 and m.ministraciones and exp.resoluciones_comite.get().monto == m.total
     assert Expediente.objects.filter(ejercicio__programa__clave="CC", estado__clave="aprobada").count() >= 2
+    # HU-3.3: contratos firmados (con su acuse y verificación) y, en PS, uno sin firma por liberar.
+    assert Expediente.objects.filter(ejercicio__programa__clave="PS", estado__clave="sin_firma_en_plazo").count() == 1
+    assert Expediente.objects.filter(ejercicio__programa__clave="PS", estado__clave="contratada").count() == 2
+    assert Expediente.objects.filter(ejercicio__programa__clave="RHF", estado__clave="contratada").count() == 3
+    assert FirmaContrato.objects.count() == 5 and SinFirma.objects.count() == 1

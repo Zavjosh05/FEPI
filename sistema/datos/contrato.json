@@ -1,0 +1,86 @@
+{
+  "nota": "Datos propios del módulo M3 (contrato). Lo que cambia por programa o por tipo de persona va aquí y no en el código. Las ROP mandan; donde no dicen, queda dicho en la nota de cada bloque.",
+  "verificacion_firmas": {
+    "nota": "Puntos que la Delegación verifica en el contrato firmado antes de recibirlo. Las ROP piden la firma y, en núcleos agrarios, el sello, por cada una de las partes que intervienen (PS 10.1 inciso h, línea 6193; RHF 10.1, línea 3559; CC, línea 4880). Los puntos concretos (Presidencia, Secretaría y Tesorería del Comisariado) salen de que el núcleo agrario se representa por esos tres cargos (glosario de PS, línea 5245). El contrato lo firma por PROBOSQUE la persona servidora pública facultada.",
+    "por_tipo_persona": {
+      "fisica": [
+        {"clave": "firma_persona", "texto": "Firma de la persona beneficiaria (o de su representante legal acreditado)"},
+        {"clave": "firma_probosque", "texto": "Firma por PROBOSQUE"}
+      ],
+      "juridica_colectiva": [
+        {"clave": "firma_representante", "texto": "Firma de la persona representante legal de la persona jurídico colectiva"},
+        {"clave": "firma_probosque", "texto": "Firma por PROBOSQUE"}
+      ],
+      "nucleo_agrario": [
+        {"clave": "firma_presidencia", "texto": "Firma de la Presidencia del Comisariado"},
+        {"clave": "firma_secretaria", "texto": "Firma de la Secretaría del Comisariado"},
+        {"clave": "firma_tesoreria", "texto": "Firma de la Tesorería del Comisariado"},
+        {"clave": "sello_nucleo", "texto": "Sello del núcleo agrario"},
+        {"clave": "firma_probosque", "texto": "Firma por PROBOSQUE"}
+      ]
+    },
+    "equivalencias": {
+      "institucion_educativa_o_osc": "juridica_colectiva",
+      "dependencia_publica": "juridica_colectiva"
+    },
+    "por_omision": "fisica"
+  },
+  "formalizacion_propia": {
+    "nota": "Lo que cada programa pide además del contrato firmado. Sin estos elementos la firma no se da por completa. MFS y PEG todavía no tienen archivo de reglas: se definen aquí (sprint 3 los mueve a sus reglas).",
+    "MFS": {
+      "fundamento": "MFS: el apoyo se otorga al contar con el Contrato de Adhesión y, en su caso, el contrato de Prestación de Servicios Técnicos (línea 8091); la persona elige libremente al prestador, con su RFN, y presenta carta compromiso bajo protesta de decir verdad de que no está suspendido o revocado (derechos, inciso f, líneas 7775 a 7778).",
+      "elementos": [
+        {"clave": "contrato_servicios_tecnicos", "nombre": "Contrato de servicios técnicos con el prestador (PSTF)", "dato": {"clave": "rfn", "etiqueta": "RFN del prestador de servicios técnicos forestales"}},
+        {"clave": "carta_compromiso_psf", "nombre": "Carta compromiso (bajo protesta de decir verdad, RFN vigente)"}
+      ]
+    },
+    "PEG": {
+      "fundamento": "PEG: las personas Guardabosque reciben de forma gratuita una credencial que las identifica (derechos, inciso g, línea 8770) y firman el contrato de adhesión posterior a la aprobación del CASPEG (obligaciones, inciso c, línea 8793).",
+      "elementos": [
+        {"clave": "credencial_guardabosque", "nombre": "Credencial del Guardabosque entregada", "dato": {"clave": "folio_credencial", "etiqueta": "Folio de la credencial"}}
+      ]
+    }
+  },
+  "catalogos_planta": {
+    "nota": "Catálogos sencillos de demostración (las ROP no traen la lista de especies por vivero ni los viveros): se mantienen en el admin. La unidad VIVERO-DEMO es la del usuario `vivero`; los demás viveros todavía no tienen personal en el sistema.",
+    "especies": [
+      {"nombre": "Pino patula", "cientifico": "Pinus patula"},
+      {"nombre": "Pino moctezuma", "cientifico": "Pinus montezumae"},
+      {"nombre": "Oyamel", "cientifico": "Abies religiosa"},
+      {"nombre": "Cedro blanco", "cientifico": "Cupressus lusitanica"},
+      {"nombre": "Encino", "cientifico": "Quercus rugosa"},
+      {"nombre": "Aile", "cientifico": "Alnus jorullensis"}
+    ],
+    "viveros": [
+      {"clave": "VIV-DEMO-01", "nombre": "Vivero Forestal de demostración (personal con usuario)", "unidad": "VIVERO-DEMO", "municipio": "Calimaya"},
+      {"clave": "VIV-DEMO-02", "nombre": "Vivero Forestal de demostración Amecameca", "municipio": "Amecameca"}
+    ]
+  },
+  "vale_de_planta": {
+    "nota": "Reglas del Vale de Planta por programa (HU-3.4). La vigencia sale de las reglas (plazo recoger_planta en datos/sistema.json); aquí van la reposición, la carta compromiso y la planta por hectárea que propone el sistema (quien emite el vale puede ajustarla dejando motivo).",
+    "PS": {
+      "reposicion": false,
+      "reposicion_texto": "Las ROP de PS no prevén reposición del Vale vencido (8.1.7 inciso e, líneas 5931 y 5932: solo fijan 30 días para recoger la planta); la persona beneficiaria debe plantearlo a PROBOSQUE y queda como decisión pendiente con el cliente (R-13).",
+      "carta_compromiso": "8.1.6 inciso f), líneas 5908 a 5913: de manera voluntaria y bajo su responsabilidad, mediante carta compromiso, puede recibir el vale antes de la firma del Contrato de Adhesión, una vez aprobada por el Comité y publicados los resultados con recurso.",
+      "vigencia_texto": "8.1.7 inciso e), línea 5931: 30 días posteriores a la entrega del Vale (el texto no dice hábiles o naturales; se toman naturales, R-13).",
+      "por_hectarea": {
+        "plantacion_forestal_comercial": {"piezas": 1100, "texto": "1,100 piezas por hectárea para maderables (7.2, cuadro, concepto I, línea 5399)."},
+        "mantenimiento_plantaciones": {"piezas": null, "texto": "Reposición con base en la sobrevivencia obtenida en campo, máximo 50 % (7.2, concepto II, línea 5410): se captura la cantidad."},
+        "mantenimiento_navidenas": {"piezas": null, "texto": "Reposición con un máximo de 1,250 piezas (7.2, concepto III, línea 5415): se captura la cantidad."}
+      }
+    },
+    "RHF": {
+      "reposicion": true,
+      "reposicion_texto": "8.1.7 inciso e), líneas 3280 a 3283: vencido el vale, la persona debe solicitar a la brevedad uno nuevo y el Organismo lo expedirá siempre que tenga disponibilidad de planta; en caso contrario la adquiere con recurso propio, sin responsabilidad para el Organismo.",
+      "carta_compromiso": "8.1.6 inciso g), líneas 3248 a 3250 (y 10.1 inciso i, línea 3548): de manera voluntaria y bajo su responsabilidad, mediante carta compromiso, puede recibir el Vale antes de la firma del Contrato de Adhesión.",
+      "vigencia_texto": "8.1.7 inciso e), líneas 3278 y 3279: 15 días hábiles posteriores a la entrega del Vale o antes de su fecha de vencimiento.",
+      "sin_planta": ["rfi_modalidad_uno"],
+      "sin_planta_texto": "RFI Modalidad uno no recibe planta (8.1.7 inciso d; 7.1).",
+      "por_hectarea": {
+        "rfi_modalidad_dos": {"piezas": 600, "texto": "Cuadro de 10.1 inciso s) (línea 3580), cobertura de 0 a 30 %, zona templada: 600 a 800 por hectárea; se propone el mínimo (cuadro interpretado, por confirmar)."},
+        "bosques_de_agua": {"piezas": 600, "texto": "Cuadro de 10.1 inciso s) (línea 3580), cobertura de 0 a 30 %, zona templada: 600 a 800 por hectárea; se propone el mínimo (cuadro interpretado, por confirmar)."},
+        "preservacion_reforestaciones": {"piezas": 250, "texto": "Cuadro de 10.1 inciso s) (línea 3580), 31 a 49 %, zona templada: 250 a 400 por hectárea; se propone el mínimo (cuadro interpretado, por confirmar)."}
+      }
+    }
+  }
+}

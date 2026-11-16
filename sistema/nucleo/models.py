@@ -516,23 +516,32 @@ class Expediente(models.Model):
         )
 
     def cambiar_estado(self, destino, usuario, motivo="", tipo_evento="cambio_estado", descripcion="",
-                       acuse=None, datos=None):
+                       acuse=None, datos=None, por_sistema=False):
         """Único punto que cambia el estado: valida la transición y escribe la bitácora.
 
         ``destino`` puede ser la clave o el objeto Estado. Lanza ``TransicionNoPermitida``.
+        ``por_sistema=True`` (sin usuario) es para lo que hace solo el sistema, como el señalamiento de un contrato
+        sin firma en plazo: exige que exista la transición en la tabla (de cualquier unidad) y queda en la bitácora
+        sin persona.
         """
         if isinstance(destino, str):
             destino = Estado.objects.get(clave=destino)
         with transaction.atomic():
             actual = Expediente.objects.select_for_update().get(pk=self.pk)
-            if not puede_ver_expediente(usuario, actual):
-                raise TransicionNoPermitida("El expediente no pertenece a su unidad.")
-            transicion = actual.transiciones_posibles(usuario).filter(destino=destino).first()
-            if transicion is None:
-                raise TransicionNoPermitida(
-                    f"No se permite pasar de «{actual.estado}» a «{destino}» desde "
-                    f"{usuario.unidad or 'un usuario sin unidad'}."
-                )
+            if por_sistema and usuario is None:
+                transicion = (Transicion.objects.filter(origen=actual.estado, destino=destino)
+                              .filter(models.Q(programa__isnull=True) | models.Q(programa=actual.programa)).first())
+                if transicion is None:
+                    raise TransicionNoPermitida(f"No existe la transición de «{actual.estado}» a «{destino}».")
+            else:
+                if not puede_ver_expediente(usuario, actual):
+                    raise TransicionNoPermitida("El expediente no pertenece a su unidad.")
+                transicion = actual.transiciones_posibles(usuario).filter(destino=destino).first()
+                if transicion is None:
+                    raise TransicionNoPermitida(
+                        f"No se permite pasar de «{actual.estado}» a «{destino}» desde "
+                        f"{usuario.unidad or 'un usuario sin unidad'}."
+                    )
             if transicion.requiere_motivo and not motivo.strip():
                 raise ValidationError("Esta acción requiere un motivo.")
             origen = actual.estado

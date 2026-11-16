@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones y HU-3.2 Elaboración del contrato.
+notificaciones, HU-3.2 Elaboración del contrato y HU-3.3 Firma del contrato.
 
 ## Cómo levantar
 
@@ -103,7 +103,12 @@ publicada, por notificar) y en RHF solo el resultado de Barranca Honda; PSAHEM y
 publicar, para mostrar la pantalla «Publicación de resultados». En HU-3.2, PS y RHF tienen un modelo de Contrato de
 Adhesión validado por la Unidad Jurídica y CC, PS y PSAHEM la plantilla base por validar; el contrato de Plantación
 Los Pinos (PS) está enviado a la Delegación, el de Barranca Honda (RHF) elaborado por enviar y Ojo de Agua (RHF)
-notificada y por elaborar. La página pública de resultados está en
+notificada y por elaborar. En HU-3.3 cada uno de PS y RHF tiene un segundo lote de tres solicitudes con su propia
+sesión y publicación: en PS, dos contratos firmados en plazo (Mirador de los Pinos, Ladera Verde) y uno sin firma al
+vencer el plazo, señalado y por liberar (Cañada Seca); en RHF, tres firmados (Arroyo Claro, Cerro Gordo y Peña Blanca, esta
+de RFI Modalidad uno, que no recibe planta). Para vencer el plazo sin esperar días, la demostración corre hacia atrás las
+fechas de la publicación y la notificación de Cañada Seca (calendario simulado). Plantación Los Pinos queda por firmar en
+la Delegación. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
@@ -463,6 +468,43 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Barra de navegación.** Con las pantallas de M3 la barra de la Dirección y de la Unidad Jurídica ya no cabía:
   nombres más cortos («Publicación», «Modelos»), subtítulo de la marca solo en pantallas anchas, colapso desde 1200 px y
   nombre de la unidad truncado (con su `title`).
+
+### M3 · HU-3.3 Firma del contrato
+
+- **Organización.** `contrato/models/firma.py` (migración `0003_hu_3_3_firma`: `FirmaContrato`, `ElementoFormalizacion`,
+  `SinFirma`), servicio `contrato/firma.py`, vistas `vistas/firma.py`, formularios `formularios/firma.py` y
+  `templates/contrato/firma/`. Los datos por programa y por tipo de persona están en `datos/contrato.json`.
+- **Registrar la firma.** `firma.registrar_firma`: solo la Delegación del expediente, con el contrato ya enviado
+  (`contrato_en_delegacion`). Pide la fecha y hora de la firma (por omisión, ahora; ni futura ni anterior al envío del
+  contrato), quién firma (la persona o su representante), el contrato firmado digitalizado (PDF, JPG o PNG, obligatorio) y la
+  **verificación de firmas y sello**: una lista por tipo de persona (`datos/contrato.json` → `verificacion_firmas`: persona
+  física, jurídico colectiva, núcleo agrario con Presidencia, Secretaría, Tesorería y sello; tipos sin lista propia usan la de
+  su equivalente). Todos los puntos deben marcarse; si no, no se recibe. Deja el acuse de la firma, el hito `firma_contrato`
+  con la fecha y hora de la firma y el estado `contratada`.
+- **Dos fechas (R-03).** Se muestran siempre la **fecha programada de firma** (`firma_programada`) y el **vencimiento para
+  liberar el recurso** (`firma_liberacion`), con los días hábiles que faltan. Una firma posterior a la programada y anterior
+  a la de liberación es válida y queda «fuera de la fecha programada»; una posterior a la de liberación no se recibe. En PS la
+  programada corre desde la notificación y la de liberación desde la publicación (R-13): la de liberación puede caer antes;
+  el servicio aplica la de liberación como tope. Los casos «fuera de la fecha programada» solo se dan en CC (programada desde
+  la publicación, liberación desde la notificación) y se cubren en las pruebas; en la demostración no hay uno porque la
+  publicación de CC queda pendiente a propósito.
+- **Formalización propia (criterio 2).** MFS y PEG no tienen archivo de reglas: sus elementos están en
+  `datos/contrato.json` → `formalizacion_propia`. MFS: contrato de servicios técnicos con el prestador (con su RFN) y carta
+  compromiso (ROP MFS, línea 8091 y derechos, líneas 7775 a 7778); PEG: credencial del Guardabosque entregada, con su folio
+  (derechos, línea 8770). Sin ellos la firma no se da por completa. Se prueban con programas de fixtures (`mfs`, `peg`).
+- **Sin firma al vencer (criterio 3, P-08).** `manage.py revisar_plazos` (`firma.revisar_firmas`) señala los contratos de
+  solicitudes publicadas, notificadas, con contrato elaborado o en la Delegación cuyo vencimiento para liberar el recurso ya
+  pasó: estado `sin_firma_en_plazo`, renglón en la bitácora sin persona (el sistema), registro `SinFirma` y aviso en la
+  bandeja de la Dirección (panel «Sin firma en plazo»). Para esto `Expediente.cambiar_estado` acepta `por_sistema=True` sin
+  usuario (solo si la transición existe). **Liberar el recurso no es automático:** una persona de la Dirección del programa
+  lo confirma con un motivo (`firma.liberar_recurso`; estado `recurso_liberado` y acuse). Una firma que llegue cuando ya está
+  señalado se rechaza con un mensaje claro. La reasignación a la lista de espera es del sprint 3: queda el gancho
+  `extensiones.AL_LIBERAR_RECURSO`. Se agregó la transición `sin_firma_en_plazo → recurso_liberado` para la Dirección (el
+  flujo la traía solo para la Secretaría Técnica) y `extensiones.AL_FIRMAR` para que HU-3.4 reaccione a la firma.
+- **Pantallas.** «Firmas» (menú de la Delegación y de la Dirección): por firmar con las dos fechas y los días, firmados y
+  sin firma con la acción de liberar; «Registrar la firma» (formulario con la verificación y los elementos del programa);
+  pestaña «Contrato» con la firma, sus puntos, los archivos y el señalamiento; paneles en las bandejas de la Delegación y de
+  la Dirección y siguiente paso en el expediente.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

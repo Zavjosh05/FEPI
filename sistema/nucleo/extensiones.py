@@ -18,6 +18,11 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   monto (``nucleo.montos``); la primera que no dé None gana (M2: la superficie factible del dictamen).
 - SIGUIENTES_PASOS: funciones ``(usuario, expediente) -> {"texto", "url", "ayuda"} | None`` con el botón
   del siguiente paso que se muestra en el expediente (``nucleo.pasos``); gana la primera que responda.
+- AL_FIRMAR: funciones ``(firma) -> None`` que corren cuando la Delegación registra la firma del contrato
+  (HU-3.3); M3.4 las usa para dejar el Vale de Planta entregado antes de la firma en el estado que toca.
+- AL_LIBERAR_RECURSO: funciones ``(expediente, usuario) -> None`` que corren cuando el área responsable confirma
+  la liberación del recurso de un contrato sin firma en plazo (HU-3.3). Gancho para la reasignación a la lista de
+  espera por acuerdo del Comité (sprint 3, flujo alterno D).
 """
 
 FILTROS_BANDEJA = []
@@ -30,3 +35,5 @@ AL_NOTIFICAR = []
 EVENTOS_PLAZO = {}
 SUPERFICIE_APROBADA = []
 SIGUIENTES_PASOS = []
+AL_FIRMAR = []
+AL_LIBERAR_RECURSO = []

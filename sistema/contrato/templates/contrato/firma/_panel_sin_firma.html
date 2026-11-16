@@ -1,0 +1,8 @@
+<div class="tarjeta mb-3 border-danger" data-prueba="panel-sin-firma">
+  <div class="titulo-seccion">Sin firma en plazo · recurso por liberar ({{ panel.total }})</div>
+  <div class="small mb-2">Venció el plazo de firma. La liberación del recurso la confirma el área responsable con un motivo.</div>
+  <ul class="small mb-2">{% for s in panel.senalados %}
+    <li><a href="{% url 'recepcion:expediente' s.expediente.folio %}?pestana=contrato">{{ s.expediente.folio }}</a> · {{ s.expediente.solicitante.nombre }} · venció el {{ s.vencio_el|date:"d/m/Y" }}</li>
+  {% endfor %}</ul>
+  <a class="btn btn-sm btn-outline-danger" href="{% url 'contrato:firmas' %}">Abrir los señalados</a>
+</div>

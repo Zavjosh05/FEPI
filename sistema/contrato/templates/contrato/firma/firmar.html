@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}Firma del contrato {{ exp.folio }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <div class="small text-secondary">{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }} · {{ unidad_actual.nombre }}</div>
+    <h1 class="h4 mb-0">Registrar la firma del contrato {{ contrato.folio }}</h1>
+    <div class="small">{{ exp.folio }} · {{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }} · {{ exp.solicitante.nombre }} ({{ exp.tipo_persona.nombre }})</div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if contrato %}<a class="btn btn-outline-secondary btn-sm" href="{% url 'contrato:contrato_pdf' exp.folio %}" target="_blank">Ver el contrato</a>{% endif %}
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'recepcion:expediente' exp.folio %}?pestana=contrato">Ver expediente</a>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="tarjeta mb-3">
+      <div class="titulo-seccion mb-1">Plazo de firma</div>
+      {% include "contrato/firma/_fechas.html" %}
+      <div class="small text-secondary mt-2">Una firma posterior a la fecha programada y anterior al vencimiento es válida y queda marcada «fuera de la fecha programada». Pasado el vencimiento el contrato queda sin firma en plazo y el recurso se libera.</div>
+    </div>
+    {% if formalizacion.elementos %}
+    <div class="tarjeta"><div class="titulo-seccion mb-1">Formalización de {{ exp.ejercicio.programa.clave }}</div>
+      <div class="small text-secondary">{{ formalizacion.fundamento }}</div></div>
+    {% endif %}
+  </div>
+  <div class="col-12 col-lg-8">
+    <div class="tarjeta">
+      {% if not puede %}
+      <div class="alert alert-warning small mb-0" data-prueba="sin-firma-no-se-recibe">{% if sin_firma %}Este contrato ya está señalado como «sin firma en plazo» (venció el {{ sin_firma.vencio_el|date:"d/m/Y" }}): la firma ya no se puede registrar. El área responsable debe confirmar la liberación del recurso.{% else %}El expediente está «{{ exp.estado }}»: solo se registra la firma de un contrato que ya llegó a la Delegación.{% endif %}</div>
+      {% else %}
+      <form method="post" enctype="multipart/form-data" id="form-firma">
+        {% csrf_token %}
+        {% include "recepcion/_campo.html" with campo=form.firmado_en %}
+        <div class="mb-3"><label class="form-label">{{ form.firmante.label }}</label>
+          <div class="d-flex flex-wrap gap-3">{% for r in form.firmante %}<div class="form-check">{{ r.tag }}<label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}</div>
+          {% for e in form.firmante.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}</div>
+        {% include "recepcion/_campo.html" with campo=form.firmante_nombre %}
+        {% include "recepcion/_campo.html" with campo=form.archivo %}
+        <div class="titulo-seccion mb-1">Verificación de firmas y sello</div>
+        <div class="small text-secondary mb-2">Marque cada punto una vez comprobado en el contrato firmado. Todos son necesarios para recibirlo.</div>
+        <div class="mb-3" data-prueba="verificacion">{% for c in form.campos_verificacion %}
+          <div class="form-check">{{ c }}<label class="form-check-label" for="{{ c.id_for_label }}">{{ c.label }}</label></div>{% endfor %}</div>
+        {% if form.elementos %}
+        <div class="titulo-seccion mb-1">Formalización propia de {{ exp.ejercicio.programa.clave }}</div>
+        {% for e, archivo, dato in form.campos_formalizacion %}
+        <div class="row g-2 mb-2" data-elemento="{{ e.clave }}"><div class="col-12 col-md-7">{% include "recepcion/_campo.html" with campo=archivo %}</div>
+          {% if dato %}<div class="col-12 col-md-5">{% include "recepcion/_campo.html" with campo=dato %}</div>{% endif %}</div>
+        {% endfor %}{% endif %}
+        {% include "recepcion/_campo.html" with campo=form.observaciones %}
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar la firma</button></div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
