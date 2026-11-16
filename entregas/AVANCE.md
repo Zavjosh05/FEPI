@@ -16,7 +16,9 @@ El porqué de cada decisión está en [BITACORA.md](BITACORA.md).
 3. Correr las pruebas rápidas (abajo). Si pasan, lo que hay en el árbol sirve: se completa, se verifica y
    se hace el commit. Si fallan y no se entiende por qué, se descarta solo esa tarea
    (`git stash` o `git restore`) y se vuelve a empezar: cada tarea es de una historia o menos.
-4. Al terminar una tarea, en el mismo commit: marcarla aquí como «Hecho» con su commit, mover «Siguiente
+4. Al cerrar un sprint se escribe su resumen en PDF (`python entregas/generar_resumen.py N`, dentro de la imagen de
+   Docker; el texto va en `sprint_N/resumen_contenido.html` y sus datos en `resumen_datos.json`).
+5. Al terminar una tarea, en el mismo commit: marcarla aquí como «Hecho» con su commit, mover «Siguiente
    paso» y actualizar la bitácora si hubo una decisión.
 
 Estados de una tarea: **Pendiente**, **En curso**, **Por verificar** (construida, falta revisarla y
@@ -74,6 +76,7 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 | A-5 | Capturas solo cuando se piden (P-06) | Hecho | `045feb7` |
 | A-6 | Pruebas rápidas separadas de las de navegador (P-07) | Hecho | `045feb7` |
 | A-7 | Recorrido completo por la interfaz, con una sola solicitud y cambio de usuario en cada relevo (P-09) | Hecho | `450a5ac` |
+| Resumen | Resumen en PDF del sprint 1 (`sprint_1/Resumen_sprint_1.pdf`) | Hecho | `0598b95` |
 
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — en curso desde el 14-nov
 
@@ -99,6 +102,7 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
 | S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Pendiente | |
 | S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Pendiente | |
+| S2-15 | Resumen en PDF del sprint 2 (`sprint_2/Resumen_sprint_2.pdf`) | S2-14 | Pendiente | |
 
 ## Sprint 3 · Ejecución, seguimiento y cierre (M4, M6; M7.4 y M7.5) — sin empezar
 
