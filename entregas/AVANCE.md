@@ -32,11 +32,12 @@ Desde Windows, con Docker dentro de WSL:
 wsl -e bash -lc "cd /mnt/c/Users/josh/Documents/GitHub/FEPI/sistema && docker compose --profile pruebas run --rm pruebas"
 ```
 
-Ese comando corre todo (unos 2 minutos). Durante el trabajo se usan las formas cortas, agregando al final:
+Ese comando corre todo (unos 7 minutos y medio con 380 pruebas). Durante el trabajo se usan las formas cortas, agregando al final:
 
 | Para | Se agrega | Tarda |
 | --- | --- | --- |
-| Pruebas rápidas, sin navegador | `pytest -m "not navegador"` | ~1 min |
+| Pruebas rápidas, sin navegador | `pytest -m "not navegador"` | ~4 min |
+| Con los PDF reales en todas (antes de cada entrega) | `-e PDF_REAL=1` antes de `pruebas` | ~14 min |
 | Una sola historia | `pytest pruebas/test_hu_2_3.py` | ~20 s |
 | Guardar capturas | `-e CAPTURAS=1` antes de `pruebas` | — |
 
@@ -100,9 +101,9 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-10 | HU-7.2 Histograma del balance entre dos años | — (en paralelo) | Hecho | `9254478` |
 | S2-11 | HU-7.3 Pérdida por incendios: lo que falte contra sus criterios | S2-10 | Hecho | `5bfa706` |
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
-| S2-13a | Cierre técnico: acortar la batería (P-20), menú por módulo (P-21), modelo de datos y README al día | S2-09 | En curso | |
+| S2-13a | Cierre técnico: acortar la batería (P-20), menú por módulo (P-21), modelo de datos y README al día | S2-09 | Hecho | `88d9f93`, `f24d627`, `c94a5c9` |
 | S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Pendiente | |
-| S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Pendiente | |
+| S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | En curso | |
 | S2-15 | Resumen en PDF del sprint 2 (`sprint_2/Resumen_sprint_2.pdf`) | S2-14 | Pendiente | |
 
 ## Sprint 3 · Ejecución, seguimiento y cierre (M4, M6; M7.4 y M7.5) — sin empezar
