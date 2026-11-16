@@ -11,6 +11,9 @@ body { background: #f5f6f4; }
 .barra-probosque { background: var(--pb-verde); }
 .barra-probosque .marca { font-weight: 700; letter-spacing: .06em; }
 .barra-probosque .navbar-nav .nav-link { padding-left: .5rem; padding-right: .5rem; font-size: .92rem; }
+.barra-probosque button.nav-link { background: none; border: 0; }
+.barra-probosque .dropdown-menu { font-size: .92rem; }
+.barra-probosque .dropdown-item.active { background: var(--pb-verde); }
 .barra-probosque .usuario-barra { flex-shrink: 0; }
 .barra-probosque .unidad-barra { max-width: 13rem; }
 .tarjeta { background: #fff; border: 1px solid #dde2dc; border-radius: .5rem; padding: 1rem 1.25rem; }

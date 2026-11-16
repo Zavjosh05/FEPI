@@ -21,11 +21,19 @@
     <div class="collapse navbar-collapse" id="menu">
       <ul class="navbar-nav me-auto">
         <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'bandeja' %}active{% endif %}" href="{% url 'nucleo:bandeja' %}">Bandeja</a></li>
-        {% if unidad_actual.es_delegacion %}
-        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'registrar' %}active{% endif %}" href="{% url 'recepcion:registrar' %}">Registrar solicitud</a></li>
-        {% endif %}
         {% for m in menu_extra %}
-        <li class="nav-item"><a class="nav-link text-nowrap {% if request.resolver_match.url_name == m.nombre_url %}active{% endif %}" href="{{ m.url }}">{{ m.nombre }}</a></li>
+        {% if m.grupo %}
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle text-nowrap {% if m.activo %}active{% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-menu-grupo="{{ m.nombre }}">{{ m.nombre }}</button>
+          <ul class="dropdown-menu">
+            {% for h in m.hijos %}
+            <li><a class="dropdown-item {% if h.activo %}active{% endif %}" href="{{ h.url }}">{{ h.nombre }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link text-nowrap {% if m.activo %}active{% endif %}" href="{{ m.url }}">{{ m.nombre }}</a></li>
+        {% endif %}
         {% endfor %}
         {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Catálogos</a></li>{% endif %}
       </ul>

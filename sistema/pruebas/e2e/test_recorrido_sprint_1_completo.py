@@ -19,6 +19,7 @@ from playwright.sync_api import expect
 from dictamen.models import SesionComite
 from nucleo.demo import _pdf_demo, cuadro_en_municipio
 from nucleo.models import Expediente, Municipio
+from pruebas.e2e.conftest import ir_a
 from pruebas.e2e.test_recorridos import _elegir
 from pruebas.fixtures_m2 import fecha_sesion
 
@@ -252,7 +253,7 @@ def test_sprint_1_una_solicitud_recorre_todo_por_la_interfaz(datos_e2e, page, li
     # ---- 7. Secretaría Técnica del Comité: sesión de aprobación, convocatoria, listados y acta (HU-2.3) --
     relevo("comite")
     en_bandeja(folio, "Dictaminada")
-    page.click(".navbar a:has-text('Sesiones del Comité')")
+    ir_a(page, "Sesiones del Comité")
     page.wait_for_url("**/dictamen/sesiones/")
     page.click("a:has-text('Nueva sesión de aprobación')")
     page.wait_for_url("**/sesiones/nueva/**")

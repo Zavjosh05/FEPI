@@ -108,9 +108,9 @@ def registrar():
                                             "plantilla": "dictamen/pestana_dictamenes.html", "contexto": contexto_pestana})
     T = TipoUnidad
     extensiones.MENU.extend([
-        {"nombre": "Listado preliminar", "url": "dictamen:listado", "tipos": [T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE]},
-        {"nombre": "Sesiones del Comité", "url": "dictamen:sesiones", "tipos": [T.SECRETARIA_COMITE, T.DIRECCION, T.JURIDICA]},
-        {"nombre": "Incumplidas", "url": "dictamen:incumplidas", "tipos": [T.JURIDICA, T.DIRECCION, T.SECRETARIA_COMITE]},
+        {"nombre": "Listado preliminar", "url": "dictamen:listado", "grupo": "Dictamen y Comité", "tipos": [T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE]},
+        {"nombre": "Sesiones del Comité", "url": "dictamen:sesiones", "grupo": "Dictamen y Comité", "tipos": [T.SECRETARIA_COMITE, T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Incumplidas", "url": "dictamen:incumplidas", "grupo": "Dictamen y Comité", "tipos": [T.JURIDICA, T.DIRECCION, T.SECRETARIA_COMITE]},
     ])
     extensiones.REVISIONES_PLAZO.append(revisar_plazos)
     extensiones.SUPERFICIE_APROBADA.append(superficie_factible)

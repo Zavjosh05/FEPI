@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -54,3 +55,18 @@ def entrar(page, live_server, contrasena):
         page.click("button[type=submit]")
         page.wait_for_url("**/bandeja/**")
     return _entrar
+
+
+def ir_a(page, enlace):
+    """Hace clic en un enlace del menú superior; si está en un grupo desplegable, lo abre primero (en móvil, abre
+    también el menú colapsado). ``enlace`` es el texto exacto del enlace, por ejemplo ``ir_a(page, "Pagos")``."""
+    barra = page.locator("nav.barra-probosque")
+    destino = barra.locator("a", has_text=re.compile(rf"^\s*{re.escape(enlace)}\s*$")).first
+    if not destino.is_visible():
+        if page.locator("button.navbar-toggler").is_visible():
+            page.click("button.navbar-toggler")
+            page.wait_for_selector("#menu.show")
+        if not destino.is_visible():
+            grupo = barra.locator("li.dropdown", has=page.locator(f"a.dropdown-item:text-is('{enlace}')")).first
+            grupo.locator("button.dropdown-toggle").click()
+    destino.click()

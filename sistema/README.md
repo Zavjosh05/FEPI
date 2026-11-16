@@ -476,9 +476,12 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pendiente.** La ampliación de plazo por causa externa en MFS: MFS aún no tiene reglas (sprint 3), por eso solo
   quedó el modelo de datos `Adendum` (ligado al contrato, con motivo, plazo original y nuevo y su modelo), sin servicio
   ni pantalla. El texto jurídico real de los modelos lo aporta el cliente (R-07).
-- **Barra de navegación.** Con las pantallas de M3 la barra de la Dirección y de la Unidad Jurídica ya no cabía:
-  nombres más cortos («Publicación», «Modelos»), subtítulo de la marca solo en pantallas anchas, colapso desde 1200 px y
-  nombre de la unidad truncado (con su `title`).
+- **Barra de navegación (P-21).** Con todos los módulos la barra ya no cabía a 1366 px. Ahora el menú va agrupado por módulo en
+  listas desplegables (Recepción · Dictamen y Comité · Publicación y contrato · Pagos): cada enlace se registra con su `grupo`
+  en `extensiones.MENU` (`dictamen/registro.py`, `contrato/registro.py`, `pagos/registro.py`; el orden de los grupos es
+  `extensiones.GRUPOS_MENU`) y `nucleo/contexto.py` arma el menú de cada persona con solo lo que su unidad tiene; un grupo con un
+  solo enlace se muestra como enlace simple. El nombre, la unidad y «Salir» siempre se ven; en pantallas angostas el menú queda
+  colapsado. Las pruebas de navegador entran a un enlace con `ir_a(page, "Pagos")` (`pruebas/e2e/conftest.py`).
 
 ### M3 · HU-3.3 Firma del contrato
 

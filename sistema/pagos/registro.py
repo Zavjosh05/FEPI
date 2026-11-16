@@ -228,9 +228,9 @@ def registrar():
     extensiones.REVISIONES_PLAZO.extend([pagos.revisar_remisiones, cheques.revisar_cobros])
     T = TipoUnidad
     extensiones.MENU.extend([
-        {"nombre": "Pagos", "url": "pagos:solicitudes", "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA]},
-        {"nombre": "Pagos", "url": "pagos:pagos", "tipos": [T.ADMIN_FINANZAS, T.SECRETARIA_COMITE]},
-        {"nombre": "Cheques", "url": "pagos:cheques", "tipos": [T.FIDUCIARIA, T.DELEGACION, T.ADMIN_FINANZAS]}])
+        {"nombre": "Pagos", "url": "pagos:solicitudes", "grupo": "Pagos", "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Pagos", "url": "pagos:pagos", "grupo": "Pagos", "tipos": [T.ADMIN_FINANZAS, T.SECRETARIA_COMITE]},
+        {"nombre": "Cheques", "url": "pagos:cheques", "grupo": "Pagos", "tipos": [T.FIDUCIARIA, T.DELEGACION, T.ADMIN_FINANZAS]}])
     extensiones.DEMOS.append(cargar_demo)
 
 

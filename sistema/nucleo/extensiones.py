@@ -7,7 +7,10 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   panel extra en la bandeja (por ejemplo, acuerdos del Comité pendientes de cumplir).
 - PESTANAS_EXPEDIENTE: dicts ``{"clave", "nombre", "plantilla", "contexto": fn(request, exp)}``
   que se agregan a la página del expediente.
-- MENU: dicts ``{"nombre", "url", "tipos": [tipos de unidad] | None}`` para la barra superior.
+- MENU: dicts ``{"nombre", "url", "grupo", "tipos": [tipos de unidad] | None}`` para la barra superior. ``grupo`` es el
+  módulo (uno de ``GRUPOS_MENU``) bajo el que se despliega el enlace; sin grupo, el enlace va suelto. ``estricto`` impide que el superusuario sin unidad lo vea. Cada unidad ve solo
+  los grupos y enlaces que le tocan; un grupo con un solo enlace para esa unidad se muestra como enlace simple.
+- GRUPOS_MENU: orden de los grupos del menú.
 - REVISIONES_PLAZO: funciones ``(fecha) -> int`` que corre ``manage.py revisar_plazos``.
 - DEMOS: funciones ``() -> int`` que agregan datos de demostración (``manage.py cargar_demo``).
 - AL_NOTIFICAR: funciones ``(notificacion) -> None`` que corren cuando la Delegación registra que
@@ -28,7 +31,9 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
 FILTROS_BANDEJA = []
 PANELES_BANDEJA = []
 PESTANAS_EXPEDIENTE = []
-MENU = []
+GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos"]
+MENU = [{"nombre": "Registrar solicitud", "url": "recepcion:registrar", "grupo": "Recepción", "tipos": ["delegacion"],
+         "estricto": True}]
 REVISIONES_PLAZO = []
 DEMOS = []
 AL_NOTIFICAR = []

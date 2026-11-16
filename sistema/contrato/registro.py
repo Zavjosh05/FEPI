@@ -183,14 +183,14 @@ def registrar():
     extensiones.AL_NOTIFICAR.append(publicacion.al_notificar)
     T = TipoUnidad
     extensiones.MENU.extend([
-        {"nombre": "Publicación", "url": "contrato:publicaciones",
+        {"nombre": "Publicación", "url": "contrato:publicaciones", "grupo": "Publicación y contrato",
          "tipos": [T.DIRECCION, T.SECRETARIA_COMITE, T.JURIDICA]},
-        {"nombre": "Notificaciones", "url": "contrato:notificaciones", "tipos": [T.DELEGACION, T.DIRECCION]},
-        {"nombre": "Modelos", "url": "contrato:modelos", "tipos": [T.DIRECCION, T.JURIDICA]},
-        {"nombre": "Contratos", "url": "contrato:contratos", "tipos": [T.DIRECCION, T.JURIDICA]},
-        {"nombre": "Firmas", "url": "contrato:firmas", "tipos": [T.DELEGACION, T.DIRECCION]},
-        {"nombre": "Vales", "url": "contrato:vales", "tipos": [T.DELEGACION, T.DIRECCION]},
-        {"nombre": "Planta", "url": "contrato:vivero", "tipos": [T.VIVERO]},
+        {"nombre": "Notificaciones", "url": "contrato:notificaciones", "grupo": "Publicación y contrato", "tipos": [T.DELEGACION, T.DIRECCION]},
+        {"nombre": "Modelos", "url": "contrato:modelos", "grupo": "Publicación y contrato", "tipos": [T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Contratos", "url": "contrato:contratos", "grupo": "Publicación y contrato", "tipos": [T.DIRECCION, T.JURIDICA]},
+        {"nombre": "Firmas", "url": "contrato:firmas", "grupo": "Publicación y contrato", "tipos": [T.DELEGACION, T.DIRECCION]},
+        {"nombre": "Vales", "url": "contrato:vales", "grupo": "Publicación y contrato", "tipos": [T.DELEGACION, T.DIRECCION]},
+        {"nombre": "Planta", "url": "contrato:vivero", "grupo": "Publicación y contrato", "tipos": [T.VIVERO]},
     ])
     extensiones.DEMOS.append(cargar_demo)
 
