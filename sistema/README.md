@@ -645,6 +645,26 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Demostración.** En PSAHEM, cheque emitido (Paraje Las Ánimas), enviado (Monte Alto), entregado (Cerro del Venado) y entregado hace
   casi 3 meses, por vencer sin cobro (Loma Verde; calendario simulado); Bosque Los Cedros espera su cheque.
 
+### Tropiezos de interfaz del sprint 2 (P-23 a P-31)
+
+Salieron del recorrido completo por la interfaz (`pruebas/e2e/test_recorrido_sprint_2_completo.py`, que ya no lleva rodeos) y
+se prueban en `pruebas/test_nucleo_tropiezos_interfaz_s2.py`:
+- **P-23** La bitácora del expediente va en orden cronológico (lo más antiguo arriba); los renglones del mismo segundo van en el
+  orden en que se registraron.
+- **P-24** Toda página pública (entrada excluida) trae el botón «Iniciar sesión» en la barra.
+- **P-25** El folio del panel «Notificaciones por entregar» abre la bandeja de notificaciones con ese aviso resaltado y su
+  formulario de entrega desplegado (`?aviso=<id>`).
+- **P-26** «Por atender» puede crecer por módulo: `extensiones.EXTRAS_BANDEJA` (funciones `usuario → Q`). M5 lo usa para que
+  la Secretaría Técnica de PSAHEM vea ahí la solicitud aceptada que debe remitir.
+- **P-27** Remitida la solicitud, el plazo de la Secretaría Técnica dice «cumplido en plazo» o «cumplido fuera de plazo» con su fecha.
+- **P-28** El documento se llama «Vale de Salida de Planta» (nombre de las ROP; encabezados, PDF y acuse) y «Vale de Planta» como
+  forma corta en botones, estados y mensajes. Al surtirse el vale, el mensaje del vivero dice que la solicitud pasó a «Planta entregada».
+- **P-29** La página pública muestra la fecha de la publicación y de la sesión del Comité, no su clave interna.
+- **P-30** Un soporte faltante se dice una vez (al intentar enviar) y con la unidad que lo resuelve
+  (`pagos.solicitudes.RESPONSABLE`); la tabla de soportes lo repite solo como detalle de su renglón.
+- **P-31** El cobro del cheque lleva rótulo «Cobro del cheque», ayuda y fecha rotulada, y solo se ve a la Fiduciaria y a la
+  Delegación del cheque.
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,

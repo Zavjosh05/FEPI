@@ -15,8 +15,12 @@
     <div class="col-12 col-md-6">{% include "recepcion/_campo.html" with campo=m.form_entrega.entregado_en %}</div></div>
   <button class="btn btn-sm btn-primary" type="submit">Registrar la entrega</button></form>{% endif %}
 {% if m.puede_cobrar %}
-<form method="post" action="{% url 'pagos:cheque_cobro' c.pk %}" class="mt-2 d-flex gap-2 align-items-end" data-prueba="form-cobro-m{{ m.numero }}">{% csrf_token %}
-  <div>{{ m.form_cobro.fecha_cobro }}</div><button class="btn btn-sm btn-outline-success" type="submit">Registrar que fue cobrado</button></form>{% endif %}
+<form method="post" action="{% url 'pagos:cheque_cobro' c.pk %}" class="mt-2" data-prueba="form-cobro-m{{ m.numero }}">{% csrf_token %}
+  <div class="small fw-semibold mb-1">Cobro del cheque</div>
+  <div class="small text-secondary mb-1">La Fiduciaria o la Delegación del cheque registran aquí que la persona beneficiaria ya lo cobró. Si se deja vacía la fecha, se usa hoy.</div>
+  <div class="d-flex flex-wrap gap-2 align-items-end">
+    <div><label class="form-label small mb-0" for="{{ m.form_cobro.fecha_cobro.id_for_label }}">{{ m.form_cobro.fecha_cobro.label }}</label>{{ m.form_cobro.fecha_cobro }}</div>
+    <button class="btn btn-sm btn-outline-success" type="submit">Registrar que fue cobrado</button></div></form>{% endif %}
 {% endwith %}{% elif m.puede_emitir %}
 <form method="post" action="{% url 'pagos:cheque_emitir' m.solicitud.pk %}" class="mt-2" data-prueba="form-emision-m{{ m.numero }}">{% csrf_token %}
   <div class="titulo-seccion mb-1">Emitir el cheque de la ministración {{ m.numero }}</div>

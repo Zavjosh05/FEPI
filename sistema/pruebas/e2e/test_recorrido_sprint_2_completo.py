@@ -9,7 +9,7 @@
 
 Cada relevo cierra la sesión (Salir) y entra la unidad siguiente. El tramo de partida (la solicitud aprobada, o con el
 contrato firmado) se arma con los servicios: el recorrido del sprint 1 ya cubre la interfaz hasta la aprobación.
-Los rodeos y los hallazgos de interfaz están marcados con «RODEO» y «HALLAZGO» en los comentarios.
+Todo se hace por el camino natural de la interfaz (los tropiezos P-23 a P-31 ya están corregidos).
 """
 import re
 from datetime import timedelta
@@ -89,16 +89,15 @@ class Recorrido:
         boton.click()
 
     def bitacora(self):
-        """Pestaña «Bitácora»: filas (fecha y hora, quién, estado) en orden cronológico."""
+        """Pestaña «Bitácora»: filas (fecha y hora, quién, qué, estado), tal como las muestra la tabla (P-23: cronológica)."""
         self.pestana("bitacora")
         filas = self.page.locator("#tabla-bitacora tbody tr").evaluate_all(
             "trs => trs.map(t => [...t.querySelectorAll('td')].map(c => c.innerText.trim()))")
         filas = [f for f in filas if len(f) >= 4]
         from datetime import datetime
-        fecha = lambda f: datetime.strptime(f[0], "%d/%m/%Y %H:%M:%S")  # noqa: E731
-        if fecha(filas[0]) > fecha(filas[-1]):      # la tabla va de lo más nuevo a lo más viejo
-            filas = filas[::-1]                      # (así los renglones del mismo segundo conservan su orden)
-        return sorted(filas, key=fecha)
+        fechas = [datetime.strptime(f[0], "%d/%m/%Y %H:%M:%S") for f in filas]
+        assert fechas == sorted(fechas), "la bitácora no viene en orden cronológico"
+        return filas
 
 
 def comprobar_bitacora(filas, transiciones, unidades):
@@ -152,10 +151,7 @@ def test_sprint_2_ps_de_aprobada_al_pago_por_la_interfaz(  # noqa: F811
     captura("recorrido_sprint_2_ps_02_pagina_publica_busqueda_por_folio")
 
     # ---- 3. Delegación: notifica a la persona (HU-3.1) -------------------------------------------------------------
-    if page.locator("a:has-text('Iniciar sesión')").count():
-        page.click("a:has-text('Iniciar sesión')")
-    else:   # HALLAZGO: la página de listados no trae enlace para volver a iniciar sesión (solo el índice)
-        page.goto(f"{live_server.url}/entrar/")
+    page.click("a:has-text('Iniciar sesión')")                # P-24: la página pública enlaza a la entrada
     r.relevo(delegacion)
     r.en_bandeja(folio, "Resultados publicados")
     page.click(f"#tabla-bandeja a:has-text('{folio}')")
@@ -256,6 +252,7 @@ def test_sprint_2_ps_de_aprobada_al_pago_por_la_interfaz(  # noqa: F811
     page.fill("#id_cantidad", "1400")
     page.click("button:has-text('Registrar la salida')")
     expect(page.locator("[data-prueba=salidas]")).to_contain_text("1400")
+    expect(page.locator("#mensajes .alert-success")).to_contain_text("pasó a «Planta entregada")      # P-28
     captura("recorrido_sprint_2_ps_10_salida_final")
     r.fuera_de_bandeja(folio)
 
@@ -297,11 +294,10 @@ def test_sprint_2_ps_de_aprobada_al_pago_por_la_interfaz(  # noqa: F811
     # ---- 13. Delegación: notifica el pago; Dirección ve el expediente pagado con su bitácora ----------------------
     r.relevo(delegacion)
     expect(page.locator("[data-prueba=panel-notificaciones]")).to_contain_text("Aviso de pago")
-    # HALLAZGO (menor): el folio del panel abre la pestaña «Contrato» del expediente, donde el aviso de pago no se puede
-    # registrar; hay que usar el botón de abajo, «Abrir la bandeja de notificaciones».
-    page.click("[data-prueba=panel-notificaciones] a:has-text('Abrir la bandeja de notificaciones')")
+    page.click("[data-prueba=panel-notificaciones] li:has-text('Aviso de pago') a")       # P-25: el folio abre el aviso por registrar
+    page.wait_for_url("**/contrato/notificaciones/**")
     fila = page.locator("tr[data-tipo=pago]")
-    fila.locator("summary").click()
+    expect(fila.locator("details")).to_have_attribute("open", "")
     fila.locator("select").select_option("telefono")
     fila.locator("button:has-text('Registrar notificación')").click()
     expect(page.locator("#mensajes .alert-success")).to_contain_text("Notificación registrada")
@@ -388,14 +384,13 @@ def test_sprint_2_psahem_de_contratada_al_cheque_entregado_por_la_interfaz(  # n
     # ---- 6. Secretaría Técnica: solicita el pago a la Fiduciaria dentro de sus 5 días hábiles ------------------------
     r.relevo("comite")
     expect(page.locator("[data-prueba=panel-por-remitir]")).to_contain_text(folio)
-    # HALLAZGO (menor): la solicitud aceptada que la Secretaría Técnica debe remitir NO sale en la tabla «por atender» de su
-    # bandeja (solo en el panel «Pagos por solicitar a la Fiduciaria» y en «Todos los míos»): se entra por el panel.
-    page.click(f"[data-prueba=panel-por-remitir] a:has-text('{folio}')")
+    r.abrir(folio, "Ministración solicitada")                      # P-26: también está en su tabla «por atender»
     r.siguiente_paso("Solicitar el pago a la Fiduciaria")
     expect(page.locator("[data-prueba=plazo-remision]")).to_contain_text("5 días hábiles")
     page.fill("#id_oficio", "ST-FIPASAHEM/001/2026")
     page.click("[data-prueba=form-remision-m1] button:has-text('Solicitar el pago')")
     expect(page.locator("[data-prueba=remision-m1]")).to_contain_text("en plazo")
+    expect(page.locator("[data-prueba=plazo-remision]")).to_contain_text("cumplido en plazo")      # P-27
     captura("recorrido_sprint_2_psa_06_remision_a_la_fiduciaria")
 
     # ---- 7. Fiduciaria: emite el cheque y lo envía a la Delegación (HU-5.3) --------------------------------------------

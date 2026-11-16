@@ -4,7 +4,7 @@
 <div class="mb-3">
   <div class="small"><a href="{% url 'contrato:resultados' %}">Todos los programas</a></div>
   <h1 class="h4 mb-1">Resultados · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
-  <div class="text-secondary small">{% for p in publicaciones %}Publicados el {{ p.publicada_en|date:"d/m/Y" }} a las {{ p.publicada_en|date:"H:i" }} h (sesión {{ p.sesion.numero }}){% if not forloop.last %}; {% endif %}{% endfor %}.
+  <div class="text-secondary small">{% for p in publicaciones %}Publicados el {{ p.publicada_en|date:"d/m/Y" }} a las {{ p.publicada_en|date:"H:i" }} h (el Comité aprobó los listados en su sesión del {{ p.sesion.fecha_hora|date:"d/m/Y" }}){% if not forloop.last %}; {% endif %}{% endfor %}.
     Se muestran el folio, el predio, el municipio y el resultado; el nombre solo aparece en el listado de personas beneficiarias.</div>
 </div>
 <form method="get" class="tarjeta mb-3 d-flex flex-wrap gap-2 align-items-end" role="search">

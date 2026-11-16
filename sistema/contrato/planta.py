@@ -238,7 +238,7 @@ def emitir_vale(usuario, expediente, vivero, renglones, carta=None, motivo_ajust
         vale.archivo.save(f"{folio}.pdf", ContentFile(pdf), save=False)
         vale.save()
         renglones_acuse = [
-            ("Vale de Planta", folio), ("Solicitud", expediente.folio),
+            ("Vale de Salida de Planta", folio), ("Solicitud", expediente.folio),
             ("Persona beneficiaria", expediente.solicitante.nombre), ("Predio", expediente.predio.nombre),
             ("Vivero que entrega", vivero.nombre),
             ("Planta autorizada", "; ".join(f"{e.nombre}: {c}" for e, c in limpios) + f" (total {total})"),
@@ -332,7 +332,7 @@ def registrar_salida(usuario, vale, especie, cantidad, salido_en=None, observaci
         completo = all(p == 0 for _, p in saldo)
         salida.acuse = emitir_acuse(
             exp, "salida_planta", f"Salida de planta del vale {vale.folio}", usuario,
-            [("Vale de Planta", vale.folio), ("Solicitud", exp.folio), ("Persona beneficiaria", exp.solicitante.nombre),
+            [("Vale de Salida de Planta", vale.folio), ("Solicitud", exp.folio), ("Persona beneficiaria", exp.solicitante.nombre),
              ("Vivero", vale.vivero.nombre), ("Especie", especie.nombre), ("Cantidad", f"{cantidad} piezas"),
              ("Fecha y hora de la salida", f"{timezone.localtime(salido_en):%d/%m/%Y %H:%M:%S} h"),
              ("Por entregar del vale", "; ".join(f"{n}: {p}" for n, p in saldo) + (" (vale completo)" if completo else "")),

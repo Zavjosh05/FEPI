@@ -229,9 +229,10 @@ def test_hu_5_1_pantallas_de_la_delegacion_y_del_area_responsable(client, contra
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
     assert 'data-prueba="solicitud-m1"' in html and "comprobante de la cuenta bancaria" in html.lower()
-    assert 'data-prueba="faltan-soportes-m1"' in html
+    assert "Lo resuelve la Delegación" in html and 'data-prueba="faltan-soportes-m1"' not in html
     r = client.post(f"/pagos/solicitud/{exp.folio}/1/enviar/", follow=True)  # falta el comprobante
-    assert "No se puede enviar la solicitud" in r.content.decode()
+    cuerpo = r.content.decode()
+    assert cuerpo.count("No se puede enviar la solicitud") == 1 and "lo resuelve la Delegación" in cuerpo
     assert 'data-prueba="panel-por-solicitar"' in client.get("/bandeja/").content.decode()
     lista = client.get("/pagos/solicitudes/").content.decode()
     assert 'data-prueba="por-solicitar"' in lista and exp.folio in lista

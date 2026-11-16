@@ -123,7 +123,8 @@ def contexto_expediente(request, exp):
         "aviso": servicios.aviso_vigente(exp) if exp.estado.clave == "faltantes" else None,
         "limite_recepcion": servicios.plazo_recepcion(exp),
         "vigencia_refrendo": servicios.vigencia_refrendo(exp) if exp.es_refrendo else None,
-        "eventos": exp.eventos.select_related("usuario", "unidad", "acuse", "estado_origen", "estado_destino"),
+        "eventos": exp.eventos.select_related("usuario", "unidad", "acuse", "estado_origen", "estado_destino")
+        .order_by("fecha_hora", "id"),     # cronológico; en un mismo instante, el orden en que se registraron (P-23)
         "historial": exp.history.select_related("history_user", "estado").order_by("-history_date")[:50],
         "es_delegacion": es_delegacion,
         "es_direccion": es_direccion,

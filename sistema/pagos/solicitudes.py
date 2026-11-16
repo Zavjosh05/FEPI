@@ -123,13 +123,22 @@ FUENTES = {
 }  # el sprint 3 reemplaza FUENTES["verificacion_campo"] por la verificación real
 
 
+# P-30: la unidad que debe resolver cada soporte que falta
+RESPONSABLE = {
+    "contrato_firmado": "la Delegación (registra la firma)", "oficio_delegacion": "la Delegación (emite el oficio)",
+    "comprobante_cuenta": "la Delegación (recaba el comprobante)", "instruccion_comite": "la Secretaría Técnica del Comité",
+    "dictamen": "la Dirección y la Unidad Jurídica", "verificacion_campo": "la Dirección (sprint 3)",
+}
+
+
 def soportes(expediente, numero):
     """Estado de cada soporte de la ministración: ``[{"clave", "nombre", "fundamento", "cumple", "detalle",
     "referencia", "url"}]``."""
     resultado = []
     for s in soportes_requeridos(expediente, numero):
         cumple, detalle, referencia, url = FUENTES[s["clave"]](expediente, numero)
-        resultado.append({**s, "cumple": bool(cumple), "detalle": detalle, "referencia": referencia, "url": url})
+        resultado.append({**s, "cumple": bool(cumple), "detalle": detalle, "referencia": referencia, "url": url,
+                          "responsable": RESPONSABLE.get(s["clave"], "el área responsable")})
     return resultado
 
 
@@ -334,7 +343,7 @@ def enviar_solicitud(usuario, expediente, numero, observaciones="", momento=None
         faltan = faltantes(lista)
         if faltan:
             raise ValidationError("No se puede enviar la solicitud: falta " + "; ".join(
-                f"{s['nombre']} ({s['detalle'].rstrip('.')})" for s in faltan) + ".")
+                f"{s['nombre']} ({s['detalle'].rstrip('.')}; lo resuelve {s['responsable']})" for s in faltan) + ".")
         ahora = momento or timezone.now()
         af = _unidad(TipoUnidad.ADMIN_FINANZAS)
         psa = plazos.config_uso(expediente.programa.clave, "instruccion_pago_fiduciaria") is not None

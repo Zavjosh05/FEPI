@@ -773,9 +773,14 @@ def bandeja(usuario):
         return expedientes_visibles(usuario).filter(estado__final=False)
     if not usuario.unidad_id:
         return Expediente.objects.none()
-    from .extensiones import FILTROS_BANDEJA
+    from .extensiones import EXTRAS_BANDEJA, FILTROS_BANDEJA
 
-    qs = expedientes_visibles(usuario).filter(_q_tipo("estado__tipo_unidad_bandeja", usuario.unidad.tipo))
+    condicion = _q_tipo("estado__tipo_unidad_bandeja", usuario.unidad.tipo)
+    for extra in EXTRAS_BANDEJA:
+        q = extra(usuario)
+        if q is not None:
+            condicion |= q
+    qs = expedientes_visibles(usuario).filter(condicion)
     for filtro in FILTROS_BANDEJA:
         qs = filtro(usuario, qs)
     return qs

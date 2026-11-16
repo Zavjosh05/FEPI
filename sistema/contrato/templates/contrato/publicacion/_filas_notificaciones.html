@@ -4,7 +4,7 @@
   <thead class="table-light"><tr><th>Solicitud</th><th>Aviso</th><th>Envío a la Delegación</th><th>Notificación a la persona</th><th>Plazo</th></tr></thead>
   <tbody>
   {% for f in filas %}{% with n=f.n %}
-  <tr data-notificacion="{{ n.pk }}" data-tipo="{{ n.tipo }}">
+  <tr id="notificacion-{{ n.pk }}" data-notificacion="{{ n.pk }}" data-tipo="{{ n.tipo }}"{% if f.abierta %} class="table-warning"{% endif %}>
     <td class="text-nowrap"><a href="{% url 'recepcion:expediente' n.expediente.folio %}?pestana=contrato">{{ n.expediente.folio }}</a>
       <div class="text-secondary">{{ n.expediente.predio.nombre }} · {{ n.expediente.predio.municipio.nombre }}</div></td>
     <td><strong>{{ n.get_tipo_display }}</strong><div class="text-secondary">{{ n.asunto }}</div>
@@ -16,7 +16,7 @@
       <div class="text-secondary">{{ n.get_medio_display }}{% if n.notificada_por %} · {{ n.notificada_por.get_full_name|default:n.notificada_por.username }}{% endif %}</div>
       {% if n.acuse_notificacion %}<a href="{% url 'nucleo:acuse' n.acuse_notificacion.folio %}" target="_blank">{{ n.acuse_notificacion.folio }}</a>{% endif %}
       {% elif f.puede_entregar %}
-      <details>
+      <details{% if f.abierta %} open{% endif %}>
         <summary class="btn btn-sm btn-outline-primary">Registrar entrega</summary>
         <form method="post" action="{% url 'contrato:notificacion_entregar' n.pk %}" class="mt-2" style="min-width: 15rem">
           {% csrf_token %}<input type="hidden" name="volver" value="{{ volver }}">

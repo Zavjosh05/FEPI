@@ -47,6 +47,8 @@
         </form>
       </div>
     </div>
+    {% elif request.resolver_match.url_name != 'entrar' %}
+    <a class="btn btn-sm btn-outline-light ms-auto" href="{% url 'nucleo:entrar' %}" data-prueba="enlace-entrar">Iniciar sesión</a>
     {% endif %}
   </div>
 </nav>

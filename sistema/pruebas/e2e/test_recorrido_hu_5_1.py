@@ -36,7 +36,7 @@ def test_hu_5_1_recorrido_oficio_comprobante_y_envio_de_la_solicitud(  # noqa: F
     expect(page.locator("[data-prueba=panel-por-solicitar]")).to_contain_text(incompleta.folio)
     captura("hu_5_1_04_bandeja_del_area_responsable_ministraciones_por_solicitar")
     page.goto(f"{live_server.url}/recepcion/expediente/{incompleta.folio}/?pestana=pagos")
-    expect(page.locator("[data-prueba=faltan-soportes-m1]")).to_contain_text("comprobante de la cuenta bancaria")
+    expect(page.locator("[data-soporte=comprobante_cuenta]")).to_contain_text("Lo resuelve la Delegación")
     page.click("[data-prueba=form-envio-m1] button")
     expect(page.locator(".alert-danger")).to_contain_text("No se puede enviar la solicitud: falta Comprobante de la cuenta bancaria")
     captura("hu_5_1_05_solicitud_incompleta_no_se_envia_y_dice_que_falta")

@@ -43,14 +43,15 @@
   </div>
   {% if m.solicitud and m.solicitud.enviada_en %}
   <div class="small mt-1" data-prueba="envio-solicitud">Enviada a Administración y Finanzas el <strong data-prueba="fecha-envio">{{ m.solicitud.enviada_en|date:"d/m/Y H:i:s" }} h</strong>{% if m.solicitud.envios > 1 %} (envío {{ m.solicitud.envios }}){% endif %}{% if m.solicitud.acuse_envio %} · acuse <a href="{% url 'nucleo:acuse' m.solicitud.acuse_envio.folio %}" target="_blank">{{ m.solicitud.acuse_envio.folio }}</a>{% endif %} · {{ m.solicitud.folio }}</div>
-  {% if m.plazo_remision %}<div class="small" data-prueba="plazo-remision">Plazo de la Secretaría Técnica para solicitar el pago a la Fiduciaria: <strong>{{ m.plazo_remision.texto }}</strong> ({{ m.plazo_remision.estado }}).</div>{% endif %}
+  {% if m.plazo_remision %}<div class="small" data-prueba="plazo-remision">Plazo de la Secretaría Técnica para solicitar el pago a la Fiduciaria: <strong>{{ m.plazo_remision.texto }}</strong>
+    {% if m.remision %}(<span data-prueba="plazo-remision-resultado">{% if m.remision.en_plazo %}cumplido en plazo{% else %}cumplido fuera de plazo{% endif %}: solicitado el {{ m.remision.remitida_en|date:"d/m/Y H:i" }} h</span>){% else %}({{ m.plazo_remision.estado }}){% endif %}.</div>{% endif %}
   {% endif %}
   <table class="table table-sm small mt-2 mb-1" data-prueba="soportes-m{{ m.numero }}">
     <thead class="table-light"><tr><th>Soporte</th><th>Estado</th><th>Detalle</th></tr></thead>
     <tbody>{% for s in m.soportes %}
       <tr data-soporte="{{ s.clave }}"><td>{{ s.nombre }}<div class="text-secondary">{{ s.fundamento|truncatechars:150 }}</div></td>
         <td>{% if s.cumple %}<span class="badge text-bg-success">Completo</span>{% else %}<span class="badge text-bg-danger">Falta</span>{% endif %}</td>
-        <td>{{ s.detalle }}{% if s.referencia %} · {% if s.url %}<a href="{{ s.url }}" target="_blank">{{ s.referencia }}</a>{% else %}{{ s.referencia }}{% endif %}{% endif %}</td></tr>
+        <td>{{ s.detalle }}{% if not s.cumple %} <span class="text-danger" data-prueba="responsable-soporte">Lo resuelve {{ s.responsable }}.</span>{% endif %}{% if s.referencia %} · {% if s.url %}<a href="{{ s.url }}" target="_blank">{{ s.referencia }}</a>{% else %}{{ s.referencia }}{% endif %}{% endif %}</td></tr>
     {% endfor %}</tbody>
   </table>
   {% if m.solicitud and m.solicitud.estado == 'devuelta' %}<div class="alert alert-danger small py-1 mb-2" data-prueba="solicitud-devuelta">Devuelta por Administración y Finanzas: corrija y reenvíe.</div>{% endif %}
@@ -59,10 +60,8 @@
       <input class="form-control form-control-sm w-auto flex-grow-1" name="observaciones" placeholder="Observaciones (opcional)" aria-label="Observaciones">
       <button class="btn btn-sm btn-primary" type="submit">Enviar la solicitud a Administración y Finanzas</button></form>
     {% if not m.solicitud %}<form method="post" action="{% url 'pagos:solicitud_preparar' exp.folio m.numero %}" class="mt-1">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Dejarla por enviar</button></form>{% endif %}
-    {% if m.faltan %}<div class="small text-danger mt-1" data-prueba="faltan-soportes-m{{ m.numero }}">No se puede enviar: falta {% for s in m.faltan %}{{ s.nombre|lower }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
   {% elif not m.enviada and m.motivo %}
     <div class="small text-secondary" data-prueba="motivo-sin-solicitar">{{ m.motivo }}</div>
-    {% if m.faltan and m.numero > 1 %}<div class="small text-danger" data-prueba="faltan-soportes-m{{ m.numero }}">Faltan soportes: {% for s in m.faltan %}{{ s.nombre|lower }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
   {% endif %}
   {% include "pagos/pagos/_en_ministracion.html" %}
   {% include "pagos/cheques/_en_ministracion.html" %}

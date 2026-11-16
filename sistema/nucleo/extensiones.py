@@ -26,9 +26,12 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
 - AL_LIBERAR_RECURSO: funciones ``(expediente, usuario) -> None`` que corren cuando el área responsable confirma
   la liberación del recurso de un contrato sin firma en plazo (HU-3.3). Gancho para la reasignación a la lista de
   espera por acuerdo del Comité (sprint 3, flujo alterno D).
+- EXTRAS_BANDEJA: funciones ``(usuario) -> Q | None`` que suman a «por atender» expedientes que la unidad debe atender
+  aunque su estado esté asignado a otra unidad (PSAHEM: la solicitud aceptada que la Secretaría Técnica debe remitir, P-26).
 """
 
 FILTROS_BANDEJA = []
+EXTRAS_BANDEJA = []
 PANELES_BANDEJA = []
 PESTANAS_EXPEDIENTE = []
 GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos"]

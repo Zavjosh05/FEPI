@@ -72,6 +72,7 @@ def bandeja_notificaciones(request):
     if request.user.tipo_unidad not in (TipoUnidad.DELEGACION, TipoUnidad.DIRECCION) and not request.user.is_superuser:
         raise PermissionDenied("Las notificaciones las entrega la Delegación y las envía el área responsable.")
     ver = request.GET.get("ver", "pendientes")
+    aviso = request.GET.get("aviso", "")      # P-25: el folio del panel abre ya el formulario de ese aviso
     todas = publicacion.notificaciones_visibles(request.user)
     pendientes = todas.filter(notificada_en__isnull=True)
     if request.user.tipo_unidad == TipoUnidad.DELEGACION:
@@ -80,6 +81,7 @@ def bandeja_notificaciones(request):
     filas = [{"n": n, "vencimiento": publicacion.vencimiento_de(n),
               "puede_entregar": request.user.tipo_unidad == TipoUnidad.DELEGACION
               and request.user.unidad_id == n.delegacion_id and n.notificada_en is None,
+              "abierta": str(n.pk) == aviso,
               "form": EntregaForm(prefix=f"n{n.pk}")} for n in qs.order_by("-enviada_en", "-id")[:200]]
     return render(request, "contrato/publicacion/notificaciones.html", {
         "filas": filas, "ver": ver, "total_pendientes": pendientes.count(), "total": todas.count(),

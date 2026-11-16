@@ -102,7 +102,11 @@ def salida(request, folio):
         except (ValidationError, PermissionDenied) as e:
             _errores(request, e)
         else:
-            messages.success(request, f"Salida registrada: {s.especie.nombre} × {s.cantidad} (acuse {s.acuse.folio}).")
+            msg = f"Salida registrada: {s.especie.nombre} × {s.cantidad} (acuse {s.acuse.folio})."
+            vale.expediente.refresh_from_db()
+            if vale.expediente.estado.clave == "planta_entregada":      # P-28: avisa el nuevo estado al surtirse
+                msg += f" El vale quedó surtido y la solicitud pasó a «{vale.expediente.estado.nombre}»."
+            messages.success(request, msg)
     else:
         messages.error(request, "Indique la especie y una cantidad mayor que cero.")
     return redirect("contrato:vale", vale.folio)

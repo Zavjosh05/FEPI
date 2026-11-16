@@ -213,6 +213,16 @@ def filtro_admin_finanzas(usuario, qs):
                         solicitudes_pago__estado="aceptada"))
 
 
+def extra_secretaria_comite(usuario):
+    """P-26: en PSAHEM la solicitud aceptada que la Secretaría Técnica debe remitir a la Fiduciaria también está en su «por atender»."""
+    if usuario.tipo_unidad != TipoUnidad.SECRETARIA_COMITE:
+        return None
+    from .models import SolicitudPago
+
+    aceptadas = SolicitudPago.objects.filter(estado="aceptada").values("expediente_id")
+    return Q(ejercicio__programa__clave="PSA", estado__clave="ministracion_solicitada", pk__in=aceptadas)
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -225,6 +235,7 @@ def registrar():
                                         panel_cheques_por_emitir, panel_cheques_por_enviar, panel_cheques_por_entregar,
                                         panel_cheques_por_vencer])
     extensiones.FILTROS_BANDEJA.append(filtro_admin_finanzas)
+    extensiones.EXTRAS_BANDEJA.append(extra_secretaria_comite)
     extensiones.REVISIONES_PLAZO.extend([pagos.revisar_remisiones, cheques.revisar_cobros])
     T = TipoUnidad
     extensiones.MENU.extend([
