@@ -7,13 +7,12 @@
 </div>
 <div class="tarjeta" data-prueba="indice-publico">
   {% for p in publicaciones %}
-  {% ifchanged p.ejercicio_id %}
+
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom">
     <div><a class="fw-semibold" href="{% url 'contrato:resultados_programa' p.ejercicio.programa.clave p.ejercicio.anio %}">{{ p.ejercicio.programa.nombre }} {{ p.ejercicio.anio }}</a>
       <div class="small text-secondary">Última publicación: {{ p.publicada_en|date:"d/m/Y H:i" }} h</div></div>
     <a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:resultados_programa' p.ejercicio.programa.clave p.ejercicio.anio %}">Ver listados</a>
   </div>
-  {% endifchanged %}
   {% empty %}
   <div class="text-secondary">Todavía no se publican resultados.</div>
   {% endfor %}

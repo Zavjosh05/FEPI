@@ -131,10 +131,20 @@ def contexto_publicacion(request, exp):
 
 
 # ----------------------------------------------------------------------------- página pública (sin sesión)
+def ultima_por_programa(publicaciones):
+    """De varias publicaciones (de la más reciente a la más antigua), la última de cada programa y ejercicio,
+    ordenadas por nombre del programa: un programa publica una vez por sesión del Comité, pero en el índice
+    aparece una sola vez."""
+    ultimas = {}
+    for p in publicaciones:
+        ultimas.setdefault(p.ejercicio_id, p)
+    return sorted(ultimas.values(), key=lambda p: (p.ejercicio.programa.nombre, -p.ejercicio.anio))
+
+
 def resultados(request):
     """Índice público: los programas y ejercicios que ya publicaron resultados."""
     return render(request, "contrato/publicacion/publica_indice.html",
-                  {"publicaciones": publicacion.publicaciones_publicas()})
+                  {"publicaciones": ultima_por_programa(publicacion.publicaciones_publicas())})
 
 
 LIMITE_PUBLICO = 250
