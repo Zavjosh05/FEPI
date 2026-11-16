@@ -44,10 +44,21 @@ Docker Compose acepta argumentos para el servicio `pruebas`; al terminar, `docke
 
 | Qué | Comando | Tiempo medido |
 |---|---|---|
-| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador"` | 119 pruebas, ~62 s (71 s con arranque) |
-| Una historia | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~15–25 s |
-| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 127 pruebas, ~114 s (120 s con arranque) |
+| Rápidas (sin navegador) | `docker compose --profile pruebas run --rm pruebas pytest -m "not navegador"` | 351 pruebas, ~3 min 30 s (antes 11 min 37 s) |
+| Una historia | `docker compose --profile pruebas run --rm pruebas pytest pruebas/test_hu_2_3.py` | ~10–25 s |
+| Todo (rápidas + recorridos de Playwright) | `docker compose --profile pruebas run --rm pruebas` | 368 pruebas, ~6 min 30 s (antes 13 min 40 s) |
+| **Antes de cada entrega**: todo con los PDF reales | `docker compose --profile pruebas run --rm -e PDF_REAL=1 pruebas` | 368 pruebas, ~13 min 45 s |
 | Todo y regenerar capturas | `docker compose --profile pruebas run --rm -e CAPTURAS=1 pruebas` | igual que «todo» |
+
+**PDF ligero (P-22).** Cada acuse, contrato, vale u oficio pasa por `nucleo.acuses._pdf`, y WeasyPrint tarda de 4 a 8 s por
+documento; casi todas las pruebas arman expedientes completos y generaban decenas. Por omisión, la fixture automática
+`pdf_ligero` (`pruebas/conftest.py`) sustituye `nucleo.acuses._render_pdf` por un PDF mínimo válido (empieza con `%PDF` y
+lleva el texto visible del documento, así que cada uno tiene su propia huella SHA-256). Siguen con el render verdadero:
+las pruebas marcadas con `@pytest.mark.pdf_real` (acuse de recepción, `test_hu_1_1`; acta, `test_hu_2_3`; contrato,
+`test_hu_3_2`, en dos pruebas; contrato firmado, `test_hu_3_3`; vale, `test_hu_3_4`; oficio, `test_hu_5_1`; y `test_nucleo_pdf`),
+**todas las de navegador** (descargan y abren documentos) y **toda la batería si se define `PDF_REAL=1`**. Para otra prueba que deba
+comprobar el documento verdadero, basta `@pytest.mark.pdf_real`. Además, las pruebas cifran las contraseñas con MD5
+(`hash_rapido`; PBKDF2 tarda ~0.5 s por inicio de sesión), y el servidor real sigue con PBKDF2.
 
 Los recorridos de Playwright (todo lo que usa `page` o `live_server`, en `pruebas/e2e/`) llevan el marcador
 `navegador` (registrado en `pytest.ini`) y corren al final. **Las capturas solo se guardan con `CAPTURAS=1`**; sin

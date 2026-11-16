@@ -83,6 +83,7 @@ def test_hu_3_2_los_campos_de_la_plantilla_se_validan(usuarios, cc):
 
 
 # ----------------------------------------------------------------------------- criterio 1: contrato sobre modelo validado
+@pytest.mark.pdf_real
 def test_hu_3_2_existe_un_contrato_por_solicitud_aprobada_sobre_un_modelo_validado(notificadas, modelo_validado, usuarios):
     """Criterio 1: existe un contrato por solicitud aprobada, elaborado sobre un modelo validado, con sus datos."""
     sesion, (exp,) = notificadas("PS")
@@ -253,6 +254,7 @@ def test_hu_3_2_pantallas_de_modelos_alta_base_version_y_revision(notificadas, u
     assert client.get("/contrato/modelos/").status_code == 403
 
 
+@pytest.mark.pdf_real
 def test_hu_3_2_pantallas_de_elaboracion_envio_y_pdf(notificadas, modelo_validado, usuarios, client, contrasena):
     sesion, (exp,) = notificadas("PS")
     client.login(username="dir_drff", password=contrasena)

@@ -37,6 +37,7 @@ def test_hu_3_4_criterios_y_necesidades_vienen_del_modelo(modelo):
 
 
 # ----------------------------------------------------------------------------- emisión del vale
+@pytest.mark.pdf_real
 def test_hu_3_4_el_vale_lleva_especie_cantidad_vivero_fecha_hora_acuse_y_hito(contratadas, catalogo_planta, usuarios):
     vivero, esp = catalogo_planta
     _, (exp,) = contratadas("PS")

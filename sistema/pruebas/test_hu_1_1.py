@@ -17,6 +17,7 @@ def test_hu_1_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     assert "municipio que atiende la Delegación" in necesidades["CC-DRF-01"]["texto"]
 
 
+@pytest.mark.pdf_real
 def test_hu_1_1_existe_solicitud_asociada_al_predio_con_acuse(nueva_solicitud, usuarios):
     """Criterio 1: existe una solicitud asociada al predio y se genera su acuse con fecha y hora de recepción."""
     exp = nueva_solicitud(nombre="Predio El Pino")

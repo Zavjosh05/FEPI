@@ -51,6 +51,7 @@ def test_hu_3_3_criterios_y_necesidades_vienen_del_modelo(modelo):
 
 
 # ----------------------------------------------------------------------------- criterio 1
+@pytest.mark.pdf_real
 def test_hu_3_3_existe_el_contrato_firmado_con_fecha_hora_y_dentro_del_plazo(en_delegacion, usuarios, pdf):
     _, (exp,) = en_delegacion("PS")
     antes = timezone.now()

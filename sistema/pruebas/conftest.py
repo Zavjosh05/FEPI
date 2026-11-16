@@ -2,6 +2,8 @@
 mismos comandos que usa el sistema, a partir de reglas/*.json y datos/*.json."""
 import io
 import json
+import os
+import re
 from pathlib import Path
 
 import pytest
@@ -32,6 +34,34 @@ def asegurar_catalogos():
         crear_usuarios()
 
 
+def pdf_real_forzado():
+    """PDF_REAL=1 obliga a renderizar con WeasyPrint en toda la batería (se corre antes de cada entrega)."""
+    return os.environ.get("PDF_REAL", "").strip().lower() in ("1", "true", "si", "sí", "yes")
+
+
+def _pdf_ligero(html):
+    """Sustituto de WeasyPrint: un PDF mínimo válido (empieza con %PDF) con el texto visible del documento, para que
+    cada documento tenga su propia huella y se pueda buscar su texto."""
+    from nucleo.demo import _pdf_demo
+
+    html = re.sub(r"(?is)<(?:style|head|script)[ >].*?</(?:style|head|script)>", " ", html)
+    texto = re.sub(r"\s+", " ", re.sub(r"(?s)<[^>]+>", " ", html)).strip()[:400]
+    texto = texto.replace("\\", " ").replace("(", "[").replace(")", "]")
+    return _pdf_demo(texto)
+
+
+@pytest.fixture(autouse=True)
+def pdf_ligero(request, monkeypatch):
+    """Por omisión las pruebas no renderizan los PDF con WeasyPrint (4 a 8 s cada uno): usan `_pdf_ligero`.
+    Conservan el render verdadero las marcadas `@pytest.mark.pdf_real`, las de navegador (descargan y abren
+    documentos) y toda la batería con `PDF_REAL=1`."""
+    if pdf_real_forzado() or request.node.get_closest_marker("pdf_real") or request.node.get_closest_marker("navegador"):
+        return
+    from nucleo import acuses
+
+    monkeypatch.setattr(acuses, "_render_pdf", _pdf_ligero)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def archivos_temporales(tmp_path_factory):
     """Los archivos subidos y los acuses de las pruebas van a una carpeta temporal nueva."""
@@ -40,8 +70,18 @@ def archivos_temporales(tmp_path_factory):
     settings.MEDIA_ROOT = str(tmp_path_factory.mktemp("archivos"))
 
 
+@pytest.fixture(scope="session", autouse=True)
+def hash_rapido():
+    """Las contraseñas de demostración se cifran con MD5 solo en las pruebas (PBKDF2 tarda ~0.5 s por inicio de
+    sesión). Va antes de crear los usuarios de la base de pruebas."""
+    from django.test.utils import override_settings
+
+    with override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"]):
+        yield
+
+
 @pytest.fixture(scope="session")
-def django_db_setup(django_db_setup, django_db_blocker):
+def django_db_setup(hash_rapido, django_db_setup, django_db_blocker):
     """Carga los catálogos una sola vez en la base de pruebas (cada prueba corre en su transacción)."""
     with django_db_blocker.unblock():
         asegurar_catalogos()

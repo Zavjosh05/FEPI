@@ -8,10 +8,16 @@ from django.utils import timezone
 from .models import Acuse
 
 
-def _pdf(html):
+def _render_pdf(html):
     from weasyprint import HTML  # importación diferida: WeasyPrint tarda en cargar
 
     return HTML(string=html).write_pdf()
+
+
+def _pdf(html):
+    """Único punto donde el sistema convierte HTML en PDF (acuses, contratos, vales, oficios). Las pruebas que no
+    comprueban el documento sustituyen `_render_pdf` (ver «Cómo probar» en el README)."""
+    return _render_pdf(html)
 
 
 def emitir_acuse(expediente, tipo, titulo, usuario, renglones, destinatario="", detalle=None, nota="", referencia="",

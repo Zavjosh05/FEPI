@@ -55,6 +55,7 @@ def test_hu_2_3_convocatoria_sin_anticipacion_o_sin_documentos_se_rechaza(sesion
     assert sesiones.enviar_convocatoria(usuarios["comite"], extraordinaria)
 
 
+@pytest.mark.pdf_real
 def test_hu_2_3_existe_acta_con_listados_aprobados_y_autorizacion_de_publicacion(sesion, dictaminada, usuarios):
     """Criterio 2: existe un acta con los listados aprobados y la autorización de publicación."""
     a = dictaminada(nombre="Predio Reforestado", ha=5)
@@ -74,6 +75,7 @@ def test_hu_2_3_existe_acta_con_listados_aprobados_y_autorizacion_de_publicacion
     s.refresh_from_db()
     assert s.estado == "celebrada" and s.autoriza_publicacion and s.acuse_acta == acta
     assert "Sí" in dict(acta.contenido["renglones"])["Autorización de publicación"]
+    assert acta.archivo.open("rb").read(4) == b"%PDF" and len(acta.huella) == 64   # el acta, con el PDF verdadero
     assert any("$10,000.00" in x["texto"] for x in acta.contenido["detalle"])   # monto con separador de miles
     listados = {x["clave"] for x in acta.contenido["detalle"]}
     assert listados == {"Lista de Personas Beneficiarias", "Lista de espera", "Lista de solicitudes No factibles"}

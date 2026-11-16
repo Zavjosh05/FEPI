@@ -30,6 +30,7 @@ def test_hu_5_1_criterios_y_necesidades_vienen_del_modelo(modelo):
 
 
 # ----------------------------------------------------------------------------- oficio de la Delegación
+@pytest.mark.pdf_real
 def test_hu_5_1_la_delegacion_emite_el_oficio_en_cuanto_el_contrato_esta_firmado(contratadas, usuarios):
     _, (exp,) = contratadas("PS")
     oficio = solicitudes.emitir_oficio(delegado_de(usuarios, exp), exp)
