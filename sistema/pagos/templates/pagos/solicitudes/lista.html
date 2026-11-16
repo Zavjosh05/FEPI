@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Solicitudes de pago{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Solicitudes de pago</h1>
+  <div class="small text-secondary">{% if es_delegacion %}La Delegación emite el oficio de solicitud de pago en cuanto el contrato está firmado.{% elif es_area %}Cada ministración se solicita con sus soportes; la segunda depende de la verificación (sprint 3).{% else %}Solicitudes de pago de los expedientes que atiende su unidad.{% endif %}</div>
+</div>
+
+{% if es_delegacion %}
+<div class="tarjeta mb-3" data-prueba="por-emitir-oficio">
+  <div class="titulo-seccion">Contratos firmados por emitir su oficio ({{ por_emitir|length }})</div>
+  {% if por_emitir %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th></th></tr></thead>
+    <tbody>{% for e in por_emitir %}<tr data-folio="{{ e.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'pagos:expediente' e.folio %}">{{ e.folio }}</a></td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td class="text-end"><a class="btn btn-sm btn-primary text-nowrap" href="{% url 'pagos:expediente' e.folio %}">Emitir el oficio</a></td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todos los contratos firmados tienen su oficio.</div>{% endif %}
+</div>
+{% endif %}
+
+{% if es_area %}
+<div class="tarjeta mb-3" data-prueba="por-solicitar">
+  <div class="titulo-seccion">Ministraciones por solicitar ({{ por_solicitar|length }})</div>
+  {% if por_solicitar %}
+  <div class="table-responsive"><table class="table table-sm small align-middle">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Ministración</th><th>Importe</th><th>Soportes</th><th></th></tr></thead>
+    <tbody>{% for f in por_solicitar %}{% with e=f.exp m=f.fila %}
+    <tr data-folio="{{ e.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'pagos:expediente' e.folio %}">{{ e.folio }}</a></td>
+      <td>{{ e.solicitante.nombre }}<div class="text-secondary">{{ e.predio.nombre }} · {{ e.predio.municipio.nombre }}</div></td>
+      <td>{{ m.numero }} ({{ m.porcentaje|floatformat:"-2" }} %){% if m.solicitud.estado == 'devuelta' %} <span class="badge text-bg-danger">devuelta</span>{% endif %}</td>
+      <td class="text-nowrap">{{ m.importe|moneda }}</td>
+      <td>{% if m.faltan %}<span class="badge text-bg-danger">Faltan {{ m.faltan|length }}</span>{% else %}<span class="badge text-bg-success">Completos</span>{% endif %}</td>
+      <td class="text-end"><a class="btn btn-sm btn-primary text-nowrap" href="{% url 'pagos:expediente' e.folio %}">Abrir la solicitud</a></td></tr>
+    {% endwith %}{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">No hay ministraciones por solicitar.</div>{% endif %}
+</div>
+{% endif %}
+
+{% include "pagos/solicitudes/_tabla.html" with titulo="Devueltas con observaciones" clave="devueltas" filas=devueltas %}
+{% include "pagos/solicitudes/_tabla.html" with titulo="Por enviar" clave="borradores" filas=borradores %}
+{% include "pagos/solicitudes/_tabla.html" with titulo="En trámite" clave="en-tramite" filas=en_tramite %}
+{% include "pagos/solicitudes/_tabla.html" with titulo="Pagadas" clave="pagadas" filas=pagadas %}
+{% endblock %}

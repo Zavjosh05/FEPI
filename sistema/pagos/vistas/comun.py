@@ -1,9 +1,28 @@
-"""Contexto de la pestaña «Pagos» del expediente. Las historias HU-5.x agregan aquí sus datos."""
-from nucleo import montos, plazos
+"""Vistas y utilidades comunes del módulo M5 y contexto de la pestaña «Pagos» del expediente."""
+from django.http import Http404
 
-from ..registro import HISTORIAS, USOS_DE_PLAZO
+from nucleo import montos, plazos
+from nucleo.models import expedientes_visibles
+
+from ..registro import USOS_DE_PLAZO, historias_pendientes
+
+
+def mensajes_error(error):
+    return error.messages if hasattr(error, "messages") else [str(error)]
+
+
+def expediente_visible(request, folio):
+    exp = expedientes_visibles(request.user).filter(folio=folio).first()
+    if exp is None:
+        raise Http404("No existe el expediente o no está entre los que atiende su unidad.")
+    return exp
 
 
 def contexto_pagos(request, exp):
-    return {"historias": HISTORIAS, "monto": montos.monto_si_aprobado(exp),
-            "vencimientos": list(plazos.vencimientos(exp, USOS_DE_PLAZO).values())}
+    """Cada historia (HU-5.x) suma aquí lo suyo a la pestaña."""
+    from .solicitudes import contexto_solicitudes_exp
+
+    contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
+                "vencimientos": list(plazos.vencimientos(exp, USOS_DE_PLAZO).values())}
+    contexto.update(contexto_solicitudes_exp(request, exp))
+    return contexto

@@ -8,7 +8,7 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato y HU-3.3 Firma del contrato y HU-3.4 Entrega de planta.
+notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta y HU-5.1 Solicitud de pago.
 
 ## Cómo levantar
 
@@ -128,7 +128,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── contrato/, pagos/  apps M3 (HU-3.1 y HU-3.2 hechas) y M5 (vacía): models/ (paquete, un módulo por historia), vistas/,
+├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 hecha): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
 ├── plantillas/        base.html
@@ -539,6 +539,38 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   Verde (PS) con vale vencido sin reposición; Arroyo Claro (RHF) con vale vigente y salida parcial; Cerro Gordo (RHF) con vale
   vencido (salida parcial) y su vale de reposición por lo no entregado. El vencimiento se simula corriendo hacia atrás las
   fechas del vale.
+
+### M5 · HU-5.1 Solicitud de pago
+
+- **Organización.** `pagos/models/solicitudes.py` (migración `0001_hu_5_1_solicitudes`: `OficioPago`, `ComprobanteCuenta`,
+  `SolicitudPago`), servicio `pagos/solicitudes.py`, vistas `vistas/solicitudes.py`, formularios `formularios/solicitudes.py`,
+  plantillas `templates/pagos/solicitudes/` y los datos por programa en `datos/pagos.json`.
+- **Oficio de la Delegación.** `solicitudes.emitir_oficio`: solo la Delegación del expediente y solo con el contrato firmado
+  (HU-3.3); uno por solicitud (folio `OFP-<programa>-<año>-NNNN`), PDF con plantilla propia marcada «BORRADOR» (las ROP no traen el
+  formato, R-07), acuse y renglón de bitácora. No cambia el estado del expediente.
+- **Soportes por programa y por número de ministración (datos).** `datos/pagos.json` dice, para la primera ministración y para
+  «siguientes», qué soportes pide cada programa, con su fundamento (numeral y línea de las ROP): CC, PS y RHF, contrato firmado,
+  oficio de la Delegación y comprobante de la cuenta bancaria (CC-REQ-23, PS-REQ-20, RHF-REQ-29: son condiciones «al firmar el
+  contrato», por eso el comprobante se sube en M5 y no se revisa en M1); PSAHEM, contrato o convenio firmado, oficio, dictámenes y la
+  **instrucción de pago del Comité Técnico** de esa ministración (acuerdo de HU-2.4 tipo `instruccion_pago`; no pide comprobante: paga
+  con cheque, 10.1 fr. X, línea 2288). Las ministraciones siguientes agregan la «verificación en campo o evaluación de reportes».
+  Cada soporte se comprueba con una función de `solicitudes.FUENTES`; la de `verificacion_campo` todavía no existe (sprint 3): dice que la
+  segunda ministración no se puede solicitar y por qué, y el sprint 3 solo la reemplaza (hay una prueba que lo demuestra).
+- **Comprobante de la cuenta.** `solicitudes.adjuntar_comprobante` (Delegación, que lo recibe al firmar, o el área responsable): PDF, JPG
+  o PNG; el más reciente es el vigente (un cambio de cuenta es un comprobante nuevo). Se rechaza en los programas que no lo piden.
+- **Solicitud de la ministración.** `preparar_solicitud` (la deja «por enviar», con su lista de soportes) y `enviar_solicitud`: solo el
+  área responsable (Dirección Instancia Ejecutora del programa). **El servicio impide el envío si falta un soporte y dice cuál**
+  (la solicitud queda por enviar). Importe y porcentaje son los de `nucleo.montos.monto_aprobado` (CC: pago único de 100 % hasta 5 ha,
+  70 y 30 arriba; PS, RHF y PSAHEM, 70 y 30). Una por expediente y número de ministración; la segunda solo cuando la anterior está pagada.
+  El envío deja fecha, hora, copia de los soportes, acuse en PDF y el estado `ministracion_solicitada`; solo se solicita desde
+  `contratada`, `planta_entregada` (PS y RHF con Vale), `pagada` o `cheque_entregado`. Una solicitud devuelta (HU-5.2) se corrige y se reenvía.
+- **PSAHEM.** El envío registra el hito `solicitud_pago_fiduciaria` (la solicitud del área llega a Administración y Finanzas y a la Secretaría
+  Técnica) con el que corren los 5 días hábiles de la Secretaría Técnica (`solicitudes.plazo_remision`, ROP 10.1 fr. X, líneas 2290 a 2292),
+  que la pestaña ya muestra.
+- **Pantallas.** Pestaña «Pagos» del expediente (oficio, comprobante y cada ministración con su lista de soportes, con enlace al
+  documento de cada uno), «Pagos» en el menú (solicitudes por emitir oficio, por solicitar, por enviar, en trámite y pagadas), paneles en
+  las bandejas de la Delegación y del área responsable y siguiente paso en el expediente.
+- **PEG.** Sin reglas: `datos/pagos.json` solo fija que su pago es un «depósito» (HU-5.2).
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

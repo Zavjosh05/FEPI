@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ folio }}</title>
+<style>
+  @page { size: letter; margin: 2cm 2cm 2.2cm 2cm;
+    @bottom-center { content: "{{ folio }} · página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; color: #1d1d1d; line-height: 1.45; }
+  .encabezado { border-bottom: 2px solid #1f5130; padding-bottom: 6px; margin-bottom: 14px; }
+  .encabezado .org { font-size: 9pt; color: #1f5130; font-weight: bold; letter-spacing: .5px; }
+  .encabezado h1 { font-size: 15pt; margin: 4px 0 0 0; }
+  .folio { float: right; text-align: right; font-size: 9pt; }
+  .folio strong { font-size: 12pt; display: block; }
+  .borrador { border: 2px solid #b02a37; color: #b02a37; font-weight: bold; text-align: center; padding: 6px; margin: 0 0 12px 0; font-size: 11pt; }
+  p { text-align: justify; margin: 0 0 9px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 9pt; }
+  th { background: #eef3ef; }
+  .datos th { width: 32%; background: none; font-weight: normal; color: #444; }
+  .firmas { margin-top: 56px; width: 100%; page-break-inside: avoid; }
+  .firmas td { border: none; width: 50%; text-align: center; padding-top: 34px; }
+  .firmas span { border-top: 1px solid #333; display: inline-block; width: 82%; padding-top: 3px; font-size: 8.5pt; }
+  .pie { margin-top: 16px; font-size: 7.5pt; color: #666; }
+</style>
+</head>
+<body>
+  <div class="encabezado">
+    <div class="folio">Oficio<strong>{{ folio }}</strong>{{ fecha|date:"d/m/Y H:i" }} h</div>
+    <div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+    <h1>Oficio de solicitud de pago</h1>
+  </div>
+  <div class="borrador">BORRADOR · formato por validar (las Reglas de Operación no traen el formato del oficio)</div>
+  <p><strong>{{ delegacion.nombre }}</strong> a <strong>{{ direccion.nombre|default:"el área responsable del programa" }}</strong>:</p>
+  <p>Con fundamento en las Reglas de Operación del programa, y toda vez que el contrato de la persona beneficiaria quedó firmado, esta
+  Delegación solicita que se tramite el pago del apoyo aprobado, con los soportes que obran en el expediente.</p>
+  <table class="datos">
+    <tr><th>Solicitud</th><td>{{ expediente.folio }} · {{ expediente.ejercicio.programa.nombre }} {{ expediente.ejercicio.anio }}</td></tr>
+    <tr><th>Persona beneficiaria</th><td>{{ expediente.solicitante.nombre }}</td></tr>
+    <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
+    <tr><th>Contrato firmado</th><td>{{ firma.contrato.folio }} · firmado el {{ firma.firmado_en|date:"d/m/Y H:i" }} h</td></tr>
+    {% if monto %}<tr><th>Monto aprobado</th><td>${{ monto.total|floatformat:2 }} ({{ monto.superficie_ha|floatformat:"-4" }} ha)</td></tr>{% endif %}
+    <tr><th>Forma de pago</th><td>{{ tipo_pago }}</td></tr>
+  </table>
+  {% if monto and monto.ministraciones %}
+  <table>
+    <thead><tr><th>Ministración</th><th>Porcentaje</th><th>Importe</th></tr></thead>
+    <tbody>{% for m in monto.ministraciones %}<tr><td>{{ m.numero }}</td><td>{{ m.porcentaje|floatformat:"-2" }} %</td><td>${{ m.importe|floatformat:2 }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+  <table class="firmas"><tr>
+    <td><span>{{ delegacion.nombre }}</span></td>
+    <td><span>Recibe: {{ direccion.nombre|default:"área responsable del programa" }}</span></td>
+  </tr></table>
+  <div class="pie">Documento generado por el Sistema de programas de PROBOSQUE. Plantilla propia en borrador: se sustituirá por el formato oficial cuando el cliente lo entregue.</div>
+</body>
+</html>

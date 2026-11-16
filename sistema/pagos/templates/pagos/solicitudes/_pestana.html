@@ -1,0 +1,70 @@
+{% load moneda %}
+<div class="titulo-seccion mt-3">Solicitud de pago (HU-5.1)</div>
+<div class="small text-secondary mb-2">Forma de pago: <strong data-prueba="tipo-pago">{{ tipo_pago }}</strong>.{% if nota_pago %} {{ nota_pago }}{% endif %}</div>
+
+<div class="tarjeta mb-3" data-prueba="oficio-pago">
+  <div class="fw-semibold mb-1">Oficio de solicitud de pago de la Delegación</div>
+  {% if oficio %}
+  <div class="small">Oficio <strong>{{ oficio.folio }}</strong> emitido el <strong>{{ oficio.emitido_en|date:"d/m/Y H:i" }} h</strong> por {{ oficio.emitido_por.get_full_name|default:oficio.emitido_por.username }}{% if oficio.acuse %} · acuse <a href="{% url 'nucleo:acuse' oficio.acuse.folio %}" target="_blank">{{ oficio.acuse.folio }}</a>{% endif %}
+    · <a href="{% url 'pagos:oficio_pdf' exp.folio %}" target="_blank">ver el oficio (PDF)</a></div>
+  <div class="small text-secondary">Formato en borrador: las ROP no traen el formato del oficio (R-07).</div>
+  {% elif puede_emitir_oficio %}
+  <div class="small mb-2">El contrato ya está firmado: la Delegación emite el oficio con el que el área responsable solicita el pago.</div>
+  <form method="post" action="{% url 'pagos:oficio_emitir' exp.folio %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit">Emitir el oficio de solicitud de pago</button></form>
+  {% elif firmado %}
+  <div class="small text-secondary" data-prueba="oficio-pendiente">La Delegación aún no emite el oficio de solicitud de pago.</div>
+  {% else %}
+  <div class="small text-secondary" data-prueba="oficio-pendiente">El oficio se emite en cuanto el contrato está firmado.</div>
+  {% endif %}
+</div>
+
+{% if pide_comprobante %}
+<div class="tarjeta mb-3" data-prueba="comprobante-cuenta">
+  <div class="fw-semibold mb-1">Comprobante de la cuenta bancaria</div>
+  {% for c in comprobantes %}
+  <div class="small">Recibido el {{ c.subido_en|date:"d/m/Y H:i" }} h{% if c.descripcion %} · {{ c.descripcion }}{% endif %} · <a href="{% url 'pagos:comprobante' exp.folio c.pk %}" target="_blank">ver</a>{% if forloop.first and comprobantes|length > 1 %} <span class="badge text-bg-success">vigente</span>{% endif %}</div>
+  {% empty %}<div class="small text-secondary mb-1">Todavía no hay comprobante: lo piden las reglas para la primera ministración.</div>{% endfor %}
+  {% if puede_subir_comprobante %}
+  <form method="post" action="{% url 'pagos:comprobante_subir' exp.folio %}" enctype="multipart/form-data" class="row g-2 align-items-end mt-1" id="form-comprobante">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_comprobante.archivo }}</div>
+    <div class="col-12 col-md-4">{{ form_comprobante.descripcion }}</div>
+    <div class="col-12 col-md-2"><button class="btn btn-sm btn-outline-primary w-100" type="submit">Guardar</button></div>
+  </form>{% endif %}
+</div>
+{% endif %}
+
+{% for m in ministraciones %}
+<div class="tarjeta mb-3" data-prueba="solicitud-m{{ m.numero }}">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div><strong>Ministración {{ m.numero }}</strong> · {{ m.porcentaje|floatformat:"-2" }} % · <strong>{{ m.importe|moneda }}</strong>
+      {% if m.solicitud %}<span class="badge text-bg-{% if m.solicitud.estado == 'pagada' %}success{% elif m.solicitud.estado == 'devuelta' %}danger{% elif m.solicitud.estado == 'borrador' %}secondary{% else %}warning{% endif %}" data-prueba="estado-solicitud">{{ m.solicitud.get_estado_display }}</span>
+      {% else %}<span class="badge text-bg-secondary" data-prueba="estado-solicitud">Sin solicitar</span>{% endif %}
+      <div class="small text-secondary">{{ m.condicion|truncatechars:240 }}</div></div>
+  </div>
+  {% if m.solicitud and m.solicitud.enviada_en %}
+  <div class="small mt-1" data-prueba="envio-solicitud">Enviada a Administración y Finanzas el <strong data-prueba="fecha-envio">{{ m.solicitud.enviada_en|date:"d/m/Y H:i:s" }} h</strong>{% if m.solicitud.envios > 1 %} (envío {{ m.solicitud.envios }}){% endif %}{% if m.solicitud.acuse_envio %} · acuse <a href="{% url 'nucleo:acuse' m.solicitud.acuse_envio.folio %}" target="_blank">{{ m.solicitud.acuse_envio.folio }}</a>{% endif %} · {{ m.solicitud.folio }}</div>
+  {% if m.plazo_remision %}<div class="small" data-prueba="plazo-remision">Plazo de la Secretaría Técnica para solicitar el pago a la Fiduciaria: <strong>{{ m.plazo_remision.texto }}</strong> ({{ m.plazo_remision.estado }}).</div>{% endif %}
+  {% endif %}
+  <table class="table table-sm small mt-2 mb-1" data-prueba="soportes-m{{ m.numero }}">
+    <thead class="table-light"><tr><th>Soporte</th><th>Estado</th><th>Detalle</th></tr></thead>
+    <tbody>{% for s in m.soportes %}
+      <tr data-soporte="{{ s.clave }}"><td>{{ s.nombre }}<div class="text-secondary">{{ s.fundamento|truncatechars:150 }}</div></td>
+        <td>{% if s.cumple %}<span class="badge text-bg-success">Completo</span>{% else %}<span class="badge text-bg-danger">Falta</span>{% endif %}</td>
+        <td>{{ s.detalle }}{% if s.referencia %} · {% if s.url %}<a href="{{ s.url }}" target="_blank">{{ s.referencia }}</a>{% else %}{{ s.referencia }}{% endif %}{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+  {% if m.solicitud and m.solicitud.estado == 'devuelta' %}<div class="alert alert-danger small py-1 mb-2" data-prueba="solicitud-devuelta">Devuelta por Administración y Finanzas: corrija y reenvíe.</div>{% endif %}
+  {% if m.puede and es_area %}
+    <form method="post" action="{% url 'pagos:solicitud_enviar' exp.folio m.numero %}" class="d-flex flex-wrap gap-2 align-items-start" data-prueba="form-envio-m{{ m.numero }}">{% csrf_token %}
+      <input class="form-control form-control-sm w-auto flex-grow-1" name="observaciones" placeholder="Observaciones (opcional)" aria-label="Observaciones">
+      <button class="btn btn-sm btn-primary" type="submit">Enviar la solicitud a Administración y Finanzas</button></form>
+    {% if not m.solicitud %}<form method="post" action="{% url 'pagos:solicitud_preparar' exp.folio m.numero %}" class="mt-1">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Dejarla por enviar</button></form>{% endif %}
+    {% if m.faltan %}<div class="small text-danger mt-1" data-prueba="faltan-soportes-m{{ m.numero }}">No se puede enviar: falta {% for s in m.faltan %}{{ s.nombre|lower }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
+  {% elif not m.enviada and m.motivo %}
+    <div class="small text-secondary" data-prueba="motivo-sin-solicitar">{{ m.motivo }}</div>
+    {% if m.faltan and m.numero > 1 %}<div class="small text-danger" data-prueba="faltan-soportes-m{{ m.numero }}">Faltan soportes: {% for s in m.faltan %}{{ s.nombre|lower }}{% if not forloop.last %}; {% endif %}{% endfor %}.</div>{% endif %}
+  {% endif %}
+</div>
+{% empty %}
+<div class="small text-secondary">Las ministraciones se solicitan cuando el Comité aprueba la solicitud y el contrato está firmado.</div>
+{% endfor %}

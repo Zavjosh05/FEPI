@@ -35,13 +35,19 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
 def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     call_command("cargar_demo")
     call_command("cargar_demo")  # idempotente
+    from pagos.demo import LOTES
+    from pagos.models import EstadoSolicitud, OficioPago, SolicitudPago
+
+    # Lote de pagos (HU-5.1): expedientes propios de M5, aparte de los de M3 que siguen como estaban.
+    nuevos = [fila[2] for plan in LOTES.values() for fila in plan]
+    antes = Expediente.objects.exclude(predio__nombre__in=nuevos)
     # Primer lote (HU-3.1 y HU-3.2): PS y RHF ya publicaron y tienen contratos en distintos puntos; PSAHEM sigue con sus
     # dos aprobadas por publicar. Segundo lote (HU-3.3): tres más en PS y en RHF, con contratos firmados y uno sin firma.
     estados = {"PS": {"contrato_en_delegacion", "publicada", "vale_entregado", "sin_firma_en_plazo"},
                "RHF": {"contrato_elaborado", "notificada", "contratada", "vale_entregado"}, "PSA": {"aprobada"}}
     cuantos = {"PS": 5, "RHF": 5, "PSA": 2}
     for clave in ("PS", "RHF", "PSA"):
-        expedientes = Expediente.objects.filter(ejercicio__programa__clave=clave, resoluciones_comite__resultado="beneficiaria")
+        expedientes = antes.filter(ejercicio__programa__clave=clave, resoluciones_comite__resultado="beneficiaria")
         assert expedientes.count() == cuantos[clave], clave
         assert {e.estado.clave for e in expedientes} == estados[clave], clave
         for exp in expedientes:
@@ -49,12 +55,24 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
             assert m.total > 0 and m.ministraciones and exp.resoluciones_comite.get().monto == m.total
     assert Expediente.objects.filter(ejercicio__programa__clave="CC", estado__clave="aprobada").count() >= 2
     # HU-3.3: contratos firmados (con su acuse y verificación) y, en PS, uno sin firma por liberar.
-    assert Expediente.objects.filter(ejercicio__programa__clave="PS", estado__clave="sin_firma_en_plazo").count() == 1
-    assert Expediente.objects.filter(ejercicio__programa__clave="PS", estado__clave="vale_entregado").count() == 2
-    assert Expediente.objects.filter(ejercicio__programa__clave="RHF", estado__clave="contratada").count() == 1  # Peña Blanca: sin planta
-    assert FirmaContrato.objects.count() == 5 and SinFirma.objects.count() == 1
+    assert antes.filter(ejercicio__programa__clave="PS", estado__clave="sin_firma_en_plazo").count() == 1
+    assert antes.filter(ejercicio__programa__clave="PS", estado__clave="vale_entregado").count() == 2
+    assert antes.filter(ejercicio__programa__clave="RHF", estado__clave="contratada").count() == 1  # Peña Blanca: sin planta
+    assert FirmaContrato.objects.filter(expediente__in=antes).count() == 5 and SinFirma.objects.count() == 1
     # HU-3.4: vales vigentes, uno vencido (PS, sin reposición) y uno vencido con su reposición (RHF), con salidas parciales.
-    vales = ValePlanta.objects.all()
+    vales = ValePlanta.objects.filter(expediente__in=antes)
     assert vales.count() == 5 and {v.situacion() for v in vales} == {"vigente", "vencido", "repuesto"}
     assert ValePlanta.objects.filter(repone__isnull=False).count() == 1 and SalidaPlanta.objects.count() >= 4
     assert not any(v.surtido for v in vales)
+    # HU-5.1: contratos firmados de CC, PS, RHF y PSAHEM con su oficio y la solicitud de la primera ministración.
+    lote = Expediente.objects.filter(predio__nombre__in=nuevos)
+    assert lote.count() == 16 and FirmaContrato.objects.filter(expediente__in=lote).count() == 16
+    assert OficioPago.objects.count() == 15  # a Predio El Paraíso (CC) todavía no se le emite
+    assert not hasattr(Expediente.objects.get(predio__nombre="Predio El Paraíso"), "oficio_pago")
+    solicitudes_demo = {s.expediente.predio.nombre: s for s in SolicitudPago.objects.select_related("expediente__predio")}
+    assert solicitudes_demo["Predio Santa Cruz"].estado == EstadoSolicitud.BORRADOR  # por enviar, con todos sus soportes
+    assert solicitudes_demo["Cañada Verde"].estado == EstadoSolicitud.BORRADOR
+    enviadas = [s for s in SolicitudPago.objects.all() if s.estado != EstadoSolicitud.BORRADOR]
+    assert len(enviadas) == 13 and all(s.enviada_en and s.acuse_envio and s.soportes for s in enviadas)
+    assert solicitudes_demo["Predio La Ciénega"].importe == 8000 and solicitudes_demo["Predio La Ciénega"].porcentaje == 100
+    assert {e.estado.clave for e in lote.filter(ejercicio__programa__clave="PSA")} == {"ministracion_solicitada"}

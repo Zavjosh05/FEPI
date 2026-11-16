@@ -1,0 +1,6 @@
+<div class="tarjeta mb-3 border-warning" data-prueba="{{ panel.clave }}">
+  <div class="titulo-seccion">{{ panel.titulo }} ({{ panel.total }})</div>
+  {% if panel.ayuda %}<div class="small mb-2">{{ panel.ayuda }}</div>{% endif %}
+  <ul class="small mb-2">{% for f in panel.filas %}<li><a href="{{ f.url }}">{{ f.texto }}</a> · {{ f.detalle }}</li>{% endfor %}</ul>
+  <a class="btn btn-sm btn-outline-primary" href="{{ panel.enlace }}">{{ panel.accion }}</a>
+</div>
