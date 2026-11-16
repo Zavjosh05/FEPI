@@ -1,6 +1,12 @@
 """Datos de demostración del módulo M5 (idempotente): un lote de solicitudes aprobadas, publicadas, contratadas y con su oficio
 en CC, PS, RHF y PSAHEM, con la solicitud de la primera ministración en cada punto del camino. Todo con los servicios de M1, M2,
-M3 y M5, igual que la interfaz.
+M3 y M5, igual que la interfaz, y en las fechas del calendario de 2026 (reloj simulado, ``nucleo/reloj.py``; ver
+``nucleo/demo_calendario.py`` para la fecha de corte, 19-nov-2026 por omisión).
+
+**Calendario del lote** (``CALENDARIO``): registro en marzo (recepción hasta el 27-mar), dictámenes en abril a junio, sesión de
+aprobación del Comité en julio (CC y PSAHEM; aprobación del 1 al 31-jul) o en agosto (PS y RHF, sin fecha límite), publicación dos
+días hábiles después, notificación, contrato elaborado y enviado, y firma dentro de los 10 días hábiles; el oficio de la Delegación
+y la solicitud de pago siguen después, cada destino en su fecha (``FECHAS_DESTINO``).
 
 HU-5.1: CC (pago único de 4 ha, 70 % de 6 a 9 ha), PS, RHF y PSAHEM con su oficio de la Delegación y su comprobante de cuenta
 donde las reglas lo piden: solicitudes enviadas a Administración y Finanzas, una por enviar con todos sus soportes y un contrato
@@ -9,30 +15,28 @@ firmado al que todavía le falta el oficio (con la solicitud incompleta). En PSA
 
 HU-5.2: Administración y Finanzas revisa las solicitudes enviadas: devuelve una con observaciones (CC), acepta y paga las de
 ``pagada`` (transferencia en CC y PS; cheque excepcional con su motivo en RHF), acepta la de ``aceptada`` (PSAHEM, por solicitar a la
-Fiduciaria) y, en PSAHEM, la Secretaría Técnica solicita a la Fiduciaria el pago de las demás (``remitida`` en adelante).
+Fiduciaria) y, en PSAHEM, la Secretaría Técnica solicita a la Fiduciaria el pago de las demás (``remitida`` en adelante), siempre
+dentro de sus 5 días hábiles.
 
 HU-5.3: la Fiduciaria emite el cheque de las solicitudes remitidas; uno queda emitido (Paraje Las Ánimas), otro enviado a la
-Delegación (Monte Alto), otro entregado a la persona (Cerro del Venado) y otro entregado hace casi 3 meses, por vencer sin cobro
-(Loma Verde; calendario simulado). ``revisar_cobros`` deja el aviso en la bitácora.
+Delegación (Monte Alto), otro entregado a la persona (Cerro del Venado) y otro entregado el 21-ago, que vence el 23-nov y está por
+vencer sin cobro en la fecha de corte (Loma Verde). ``revisar_cobros`` deja el aviso en la bitácora.
 
 Cada solicitud lleva su ``destino``: lo que las historias HU-5.2 y HU-5.3 hacen después con ella (devolver, pagar, remitir a la
 Fiduciaria, emitir y entregar el cheque); cada historia agrega su paso al final de ``cargar_demo``.
 """
-from datetime import datetime, time, timedelta
-
 from django.core.files.base import ContentFile
 from django.db import transaction
-from django.utils import timezone
 
 from contrato import contratos, planta, publicacion
-from contrato.demo import _delegacion, _despues, _firmar_demo, _modelo_validado
+from contrato.demo import _delegacion, _firmar_demo, _modelo_validado, dictaminar_lote
 from contrato.models import Especie, Vivero
-from dictamen import aprobacion, juridico, seguimiento, sesiones, tecnico
-from dictamen.demo import _validada
-from dictamen.models import SesionComite, TipoSesion
-from nucleo import dias_habiles
+from dictamen import seguimiento, sesiones
+from dictamen.demo import paso, sesion_aprobacion
+from dictamen.models import TipoSesion
 from nucleo.demo import _pdf_demo, archivo_demo
-from nucleo.models import Ejercicio, Expediente, Hito, Unidad, Usuario
+from nucleo.demo_calendario import cuando, fecha_corte, habil, habil_antes
+from nucleo.models import Ejercicio, Expediente, Unidad, Usuario
 
 from . import cheques, pagos, solicitudes
 from .models import EstadoSolicitud, SolicitudPago
@@ -61,73 +65,106 @@ LOTES = {
 SIN_COMPROBANTE = ("sin_oficio",)
 DESTINOS = {fila[2]: fila[6] for plan in LOTES.values() for fila in plan}
 
+# Calendario de cada lote (todas son fechas hábiles de 2026; el registro y los dictámenes avanzan un día hábil por solicitud).
+CALENDARIO = {
+    "CC": dict(registro="2026-03-11", tecnico="2026-05-04", juridico="2026-06-01", sesion="2026-07-21",
+               publicacion="2026-07-23", notificacion="2026-07-27", contrato="2026-07-29", firma="2026-08-03",
+               oficio="2026-08-10"),
+    "PS": dict(registro="2026-03-12", tecnico="2026-04-22", juridico="2026-04-27", sesion="2026-08-11",
+               publicacion="2026-08-13", notificacion="2026-08-14", contrato="2026-08-18", firma="2026-08-24",
+               oficio="2026-09-14", planta="2026-09-02"),
+    "RHF": dict(registro="2026-03-13", tecnico="2026-04-22", juridico="2026-04-28", sesion="2026-08-12",
+                publicacion="2026-08-14", notificacion="2026-08-17", contrato="2026-08-19", firma="2026-08-25",
+                oficio="2026-09-01"),
+    "PSA": dict(registro="2026-03-16", tecnico="2026-05-18", juridico="2026-06-08", sesion="2026-07-22",
+                publicacion="2026-07-24", notificacion="2026-07-27", contrato="2026-07-28", firma="2026-08-03",
+                oficio="2026-08-10"),
+}
+# Fechas de cada destino (la solicitud se envía a Administración y Finanzas, ésta la revisa y, según el caso, la paga o la
+# Secretaría Técnica la remite). Loma Verde es el cheque por vencer: se tramitó en agosto; los demás cheques, en noviembre.
+FECHAS_DESTINO = {
+    "pagada": dict(solicitud="2026-09-21", revision="2026-09-24", pago="2026-09-28"),
+    "enviada": dict(solicitud="2026-11-10"),
+    "devuelta": dict(solicitud="2026-10-20", revision="2026-10-22"),
+    "por_enviar": dict(preparar="2026-11-12"),
+    "aceptada": dict(solicitud="2026-11-05", revision="2026-11-09"),
+    "remitida": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10"),
+    "cheque_emitido": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10", emision="2026-11-12"),
+    "cheque_enviado": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10", emision="2026-11-12",
+                           envio="2026-11-13"),
+    "cheque_entregado": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10", emision="2026-11-12",
+                             envio="2026-11-13", entrega="2026-11-17"),
+    "cheque_por_vencer": dict(solicitud="2026-08-13", revision="2026-08-14", remision="2026-08-17", emision="2026-08-18",
+                              envio="2026-08-19", entrega="2026-08-21"),
+}
+# Instrucciones de pago del Comité Técnico de PSAHEM (sesión de seguimiento): las de noviembre y la de agosto (Loma Verde).
+SESIONES_INSTRUCCION = (("2026-11-04", ("Rancho El Pedregal", "Ejido La Joya", "Bosque Los Cedros", "Paraje Las Ánimas",
+                                        "Monte Alto", "Cerro del Venado")),
+                        ("2026-08-12", ("Loma Verde",)))
+
 
 def _ejercicio(clave):
     return Ejercicio.objects.filter(programa__clave=clave, reglas_cargadas__isnull=False).order_by("-anio").first()
 
 
 def _aprobar_y_contratar(u, ejercicio, plan):
-    """Dictamina, aprueba en sesión con acta, publica, notifica, elabora el contrato, lo envía y lo firma. Devuelve los
-    expedientes (con su destino) ya en ``contratada``."""
+    """Dictamina, aprueba en sesión con acta, publica, notifica, elabora el contrato, lo envía y lo firma, cada paso en su fecha.
+    Devuelve los expedientes (con su destino) ya en ``contratada``."""
     clave = ejercicio.programa.clave
-    drff, uj, st = u["dir_drff"], u["juridica"], u["comite"]
-    exps = []
-    for i, (usuario, municipio, predio, persona, modalidad, ha, destino) in enumerate(plan):
-        # Cada polígono se desplaza para no traslapar con los de otras solicitudes del mismo municipio.
-        exp = _validada(u[usuario], drff, ejercicio, municipio, predio, persona, modalidad, ha,
-                        desplazamiento=(3000 + i * 900, 1500 + (i % 3) * 600))
-        tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
-        juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
-        exps.append((exp, destino))
-    fecha = timezone.localtime(timezone.now()) - timedelta(hours=1)
-    sesion = sesiones.crear_sesion(
-        st, ejercicio, TipoSesion.APROBACION, fecha, "Sala de juntas de PROBOSQUE, Metepec",
-        "\n".join(["Lista de asistencia y declaración de quórum", "Presentación del listado preliminar",
-                   "Aprobación de los listados", "Autorización de la publicación de resultados"]))
-    sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo(f"Listado preliminar {clave} (pagos)"),
-                                                       name="listado_preliminar.pdf"), "Listado preliminar")
-    sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
-    aprobacion.proponer_listados(st, sesion)
-    aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.",
-                              momento=fecha + timedelta(minutes=20))
-    sesion.refresh_from_db()
-    pub = publicacion.publicar(drff, sesion, momento=_despues(sesion.acta_fecha, 10))
+    c = CALENDARIO[clave]
+    drff, st = u["dir_drff"], u["comite"]
+    filas = [(*f[:6], habil(c["registro"], i)) for i, f in enumerate(plan)]
+    resultado = dictaminar_lote(u, ejercicio, filas, c["tecnico"], c["juridico"])
+    exps = [(exp, fila[6]) for (exp, _), fila in zip(resultado, plan)]
+    sesion = sesion_aprobacion(st, ejercicio, c["sesion"], [f"Listado preliminar {clave} (pagos)"])
+    with paso(c["publicacion"], 10):
+        publicacion.publicar(drff, sesion)
     modelo = _modelo_validado(u, ejercicio, f"Contrato de Adhesión {clave} {ejercicio.anio} (modelo de demostración)")
-    for exp, _ in exps:
-        publicacion.registrar_entrega(_delegacion(u, exp), exp.notificaciones.get(tipo="resultados"), "personal",
-                                      fecha_hora=_despues(pub.publicada_en, 15), observaciones="Entregado (demostración).")
+    for i, (exp, _) in enumerate(exps):
+        with paso(c["notificacion"], 11):
+            publicacion.registrar_entrega(_delegacion(u, exp), exp.notificaciones.get(tipo="resultados"), "personal",
+                                          observaciones="Entregado (demostración).")
         exp.refresh_from_db()
-        contrato = contratos.elaborar_contrato(drff, exp, modelo)
-        contratos.enviar_a_delegacion(drff, contrato)
+        with paso(c["contrato"], 10):
+            contrato = contratos.elaborar_contrato(drff, exp, modelo)
+        with paso(c["contrato"], 15):
+            contratos.enviar_a_delegacion(drff, contrato)
         exp.refresh_from_db()
-        _firmar_demo(u, exp)
+        with paso(habil(c["firma"], i // 4), 12):
+            _firmar_demo(u, exp)
         exp.refresh_from_db()
     return exps
 
 
-def _planta_completa(u, exp):
-    """PS y RHF con Vale: la planta se entrega completa para poder solicitar la ministración."""
-    planta.cargar_catalogo()
-    vivero = Vivero.objects.filter(unidad__isnull=False).first()
-    especie = Especie.objects.get(nombre="Pino patula")
-    vale = planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(especie, 900)],
-                              motivo_ajuste="Cantidad de demostración.")
-    planta.registrar_salida(u["vivero"], vale, especie, 900)
+def _planta_completa(u, exp, fecha):
+    """PS con Vale: la planta se entrega completa para poder solicitar la ministración."""
+    with paso(fecha, 10):
+        planta.cargar_catalogo()
+        vivero = Vivero.objects.filter(unidad__isnull=False).first()
+        especie = Especie.objects.get(nombre="Pino patula")
+        vale = planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(especie, 900)], motivo_ajuste="Cantidad de demostración.")
+    with paso(habil(fecha, 2), 12):
+        planta.registrar_salida(u["vivero"], vale, especie, 900)
     exp.refresh_from_db()
 
 
-def _instruccion_de_pago(u, ejercicio, expedientes):
-    """PSAHEM: el Comité Técnico instruye a la Fiduciaria el pago de la primera ministración (sesión de seguimiento)."""
+def _instruccion_de_pago(u, ejercicio, expedientes, fecha):
+    """PSAHEM: el Comité Técnico instruye a la Fiduciaria el pago de la primera ministración (sesión de seguimiento, que se
+    convoca con 5 días hábiles de anticipación; el acuerdo se registra el día de la sesión, después de celebrada)."""
     st = u["comite"]
-    cuando = timezone.make_aware(datetime.combine(dias_habiles.sumar_dias_habiles(timezone.now(), 15), time(11, 0)))
-    sesion = sesiones.crear_sesion(st, ejercicio, TipoSesion.SEGUIMIENTO, cuando, "Sala de juntas de PROBOSQUE, Metepec",
-                                   "Lista de asistencia y declaración de quórum\nInstrucción de pago a la Fiduciaria\nAsuntos generales")
-    sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo("Solicitudes de pago PSAHEM"), name="pagos.pdf"),
-                               "Solicitudes de pago")
-    sesiones.enviar_convocatoria(st, sesion)
-    return seguimiento.registrar_acuerdo(
-        st, sesion, "instruccion_pago", "Instruir a la Fiduciaria el pago de la primera ministración (70 %) de las personas "
-        "beneficiarias de la lista.", expedientes, Unidad.objects.get(clave="FIDUCIARIA"), ministracion=1)
+    fecha = habil(fecha)
+    with paso(habil_antes(fecha, 7), 12):
+        sesion = sesiones.crear_sesion(
+            st, ejercicio, TipoSesion.SEGUIMIENTO, cuando(fecha, 11), "Sala de juntas de PROBOSQUE, Metepec",
+            "Lista de asistencia y declaración de quórum\nInstrucción de pago a la Fiduciaria\nAsuntos generales")
+        sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo("Solicitudes de pago PSAHEM"), name="pagos.pdf"),
+                                   "Solicitudes de pago")
+    with paso(habil_antes(fecha, 5), 10):
+        sesiones.enviar_convocatoria(st, sesion)
+    with paso(fecha, 12):
+        return seguimiento.registrar_acuerdo(
+            st, sesion, "instruccion_pago", "Instruir a la Fiduciaria el pago de la primera ministración (70 %) de las personas "
+            "beneficiarias de la lista.", expedientes, Unidad.objects.get(clave="FIDUCIARIA"), ministracion=1)
 
 
 def _tramitar(u, exp, destino, clave):
@@ -135,14 +172,21 @@ def _tramitar(u, exp, destino, clave):
     deleg, drff = _delegacion(u, exp), u["dir_drff"]
     if destino in SIN_COMPROBANTE:
         return
-    solicitudes.emitir_oficio(deleg, exp)
-    if any(s["clave"] == "comprobante_cuenta" for s in solicitudes.soportes_requeridos(exp, 1)):
-        solicitudes.adjuntar_comprobante(deleg, exp, archivo_demo(f"cuenta_{exp.folio}.pdf", f"Estado de cuenta {exp.folio}"),
-                                         "Estado de cuenta bancario (demostración)")
+    f = FECHAS_DESTINO.get(destino, {})
+    oficio = CALENDARIO[clave]["oficio"]
+    if destino == "cheque_por_vencer":
+        oficio = "2026-08-10"
+    with paso(oficio, 10):
+        solicitudes.emitir_oficio(deleg, exp)
+        if any(s["clave"] == "comprobante_cuenta" for s in solicitudes.soportes_requeridos(exp, 1)):
+            solicitudes.adjuntar_comprobante(deleg, exp, archivo_demo(f"cuenta_{exp.folio}.pdf", f"Estado de cuenta {exp.folio}"),
+                                             "Estado de cuenta bancario (demostración)")
     if destino == "por_enviar":
-        solicitudes.preparar_solicitud(drff, exp, 1)
+        with paso(f["preparar"], 10):
+            solicitudes.preparar_solicitud(drff, exp, 1)
         return
-    solicitudes.enviar_solicitud(drff, exp, 1, "Solicitud de demostración.")
+    with paso(f["solicitud"], 10):
+        solicitudes.enviar_solicitud(drff, exp, 1, "Solicitud de demostración.")
 
 
 def _revisiones(u):
@@ -152,21 +196,26 @@ def _revisiones(u):
     for sol in SolicitudPago.objects.filter(estado=EstadoSolicitud.ENVIADA, ministracion=1).select_related(
             "expediente__predio", "expediente__ejercicio__programa"):
         destino = DESTINOS.get(sol.expediente.predio.nombre)
+        f = FECHAS_DESTINO.get(destino, {})
         if destino == "devuelta":
-            pagos.revisar_solicitud(af, sol, "devuelta", "El comprobante de la cuenta bancaria no es legible; la Delegación debe "
-                                                         "recabar uno nuevo y el área reenviar la solicitud.")
+            with paso(f["revision"], 10):
+                pagos.revisar_solicitud(af, sol, "devuelta", "El comprobante de la cuenta bancaria no es legible; la Delegación debe "
+                                                             "recabar uno nuevo y el área reenviar la solicitud.")
         elif destino in ("pagada", "aceptada", "remitida", "cheque_emitido", "cheque_enviado", "cheque_entregado",
                          "cheque_por_vencer"):
-            pagos.revisar_solicitud(af, sol, "aceptada", "Soportes completos.")
+            with paso(f["revision"], 10):
+                pagos.revisar_solicitud(af, sol, "aceptada", "Soportes completos.")
             if destino == "pagada":
                 excepcional = sol.expediente.programa.clave == "RHF"
-                pagos.registrar_pago(
-                    af, sol, f"{'CHQ' if excepcional else 'SPEI'}-{sol.pk:06d}", timezone.localdate(),
-                    tipo="cheque_excepcional" if excepcional else None,
-                    motivo_cheque="La persona beneficiaria no cuenta con la cuenta bancaria vigente (demostración)."
-                    if excepcional else "")
+                with paso(f["pago"], 11):
+                    pagos.registrar_pago(
+                        af, sol, f"{'CHQ' if excepcional else 'SPEI'}-{sol.pk:06d}", cuando(f["pago"]).date(),
+                        tipo="cheque_excepcional" if excepcional else None,
+                        motivo_cheque="La persona beneficiaria no cuenta con la cuenta bancaria vigente (demostración)."
+                        if excepcional else "")
             elif destino != "aceptada":
-                pagos.remitir_a_fiduciaria(st, sol, f"ST-FIPASAHEM/{sol.pk:03d}/2026", "Con la instrucción del Comité Técnico.")
+                with paso(f["remision"], 10):
+                    pagos.remitir_a_fiduciaria(st, sol, f"ST-FIPASAHEM/{sol.pk:03d}/2026", "Con la instrucción del Comité Técnico.")
         else:
             continue
         hechas += 1
@@ -182,19 +231,19 @@ def _cheques(u):
         destino = DESTINOS.get(sol.expediente.predio.nombre)
         if destino not in ("cheque_emitido", "cheque_enviado", "cheque_entregado", "cheque_por_vencer"):
             continue
-        cheque = cheques.emitir_cheque(fid, sol, f"FIPASAHEM-{sol.pk:06d}")
+        f = FECHAS_DESTINO[destino]
+        with paso(f["emision"], 10):
+            cheque = cheques.emitir_cheque(fid, sol, f"FIPASAHEM-{sol.pk:06d}")
         if destino != "cheque_emitido":
-            cheques.enviar_a_delegacion(fid, cheque)
+            with paso(f["envio"], 10):
+                cheques.enviar_a_delegacion(fid, cheque)
         if destino in ("cheque_entregado", "cheque_por_vencer"):
-            cheque = cheques.registrar_entrega(_delegacion(u, sol.expediente), cheque, sol.expediente.solicitante.nombre)
-        if destino == "cheque_por_vencer":  # calendario simulado: se entregó hace casi 3 meses
-            antes = timezone.now() - timedelta(days=88)
-            cheque.entregado_en = antes
-            cheque.vence_cobro = cheques.vencimiento_cobro(cheque).vencimiento
-            cheque.save(update_fields=["entregado_en", "vence_cobro"])
-            Hito.objects.filter(expediente=sol.expediente, clave="entrega_cheque").update(fecha_hora=antes)
-            cheques.revisar_cobros(timezone.localdate())
+            with paso(f["entrega"], 12):
+                cheque = cheques.registrar_entrega(_delegacion(u, sol.expediente), cheque, sol.expediente.solicitante.nombre)
         hechas += 1
+    # Loma Verde se entregó el 21-ago: en la fecha de corte le quedan 2 días hábiles para cobrarlo.
+    with paso(fecha_corte(), 9):
+        cheques.revisar_cobros(fecha_corte())
     return hechas
 
 
@@ -208,10 +257,12 @@ def cargar_demo():
             continue
         exps = _aprobar_y_contratar(u, ejercicio, plan)
         if clave == "PSA":
-            _instruccion_de_pago(u, ejercicio, [e for e, d in exps if d != "sin_oficio"])
+            por_nombre = {e.predio.nombre: e for e, _ in exps}
+            for fecha, nombres in SESIONES_INSTRUCCION:
+                _instruccion_de_pago(u, ejercicio, [por_nombre[n] for n in nombres], fecha)
         for exp, destino in exps:
             if clave == "PS" and destino != "sin_oficio":
-                _planta_completa(u, exp)
+                _planta_completa(u, exp, CALENDARIO["PS"]["planta"])
             _tramitar(u, exp, destino, clave)
             hechas += 1
     hechas += _revisiones(u)

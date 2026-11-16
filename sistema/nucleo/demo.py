@@ -13,6 +13,8 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 
+from . import reloj
+from .demo_calendario import cuando
 from .models import Ejercicio, Expediente, Municipio, Predio, TipoUnidad, Unidad, Usuario
 
 CONTRASENA_DEMO = "Probosque2026"
@@ -121,7 +123,14 @@ def _solicitud(usuario, ejercicio, municipio, predio, persona, tipo, modalidad, 
     return servicios.registrar_solicitud(usuario, datos)
 
 
+def paso(fecha, hora=10, minuto=0):
+    """Reloj simulado en la fecha (con un tic de 2 s por lectura, para que cada renglón tenga su segundo)."""
+    return reloj.en(cuando(fecha, hora, minuto), tic=2)
+
+
 def crear_solicitudes():
+    """Lote de CC 2026 de la recepción: cada paso en su fecha del calendario de la Convocatoria (recepción del 28-ene al
+    27-mar; la validación de la Dirección se hace en el plazo de la ventanilla)."""
     from recepcion import servicios
 
     ejercicio = Ejercicio.objects.filter(programa__clave="CC", reglas_cargadas__isnull=False).order_by("-anio").first()
@@ -129,77 +138,96 @@ def crear_solicitudes():
         return 0
     u = {x.username: x for x in Usuario.objects.all()}
     creadas = 0
-    hoy = timezone.localdate()
 
     def existe(nombre):
         return Predio.objects.filter(nombre=nombre, expedientes__ejercicio=ejercicio).exists()
 
-    # 1) Recibida, revisión a medias (Amecameca)
+    # 1) Recibida, revisión a medias (Amecameca): se registró en los últimos días de la recepción y el plazo de 5 días hábiles
+    #    de la ventanilla (topado a la fecha límite de recepción, 27-mar) venció sin que la Delegación completara la revisión.
     if not existe("Los Ocotes"):
-        exp = _solicitud(u["del_amecameca"], ejercicio, "Amecameca", "Los Ocotes", "María Elena Castillo Rojas",
-                         "fisica", "reforestacion", "6.5", curp="CARM700312MMCSJR05", localidad="San Pedro Nexapa")
-        revs = list(exp.revisiones.select_related("requisito"))[:4]
-        for r in revs:
-            servicios.revisar_requisito(u["del_amecameca"], r, "entregado", archivo=archivo_demo(f"{r.requisito.clave}.pdf"))
+        with paso("2026-03-23", 9, 30):
+            exp = _solicitud(u["del_amecameca"], ejercicio, "Amecameca", "Los Ocotes", "María Elena Castillo Rojas",
+                             "fisica", "reforestacion", "6.5", curp="CARM700312MMCSJR05", localidad="San Pedro Nexapa")
+        with paso("2026-03-23", 11):
+            revs = list(exp.revisiones.select_related("requisito"))[:4]
+            for r in revs:
+                servicios.revisar_requisito(u["del_amecameca"], r, "entregado", archivo=archivo_demo(f"{r.requisito.clave}.pdf"))
         creadas += 1
 
     # 2) Recibida, completa y con polígono: lista para enviar (Tlalmanalco, núcleo agrario)
     if not existe("Ejido San Rafael, paraje El Mirador"):
-        exp = _solicitud(u["del_amecameca"], ejercicio, "Tlalmanalco", "Ejido San Rafael, paraje El Mirador",
-                         "Ejido San Rafael", "nucleo_agrario", "plantacion_maderable", "48",
-                         representante="Comisariado ejidal: Pedro Ramírez Solís", con_representante_legal=True)
-        completar_requisitos(u["del_amecameca"], exp)
-        servicios.registrar_poligono(u["del_amecameca"], exp, cuadro_en_municipio(exp.predio.municipio, 47.2),
-                                     "dibujo", "delegacion", "Ing. Carlos Ortega (Delegación Amecameca)",
-                                     hoy - timedelta(days=3))
+        with paso("2026-02-10", 10):
+            exp = _solicitud(u["del_amecameca"], ejercicio, "Tlalmanalco", "Ejido San Rafael, paraje El Mirador",
+                             "Ejido San Rafael", "nucleo_agrario", "plantacion_maderable", "48",
+                             representante="Comisariado ejidal: Pedro Ramírez Solís", con_representante_legal=True)
+            completar_requisitos(u["del_amecameca"], exp)
+        with paso("2026-02-12", 12):
+            servicios.registrar_poligono(u["del_amecameca"], exp, cuadro_en_municipio(exp.predio.municipio, 47.2),
+                                         "dibujo", "delegacion", "Ing. Carlos Ortega (Delegación Amecameca)",
+                                         timezone.localdate() - timedelta(days=1))
         creadas += 1
 
     # 3) Enviada a la Dirección (Atlautla)
     if not existe("La Cañada"):
-        exp = _solicitud(u["del_amecameca"], ejercicio, "Atlautla", "La Cañada", "Juan Carlos Pérez Galicia",
-                         "fisica", "plantacion_navidena", "3.2", curp="PEGJ810523HMCRLN08")
-        completar_requisitos(u["del_amecameca"], exp)
-        servicios.registrar_poligono(u["del_amecameca"], exp, cuadro_en_municipio(exp.predio.municipio, 3.1),
-                                     "dibujo", "prestador", "Servicios Técnicos Forestales del Oriente, S.C.",
-                                     hoy - timedelta(days=2))
-        servicios.enviar_a_direccion(u["del_amecameca"], exp)
+        with paso("2026-02-16", 10):
+            exp = _solicitud(u["del_amecameca"], ejercicio, "Atlautla", "La Cañada", "Juan Carlos Pérez Galicia",
+                             "fisica", "plantacion_navidena", "3.2", curp="PEGJ810523HMCRLN08")
+            completar_requisitos(u["del_amecameca"], exp)
+        with paso("2026-02-18", 12):
+            servicios.registrar_poligono(u["del_amecameca"], exp, cuadro_en_municipio(exp.predio.municipio, 3.1),
+                                         "dibujo", "prestador", "Servicios Técnicos Forestales del Oriente, S.C.",
+                                         timezone.localdate() - timedelta(days=2))
+        with paso("2026-02-19", 10):
+            servicios.enviar_a_direccion(u["del_amecameca"], exp)
         creadas += 1
 
-    # 4) Aviso de faltantes notificado (Valle de Bravo, Amanalco)
+    # 4) Aviso de faltantes notificado (Valle de Bravo, Amanalco), dentro de su plazo de 5 días hábiles
     if not existe("Rancho El Capulín"):
-        exp = _solicitud(u["del_valle"], ejercicio, "Amanalco", "Rancho El Capulín", "Agroforestal Amanalco, S.P.R. de R.L.",
-                         "juridica_colectiva", "reforestacion", "12", rfc="AAM120415K21",
-                         representante="Lic. Beatriz Nava Ortiz", con_representante_legal=True)
-        completar_requisitos(u["del_valle"], exp)
-        servicios.enviar_a_direccion(u["del_valle"], exp)
-        plano = exp.revisiones.filter(requisito__clave="CC-REQ-13").first()
-        servicios.validar_expediente(u["dir_drff"], exp, [plano.pk] if plano else [],
-                                     "El plano no trae la coordenada de un vértice del predio.")
-        servicios.registrar_notificacion(u["del_valle"], servicios.aviso_vigente(exp))
+        with paso("2026-02-23", 10):
+            exp = _solicitud(u["del_valle"], ejercicio, "Amanalco", "Rancho El Capulín", "Agroforestal Amanalco, S.P.R. de R.L.",
+                             "juridica_colectiva", "reforestacion", "12", rfc="AAM120415K21",
+                             representante="Lic. Beatriz Nava Ortiz", con_representante_legal=True)
+            completar_requisitos(u["del_valle"], exp)
+        with paso("2026-02-25", 10):
+            servicios.enviar_a_direccion(u["del_valle"], exp)
+        with paso("2026-03-04", 11):
+            plano = exp.revisiones.filter(requisito__clave="CC-REQ-13").first()
+            servicios.validar_expediente(u["dir_drff"], exp, [plano.pk] if plano else [],
+                                         "El plano no trae la coordenada de un vértice del predio.")
+        with paso("2026-03-05", 12):
+            servicios.registrar_notificacion(u["del_valle"], servicios.aviso_vigente(exp))
         creadas += 1
 
     # 5) Refrendo validado con documentación vigente en PROBOSQUE y cambio de lugar del polígono (Zinacantepec)
     if not existe("Predio Agua Blanca"):
-        exp = _solicitud(u["del_toluca"], ejercicio, "Zinacantepec", "Predio Agua Blanca", "Hilario Gómez Becerril",
-                         "fisica", "reforestacion", "8", es_refrendo=True, curp="GOBH650101HMCMCL02")
-        completar_requisitos(u["del_toluca"], exp, fecha_archivo=hoy.replace(year=hoy.year - 2))
+        with paso("2026-02-03", 10):
+            exp = _solicitud(u["del_toluca"], ejercicio, "Zinacantepec", "Predio Agua Blanca", "Hilario Gómez Becerril",
+                             "fisica", "reforestacion", "8", es_refrendo=True, curp="GOBH650101HMCMCL02")
+            hoy = timezone.localdate()
+            completar_requisitos(u["del_toluca"], exp, fecha_archivo=hoy.replace(year=hoy.year - 2))
         municipio = exp.predio.municipio
-        servicios.registrar_poligono(u["del_toluca"], exp, cuadro_en_municipio(municipio, 8.4), "dibujo",
-                                     "delegacion", "Téc. Ana Laura Zepeda", hoy - timedelta(days=6))
-        servicios.registrar_poligono(u["del_toluca"], exp, cuadro_en_municipio(municipio, 7.9, (900, 600)),
-                                     "dibujo", "delegacion", "Téc. Ana Laura Zepeda", hoy - timedelta(days=1),
-                                     motivo_cambio="La persona beneficiaria cambió el área por un incendio en la parte baja.")
-        servicios.enviar_a_direccion(u["del_toluca"], exp)
-        servicios.validar_expediente(u["dir_drff"], exp, [], "Refrendo: documentación legal vigente en archivo.")
+        with paso("2026-02-05", 12):
+            servicios.registrar_poligono(u["del_toluca"], exp, cuadro_en_municipio(municipio, 8.4), "dibujo",
+                                         "delegacion", "Téc. Ana Laura Zepeda", timezone.localdate() - timedelta(days=1))
+        with paso("2026-02-10", 12):
+            servicios.registrar_poligono(u["del_toluca"], exp, cuadro_en_municipio(municipio, 7.9, (900, 600)),
+                                         "dibujo", "delegacion", "Téc. Ana Laura Zepeda", timezone.localdate() - timedelta(days=1),
+                                         motivo_cambio="La persona beneficiaria cambió el área por un incendio en la parte baja.")
+        with paso("2026-02-11", 10):
+            servicios.enviar_a_direccion(u["del_toluca"], exp)
+        with paso("2026-02-17", 11):
+            servicios.validar_expediente(u["dir_drff"], exp, [], "Refrendo: documentación legal vigente en archivo.")
         creadas += 1
 
-    # 6) Desechada: no completó la documentación (flujo alterno A) (Ozumba)
+    # 6) Desechada: no completó la documentación en los 5 días hábiles (vencían el 4-mar) (flujo alterno A) (Ozumba)
     if not existe("El Tecolote"):
-        exp = _solicitud(u["del_amecameca"], ejercicio, "Ozumba", "El Tecolote", "Gregorio Linares Peña",
-                         "fisica", "reforestacion", "2")
-        completar_requisitos(u["del_amecameca"], exp, faltar=("CC-REQ-10",))
-        exp.cambiar_estado("desechada", u["del_amecameca"],
-                           motivo="No presentó el documento de propiedad dentro de los 5 días hábiles (8.1.1.2 fr. XIV).")
+        with paso("2026-02-24", 10):
+            exp = _solicitud(u["del_amecameca"], ejercicio, "Ozumba", "El Tecolote", "Gregorio Linares Peña",
+                             "fisica", "reforestacion", "2")
+            completar_requisitos(u["del_amecameca"], exp, faltar=("CC-REQ-10",))
+        with paso("2026-03-05", 10):
+            exp.cambiar_estado("desechada", u["del_amecameca"],
+                               motivo="No presentó el documento de propiedad dentro de los 5 días hábiles (8.1.1.2 fr. XIV).")
         creadas += 1
     return creadas
 

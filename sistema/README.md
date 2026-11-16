@@ -131,8 +131,7 @@ Los Pinos (PS) está enviado a la Delegación, el de Barranca Honda (RHF) elabor
 notificada y por elaborar. En HU-3.3 cada uno de PS y RHF tiene un segundo lote de tres solicitudes con su propia
 sesión y publicación: en PS, dos contratos firmados en plazo (Mirador de los Pinos, Ladera Verde) y uno sin firma al
 vencer el plazo, señalado y por liberar (Cañada Seca); en RHF, tres firmados (Arroyo Claro, Cerro Gordo y Peña Blanca, esta
-de RFI Modalidad uno, que no recibe planta). Para vencer el plazo sin esperar días, la demostración corre hacia atrás las
-fechas de la publicación y la notificación de Cañada Seca (calendario simulado). Plantación Los Pinos queda por firmar en
+de RFI Modalidad uno, que no recibe planta). Cañada Seca venció su plazo de firma por el calendario (publicada el 24-sep). Plantación Los Pinos queda por firmar en
 la Delegación. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
@@ -657,7 +656,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   vez por situación, de los entregados sin cobro **por vencer** (5 días hábiles o menos) o **vencidos**, y hay un panel en las bandejas.
   Solo es aviso: la baja por cheque vencido (8.1.9, fr. VII) es del sprint 3.
 - **Demostración.** En PSAHEM, cheque emitido (Paraje Las Ánimas), enviado (Monte Alto), entregado (Cerro del Venado) y entregado hace
-  casi 3 meses, por vencer sin cobro (Loma Verde; calendario simulado); Bosque Los Cedros espera su cheque.
+  el 21-ago, por vencer sin cobro en la fecha de corte (Loma Verde); Bosque Los Cedros espera su cheque.
 
 ### Tropiezos de interfaz del sprint 2 (P-23 a P-31)
 
@@ -678,6 +677,28 @@ se prueban en `pruebas/test_nucleo_tropiezos_interfaz_s2.py`:
   (`pagos.solicitudes.RESPONSABLE`); la tabla de soportes lo repite solo como detalle de su renglón.
 - **P-31** El cobro del cheque lleva rótulo «Cobro del cheque», ayuda y fecha rotulada, y solo se ve a la Fiduciaria y a la
   Delegación del cheque.
+
+### Reloj simulado y calendario de la demostración (G-03, P-03)
+
+`nucleo/reloj.py`: `with reloj.en("2026-03-02 10:30") as r: ...` hace que **todo** el sistema vea ese momento como «ahora»
+(`timezone.now`, `localdate`, `auto_now`, los `default=timezone.now` de los modelos, folios, acuses, bitácora y plazos) y al salir
+restaura el reloj real; `r.avanzar(days=1)`, `r.ir_a(...)` y `tic=` (segundos por lectura) lo mueven, y se puede anidar. No agrega
+dependencias (sustituye `django.utils.timezone.now` y los valores por omisión de los campos) y no es seguro entre hilos: lo usan
+la demostración, el generador y las pruebas; la interfaz y los servicios no cambian. El sistema no usa `datetime.now()` ni
+`date.today()` (se revisó con grep).
+
+La carga de demostración (`nucleo/demo.py`, `dictamen/demo.py`, `contrato/demo.py`, `pagos/demo.py`) pone cada paso en su fecha del
+calendario de la Convocatoria 2026 (`nucleo/demo_calendario.py`): solicitudes entre el 3-feb y el 24-mar (recepción del 28-ene al
+27-mar), dictámenes de abril a junio (límite 30-jun en CC y PSAHEM; 30-abr en PS y RHF), sesión de aprobación de CC el 14-jul y de
+PSAHEM el 15-jul (aprobación del 1 al 31-jul), y, donde las reglas no dan fecha límite de aprobación (PS y RHF), sesiones en agosto,
+septiembre y noviembre para que los plazos de firma estén vigentes o vencidos según el caso. Casos fuera de plazo a propósito:
+Los Ocotes (revisión sin terminar, plazo de la ventanilla vencido), El Tecolote (desechada), El Ocotal (dictamen vencido), Potrero
+Viejo (dictaminado el 15-jul, fuera de plazo), Cañada Seca (sin firma en plazo), Ladera Verde y Cerro Gordo (vales vencidos) y
+Loma Verde (cheque entregado el 21-ago, por vencer). **Fecha de corte:** el «hoy» de la demostración es el 19-nov-2026
+(`DEMO_FECHA_CORTE=AAAA-MM-DD` la cambia): con ella se señalan lo sin firma y lo por vencer, y lo vigente (vales, firmas por vencer) se
+arma hacia atrás desde ella. La carga da lo mismo el día que se corra (se prueba corriéndola con un reloj de 2031) y es idempotente.
+Una vez cargada, el sistema usa el reloj real, así que un sitio de demostración viejo muestra sus plazos vencidos, como cualquier
+expediente real.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

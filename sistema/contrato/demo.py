@@ -2,6 +2,13 @@
 de PSAHEM, cada programa con su sesión de aprobación y su acta. Todo con los servicios de M1, M2 y M3, igual
 que la interfaz. Las de CC aprobadas las deja ``dictamen/demo.py``.
 
+**Calendario.** La carga corre con el reloj simulado (``nucleo/reloj.py``) y cada paso ocurre en su fecha del calendario de 2026
+(``nucleo/demo_calendario.py``): registro en febrero (recepción del 28-ene al 27-mar), dictámenes en abril y mayo (PS y RHF
+hasta el 30-abr; PSAHEM hasta el 30-jun), y la sesión del Comité de PSAHEM el 15-jul (aprobación del 1 al 31-jul). PS y RHF no
+tienen fecha límite de aprobación («hasta agotar el recurso»): su primer lote se aprueba en noviembre, para que sus plazos de
+firma sigan corriendo en la fecha de corte, y el segundo en septiembre. La fecha de corte (19-nov-2026 por omisión) es el «hoy» de
+la demostración: lo vencido se vence por el calendario y lo vigente se arma hacia atrás desde ella.
+
 HU-3.1: PS y RHF ya publicaron sus resultados (a distintas horas); en PS la Delegación notificó el resultado
 y la cita de la primera solicitud, y en RHF solo el resultado; lo demás queda por notificar. PSAHEM y CC
 quedan con el acta que autoriza publicar, para mostrar la pantalla de publicación.
@@ -11,66 +18,67 @@ además la plantilla base («BORRADOR – modelo por validar») por validar. El 
 está elaborado y enviado a la Delegación; el de Barranca Honda (RHF), elaborado y por enviar; Ojo de Agua (RHF)
 está notificada y por elaborar.
 
-HU-3.3: un segundo lote por programa (PS y RHF, con su propia sesión de aprobación y publicación) con contratos firmados
-en plazo (la firma, con su verificación, deja el expediente en «contratada») y uno sin firma al vencer el plazo, señalado
-por ``revisar_plazos`` y por liberar. Los de HU-3.2 siguen igual (Plantación Los Pinos queda por firmar en la
-Delegación). Para vencer el plazo sin esperar días, la demostración corre hacia atrás las fechas de la publicación y de la
-notificación del contrato que queda sin firma (calendario simulado).
+HU-3.3: un segundo lote por programa (PS y RHF, con su propia sesión de aprobación y publicación en septiembre) con contratos
+firmados en plazo (la firma, con su verificación, deja el expediente en «contratada») y uno sin firma que venció el plazo
+(10 días hábiles), señalado por ``revisar_plazos`` en la fecha de corte y por liberar. Los de HU-3.2 siguen en su plazo
+(Plantación Los Pinos queda por firmar en la Delegación, a un día hábil de vencer).
 
 HU-3.4: catálogos de especies y viveros y, sobre los contratos firmados del segundo lote, Vales de Planta: en PS uno
-vigente con salidas parciales (Mirador de los Pinos) y uno vencido, no válido y sin reposición en PS (Ladera Verde); en RHF
-uno vigente con una salida parcial (Arroyo Claro) y uno vencido con salida parcial que ya tiene su vale de reposición por
-lo no entregado (Cerro Gordo). Peña Blanca (RFI Modalidad uno) no recibe planta."""
-from datetime import timedelta
-
-from django.core.files.base import ContentFile
+vigente con salidas parciales (Mirador de los Pinos, entregado el 9-nov) y uno vencido, no válido y sin reposición en PS (Ladera
+Verde, entregado el 6-oct); en RHF uno vigente con una salida parcial (Arroyo Claro) y uno vencido con salida parcial que ya tiene su
+vale de reposición por lo no entregado (Cerro Gordo). Peña Blanca (RFI Modalidad uno) no recibe planta."""
 from django.db import transaction
-from django.utils import timezone
 
 from contrato import contratos, firma, planta, publicacion
-from contrato.models import Contrato, Especie, ModeloContrato, Publicacion, TipoModelo, ValePlanta, Vivero
-from dictamen import aprobacion, juridico, sesiones, tecnico
-from dictamen.demo import _validada
+from contrato.models import Contrato, Especie, ModeloContrato, TipoModelo, ValePlanta, Vivero
+from dictamen import juridico, tecnico
+from dictamen.demo import _validada, paso, sesion_aprobacion
 from dictamen.models import SesionComite, TipoSesion
-from nucleo.demo import _pdf_demo
-from nucleo.models import Ejercicio, Expediente, Hito, Notificacion, Usuario
+from nucleo.demo_calendario import cuando, fecha_corte, habil
+from nucleo.models import Ejercicio, Expediente, Usuario
 
-# programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas)]
+# programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, fecha de registro)]
 SOLICITUDES = {
-    "PS": [("del_amecameca", "Tlalmanalco", "Plantación Los Pinos", "Abel Contreras Vega", "plantacion_forestal_comercial", 4),
-           ("del_toluca", "Zinacantepec", "Rancho La Huerta", "Leticia Mora Garduño", "mantenimiento_plantaciones", 2.5)],
-    "RHF": [("del_amecameca", "Ozumba", "Barranca Honda", "Rafael Sánchez Ortega", "rfi_modalidad_dos", 3),
-            ("del_valle", "Amanalco", "Ojo de Agua", "Guadalupe Reyes Albarrán", "bosques_de_agua", 2)],
-    "PSA": [("del_toluca", "Ocoyoacac", "Bosque El Zarco", "Felipe Hernández Ramos", "cuenca_alta", 30),
-            ("del_valle", "Villa Victoria", "Monte La Loma", "Josefina Colín Becerril", "cuenca_media_baja", 25)],
+    "PS": [("del_amecameca", "Tlalmanalco", "Plantación Los Pinos", "Abel Contreras Vega", "plantacion_forestal_comercial", 4, "2026-02-17"),
+           ("del_toluca", "Zinacantepec", "Rancho La Huerta", "Leticia Mora Garduño", "mantenimiento_plantaciones", 2.5, "2026-02-18")],
+    "RHF": [("del_amecameca", "Ozumba", "Barranca Honda", "Rafael Sánchez Ortega", "rfi_modalidad_dos", 3, "2026-02-19"),
+            ("del_valle", "Amanalco", "Ojo de Agua", "Guadalupe Reyes Albarrán", "bosques_de_agua", 2, "2026-02-20")],
+    "PSA": [("del_toluca", "Ocoyoacac", "Bosque El Zarco", "Felipe Hernández Ramos", "cuenca_alta", 30, "2026-02-23"),
+            ("del_valle", "Villa Victoria", "Monte La Loma", "Josefina Colín Becerril", "cuenca_media_baja", 25, "2026-02-24")],
 }
+# programa: (fecha de la sesión de aprobación, primer día de dictamen técnico, primer día de dictamen jurídico)
+PRIMER_LOTE = {"PS": ("2026-11-03", "2026-04-08", "2026-04-14"), "RHF": ("2026-11-04", "2026-04-09", "2026-04-15"),
+               "PSA": ("2026-07-15", "2026-05-12", "2026-05-19")}
+
+
+def dictaminar_lote(u, ejercicio, filas, tecnico_desde, juridico_desde):
+    """Registra, valida y dictamina (técnico y jurídico) las solicitudes de ``filas`` en sus fechas; devuelve ``[(exp, fila)]``."""
+    drff, uj = u["dir_drff"], u["juridica"]
+    exps = []
+    for i, fila in enumerate(filas):
+        usuario, municipio, predio, persona, modalidad, ha = fila[:6]
+        exp = _validada(u[usuario], drff, ejercicio, municipio, predio, persona, modalidad, ha,
+                        registro=fila[6])
+        with paso(habil(tecnico_desde, i), 10):
+            tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
+        with paso(habil(juridico_desde, i), 10):
+            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
+        exps.append((exp, fila))
+    return exps
 
 
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
-    drff, uj, st = u["dir_drff"], u["juridica"], u["comite"]
+    st = u["comite"]
     creadas = 0
     for clave, solicitudes in SOLICITUDES.items():
         ejercicio = Ejercicio.objects.filter(programa__clave=clave, reglas_cargadas__isnull=False).order_by("-anio").first()
         if ejercicio is None or SesionComite.objects.filter(ejercicio=ejercicio).exists():
             continue
-        for usuario, municipio, predio, persona, modalidad, ha in solicitudes:
-            exp = _validada(u[usuario], drff, ejercicio, municipio, predio, persona, modalidad, ha)
-            tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
-            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
-            creadas += 1
-        fecha = timezone.localtime(timezone.now()) - timedelta(hours=2)
-        sesion = sesiones.crear_sesion(
-            st, ejercicio, TipoSesion.APROBACION, fecha, "Sala de juntas de PROBOSQUE, Metepec",
-            "Lista de asistencia y declaración de quórum\nPresentación del listado preliminar\n"
-            "Aprobación de los listados\nAutorización de la publicación de resultados")
-        sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo(f"Listado preliminar {clave} 2026"),
-                                                           name="listado_preliminar.pdf"), "Listado preliminar")
-        sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
-        aprobacion.proponer_listados(st, sesion)
-        aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.",
-                                  momento=fecha + timedelta(minutes=30))
+        fecha_sesion, tecnico_desde, juridico_desde = PRIMER_LOTE[clave]
+        creadas += len(dictaminar_lote(u, ejercicio, solicitudes, tecnico_desde, juridico_desde))
+        sesion_aprobacion(st, ejercicio, fecha_sesion, ["Listado preliminar"])
     creadas += _publicaciones(u)
     creadas += _contratos(u)
     creadas += _firmas(u)
@@ -78,28 +86,28 @@ def cargar_demo():
     return creadas
 
 
-def _despues(base, minutos):
-    """Un momento posterior a ``base`` (nunca en el futuro)."""
-    return max(base, min(base + timedelta(minutes=minutos), timezone.now()))
+# programa: (publicación, [(fecha de la entrega, medio) de cada aviso de la primera solicitud])
+PUBLICAR = {"PS": ("2026-11-05", [("2026-11-06", "personal"), ("2026-11-09", "telefono")]),
+            "RHF": ("2026-11-06", [("2026-11-09", "personal")])}
 
 
 def _publicaciones(u):
     """HU-3.1: publica PS y RHF con la demostración de avisos a distintas horas (idempotente)."""
     hechas = 0
     drff = u["dir_drff"]
-    for clave, entregas in (("PS", ("resultados", "cita_firma")), ("RHF", ("resultados",))):
+    for clave, (fecha, entregas) in PUBLICAR.items():
         sesion = (SesionComite.objects.filter(ejercicio__programa__clave=clave, tipo=TipoSesion.APROBACION,
                                               estado="celebrada", autoriza_publicacion=True, publicacion__isnull=True)
                   .order_by("-fecha_hora").first())
         if sesion is None:
             continue
-        pub = publicacion.publicar(drff, sesion, momento=_despues(sesion.acta_fecha, 30))
+        with paso(fecha, 10, 30):
+            pub = publicacion.publicar(drff, sesion)
         primera = pub.renglones.order_by("folio").first().expediente
-        for minutos, tipo in zip((20, 40), entregas):
+        for (dia, medio), tipo in zip(entregas, ("resultados", "cita_firma")):
             n = primera.notificaciones.get(tipo=tipo)
-            publicacion.registrar_entrega(
-                _delegacion(u, primera), n, "personal" if tipo == "resultados" else "telefono",
-                fecha_hora=_despues(pub.publicada_en, minutos), observaciones="Entregado (demostración).")
+            with paso(dia, 11):
+                publicacion.registrar_entrega(_delegacion(u, primera), n, medio, observaciones="Entregado (demostración).")
         hechas += 1
     return hechas
 
@@ -109,13 +117,16 @@ def _delegacion(u, expediente):
 
 
 def _modelo_validado(u, ejercicio, nombre):
-    """Modelo de Contrato de Adhesión de demostración, registrado por el área responsable y validado por la UJ."""
+    """Modelo de Contrato de Adhesión de demostración, registrado por el área responsable y validado por la UJ (en octubre,
+    antes de los primeros contratos; si ya hay contratos anteriores, el que se da por registrado)."""
     existente = ModeloContrato.objects.filter(ejercicio=ejercicio, nombre=nombre).first()
     if existente:
         return existente
     texto = contratos.PLANTILLAS_BASE[TipoModelo.CONTRATO_ADHESION].replace(contratos.MARCA_BORRADOR, "").strip()
-    m = contratos.registrar_modelo(u["dir_drff"], ejercicio, TipoModelo.CONTRATO_ADHESION, nombre, texto)
-    contratos.validar_version(u["juridica"], m.vigente, "Cláusulas revisadas contra las Reglas de Operación 2026 (demostración).")
+    with paso("2026-06-01", 10):
+        m = contratos.registrar_modelo(u["dir_drff"], ejercicio, TipoModelo.CONTRATO_ADHESION, nombre, texto)
+    with paso("2026-06-02", 11):
+        contratos.validar_version(u["juridica"], m.vigente, "Cláusulas revisadas contra las Reglas de Operación 2026 (demostración).")
     return m
 
 
@@ -130,46 +141,47 @@ def _contratos(u):
         if clave in ("PS", "RHF"):
             _modelo_validado(u, ejercicio, f"Contrato de Adhesión {clave} {ejercicio.anio} (modelo de demostración)")
         if clave != "RHF" and not ModeloContrato.objects.filter(ejercicio=ejercicio, es_base=True).exists():
-            contratos.crear_plantilla_base(drff, ejercicio)
+            with paso("2026-06-03", 10):
+                contratos.crear_plantilla_base(drff, ejercicio)
             hechos += 1
-    for clave, predio, enviar in (("PS", "Plantación Los Pinos", True), ("RHF", "Barranca Honda", False)):
+    for clave, predio, enviar, elaborado, enviado in (("PS", "Plantación Los Pinos", True, "2026-11-10", "2026-11-11"),
+                                                      ("RHF", "Barranca Honda", False, "2026-11-12", None)):
         exp = Expediente.objects.filter(ejercicio__programa__clave=clave, predio__nombre=predio).first()
         if exp is None or Contrato.objects.filter(expediente=exp).exists() or exp.estado.clave != "notificada":
             continue
         modelo = contratos.modelos_elegibles(exp)[0]
-        contrato = contratos.elaborar_contrato(drff, exp, modelo)
+        with paso(elaborado, 10):
+            contrato = contratos.elaborar_contrato(drff, exp, modelo)
         if enviar:
-            contratos.enviar_a_delegacion(drff, contrato)
+            with paso(enviado, 11):
+                contratos.enviar_a_delegacion(drff, contrato)
         hechos += 1
     # Ojo de Agua (RHF): la Delegación ya notificó el resultado y falta elaborar su contrato.
     ojo = Expediente.objects.filter(ejercicio__programa__clave="RHF", predio__nombre="Ojo de Agua",
                                     estado__clave="publicada").first()
     if ojo is not None:
         n = ojo.notificaciones.get(tipo="resultados")
-        publicacion.registrar_entrega(_delegacion(u, ojo), n, "correo", fecha_hora=_despues(n.enviada_en, 50),
-                                      observaciones="Notificado por correo electrónico (demostración).")
+        with paso("2026-11-10", 12):
+            publicacion.registrar_entrega(_delegacion(u, ojo), n, "correo",
+                                          observaciones="Notificado por correo electrónico (demostración).")
         hechos += 1
     return hechos
 
 
 # ----------------------------------------------------------------------------- HU-3.3
-# programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, destino)]; destino:
+# programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, registro, destino)]; destino:
 # «firmado» (contrato firmado en plazo), «sin_firma» (vence sin firma y queda señalado) o «sin_planta» (firmado).
 LOTE_FIRMAS = {
-    "PS": [("del_amecameca", "Amecameca", "Mirador de los Pinos", "Hilda Maldonado Cruz", "plantacion_forestal_comercial", 5, "firmado"),
-           ("del_toluca", "Zinacantepec", "Ladera Verde", "Octavio Rangel Mena", "plantacion_forestal_comercial", 3, "firmado"),
-           ("del_valle", "Amanalco", "Cañada Seca", "Mireya Solís Ibarra", "mantenimiento_plantaciones", 2, "sin_firma")],
-    "RHF": [("del_amecameca", "Ozumba", "Arroyo Claro", "Esteban Quiroz Lara", "bosques_de_agua", 4, "firmado"),
-            ("del_valle", "Amanalco", "Cerro Gordo", "Carmen Téllez Roa", "rfi_modalidad_dos", 3, "firmado"),
-            ("del_toluca", "Zinacantepec", "Peña Blanca", "Ignacio Lugo Ferrer", "rfi_modalidad_uno", 2, "sin_planta")],
+    "PS": [("del_amecameca", "Amecameca", "Mirador de los Pinos", "Hilda Maldonado Cruz", "plantacion_forestal_comercial", 5, "2026-02-25", "firmado"),
+           ("del_toluca", "Zinacantepec", "Ladera Verde", "Octavio Rangel Mena", "plantacion_forestal_comercial", 3, "2026-02-26", "firmado"),
+           ("del_valle", "Amanalco", "Cañada Seca", "Mireya Solís Ibarra", "mantenimiento_plantaciones", 2, "2026-02-27", "sin_firma")],
+    "RHF": [("del_amecameca", "Ozumba", "Arroyo Claro", "Esteban Quiroz Lara", "bosques_de_agua", 4, "2026-02-25", "firmado"),
+            ("del_valle", "Amanalco", "Cerro Gordo", "Carmen Téllez Roa", "rfi_modalidad_dos", 3, "2026-02-26", "firmado"),
+            ("del_toluca", "Zinacantepec", "Peña Blanca", "Ignacio Lugo Ferrer", "rfi_modalidad_uno", 2, "2026-02-27", "sin_planta")],
 }
-
-
-def _envejecer(exp, dias):
-    """Calendario simulado: la publicación y la notificación del resultado fueron hace ``dias`` días."""
-    Hito.objects.filter(expediente=exp, clave="publicacion_resultados").update(fecha_hora=timezone.now() - timedelta(days=dias))
-    Notificacion.objects.filter(expediente=exp, tipo="resultados").update(
-        notificada_en=timezone.now() - timedelta(days=dias), enviada_en=timezone.now() - timedelta(days=dias + 1))
+# programa: (sesión de aprobación, publicación, notificación del resultado, elaboración del primer contrato, firma del primero)
+CALENDARIO_FIRMAS = {"PS": ("2026-09-22", "2026-09-24", "2026-09-25", "2026-09-28", "2026-10-02"),
+                     "RHF": ("2026-09-23", "2026-09-25", "2026-09-28", "2026-10-01", "2026-10-06")}
 
 
 def _firmar_demo(u, exp, pdf=None):
@@ -186,63 +198,46 @@ def _firmar_demo(u, exp, pdf=None):
 def _firmas(u):
     """HU-3.3: segundo lote de PS y RHF con contratos firmados y uno señalado sin firma (idempotente)."""
     hechas = 0
-    drff, uj, st = u["dir_drff"], u["juridica"], u["comite"]
+    drff, st = u["dir_drff"], u["comite"]
     for clave, solicitudes in LOTE_FIRMAS.items():
         ejercicio = Ejercicio.objects.filter(programa__clave=clave, reglas_cargadas__isnull=False).order_by("-anio").first()
         if ejercicio is None or Expediente.objects.filter(ejercicio=ejercicio, predio__nombre=solicitudes[0][2]).exists():
             continue
-        exps = []
-        for usuario, municipio, predio, persona, modalidad, ha, destino in solicitudes:
-            exp = _validada(u[usuario], drff, ejercicio, municipio, predio, persona, modalidad, ha)
-            tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
-            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
-            exps.append((exp, destino))
-        fecha = timezone.localtime(timezone.now()) - timedelta(hours=1)
-        sesion = sesiones.crear_sesion(
-            st, ejercicio, TipoSesion.APROBACION, fecha, "Sala de juntas de PROBOSQUE, Metepec",
-            "\n".join(["Lista de asistencia y declaración de quórum", "Presentación del listado preliminar",
-                       "Aprobación de los listados", "Autorización de la publicación de resultados"]))
-        sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo(f"Listado preliminar {clave} (segundo lote)"),
-                                                           name="listado_preliminar.pdf"), "Listado preliminar")
-        sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
-        aprobacion.proponer_listados(st, sesion)
-        aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.", momento=fecha + timedelta(minutes=20))
-        sesion.refresh_from_db()
-        pub = publicacion.publicar(drff, sesion, momento=_despues(sesion.acta_fecha, 10))
+        fecha_sesion, fecha_pub, fecha_notif, fecha_contrato, fecha_firma = CALENDARIO_FIRMAS[clave]
+        exps = dictaminar_lote(u, ejercicio, [f[:7] for f in solicitudes], "2026-04-21", "2026-04-27")
+        destinos = [f[7] for f in solicitudes]
+        sesion = sesion_aprobacion(st, ejercicio, fecha_sesion, ["Listado preliminar (segundo lote)"])
+        with paso(fecha_pub, 10):
+            publicacion.publicar(drff, sesion)
         modelo = contratos.modelos_elegibles(exps[0][0])[0]
-        for exp, destino in exps:
-            publicacion.registrar_entrega(_delegacion(u, exp), exp.notificaciones.get(tipo="resultados"), "personal",
-                                          fecha_hora=_despues(pub.publicada_en, 15), observaciones="Entregado (demostración).")
+        for i, ((exp, _), destino) in enumerate(zip(exps, destinos)):
+            with paso(fecha_notif, 11):
+                publicacion.registrar_entrega(_delegacion(u, exp), exp.notificaciones.get(tipo="resultados"), "personal",
+                                              observaciones="Entregado (demostración).")
             exp.refresh_from_db()
             if destino == "sin_firma":
                 continue
-            contrato = contratos.elaborar_contrato(drff, exp, modelo)
-            contratos.enviar_a_delegacion(drff, contrato)
+            with paso(habil(fecha_contrato, i), 10):
+                contrato = contratos.elaborar_contrato(drff, exp, modelo)
+            with paso(habil(fecha_contrato, i + 1), 10):
+                contratos.enviar_a_delegacion(drff, contrato)
             exp.refresh_from_db()
-            _firmar_demo(u, exp)
+            with paso(habil(fecha_firma, i), 12):
+                _firmar_demo(u, exp)
             hechas += 1
-        for exp, destino in exps:
-            if destino == "sin_firma":
-                _envejecer(exp, 40)
-                firma.revisar_firmas(timezone.localdate())
-                hechas += 1
+        hechas += destinos.count("sin_firma")
+    # El contrato sin firma venció su plazo (10 días hábiles): la revisión de plazos de la fecha de corte lo señala.
+    with paso(fecha_corte(), 9):
+        firma.revisar_firmas(fecha_corte())
     return hechas
 
 
 # ----------------------------------------------------------------------------- HU-3.4
-def _vencer_vale(vale, dias=40):
-    """Calendario simulado: el vale se entregó hace ``dias`` días y ya pasó su vigencia."""
-    ahora = timezone.now()
-    vale.entregado_en = ahora - timedelta(days=dias)
-    vale.vence_el = timezone.localdate() - timedelta(days=dias // 4)
-    vale.save(update_fields=["entregado_en", "vence_el"])
-    vale.salidas.update(salido_en=ahora - timedelta(days=dias - 1))
-    vale.expediente.hitos.filter(clave="entrega_vale", referencia=vale.folio).update(fecha_hora=vale.entregado_en)
-
-
+# predio: (fecha de entrega del vale, [(especie, cantidad, fecha de la salida)])
 def _vales(u):
     """HU-3.4: catálogos y vales (vigentes, vencido, con salidas parciales y una reposición); idempotente."""
-    planta.cargar_catalogo()
+    with paso("2026-09-01", 10):
+        planta.cargar_catalogo()
     if ValePlanta.objects.exists():
         return 0
     vivero = Vivero.objects.filter(unidad__isnull=False).first()
@@ -254,32 +249,36 @@ def _vales(u):
     def exp_de(predio):
         return Expediente.objects.filter(predio__nombre=predio, estado__clave="contratada").first()
 
-    def vale(predio, renglones):
+    def vale(predio, fecha, renglones, **kw):
         exp = exp_de(predio)
         if exp is None:
             return None
-        return planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp[n], c) for n, c in renglones],
-                                  motivo_ajuste="Ajuste de demostración a la disponibilidad del vivero.")
+        with paso(fecha, 10):
+            return planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp[n], c) for n, c in renglones],
+                                      motivo_ajuste="Ajuste de demostración a la disponibilidad del vivero.", **kw)
+
+    def salida(v, especie, cantidad, fecha, **kw):
+        with paso(fecha, 12):
+            planta.registrar_salida(usuario_vivero, v, esp[especie], cantidad, **kw)
 
     hechos = 0
-    v = vale("Mirador de los Pinos", [("Pino patula", 3000), ("Oyamel", 2500)])
+    v = vale("Mirador de los Pinos", "2026-11-09", [("Pino patula", 3000), ("Oyamel", 2500)])          # vigente hasta el 9-dic
     if v:
-        planta.registrar_salida(usuario_vivero, v, esp["Pino patula"], 1200, observaciones="Primera entrega (demostración).")
-        planta.registrar_salida(usuario_vivero, v, esp["Oyamel"], 500)
+        salida(v, "Pino patula", 1200, "2026-11-12", observaciones="Primera entrega (demostración).")
+        salida(v, "Oyamel", 500, "2026-11-12")
         hechos += 1
-    v = vale("Ladera Verde", [("Pino moctezuma", 3300)])
+    v = vale("Ladera Verde", "2026-10-06", [("Pino moctezuma", 3300)])                                  # venció el 5-nov
     if v:
-        _vencer_vale(v)
         hechos += 1
-    v = vale("Arroyo Claro", [("Oyamel", 1400), ("Encino", 1000)])
+    v = vale("Arroyo Claro", "2026-11-10", [("Oyamel", 1400), ("Encino", 1000)])                        # 15 días hábiles: al 1-dic
     if v:
-        planta.registrar_salida(usuario_vivero, v, esp["Oyamel"], 700)
+        salida(v, "Oyamel", 700, "2026-11-13")
         hechos += 1
-    v = vale("Cerro Gordo", [("Pino moctezuma", 1800)])
+    v = vale("Cerro Gordo", "2026-10-12", [("Pino moctezuma", 1800)])                                   # venció el 3-nov
     if v:
-        planta.registrar_salida(usuario_vivero, v, esp["Pino moctezuma"], 600)
-        _vencer_vale(v, 25)
+        salida(v, "Pino moctezuma", 600, "2026-10-14")
         exp = v.expediente
-        planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp["Pino moctezuma"], 1200)], planta_disponible=True)
+        with paso("2026-11-17", 10):
+            planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp["Pino moctezuma"], 1200)], planta_disponible=True)
         hechos += 1
     return hechos
