@@ -1,0 +1,55 @@
+{
+  "cifras": {
+    "pruebas_sistema": "128",
+    "pruebas_calculadora": "15",
+    "capturas": "60",
+    "tablas": "33"
+  },
+  "situacion_programa": {
+    "CC": "Con reglas cargadas; es el programa con el que se demostró el sprint",
+    "PS": "Función construida; reglas cargadas y recorrido probado en el sprint 2",
+    "RHF": "Función construida; reglas cargadas y recorrido probado en el sprint 2",
+    "PSA": "Función construida; reglas cargadas y recorrido probado en el sprint 2",
+    "MFS": "Función construida; sin reglas todavía (sprint 3)",
+    "PEG": "Función construida; sin reglas todavía (sprint 3)",
+    "CF": "Página publicada con los datos 2023 a 2025"
+  },
+  "historias": {
+    "HU-1.1": {
+      "commit": "6ee4927",
+      "como": "Ventanilla de la Delegación: la solicitud se registra a nombre del predio, que recibe un folio propio y lo conserva entre programas. Se genera el acuse en PDF con fecha y hora de recepción. El servicio rechaza un predio cuyo municipio no atiende esa Delegación y dice cuál le corresponde."
+    },
+    "HU-1.2": {
+      "commit": "2c92b2c",
+      "como": "La lista de requisitos sale de las reglas del programa según el tipo de persona y la modalidad. Cada uno queda entregado (con su archivo digitalizado), faltante o no aplica. El envío a la Dirección solo procede con todos revisados y ninguno faltante, y deja fecha, hora y acuse."
+    },
+    "HU-1.3": {
+      "commit": "15e7511",
+      "como": "El polígono se carga desde un archivo (GeoJSON, KML o Shapefile) o se dibuja en el mapa. La superficie se calcula en UTM 14N y se comprueba que caiga en el municipio del predio. Si cambia de lugar se conservan el anterior y el nuevo, con quién lo levantó."
+    },
+    "HU-1.4": {
+      "commit": "26bb9b7",
+      "como": "La Dirección valida el expediente o emite el aviso de faltantes con fecha límite en días hábiles, que se notifica por conducto de la Delegación con su acuse. En un refrendo se acepta la documentación legal vigente de hasta 3 años; el número de años sale de las reglas."
+    },
+    "HU-2.1": {
+      "commit": "3417f37",
+      "como": "Dictamen factible o no factible con motivo, apoyado en una lista de verificación con los criterios del programa (que hay que revisar uno por uno) y en el análisis cartográfico con PostGIS: superficie, municipio y traslapes con otros expedientes. Listado preliminar exportable. El plazo de dictaminación sale de las reglas (45 días hábiles en Guardabosques)."
+    },
+    "HU-2.2": {
+      "commit": "160ae8b",
+      "como": "Dictamen procedente o no procedente con motivo. El Listado de Personas Beneficiarias Incumplidas y los predios con sanción se cotejan de forma automática, y el servicio impide dictaminar procedente una solicitud cuyo predio o titular está en el Listado."
+    },
+    "HU-2.3": {
+      "commit": "40ac657",
+      "como": "La Secretaría Técnica arma la convocatoria con orden del día y documentos; el envío guarda fecha, hora y acuse y exige la anticipación de las reglas. El sistema propone los listados (personas beneficiarias, lista de espera con orden, no factibles); el Comité puede ajustarlos dejando constancia. El acta lleva la autorización de publicación y mueve cada expediente a su estado."
+    },
+    "HU-2.4": {
+      "commit": "a27e107",
+      "como": "Los acuerdos de seguimiento son tipificados; cada uno indica los expedientes a los que aplica y el área que debe cumplirlo, y esa área lo ve pendiente en su bandeja hasta marcarlo cumplido. Incluye la instrucción de pago por ministración (PSAHEM) y la validación de reportes por periodo (Guardabosques), probadas con programas mínimos."
+    },
+    "HU-7.1": {
+      "commit": "d8b71ff",
+      "como": "La página de la Calculadora se publica como sitio por archivos: un archivo por año con la superficie de cada municipio y del Estado, que se carga solo al consultarlo. Se agregó la tarjeta de evolución anual del Estado, con su tendencia, y la de cada municipio en su detalle."
+    }
+  }
+}

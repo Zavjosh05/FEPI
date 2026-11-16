@@ -1,0 +1,236 @@
+<section class="portada">
+  <p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+  <h1>Resumen del sprint 1<br>Recepción y dictamen</h1>
+  <p class="sub">Qué problema se atiende, cómo está construido el sistema, qué se hizo en el primer prototipo y cómo
+  quedaron cubiertas las necesidades.</p>
+  <table>
+    <tr><td class="gris">Prototipo</td><td>Recepción y dictamen (módulos M1 y M2) y masa forestal por año (M7.1)</td></tr>
+    <tr><td class="gris">Construcción</td><td>13 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Revisión y ajustes</td><td>14 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Historias</td><td>9 de 26 (36 de 112 puntos)</td></tr>
+    <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>prototipos</code></td></tr>
+    <tr><td class="gris">Autor</td><td>Joshua Zavaleta</td></tr>
+  </table>
+  <div class="caja" style="margin-top:1cm">
+    <b>En una frase.</b> Una solicitud de apoyo ya puede registrarse en la Delegación, integrarse en el expediente de su
+    predio con su polígono, validarse, dictaminarse técnica y jurídicamente y aprobarse en sesión del Comité, dejando en
+    cada paso quién lo hizo, cuándo y con qué acuse; y la Calculadora forestal ya muestra la masa forestal de cada año y
+    su evolución.
+  </div>
+</section>
+
+<h2 class="salto">1. La problemática</h2>
+<p>PROBOSQUE (Protectora de Bosques del Estado de México) opera seis programas de apoyo: Capturando Carbono (CC),
+Manejo Forestal Sustentable (MFS), Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), Pago por
+Servicios Ambientales Hidrológicos (PSAHEM) y Guardabosques (PEG). Cada uno tiene sus Reglas de Operación, pero todos
+siguen las mismas etapas: recepción de la solicitud, dictamen, aprobación del Comité, publicación, contrato, pago,
+comprobación, seguimiento y cierre del ejercicio.</p>
+<p>El levantamiento de necesidades (Tablas de necesidades por rol, versión 12) registró <b>133 necesidades</b> de esos
+programas y <b>5</b> de una herramienta adicional, la Calculadora forestal. Leídas en conjunto describen cuatro
+problemas:</p>
+<ul>
+  <li><b>El trámite pasa por muchas manos.</b> Delegación Regional Forestal, Dirección que es Instancia Ejecutora,
+  Unidad Jurídica, Comité, Administración y Finanzas, vivero y Fiduciaria intervienen sobre el mismo expediente, y
+  ninguna tiene a la vista en qué paso está ni quién lo tiene.</li>
+  <li><b>Los plazos corren sin constancia.</b> Las Reglas fijan plazos en días hábiles (faltantes, firma del contrato,
+  avisos, verificación), pero cuentan desde una entrega o una notificación que hoy no deja fecha, hora ni acuse
+  comprobables.</li>
+  <li><b>Cada programa cambia los detalles.</b> Requisitos, montos, porcentajes de pago y plazos son distintos en cada
+  programa y cada año; si se escriben dentro del sistema, hay que reprogramarlo cada ejercicio.</li>
+  <li><b>No hay una cifra propia de masa forestal.</b> PROBOSQUE no cuenta con una medición por municipio y por año de
+  cuánto bosque hay, cuánto se pierde por incendios y cómo evoluciona.</li>
+</ul>
+
+<h2>2. La solución y su arquitectura</h2>
+<p>La propuesta de solución (12 de noviembre de 2026) plantea dos subsistemas independientes: un <b>Sistema de
+programas</b> con seis módulos generales (M1 a M6), uno por grupo de etapas, que sirven a los seis programas; y la
+<b>Calculadora forestal</b> (M7), que no usa expedientes ni base de datos. Son 26 funciones, cada una con una sola
+historia de usuario, repartidas en tres prototipos de una semana.</p>
+<figure>
+  <img src="../recursos/arquitectura.svg" alt="Arquitectura: capas, tecnologías y Calculadora forestal">
+  <figcaption>Arquitectura propuesta: capas y tecnologías del Sistema de programas y de la Calculadora forestal.</figcaption>
+</figure>
+<table>
+  <thead><tr><th style="width:17%">Capa</th><th style="width:36%">Tecnología</th><th>Para qué</th></tr></thead>
+  <tbody>
+    <tr><td>Presentación</td><td>Plantillas de Django, HTMX, Bootstrap 5, Leaflet, WeasyPrint</td><td>Pantallas por unidad, mapas de los predios y acuses en PDF. Las bibliotecas van dentro del proyecto, sin depender de internet.</td></tr>
+    <tr><td>Aplicación</td><td>Django 5.2 con GeoDjango</td><td>Una app por módulo (<code>recepcion</code>, <code>dictamen</code>) sobre un núcleo común (<code>nucleo</code>).</td></tr>
+    <tr><td>Datos</td><td>PostgreSQL con PostGIS; archivos en disco</td><td>Una sola base para el trámite y las geometrías; los documentos digitalizados se entregan solo a quien tiene permiso.</td></tr>
+    <tr><td>Pruebas</td><td>pytest, pytest-django, Playwright</td><td>Una prueba o más por criterio de aceptación y recorridos de navegador con capturas.</td></tr>
+    <tr><td>Infraestructura</td><td>Docker Compose, Nginx, Gunicorn</td><td>Todo el entorno se levanta con un comando.</td></tr>
+    <tr><td>Calculadora</td><td>Python (rasterio, geopandas), página estática con D3</td><td>Procesa imágenes Sentinel-2 una vez al año y publica archivos; no necesita servidor.</td></tr>
+  </tbody>
+</table>
+<h3>El núcleo común</h3>
+<p>Es lo que hace que los seis módulos funcionen como un solo sistema, y se construyó completo en este sprint:</p>
+<ul>
+  <li><b>Expediente único por predio.</b> El predio tiene su folio y todo lo que ocurre cuelga de su expediente.</li>
+  <li><b>Reglas como datos.</b> Requisitos, plazos, montos y formatos de cada programa se cargan desde un archivo
+  extraído de las Reglas de Operación, donde cada dato lleva su numeral y la línea del texto. El código no tiene
+  escrito ningún requisito ni plazo.</li>
+  <li><b>Estados del trámite.</b> Una tabla de transiciones permitidas dice de qué estado a cuál se puede pasar y qué
+  unidad puede hacerlo. Un solo punto del código cambia el estado, lo valida y escribe la bitácora.</li>
+  <li><b>Bandejas y permisos por unidad.</b> Cada unidad ve los expedientes que le toca atender; una Delegación solo ve
+  los suyos.</li>
+  <li><b>Días hábiles.</b> Calendario de días inhábiles y cálculo de vencimientos.</li>
+  <li><b>Bitácora y acuses.</b> Cada envío o entrega guarda quién, fecha y hora, y genera un acuse en PDF con folio.</li>
+</ul>
+<div class="caja"><b>Ajustes a la propuesta que se aceptaron.</b> Docker dentro de WSL en el equipo de desarrollo;
+bibliotecas de la interfaz copiadas al proyecto en lugar de un CDN; polígonos por carga de archivo además del dibujo en
+el mapa; y, en la Calculadora, cuadrícula en PNG y conservar el archivo único además del sitio por archivos. El detalle
+y el porqué de cada uno están en la bitácora (renglones T-01 a T-12 y C-01 a C-03).</div>
+
+<h2 class="salto">3. Qué se trabajó en el sprint 1</h2>
+<p>El objetivo del prototipo era que una solicitud se registrara en la Delegación, se integrara en el expediente del
+predio con su polígono, se validara y llegara dictaminada al Comité. Se construyeron los módulos <b>M1 Recepción y
+expediente</b> y <b>M2 Dictamen y Comité</b> completos, y la función <b>M7.1</b> de la Calculadora.</p>
+<!--TABLA_HISTORIAS-->
+<p class="gris">Pruebas: las que hoy tiene cada historia (de criterios y recorrido de navegador). Además hay pruebas del
+núcleo y dos recorridos completos, que no pertenecen a una historia.</p>
+
+<h3>El recorrido del trámite en este sprint</h3>
+<p class="flujo">
+  <span>Solicitud recibida</span> → <span>En revisión de la Dirección</span> → <span>Validado · en dictamen</span> →
+  <span>Dictaminada</span> → <span>Aprobada</span><br>
+  Flujos alternos: <span class="alt">A · Aviso de faltantes</span> <span class="alt">A · Solicitud desechada</span>
+  <span class="alt">B · No factible</span> <span class="alt">C · Lista de espera</span>
+</p>
+<table>
+  <thead><tr><th style="width:24%">Paso</th><th style="width:26%">Quién</th><th>Qué deja</th></tr></thead>
+  <tbody>
+    <tr><td>Registro de la solicitud</td><td>Delegación</td><td>Expediente con folio y acuse de recepción</td></tr>
+    <tr><td>Requisitos y polígono</td><td>Delegación</td><td>Cada requisito revisado con su archivo; polígono con superficie</td></tr>
+    <tr><td>Envío a la Dirección</td><td>Delegación</td><td>Acuse del envío; el expediente cambia de bandeja</td></tr>
+    <tr><td>Validación o aviso de faltantes</td><td>Dirección (Instancia Ejecutora)</td><td>Validación, o aviso con fecha límite notificado por la Delegación</td></tr>
+    <tr><td>Dictamen técnico y jurídico</td><td>Dirección y Unidad Jurídica, en paralelo</td><td>Dos dictámenes con motivo; listado preliminar</td></tr>
+    <tr><td>Sesión de aprobación</td><td>Secretaría Técnica y Comité</td><td>Convocatoria, listados y acta con autorización de publicación</td></tr>
+    <tr><td>Sesiones de seguimiento</td><td>Comité y área responsable</td><td>Acuerdos con su área responsable y su cumplimiento</td></tr>
+  </tbody>
+</table>
+
+<h3>Algunas pantallas</h3>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_1_1_05_solicitud_registrada_con_acuse.png" alt=""></div>
+    <figcaption>HU-1.1 · Solicitud registrada, con su acuse de recepción.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_1_3_02_poligono_cargado.png" alt=""></div>
+    <figcaption>HU-1.3 · Polígono del predio cargado, con su superficie.</figcaption></figure>
+</div>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_1_4_03_aviso_de_faltantes_con_fecha_limite.png" alt=""></div>
+    <figcaption>HU-1.4 · Aviso de faltantes con fecha límite en días hábiles.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_2_3_04_listados_propuestos.png" alt=""></div>
+    <figcaption>HU-2.3 · Sesión de aprobación: convocatoria y listados propuestos.</figcaption></figure>
+</div>
+
+<h2 class="salto">4. Cómo se cubrieron las necesidades</h2>
+<p>Cada función atiende necesidades de varios programas, y cada función tiene una sola historia con sus criterios de
+aceptación. La tabla dice, historia por historia, qué pide, cómo quedó resuelto y qué necesidades atiende. Los
+identificadores de necesidad empiezan con la clave del programa y siguen con el rol: DRF Delegación, ARP área
+responsable (DPF en Guardabosques), UJ Unidad Jurídica, COM Comité, PSF prestador de servicios forestales, BEN persona
+beneficiaria, DEV equipo desarrollador.</p>
+<!--TABLA_COBERTURA-->
+
+<h3>Cuántas necesidades toca este sprint</h3>
+<!--RESUMEN_NECESIDADES-->
+<p>«Atendida» significa que al menos una de las funciones que la cubren quedó construida; «completa», que ya no le
+falta ninguna función de un sprint posterior. El anexo A lista las 42 necesidades con ese detalle.</p>
+<div class="aviso"><b>Un límite que hay que tener presente.</b> Las funciones se construyeron para los seis programas,
+pero en este sprint solo Capturando Carbono tenía sus reglas cargadas, así que es el único programa con el que se
+demostró el recorrido. Los requisitos y plazos de PS, RHF y PSAHEM se cargaron y probaron en el sprint 2; los de MFS y
+Guardabosques llegan en el sprint 3. Las reglas propias de PSAHEM y de Guardabosques que piden las historias
+(instrucción de pago, validación de reportes, plazo de 45 días hábiles) se probaron con programas mínimos.</div>
+
+<h2>5. Modelo de datos</h2>
+<p>El sistema tiene {{tablas}} tablas propias en PostgreSQL con PostGIS, en tres áreas. El diagrama entidad-relación se
+genera desde los modelos del código (<code>sistema/docs/modelo_datos.md</code>), así que siempre corresponde a lo
+construido.</p>
+<table>
+  <thead><tr><th style="width:24%">Área</th><th>Tablas principales</th><th style="width:34%">Qué resuelven</th></tr></thead>
+  <tbody>
+    <tr><td>Reglas y catálogos (núcleo)</td><td>Programa, Ejercicio, TipoPersona, Modalidad, Requisito, Plazo, Formato, MontoApoyo, Ministración, Estado, Transición, Unidad, Usuario, Municipio, DíaInhábil</td><td>Lo que cambia entre programas y años, guardado como datos</td></tr>
+    <tr><td>Expediente y recepción (M1)</td><td>Persona, Predio, Expediente, Documento, RevisiónRequisito, Polígono, Validación, Acuse, Evento</td><td>El expediente único y todo lo que cuelga de él</td></tr>
+    <tr><td>Dictamen y Comité (M2)</td><td>DictamenTécnico, DictamenJurídico, PersonaIncumplida, PredioSancionado, SesiónComité, DocumentoSesión, ResoluciónSesión, Acuerdo</td><td>Dictámenes, listados de incumplimiento, sesiones y acuerdos</td></tr>
+  </tbody>
+</table>
+
+<h2 class="salto">6. Calculadora forestal: masa forestal por año</h2>
+<p>La Calculadora mide la superficie con cobertura arbórea (hectáreas) dentro de la zona forestal del INEGI, con
+imágenes Sentinel-2 de noviembre y diciembre de cada año. El cálculo ya existía; la historia HU-7.1 pedía la cifra de
+cada año por municipio y para el Estado, y su evolución.</p>
+<figure>
+  <img src="capturas/hu_7_1_evolucion.png" alt="Evolución del bosque del Estado de México, 2023 a 2025">
+  <figcaption>Tarjeta de evolución anual: 473,148 ha en 2023, 467,955 en 2024 y 466,058 en 2025 (−3,545 ha por año).</figcaption>
+</figure>
+<ul>
+  <li><b>Sitio por archivos.</b> La página pasó de un solo archivo de 2.76 MB a un sitio que al abrir carga 438 kB y
+  pide lo demás al consultarlo: un archivo por año y por comparación, los municipios en TopoJSON y las cuadrículas en
+  PNG. Se conserva el archivo único, que abre sin servidor.</li>
+  <li><b>Una corrección.</b> La página mostraba 473,149 ha para 2023 por un doble redondeo; la suma es 473,148.48.</li>
+  <li><b>Lo que no cambió.</b> El motor de cálculo no se tocó. Sus pendientes de método siguen abiertos: el umbral de
+  vegetación sin calibrar con puntos de campo, la selva baja que aparenta perder 7 a 8 % al año (probable caída de
+  hojas) y la baja coincidencia con el mapa global de pérdida de Hansen.</li>
+</ul>
+
+<h2>7. Cómo se comprobó</h2>
+<table>
+  <thead><tr><th style="width:36%">Comprobación</th><th>Resultado al cierre del sprint</th></tr></thead>
+  <tbody>
+    <tr><td>Pruebas automáticas del sistema</td><td>{{pruebas_sistema}} en verde: una o más por criterio de aceptación, las del núcleo y los recorridos de navegador</td></tr>
+    <tr><td>Pruebas de la Calculadora</td><td>{{pruebas_calculadora}} en verde: cifras contra los archivos del cálculo, carga diferida y alineación del mapa</td></tr>
+    <tr><td>Recorrido completo por servicios</td><td>Una sola solicitud, del registro al acta, comprobando en cada relevo estado, bandeja, acuse y bitácora</td></tr>
+    <tr><td>Recorrido completo por la interfaz</td><td>La misma cadena con clics en el navegador y cambio de usuario en cada relevo; el único paso fuera de la interfaz es mover la hora de la sesión para poder registrar el acta</td></tr>
+    <tr><td>Sitio levantado</td><td>Responde con una base nueva y la carga de demostración se puede repetir sin duplicar</td></tr>
+    <tr><td>Capturas</td><td>{{capturas}} imágenes en <code>entregas/sprint_1/capturas/</code>, nombradas por historia</td></tr>
+  </tbody>
+</table>
+<p>Nada se dio por hecho con el informe de quien lo construyó: cada entrega se volvió a probar y se revisaron sus
+capturas antes de su commit. Hay un commit por historia, con su identificador.</p>
+
+<h2>8. Decisiones, hallazgos y ajustes</h2>
+<h3>Lo que dijeron las Reglas de Operación</h3>
+<ul>
+  <li>La Convocatoria sí indica qué municipios atiende cada una de las 9 Delegaciones (125 municipios); se usa tal
+  cual, marcado como «por confirmar con el cliente».</li>
+  <li>El polígono se levanta después de entregar el expediente, así que no es condición para enviarlo a la Dirección.</li>
+  <li>Los listados, incluidas las solicitudes no factibles, los aprueba el Comité: se quitó el paso directo de
+  «validada» a «no factible».</li>
+  <li>Capturando Carbono habla de «puntaje más alto» pero no trae tabla de puntos: el orden propuesto es
+  reforestaciones, luego refrendos, y desempate por fecha de registro.</li>
+  <li>Faltan en el texto varios formatos (informe final, propuesta de actividades, modelo de contrato, oficio de pago)
+  y los días inhábiles; hay un calendario de demostración editable.</li>
+</ul>
+<h3>Ajustes tras la revisión del 14 de noviembre</h3>
+<table>
+  <thead><tr><th style="width:8%">Ajuste</th><th>Qué cambió</th></tr></thead>
+  <tbody>
+    <tr><td class="id">A-1</td><td>La lista de verificación del dictamen técnico viene sin marcar y exige revisar cada criterio</td></tr>
+    <tr><td class="id">A-2</td><td>El acta no se puede registrar antes de la fecha de la sesión</td></tr>
+    <tr><td class="id">A-3</td><td>«Ajustado» marca solo la fila que el Comité movió</td></tr>
+    <tr><td class="id">A-4</td><td>Los montos llevan separador de miles</td></tr>
+    <tr><td class="id">A-5 y A-6</td><td>Las capturas se guardan solo cuando se piden, y las pruebas rápidas corren aparte de las de navegador</td></tr>
+    <tr><td class="id">A-7</td><td>Se agregó el recorrido completo por la interfaz; pasó, con seis tropiezos menores de navegación que se corrigieron en el sprint 2</td></tr>
+  </tbody>
+</table>
+
+<h2>9. Límites y lo que sigue</h2>
+<ul>
+  <li><b>Un solo programa demostrado.</b> Como se dijo en la sección 4, el sprint se demostró con Capturando Carbono.</li>
+  <li><b>Datos de demostración.</b> Son 12 solicitudes inventadas, con polígonos sintéticos y documentos generados, y
+  todas con fecha del día de la carga, por lo que los plazos de la convocatoria aparecen vencidos.</li>
+  <li><b>Sin probar.</b> Dos personas sobre el mismo expediente, volumen, navegadores distintos de Chromium y el mapa
+  base de fondo.</li>
+  <li><b>Decisiones del cliente pendientes.</b> Confirmar la asignación de municipios por Delegación, la regla de
+  priorización, los días inhábiles oficiales y el servidor para las demostraciones.</li>
+</ul>
+<p><b>Sprint 2, contrato y pagos.</b> Sobre este prototipo se construyen la publicación de resultados, la elaboración y
+firma del contrato, la entrega de planta y los pagos (M3 y M5), y en la Calculadora el balance entre dos años con su
+histograma y la pérdida por incendios (M7.2 y M7.3). Para poder demostrarlos se cargan antes las reglas de PS, RHF y
+PSAHEM.</p>
+<div class="caja"><b>Dónde está cada cosa.</b> Código: <code>sistema/</code> (sistema) y <code>src/</code>,
+<code>docs/calculadora/</code> (Calculadora). Cómo levantar y probar, usuarios de demostración y decisiones:
+<code>sistema/README.md</code>. Avance tarea por tarea: <code>entregas/AVANCE.md</code>. Cada propuesta, su porqué y si
+se hizo: <code>entregas/BITACORA.md</code>. Reglas de cada programa: <code>sistema/reglas/</code>.</div>
+
+<h2 class="salto">Anexo A. Necesidades atendidas en el sprint 1</h2>
+<p>Las funciones que faltan indican en qué sprint se completa cada necesidad.</p>
+<!--ANEXO_NECESIDADES-->
