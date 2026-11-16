@@ -51,5 +51,74 @@
       "commit": "d8b71ff",
       "como": "La página de la Calculadora se publica como sitio por archivos: un archivo por año con la superficie de cada municipio y del Estado, que se carga solo al consultarlo. Se agregó la tarjeta de evolución anual del Estado, con su tendencia, y la de cada municipio en su detalle."
     }
+  },
+  "estados": [
+    "recibida",
+    "enviada_direccion",
+    "faltantes",
+    "desechada",
+    "validada",
+    "dictaminada",
+    "aprobada",
+    "lista_espera",
+    "no_factible"
+  ],
+  "pie_estados": "Estados del trámite en el sprint 1 y unidad que hace cada paso. En ámbar, los flujos alternos.",
+  "capturas_por_historia": 4,
+  "capturas_extra": [
+    [
+      "Recorrido completo por la interfaz, con una sola solicitud",
+      "recorrido_sprint_1_*.png",
+      4
+    ]
+  ],
+  "er": {
+    "er_expediente": {
+      "area": 2,
+      "campos": 5,
+      "entidades": [
+        "Persona",
+        "Predio",
+        "Expediente",
+        "Documento",
+        "RevisionRequisito",
+        "Poligono",
+        "Validacion",
+        "Acuse",
+        "Evento"
+      ]
+    },
+    "er_dictamen": {
+      "area": 3,
+      "campos": 5,
+      "entidades": [
+        "Expediente",
+        "DictamenTecnico",
+        "DictamenJuridico",
+        "PersonaIncumplida",
+        "PredioSancionado",
+        "SesionComite",
+        "ResolucionSesion",
+        "Acuerdo",
+        "Unidad"
+      ]
+    },
+    "er_reglas": {
+      "area": 1,
+      "campos": 4,
+      "entidades": [
+        "Programa",
+        "Ejercicio",
+        "Requisito",
+        "Plazo",
+        "MontoApoyo",
+        "Ministracion",
+        "Estado",
+        "Transicion",
+        "Unidad",
+        "Usuario",
+        "Municipio"
+      ]
+    }
   }
 }

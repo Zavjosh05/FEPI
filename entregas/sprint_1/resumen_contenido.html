@@ -89,12 +89,36 @@ expediente</b> y <b>M2 Dictamen y Comité</b> completos, y la función <b>M7.1</
 núcleo y dos recorridos completos, que no pertenecen a una historia.</p>
 
 <h3>El recorrido del trámite en este sprint</h3>
-<p class="flujo">
-  <span>Solicitud recibida</span> → <span>En revisión de la Dirección</span> → <span>Validado · en dictamen</span> →
-  <span>Dictaminada</span> → <span>Aprobada</span><br>
-  Flujos alternos: <span class="alt">A · Aviso de faltantes</span> <span class="alt">A · Solicitud desechada</span>
-  <span class="alt">B · No factible</span> <span class="alt">C · Lista de espera</span>
-</p>
+<!--DIAGRAMA_ESTADOS-->
+<p>Cada flecha dice qué unidad puede hacer ese paso; el sistema no deja a ninguna otra. Los estados en ámbar son los
+flujos alternos de las Reglas de Operación (A expediente incompleto, B no factible, C lista de espera).</p>
+<pre class="mermaid" data-nombre="secuencia" data-pie="Quién hace cada paso y qué queda registrado, de la solicitud al acta del Comité.">sequenceDiagram
+  autonumber
+  actor P as Persona solicitante
+  participant D as Delegación
+  participant A as Dirección (Instancia Ejecutora)
+  participant J as Unidad Jurídica
+  participant C as Secretaría Técnica y Comité
+  P->>D: Entrega la solicitud y sus documentos
+  D->>D: Registra la solicitud a nombre del predio (acuse)
+  D->>D: Revisa requisitos y carga el polígono
+  D->>A: Envía el expediente digital (acuse)
+  alt Faltan documentos
+    A-->>D: Aviso de faltantes con fecha límite
+    D-->>P: Notifica el aviso (acuse)
+    P->>D: Entrega lo faltante
+    D->>A: Reenvía el expediente
+  end
+  A->>A: Valida el expediente
+  par Dictámenes en paralelo
+    A->>A: Dictamen técnico con análisis cartográfico
+  and
+    J->>J: Dictamen jurídico y cotejo del Listado de Incumplidas
+  end
+  A->>C: Listado preliminar
+  C->>C: Convocatoria con orden del día y documentos (acuse)
+  C->>C: Acta: beneficiarias, lista de espera, no factibles y autorización de publicación
+</pre>
 <table>
   <thead><tr><th style="width:24%">Paso</th><th style="width:26%">Quién</th><th>Qué deja</th></tr></thead>
   <tbody>
@@ -133,7 +157,7 @@ beneficiaria, DEV equipo desarrollador.</p>
 <h3>Cuántas necesidades toca este sprint</h3>
 <!--RESUMEN_NECESIDADES-->
 <p>«Atendida» significa que al menos una de las funciones que la cubren quedó construida; «completa», que ya no le
-falta ninguna función de un sprint posterior. El anexo A lista las 42 necesidades con ese detalle.</p>
+falta ninguna función de un sprint posterior. El anexo A lista las 42 necesidades con ese detalle y el anexo B reúne las capturas de cada historia.</p>
 <div class="aviso"><b>Un límite que hay que tener presente.</b> Las funciones se construyeron para los seis programas,
 pero en este sprint solo Capturando Carbono tenía sus reglas cargadas, así que es el único programa con el que se
 demostró el recorrido. Los requisitos y plazos de PS, RHF y PSAHEM se cargaron y probaron en el sprint 2; los de MFS y
@@ -153,6 +177,11 @@ construido.</p>
   </tbody>
 </table>
 
+<p>Los tres diagramas muestran las tablas principales de cada área, sus primeros campos y cómo se relacionan (uno a
+muchos, uno a uno, muchos a muchos); el diagrama completo, con todas las tablas y campos, está en <code>sistema/docs/modelo_datos.md</code>.</p>
+<!--DIAGRAMA_ER:er_expediente|Expediente y recepción (M1): el expediente único del predio y lo que cuelga de él.-->
+<!--DIAGRAMA_ER:er_dictamen|Dictamen y Comité (M2): dictámenes, listados de incumplimiento, sesiones y acuerdos.-->
+<!--DIAGRAMA_ER:er_reglas|Reglas por programa y catálogos (núcleo): lo que cambia entre programas y años.-->
 <h2 class="salto">6. Calculadora forestal: masa forestal por año</h2>
 <p>La Calculadora mide la superficie con cobertura arbórea (hectáreas) dentro de la zona forestal del INEGI, con
 imágenes Sentinel-2 de noviembre y diciembre de cada año. El cálculo ya existía; la historia HU-7.1 pedía la cifra de
@@ -234,3 +263,6 @@ se hizo: <code>entregas/BITACORA.md</code>. Reglas de cada programa: <code>siste
 <h2 class="salto">Anexo A. Necesidades atendidas en el sprint 1</h2>
 <p>Las funciones que faltan indican en qué sprint se completa cada necesidad.</p>
 <!--ANEXO_NECESIDADES-->
+
+<h2 class="salto">Anexo B. Capturas del sprint 1</h2>
+<!--ANEXO_CAPTURAS-->
