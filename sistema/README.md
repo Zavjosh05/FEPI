@@ -700,6 +700,14 @@ arma hacia atrás desde ella. La carga da lo mismo el día que se corra (se prue
 Una vez cargada, el sistema usa el reloj real, así que un sitio de demostración viejo muestra sus plazos vencidos, como cualquier
 expediente real.
 
+**Bordes de los plazos (G-03).** `pruebas/test_nucleo_plazos_bordes.py` fija, con el reloj simulado, el último momento válido y el
+primero inválido de cada plazo que calcula el sistema: faltantes en ventanilla (5 días hábiles, topados al 27-mar y el caso de una
+recepción posterior), faltantes avisados por la Dirección, firma del contrato (las dos fechas, en CC y en PS, donde van al revés; el
+servicio recibe la firma el último día y la rechaza al siguiente), cita a firma de PS, vale de PS (30 días naturales) y de RHF (15
+días hábiles), remisión a la Fiduciaria (5 días hábiles), cobro del cheque (3 meses; entregado el 30-nov vence el 1-mar-2027),
+convocatoria del Comité (3 días hábiles de anticipación) y dictaminación (30-jun en CC); con fines de semana y días inhábiles
+(2-mar, 16-mar, Jueves y Viernes Santo, 1-may, 16-sep, 2 y 16-nov) en medio. No encontraron ningún cálculo incorrecto.
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
