@@ -5,8 +5,8 @@ El porqué de cada decisión está en [BITACORA.md](BITACORA.md).
 
 ## Siguiente paso
 
-> **Sprint 2 en curso** (autorizado por Joshua el 14-nov). Seguir la tabla del sprint 2 en orden: la
-> primera tarea que no esté en «Hecho» es la que sigue.
+> **Sprint 3 en curso** (autorizado por Joshua el 16-nov). Seguir la tabla del sprint 3 en orden: la primera tarea
+> que no esté en «Hecho» es la que sigue.
 
 ## Cómo retomar un trabajo interrumpido
 
@@ -32,12 +32,14 @@ Desde Windows, con Docker dentro de WSL:
 wsl -e bash -lc "cd /mnt/c/Users/josh/Documents/GitHub/FEPI/sistema && docker compose --profile pruebas run --rm pruebas"
 ```
 
-Ese comando corre todo (unos 7 minutos y medio con 380 pruebas). Durante el trabajo se usan las formas cortas, agregando al final:
+Ese comando corre todo en paralelo (unos 5 minutos con 432 pruebas: primero las rápidas con 4 procesos y luego los
+recorridos de navegador con 3). Durante el trabajo se usan las formas cortas, agregando al final:
 
 | Para | Se agrega | Tarda |
 | --- | --- | --- |
-| Pruebas rápidas, sin navegador | `pytest -m "not navegador"` | ~4 min |
-| Con los PDF reales en todas (antes de cada entrega) | `-e PDF_REAL=1` antes de `pruebas` | ~14 min |
+| Pruebas rápidas, sin navegador | `pytest -m "not navegador" -n 4` | ~3 min |
+| Con los PDF reales en todas (antes de cada entrega) | `-e PDF_REAL=1` antes de `pruebas` | ~8 min |
+| En serie, para depurar | `-e PRUEBAS_N=0 -e PRUEBAS_N_NAVEGADOR=0` antes de `pruebas`, o `-n 0` | ~9 min |
 | Una sola historia | `pytest pruebas/test_hu_2_3.py` | ~20 s |
 | Guardar capturas | `-e CAPTURAS=1` antes de `pruebas` | — |
 
@@ -79,7 +81,7 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 | A-7 | Recorrido completo por la interfaz, con una sola solicitud y cambio de usuario en cada relevo (P-09) | Hecho | `450a5ac` |
 | Resumen | Resumen en PDF del sprint 1 (`sprint_1/Resumen_sprint_1.pdf`) | Hecho | `0598b95` |
 
-## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — en curso desde el 14-nov
+## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — terminado el 16-nov
 
 Orden de trabajo. Cada renglón es una tarea que se puede hacer, verificar y commitear por separado; las
 que dicen «en paralelo» no tocan los mismos archivos.
@@ -103,13 +105,34 @@ que dicen «en paralelo» no tocan los mismos archivos.
 | S2-12 | Investigación de los datos del INFyS para HU-7.5 | — (en paralelo) | Hecho | `5f899fb` |
 | S2-13a | Cierre técnico: acortar la batería (P-20), menú por módulo (P-21), modelo de datos y README al día | S2-09 | Hecho | `88d9f93`, `f24d627`, `c94a5c9` |
 | S2-13b | Tropiezos de interfaz del recorrido del sprint 2 (P-23 a P-31) | S2-14 | Hecho | `0871a66` |
-| S2-13c | Pruebas en paralelo (W-17) | S2-13b | En curso | |
-| S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | En curso | |
+| S2-13c | Pruebas en paralelo (W-17) | S2-13b | Hecho | `6753f8c` |
+| S2-13 | Datos de prueba: generador con semilla y calendario simulado | S2-09 | Hecho | `f1addff`, `8e95e4c`, `d9bbf7d` |
 | S2-14 | Recorrido completo del sprint 2 (servicios y navegador), batería completa y entrega | Todo lo anterior | Hecho | `62b5ae4` (servicios), `38e7e6a` (interfaz) |
-| S2-15 | Resumen en PDF del sprint 2 (`sprint_2/Resumen_sprint_2.pdf`) | S2-14 | Pendiente | |
+| S2-15 | Resumen en PDF del sprint 2 (`sprint_2/Resumen_sprint_2.pdf`) | S2-14 | Hecho | `5849d57` |
 
-## Sprint 3 · Ejecución, seguimiento y cierre (M4, M6; M7.4 y M7.5) — sin empezar
+Pruebas al cierre: 432 del sistema (corridas con todos los documentos PDF reales) y 43 de la Calculadora, todas en
+verde. Sitio levantado con una base nueva y revisado en el navegador. Resumen: `sprint_2/Resumen_sprint_2.pdf`.
 
-Se detalla al cerrar el sprint 2. Ya se sabe que empieza por subir el sprint 2 al repositorio (S3-00) y
-por las reglas de MFS y Guardabosques (S3-01), y que incluye HU-4.1 a 4.3, HU-6.1 a 6.3, HU-7.4, HU-7.5,
-el portal externo, los plazos y avisos, y el recorrido de un programa completo, de la solicitud al padrón.
+## Sprint 3 · Ejecución, seguimiento y cierre (M4, M6; M7.4 y M7.5) — iniciado el 16-nov
+
+Joshua autorizó iniciarlo el 16-nov al cerrar el sprint 2. Cada renglón es una tarea que se hace, se verifica y se
+registra por separado; las que dicen «en paralelo» no tocan los mismos archivos ni usan Docker.
+
+| Tarea | Qué | Depende de | Estado | Commit |
+| --- | --- | --- | --- | --- |
+| S3-00 | Subir la rama `prototipos` con el sprint 2 al repositorio remoto | — | Hecho | 16-nov |
+| S3-01a | Reglas de Manejo Forestal Sustentable desde las ROP (`reglas/MFS.json`) | — (en paralelo) | En curso | |
+| S3-01b | Reglas de Guardabosques desde las ROP y su convocatoria (`reglas/PEG.json`) | — (en paralelo) | En curso | |
+| S3-02 | Base de M4 y M6: apps `ejecucion` y `seguimiento`, estados nuevos, cuentas del portal externo, plazos, y recepción a pagos funcionando con MFS y Guardabosques | S3-01 | Pendiente | |
+| S3-03 | HU-4.1 Envío de comprobaciones, en el portal o en la Delegación | S3-02 | Pendiente | |
+| S3-04 | HU-4.2 Verificación en campo y conexión con la segunda ministración | S3-03 | Pendiente | |
+| S3-05 | HU-4.3 Evaluación de reportes de Guardabosques | S3-04 | Pendiente | |
+| S3-06 | HU-6.1 Lista de espera y sustituciones | S3-05 | Pendiente | |
+| S3-07 | HU-6.2 Incumplimientos y reintegros | S3-06 | Pendiente | |
+| S3-08 | HU-6.3 Cierre del ejercicio y padrón | S3-07 | Pendiente | |
+| S3-09 | HU-7.4 Uso del suelo al que pasó el terreno perdido (Calculadora) | — (en paralelo) | Pendiente | |
+| S3-10 | HU-7.5 Especies por municipio (Calculadora) | S3-09 | Pendiente | |
+| S3-11 | Cierre técnico: recorrido de un programa completo, de la solicitud al padrón, por servicios (seis programas) y por la interfaz; tropiezos; textos de la interfaz sin la palabra «sprint»; modelo de datos y README | S3-08 | Pendiente | |
+| S3-12 | Verificación final: batería con PDF reales, Calculadora, sitio con base nueva | S3-10, S3-11 | Pendiente | |
+| S3-13 | Resumen en PDF del sprint 3 (`sprint_3/Resumen_sprint_3.pdf`) | S3-12 | Pendiente | |
+| S3-14 | Entrega a Joshua para revisión (sin subir hasta que lo indique) | S3-13 | Pendiente | |
