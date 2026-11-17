@@ -123,9 +123,9 @@ registra por separado; las que dicen «en paralelo» no tocan los mismos archivo
 | S3-00 | Subir la rama `prototipos` con el sprint 2 al repositorio remoto | — | Hecho | 16-nov |
 | S3-01a | Reglas de Manejo Forestal Sustentable desde las ROP (`reglas/MFS.json`) | — (en paralelo) | Hecho | `1a192d4` |
 | S3-01b | Reglas de Guardabosques desde las ROP y su convocatoria (`reglas/PEG.json`) | — (en paralelo) | Hecho | `eb0c4dd` (con las pruebas ajustadas) |
-| S3-02 | Base de M4 y M6: apps `ejecucion` y `seguimiento`, estados nuevos, cuentas del portal externo, plazos, y recepción a pagos funcionando con MFS y Guardabosques | S3-01 | En curso | |
-| S3-03 | HU-4.1 Envío de comprobaciones, en el portal o en la Delegación | S3-02 | Pendiente | |
-| S3-04 | HU-4.2 Verificación en campo y conexión con la segunda ministración | S3-03 | Pendiente | |
+| S3-02 | Base de M4 y M6: apps `ejecucion` y `seguimiento`, estados nuevos, cuentas del portal externo, plazos, y recepción a pagos funcionando con MFS y Guardabosques | S3-01 | Hecho | `5a67840` a `99fe534` (5 commits) |
+| S3-03 | HU-4.1 Envío de comprobaciones, en el portal o en la Delegación | S3-02 | En curso |  |
+| S3-04 | HU-4.2 Verificación en campo y conexión con la segunda ministración | S3-03 | En curso |  |
 | S3-05 | HU-4.3 Evaluación de reportes de Guardabosques | S3-04 | Pendiente | |
 | S3-06 | HU-6.1 Lista de espera y sustituciones | S3-05 | Pendiente | |
 | S3-07 | HU-6.2 Incumplimientos y reintegros | S3-06 | Pendiente | |
