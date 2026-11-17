@@ -1,0 +1,145 @@
+{
+  "cifras": {
+    "pruebas_sistema": "432",
+    "pruebas_calculadora": "43",
+    "capturas": "120",
+    "tablas": "56",
+    "tiempo_rapidas": "3 minutos",
+    "tiempo_completa": "5 minutos, y 8 con todos los PDF reales"
+  },
+  "situacion_programa": {
+    "CC": "Con reglas; recorrido completo hasta el primer pago",
+    "PS": "Con reglas; recorrido completo hasta el primer pago, con vale y planta",
+    "RHF": "Con reglas; recorrido completo hasta el primer pago, con vale y planta",
+    "PSA": "Con reglas; recorrido completo hasta el cheque entregado",
+    "MFS": "Función construida; sin reglas todavía (sprint 3)",
+    "PEG": "Función construida; sin reglas todavía (sprint 3)",
+    "CF": "Página publicada con los datos 2023 a 2025"
+  },
+  "historias": {
+    "HU-3.1": {
+      "commit": "4fbf940",
+      "como": "El área responsable publica los listados de una sesión solo si su acta lo autorizó, una vez por sesión, con fecha, hora y acuse. Hay una página pública sin sesión con los listados y búsqueda por folio, que no muestra CURP, RFC ni documentos. Los avisos van por conducto de la Delegación y guardan el envío y la notificación a la persona, cada uno con fecha, hora, medio y acuse."
+    },
+    "HU-3.2": {
+      "commit": "e9a1f2c",
+      "como": "Los modelos de contrato tienen versiones: el área responsable los registra y la Unidad Jurídica los valida o los devuelve con observaciones. El contrato se elabora en PDF con los datos de la solicitud y su monto, y solo sobre la versión vigente y validada; lo impide el servicio. El envío a la Delegación deja fecha, hora y acuse."
+    },
+    "HU-3.3": {
+      "commit": "d877a63",
+      "como": "La Delegación registra la firma con fecha y hora, el contrato firmado digitalizado y la verificación de firmas y sello según el tipo de persona. Se muestran dos fechas: la programada de firma y el vencimiento para liberar el recurso. Al vencer este sin firma el contrato queda señalado, y liberar el recurso lo confirma una persona con motivo. Lo propio de MFS y de Guardabosques queda como datos."
+    },
+    "HU-3.4": {
+      "commit": "d5698c8",
+      "como": "La Delegación entrega el vale con especie, cantidad propuesta por hectárea, vivero y vigencia del programa; antes de la firma exige carta compromiso. El vivero valida el vale y registra salidas parciales con especie, cantidad y fecha, sin pasar de lo autorizado. Un vale vencido no es válido; se repone donde las Reglas lo prevén (RHF) y no donde no (PS)."
+    },
+    "HU-5.1": {
+      "commit": "82d2ed8",
+      "como": "La Delegación emite el oficio de solicitud de pago al firmarse el contrato. El área responsable solicita la ministración con sus soportes, que son datos por programa y número de ministración; si falta uno, el servicio no envía la solicitud y dice cuál. El envío a Administración y Finanzas deja fecha, hora y acuse."
+    },
+    "HU-5.2": {
+      "commit": "abc03e0",
+      "como": "Administración y Finanzas acepta la solicitud o la devuelve con observaciones, y registra el pago con referencia, fecha e importe igual al solicitado; un pago cuelga siempre de una solicitud aceptada y no se repite. En PSAHEM, tras esa aceptación, la Secretaría Técnica remite el pago a la Fiduciaria, con fecha, hora, acuse y su plazo de 5 días hábiles."
+    },
+    "HU-5.3": {
+      "commit": "1af1d0a",
+      "como": "La Fiduciaria emite un cheque por persona beneficiaria y ministración y lo envía a la Delegación con fecha y hora; la Delegación registra la entrega con fecha, hora y quién recibe. Se muestra el vencimiento del cobro (3 meses desde la entrega) y el sistema avisa de los cheques por vencer."
+    },
+    "HU-7.2": {
+      "commit": "9254478",
+      "como": "Tarjeta «Balance del periodo» en la comparación de dos años, para el Estado o el municipio elegido: pérdida por incendio, otras pérdidas, ganancia y cambio neto en hectáreas, y un histograma de los municipios según su cambio neto."
+    },
+    "HU-7.3": {
+      "commit": "5bfa706",
+      "como": "Capa de incendios en el mapa, con un punto por incendio y su clave, fecha, municipio y hectáreas; tabla ordenable y pérdida por incendio por año y por municipio. Los años que CONAFOR no ha publicado dicen «sin dato», no cero."
+    }
+  },
+  "estados": [
+    "aprobada",
+    "lista_espera",
+    "publicada",
+    "notificada",
+    "contrato_elaborado",
+    "contrato_en_delegacion",
+    "sin_firma_en_plazo",
+    "recurso_liberado",
+    "contratada",
+    "vale_entregado",
+    "planta_entregada",
+    "ministracion_solicitada",
+    "pagada",
+    "remitida_fiduciaria",
+    "cheque_emitido",
+    "cheque_enviado",
+    "cheque_entregado"
+  ],
+  "estados_nuevos": [
+    "publicada",
+    "notificada",
+    "contrato_elaborado",
+    "contrato_en_delegacion",
+    "contratada",
+    "vale_entregado",
+    "planta_entregada",
+    "ministracion_solicitada",
+    "pagada",
+    "remitida_fiduciaria",
+    "cheque_emitido",
+    "cheque_enviado",
+    "cheque_entregado",
+    "recurso_liberado"
+  ],
+  "pie_estados": "Estados del trámite desde la aprobación del Comité y unidad que hace cada paso. En verde, los que agregó el sprint 2.",
+  "er": {
+    "er_contrato": {
+      "area": 4,
+      "campos": 5,
+      "entidades": [
+        "Expediente",
+        "Publicacion",
+        "ResultadoPublicado",
+        "Notificacion",
+        "ModeloContrato",
+        "VersionModelo",
+        "Contrato",
+        "FirmaContrato",
+        "ValePlanta",
+        "RenglonVale",
+        "SalidaPlanta",
+        "Vivero"
+      ]
+    },
+    "er_pagos": {
+      "area": 5,
+      "campos": 5,
+      "entidades": [
+        "Expediente",
+        "OficioPago",
+        "ComprobanteCuenta",
+        "SolicitudPago",
+        "RevisionSolicitud",
+        "Pago",
+        "RemisionFiduciaria",
+        "Cheque"
+      ]
+    }
+  },
+  "capturas_por_historia": 4,
+  "capturas_extra": [
+    [
+      "Recorrido completo por la interfaz: Plantaciones Sustentables, de aprobada al pago",
+      "recorrido_sprint_2_ps_*.png",
+      6
+    ],
+    [
+      "Recorrido completo por la interfaz: PSAHEM, del contrato firmado al cheque entregado",
+      "recorrido_sprint_2_psa_*.png",
+      4
+    ],
+    [
+      "Menú agrupado por módulo",
+      "s2_14_menu_*.png",
+      2
+    ]
+  ]
+}

@@ -1,0 +1,259 @@
+<section class="portada">
+  <p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+  <h1>Resumen del sprint 2<br>Contrato y pagos</h1>
+  <p class="sub">Qué se agregó al sistema en el segundo prototipo, cómo quedaron cubiertas sus necesidades, qué se
+  encontró en las Reglas de Operación y qué falta.</p>
+  <table>
+    <tr><td class="gris">Prototipo</td><td>Contrato y pagos (módulos M3 y M5); balance e incendios (M7.2 y M7.3)</td></tr>
+    <tr><td class="gris">Construcción</td><td>14 al 16 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Historias</td><td>9 de 26 (37 de 112 puntos); con el sprint 1, 18 de 26</td></tr>
+    <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>prototipos</code></td></tr>
+    <tr><td class="gris">Autor</td><td>Joshua Zavaleta</td></tr>
+    <tr><td class="gris">Antecedente</td><td>Resumen del sprint 1 (<code>entregas/sprint_1/Resumen_sprint_1.pdf</code>)</td></tr>
+  </table>
+  <div class="caja" style="margin-top:1cm">
+    <b>En una frase.</b> Una solicitud aprobada por el Comité ya se publica, se notifica por conducto de la Delegación,
+    recibe su contrato sobre un modelo validado por la Unidad Jurídica, se firma dentro de plazo, recibe su planta
+    donde aplica y cobra su primera ministración, por transferencia o con cheque de la Fiduciaria; y esto funciona con
+    cuatro programas, no con uno.
+  </div>
+</section>
+
+<h2 class="salto">1. De dónde se parte y qué atiende este sprint</h2>
+<p>El sprint 1 dejó el trámite hasta la sesión de aprobación del Comité: recepción, expediente, polígono, validación,
+dictámenes y acta, con un núcleo común de reglas como datos, estados con tabla de transiciones, bandejas por unidad,
+días hábiles, bitácora y acuses. Se había demostrado con un solo programa, Capturando Carbono.</p>
+<p>Este sprint atiende la parte del trámite donde el apoyo se formaliza y se paga, que es donde las necesidades
+levantadas concentran tres problemas:</p>
+<ul>
+  <li><b>Los plazos corren desde un hecho que hay que poder comprobar.</b> La firma del contrato, la recolección de la
+  planta, la instrucción de pago y el cobro del cheque tienen plazo, y cada uno arranca en una publicación, una
+  notificación o una entrega. Sin fecha, hora y acuse de ese hecho, el plazo no se puede exigir.</li>
+  <li><b>Cada programa formaliza y paga distinto.</b> PS y RHF entregan planta con un vale; PSAHEM paga con cheques
+  de una Fiduciaria por instrucción de su Comité Técnico; Capturando Carbono paga de una sola vez hasta 5 hectáreas;
+  los montos, porcentajes y plazos cambian en cada uno.</li>
+  <li><b>Un pago debe poder rastrearse hasta lo que lo justifica.</b> Cada ministración se paga contra soportes
+  (contrato firmado, oficio, comprobante, instrucción, verificación) que hoy viajan en papel entre unidades.</li>
+</ul>
+
+<h2>2. Qué cambió en la arquitectura</h2>
+<p>La arquitectura es la del sprint 1 (Django con GeoDjango, PostgreSQL con PostGIS, HTMX, Docker Compose). Lo nuevo
+está en tres lugares:</p>
+<table>
+  <thead><tr><th style="width:24%">Pieza</th><th>Qué es</th><th style="width:34%">Por qué</th></tr></thead>
+  <tbody>
+    <tr><td>Reglas de cuatro programas</td><td>Se extrajeron de las Reglas de Operación las de PS, RHF y PSAHEM, igual que las de Capturando Carbono: requisitos, plazos, montos y ministraciones, cada dato con su numeral y su línea del texto.</td><td>La entrega de planta es de PS y RHF y los cheques son de PSAHEM: con un solo programa este sprint no se podía demostrar.</td></tr>
+    <tr><td>Notificaciones en el núcleo</td><td>Un solo servicio registra el envío a la Delegación y la notificación a la persona, cada uno con fecha, hora, medio y acuse.</td><td>La usan los faltantes, los resultados, la cita a firma y el aviso de pago; antes vivía solo en la recepción.</td></tr>
+    <tr><td>Plazos con su evento de arranque</td><td>Cada plazo que el sistema calcula se configura por programa: qué plazo de las reglas usa y desde qué hecho corre. Si el hecho aún no ocurre, el vencimiento es «sin fecha todavía».</td><td>Las Reglas cuentan el mismo plazo desde hechos distintos según el programa (sección 5).</td></tr>
+    <tr><td>Monto aprobado</td><td>Un servicio calcula el monto del apoyo y sus ministraciones con la superficie aprobada y las reglas del programa.</td><td>Lo usan los listados del Comité, el contrato y los pagos, con la misma cifra.</td></tr>
+    <tr><td>Módulos <code>contrato</code> y <code>pagos</code></td><td>Dos apps nuevas, con un archivo de código, sus tablas y sus pruebas por historia.</td><td>Cada historia se construyó, probó y registró por separado.</td></tr>
+  </tbody>
+</table>
+<p>El sistema pasó de 33 a {{tablas}} tablas. El diagrama entidad-relación, generado desde el código, tiene ahora cinco
+áreas (<code>sistema/docs/modelo_datos.md</code>).</p>
+<h3>Las tablas nuevas</h3>
+<!--DIAGRAMA_ER:er_contrato|Publicación y contrato (M3): publicación, modelos de contrato con versiones, contrato, firma, vale y salidas de planta.-->
+<!--DIAGRAMA_ER:er_pagos|Pagos (M5): oficio, solicitud con su revisión, pago, remisión a la Fiduciaria y cheque.-->
+
+<h2 class="salto">3. Qué se trabajó en el sprint 2</h2>
+<p>Se construyeron completos los módulos <b>M3 Publicación y contrato</b> y <b>M5 Pagos</b>, y las funciones
+<b>M7.2</b> y <b>M7.3</b> de la Calculadora. De los pagos se demuestra de punta a punta la primera ministración; la
+segunda depende de la verificación en campo, que es del sprint 3.</p>
+<!--TABLA_HISTORIAS-->
+
+<h3>El recorrido del trámite en este sprint</h3>
+<!--DIAGRAMA_ESTADOS-->
+<p>En verde, los estados que agregó este sprint; en ámbar, los flujos alternos. Cada flecha dice qué unidad puede hacer
+el paso y, cuando es propio de un programa, cuál. El vale de planta solo existe en PS y RHF, y los cheques, solo en
+PSAHEM.</p>
+<pre class="mermaid" data-nombre="secuencia" data-pie="Quién hace cada paso y qué queda registrado, de la aprobación al primer pago. Los pasos de planta son de PS y RHF; los de la Fiduciaria, de PSAHEM.">sequenceDiagram
+  autonumber
+  participant A as Dirección (área responsable)
+  participant J as Unidad Jurídica
+  participant D as Delegación
+  actor P as Persona beneficiaria
+  participant V as Vivero
+  participant F as Adm. y Finanzas
+  participant S as Secretaría Técnica
+  participant B as Fiduciaria
+  A->>A: Publica los listados que autorizó el Comité (acuse)
+  A->>D: Avisos de resultado y cita a firma
+  D->>P: Notifica (fecha, hora, medio y acuse)
+  J->>A: Valida el modelo de contrato
+  A->>D: Elabora el contrato y lo envía (acuse)
+  P->>D: Firma el contrato
+  D->>D: Registra la firma y verifica firmas y sello (acuse)
+  opt PS y RHF
+    D->>P: Entrega el vale de planta (vigencia)
+    P->>V: Presenta el vale
+    V->>V: Registra la salida por especie y cantidad (acuse)
+  end
+  D->>A: Oficio de solicitud de pago
+  A->>F: Solicitud de la ministración con sus soportes (acuse)
+  alt Capturando Carbono, PS y RHF
+    F->>F: Acepta y registra el pago por transferencia
+    F->>D: Aviso de pago
+    D->>P: Notifica el pago
+  else PSAHEM
+    F->>S: Acepta la solicitud
+    S->>B: Solicita el pago en 5 días hábiles (acuse)
+    B->>D: Emite el cheque y lo envía
+    D->>P: Entrega el cheque (3 meses para cobrarlo)
+  end
+</pre>
+<table>
+  <thead><tr><th style="width:27%">Paso</th><th style="width:28%">Quién</th><th>Qué deja</th></tr></thead>
+  <tbody>
+    <tr><td>Publicación de resultados</td><td>Área responsable del programa</td><td>Listados publicados, acuse y el hecho que arranca los plazos</td></tr>
+    <tr><td>Notificación a la persona</td><td>Delegación</td><td>Fecha, hora, medio y acuse de la entrega del aviso</td></tr>
+    <tr><td>Modelo de contrato</td><td>Área responsable y Unidad Jurídica</td><td>Versión validada, con fecha, hora y observaciones</td></tr>
+    <tr><td>Elaboración y envío del contrato</td><td>Área responsable</td><td>Contrato en PDF y acuse del envío a la Delegación</td></tr>
+    <tr><td>Firma</td><td>Delegación</td><td>Fecha y hora de la firma, contrato firmado y verificación de firmas y sello</td></tr>
+    <tr><td>Vale y salida de planta</td><td>Delegación y vivero</td><td>Vale con su vigencia; salidas por especie, cantidad y fecha</td></tr>
+    <tr><td>Oficio y solicitud de pago</td><td>Delegación y área responsable</td><td>Solicitud con todos sus soportes y acuse del envío</td></tr>
+    <tr><td>Pago</td><td>Administración y Finanzas</td><td>Pago asociado a su solicitud, con fecha</td></tr>
+    <tr><td>Remisión y cheques (PSAHEM)</td><td>Secretaría Técnica, Fiduciaria y Delegación</td><td>Fecha de remisión; cheque emitido, enviado y entregado</td></tr>
+  </tbody>
+</table>
+
+<h3>Algunas pantallas</h3>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_3_1_12_pagina_publica_listados.png" alt=""></div>
+    <figcaption>HU-3.1 · Página pública de resultados, sin iniciar sesión.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_3_2_10_contrato_enviado_con_fecha_hora_y_acuse.png" alt=""></div>
+    <figcaption>HU-3.2 · Contrato elaborado sobre un modelo validado y enviado a la Delegación.</figcaption></figure>
+</div>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_3_4_06_salida_parcial_y_exceso_rechazado.png" alt=""></div>
+    <figcaption>HU-3.4 · El vivero no puede entregar más planta de la autorizada.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_5_3_05_cheque_entregado_con_fecha_hora_y_vencimiento_del_cobro.png" alt=""></div>
+    <figcaption>HU-5.3 · PSAHEM: solicitud, remisión, cheque entregado y vencimiento del cobro.</figcaption></figure>
+</div>
+
+<h2 class="salto">4. Cómo se cubrieron las necesidades</h2>
+<p>Historia por historia: qué pide cada criterio de aceptación, cómo quedó resuelto y qué necesidades atiende. Los
+identificadores empiezan con la clave del programa y siguen con el rol: DRF Delegación, ARP área responsable (DPF en
+Guardabosques), UJ Unidad Jurídica, VIV vivero, AF Administración y Finanzas, FID Fiduciaria, COM Comité, BEN persona
+beneficiaria, PSF prestador de servicios forestales, DEV equipo desarrollador.</p>
+<!--TABLA_COBERTURA-->
+
+<h3>Cuántas necesidades toca este sprint</h3>
+<!--RESUMEN_NECESIDADES-->
+<p>«Atendida» significa que al menos una de las funciones que la cubren se construyó en este sprint; «completa», que ya
+no le falta ninguna función de un sprint posterior. El anexo A las lista una por una y el anexo B reúne las capturas de cada historia.</p>
+<div class="aviso"><b>Límites de la cobertura.</b> MFS y Guardabosques todavía no tienen reglas cargadas: lo que las
+historias piden de ellos (contrato de servicios técnicos y carta compromiso en MFS, credencial y depósito en
+Guardabosques) se construyó como datos y se probó con programas mínimos. La segunda ministración existe en el modelo,
+pero queda bloqueada hasta que haya verificación en campo. Y los documentos (contrato, oficio de pago) usan plantillas
+propias marcadas como borrador, porque las Reglas no traen sus formatos.</div>
+
+<h2>5. Lo que dijeron las Reglas de Operación</h2>
+<p>Extraer las reglas de tres programas más y construir sobre ellas sacó a la luz diferencias entre el texto y lo que
+se había supuesto. Todas están en la bitácora con su numeral y su línea; estas son las que cambiaron el diseño:</p>
+<table>
+  <thead><tr><th style="width:23%">Tema</th><th>Qué dicen las Reglas</th><th style="width:33%">Qué se hizo</th></tr></thead>
+  <tbody>
+    <tr><td>Plazo de firma del contrato</td><td>Son 10 días hábiles, pero la Convocatoria y la causa de baja los cuentan desde hechos distintos, y no igual en cada programa: en Capturando Carbono, publicación y notificación; en PS, al revés.</td><td>Se llevan dos fechas por programa: la programada de firma y el vencimiento para liberar el recurso. La baja, que es una sanción, se aplica con su propia regla.</td></tr>
+    <tr><td>Documentación faltante</td><td>Los 5 días hábiles corren desde la recepción de la solicitud, sin pasar de la fecha límite de recepción; para el aviso posterior de la Dirección no hay número de días.</td><td>Se agregó el plazo de ventanilla que faltaba; el de la Dirección se conserva como decisión propia, parametrizada.</td></tr>
+    <tr><td>Vale de planta</td><td>PS da «30 días» sin decir si son hábiles y no prevé reponer un vale vencido; RHF da 15 días hábiles y sí lo repone si hay planta.</td><td>Vigencia y reposición son datos por programa; en PS la pantalla lo dice citando la regla.</td></tr>
+    <tr><td>Verificación en campo</td><td>Los plazos de 15, 30 y 10 días hábiles (Capturando Carbono, PS y RHF) son para entregar el documento de verificación, no para hacer la visita.</td><td>Queda anotado para el sprint 3, que construye la verificación.</td></tr>
+    <tr><td>Pago en PSAHEM</td><td>El pago se solicita a la Fiduciaria a través de la Secretaría Técnica del Comité Técnico, en 5 días hábiles; la historia lo ponía en Administración y Finanzas.</td><td>Administración y Finanzas acepta la solicitud y la Secretaría Técnica remite. Pendiente de confirmar con el cliente.</td></tr>
+    <tr><td>PTRFI de RHF</td><td>Lo entrega la persona solicitante con la solicitud; un prestador con registro puede elaborarlo.</td><td>Es un requisito más del expediente, no una entrega aparte del prestador.</td></tr>
+    <tr><td>Formatos y fechas que no están</td><td>No vienen el modelo de contrato, el oficio de pago ni los formatos de verificación; tampoco hay plazo en días para publicar, pagar o reintegrar.</td><td>Plantillas en borrador que valida la Unidad Jurídica; donde no hay plazo, la pantalla dice «sin fecha en las reglas».</td></tr>
+  </tbody>
+</table>
+<p>Decisiones tomadas con Joshua en este sprint: el desecho de una solicitud por faltantes vencidos y la liberación de
+un recurso por falta de firma los confirma una persona (el sistema los prepara y los señala, no los ejecuta solo); la
+consulta pública de resultados no pide cuenta; y el portal del sprint 3 usará una cuenta creada al firmar el contrato,
+con folio y código como respaldo.</p>
+
+<h2 class="salto">6. Calculadora forestal: balance e incendios</h2>
+<div class="dos">
+  <figure><img src="capturas/hu_7_2_balance_estado.png" alt="Balance del periodo e histograma de municipios">
+    <figcaption>HU-7.2 · Balance 2023 a 2024 del Estado e histograma de municipios según su cambio neto.</figcaption></figure>
+</div>
+<ul>
+  <li><b>Balance entre dos años (HU-7.2).</b> Para el par de años elegido y para el Estado o un municipio: pérdida por
+  incendio, otras pérdidas, ganancia y cambio neto. El histograma cuenta los municipios con 500 hectáreas o más de
+  bosque inicial, porque en uno con muy poco bosque unas cuantas hectáreas dan porcentajes que lo deforman, y dice
+  cuántos quedan fuera.</li>
+  <li><b>Pérdida por incendios (HU-7.3).</b> Un punto por incendio con su clave, fecha, municipio y hectáreas; tabla
+  ordenable y pérdida por año. Los años que CONAFOR aún no publica dicen «sin dato»: antes mostraban cero, que se
+  leía como «no hubo incendios».</li>
+  <li><b>Una corrección.</b> El balance mostraba 473,149 hectáreas para 2023 y la evolución 473,148, por un doble
+  redondeo. Se corrigió y una prueba exige ahora que la cifra de un año sea la misma en todas las vistas.</li>
+  <li><b>Datos para las especies (sprint 3).</b> Se investigó de dónde obtener las especies por municipio. El sitio
+  oficial del inventario forestal no responde, pero sus archivos por estado se descargan de la infraestructura de
+  datos de CONAFOR. Para el Estado de México traen 10,391 árboles en 135 conglomerados: 55 de los 125 municipios
+  tienen registros, y poco más de la mitad de los registros llega a especie. La licencia está por confirmar.</li>
+</ul>
+
+<h2>7. Cómo se comprobó</h2>
+<table>
+  <thead><tr><th style="width:36%">Comprobación</th><th>Resultado al cierre del sprint</th></tr></thead>
+  <tbody>
+    <tr><td>Pruebas automáticas del sistema</td><td>{{pruebas_sistema}} en verde, corridas también con todos los documentos PDF reales</td></tr>
+    <tr><td>Pruebas de la Calculadora</td><td>{{pruebas_calculadora}} en verde</td></tr>
+    <tr><td>Recorrido completo por servicios</td><td>Una solicitud por programa (Capturando Carbono, PS, RHF y PSAHEM), de aprobada a la primera ministración pagada, comprobando en cada relevo estado, bandeja, acuse, bitácora y fechas</td></tr>
+    <tr><td>Recorrido completo por la interfaz</td><td>Con clics y cambio de usuario en cada relevo: PS, de aprobada al pago, con vale y planta; y PSAHEM, de contrato firmado al cheque entregado</td></tr>
+    <tr><td>El sprint 1, con cuatro programas</td><td>El recorrido de recepción y dictamen corre ahora en los cuatro programas con reglas, no solo en uno</td></tr>
+    <tr><td>Bordes de los plazos</td><td>26 pruebas con un reloj simulado: para cada plazo que el sistema calcula, el último momento válido y el primero inválido, con fines de semana y días inhábiles en medio. Ningún cálculo resultó incorrecto</td></tr>
+    <tr><td>Volumen</td><td>Con cientos de solicitudes generadas con semilla, las bandejas, los listados y la página pública responden con un número fijo de consultas; se corrigió la única pantalla que hacía una consulta por renglón</td></tr>
+    <tr><td>Tiempo de la batería</td><td>En paralelo: rápidas {{tiempo_rapidas}}; completa {{tiempo_completa}}. En serie, al inicio del cierre, tardaban unos 10 y 14 minutos</td></tr>
+    <tr><td>Capturas</td><td>{{capturas}} imágenes en <code>entregas/sprint_2/capturas/</code></td></tr>
+  </tbody>
+</table>
+<p>Los recorridos por la interfaz encontraron tropiezos de navegación, no errores de lógica: seis en el sprint 1 y
+nueve en este (por ejemplo, un folio que llevaba a una pantalla desde la que no se podía registrar la entrega del
+aviso, o un menú que ya no cabía en la pantalla). Todos están en la bitácora y se corrigieron dentro del sprint.</p>
+
+<h2>8. Cómo se trabajó</h2>
+<ul>
+  <li><b>Una historia, un commit.</b> Desde este sprint cada historia tiene su archivo de código, sus tablas con su
+  propia migración y sus pruebas, y se registra por separado en cuanto pasa sus pruebas.</li>
+  <li><b>Trabajo que se puede retomar.</b> El trabajo se interrumpió varias veces a la mitad de una tarea. Se retomó
+  cada vez desde el tablero de avance, las notas de la tarea y lo que había sin registrar, sin perder ni rehacer nada.
+  De ahí salió una regla: no se empieza la historia siguiente con la anterior sin registrar.</li>
+  <li><b>Todo se vuelve a probar.</b> Ninguna entrega se dio por buena con el informe de quien la construyó: se
+  repitieron las pruebas y se revisaron las capturas. Así apareció, por ejemplo, la diferencia de una hectárea entre
+  dos vistas de la Calculadora, que las pruebas toleraban.</li>
+  <li><b>Pruebas más cortas sin perder lo que comprueban.</b> La batería llegó a tardar 14 minutos. Primero se dejó
+  de generar el documento PDF real en las pruebas que no lo revisan, y después se repartió en varios procesos en
+  paralelo; se repitió tres veces para confirmar que no aparecían fallas intermitentes. Antes de cada entrega se corre
+  completa con todos los PDF reales.</li>
+  <li><b>Datos de demostración con fechas verosímiles.</b> La demostración ya no tiene todo fechado el día de la
+  carga: cada paso ocurre en una fecha del calendario 2026 de su convocatoria, con un reloj simulado, y los casos
+  fuera de plazo están ahí a propósito. Un generador con semilla crea cientos de solicitudes para probar con volumen.</li>
+  <li><b>Lo propuesto y su porqué quedan escritos.</b> <code>entregas/BITACORA.md</code> registra cada propuesta,
+  hallazgo y decisión con su estado; <code>entregas/AVANCE.md</code>, cada tarea con su commit.</li>
+</ul>
+
+<h2>9. Límites y lo que sigue</h2>
+<ul>
+  <li><b>Dos programas sin reglas.</b> MFS y Guardabosques se cargan al inicio del sprint 3.</li>
+  <li><b>Segunda ministración.</b> Queda bloqueada hasta que exista la verificación en campo.</li>
+  <li><b>Documentos en borrador.</b> Contrato y oficio de pago usan textos propios; hacen falta los modelos oficiales.</li>
+  <li><b>Volumen parcial.</b> El generador de datos llega hasta la publicación de resultados; contratos, vales y
+  pagos no se han probado con volumen.</li>
+  <li><b>Sin probar.</b> Dos personas sobre el mismo expediente, navegadores distintos de Chromium, el mapa base de
+  fondo, la Calculadora en un teléfono real y su publicación en GitHub Pages.</li>
+  <li><b>Decisiones del cliente pendientes.</b> Desde qué hecho corre cada plazo donde las Reglas se contradicen;
+  quién remite el pago a la Fiduciaria; días del vale de PS; cuenta para reintegros de PSAHEM; el Reglamento Interno
+  del Comité Técnico; catálogo real de viveros y especies; días inhábiles oficiales; servidor para las demostraciones.</li>
+</ul>
+<p><b>Sprint 3, ejecución, seguimiento y cierre.</b> Faltan 8 historias (39 puntos): envío de comprobaciones por la
+persona beneficiaria y su portal, verificación en campo, evaluación de reportes de Guardabosques, lista de espera y
+sustituciones, incumplimientos y reintegros, cierre del ejercicio con el padrón, y en la Calculadora el uso del suelo
+al que pasó el terreno perdido y las especies por municipio. Con la verificación se conecta la segunda ministración.</p>
+<div class="caja"><b>Dónde está cada cosa.</b> Código: <code>sistema/</code> y, de la Calculadora, <code>src/</code> y
+<code>docs/calculadora/</code>. Cómo levantar y probar, usuarios de demostración y decisiones:
+<code>sistema/README.md</code>. Reglas de cada programa: <code>sistema/reglas/</code>. Avance:
+<code>entregas/AVANCE.md</code>. Propuestas, hallazgos y decisiones: <code>entregas/BITACORA.md</code>. Datos del
+inventario forestal: <code>entregas/sprint_2/investigacion_infys.md</code>.</div>
+
+<h2 class="salto">Anexo A. Necesidades atendidas en el sprint 2</h2>
+<p>Las funciones que faltan indican en qué sprint se completa cada necesidad.</p>
+<!--ANEXO_NECESIDADES-->
+
+<h2 class="salto">Anexo B. Capturas del sprint 2</h2>
+<!--ANEXO_CAPTURAS-->
