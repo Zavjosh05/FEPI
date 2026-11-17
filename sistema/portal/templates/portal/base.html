@@ -1,0 +1,32 @@
+{% load static %}<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Portal{% endblock %} · Personas beneficiarias · PROBOSQUE</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/probosque.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-dark barra-probosque" data-prueba="barra-portal">
+  <div class="container-fluid contenedor">
+    <a class="navbar-brand" href="{% url 'portal:inicio' %}"><span class="marca">PROBOSQUE</span> Personas beneficiarias</a>
+    {% if user.is_authenticated and user.cuenta_externa %}
+    <div class="d-flex align-items-center gap-3 text-white small">
+      <span>{{ user.cuenta_externa.persona.nombre }}</span>
+      <form method="post" action="{% url 'portal:salir' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-light" type="submit">Salir</button></form>
+    </div>
+    {% elif request.session.portal_consulta %}
+    <form method="post" action="{% url 'portal:salir' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-light" type="submit">Terminar la consulta</button></form>
+    {% endif %}
+  </div>
+</nav>
+<main class="contenedor py-3 px-3">
+  {% for m in messages %}<div class="alert alert-{% if m.tags == 'error' %}danger{% else %}{{ m.tags }}{% endif %}">{{ m }}</div>{% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+<footer class="contenedor px-3 pb-4 text-secondary small">
+  Portal de personas beneficiarias de los programas de PROBOSQUE · Reglas de Operación 2026 · Solo muestra sus propios expedientes.
+</footer>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends "portal/base.html" %}
+{% load moneda %}
+{% block titulo %}{{ exp.folio }}{% endblock %}
+{% block contenido %}
+{% if con_cuenta %}<a class="small" href="{% url 'portal:inicio' %}">← Mis expedientes</a>{% endif %}
+<h1 class="h4 mt-1" data-prueba="folio-portal">{{ exp.folio }} · {{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }}</h1>
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta">
+      <div class="titulo-seccion">Situación</div>
+      <div class="fs-5" data-prueba="estado-portal">{{ exp.estado.nombre }}</div>
+      <div class="small text-secondary">{{ exp.estado.descripcion }}</div>
+      <div class="small mt-2">Predio {{ exp.predio.nombre }} ({{ exp.predio.folio }}), {{ exp.predio.municipio.nombre }} · {{ exp.delegacion.nombre }}</div>
+      <div class="small">Persona beneficiaria: {{ exp.beneficiaria.nombre }}</div>
+    </div>
+    {% if monto %}<div class="tarjeta">
+      <div class="titulo-seccion">Apoyo aprobado</div>
+      <div>{{ monto.texto_calculo }}</div>
+      <ul class="small mb-0">{% for m in monto.ministraciones %}<li>{{ m.numero }}.ª ministración: {{ m.porcentaje|floatformat:"-2" }} % · {{ m.importe|moneda }}{% if m.supuesto %} (reparto por confirmar){% endif %}</li>{% endfor %}</ul>
+    </div>{% endif %}
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta">
+      <div class="titulo-seccion">Plazos</div>
+      <ul class="small mb-0">{% for v in vencimientos %}<li>{{ v.nombre }}: {{ v.texto }}</li>{% empty %}<li class="text-secondary">Sin plazos con fecha.</li>{% endfor %}</ul>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo-seccion">Notificaciones recibidas</div>
+      <ul class="small mb-0">{% for n in notificaciones %}<li>{{ n.notificada_en|date:"d/m/Y H:i" }} · {{ n.asunto }}</li>{% empty %}<li class="text-secondary">Ninguna todavía.</li>{% endfor %}</ul>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo-seccion">Acuses</div>
+      <ul class="small mb-0" data-prueba="acuses-portal">{% for a in acuses %}<li><a href="{% url 'portal:acuse' exp.folio a.folio %}">{{ a.folio }}</a> · {{ a.titulo }} · {{ a.fecha_hora|date:"d/m/Y H:i" }}</li>{% empty %}<li class="text-secondary">Sin acuses.</li>{% endfor %}</ul>
+    </div>
+  </div>
+</div>
+<p class="small text-secondary mt-2">Las comprobaciones, reportes y avisos que pueda enviar desde aquí se agregarán con las historias de ejecución (HU-4.1 a HU-4.3) y de seguimiento (HU-6.1 y HU-6.2); mientras tanto se entregan en la Delegación.</p>
+{% endblock %}

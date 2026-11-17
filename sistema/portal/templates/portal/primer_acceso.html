@@ -1,0 +1,19 @@
+{% extends "portal/base.html" %}
+{% block titulo %}Primer acceso{% endblock %}
+{% block contenido %}
+<div class="pantalla-entrar">
+  <div class="tarjeta p-4" data-prueba="primer-acceso">
+    <h1 class="h4 mb-1">Primer acceso</h1>
+    <p class="text-secondary small">Escriba su CURP y el código de primer acceso impreso en el acuse que le entregó la Delegación al firmar su contrato. El código sirve una sola vez.</p>
+    {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+    <form method="post">{% csrf_token %}
+      <div class="mb-3"><label class="form-label" for="curp">CURP</label><input class="form-control text-uppercase" id="curp" name="curp" maxlength="18" required></div>
+      <div class="mb-3"><label class="form-label" for="codigo">Código de primer acceso</label><input class="form-control text-uppercase" id="codigo" name="codigo" required placeholder="XXXX-XXXX"></div>
+      <div class="mb-3"><label class="form-label" for="contrasena">Contraseña nueva</label><input class="form-control" type="password" id="contrasena" name="contrasena" required autocomplete="new-password"></div>
+      <div class="mb-3"><label class="form-label" for="confirmacion">Repita la contraseña</label><input class="form-control" type="password" id="confirmacion" name="confirmacion" required autocomplete="new-password"></div>
+      <button class="btn btn-primary w-100" type="submit">Activar mi cuenta</button>
+    </form>
+    <p class="small mt-3 mb-0"><a href="{% url 'portal:entrar' %}">Volver a la entrada</a></p>
+  </div>
+</div>
+{% endblock %}

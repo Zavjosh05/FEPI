@@ -1,0 +1,17 @@
+{% extends "portal/base.html" %}
+{% block titulo %}Consulta sin cuenta{% endblock %}
+{% block contenido %}
+<div class="pantalla-entrar">
+  <div class="tarjeta p-4" data-prueba="consulta-sin-cuenta">
+    <h1 class="h4 mb-1">Consulta sin cuenta</h1>
+    <p class="text-secondary small">Con el folio de su expediente y el código de consulta del acuse verá solo ese expediente.</p>
+    {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+    <form method="post">{% csrf_token %}
+      <div class="mb-3"><label class="form-label" for="folio">Folio del expediente</label><input class="form-control text-uppercase" id="folio" name="folio" required placeholder="CC-2026-AME-0001"></div>
+      <div class="mb-3"><label class="form-label" for="codigo">Código de consulta</label><input class="form-control text-uppercase" id="codigo" name="codigo" required placeholder="XXXX-XXXX"></div>
+      <button class="btn btn-primary w-100" type="submit">Consultar</button>
+    </form>
+    <p class="small mt-3 mb-0"><a href="{% url 'portal:entrar' %}">Volver a la entrada</a></p>
+  </div>
+</div>
+{% endblock %}

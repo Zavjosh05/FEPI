@@ -1,0 +1,24 @@
+{% extends "portal/base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block contenido %}
+<div class="pantalla-entrar">
+  <div class="tarjeta p-4" data-prueba="entrar-portal">
+    <h1 class="h4 mb-1">Portal de personas beneficiarias</h1>
+    <p class="text-secondary small">Para personas beneficiarias y Guardabosques con contrato firmado. Su usuario es su CURP.</p>
+    {% if error %}<div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+    <form method="post">{% csrf_token %}
+      <div class="mb-3"><label class="form-label" for="curp">CURP</label>
+        <input class="form-control text-uppercase" id="curp" name="curp" maxlength="18" required autofocus autocomplete="username"></div>
+      <div class="mb-3"><label class="form-label" for="contrasena">Contraseña</label>
+        <input class="form-control" type="password" id="contrasena" name="contrasena" required autocomplete="current-password"></div>
+      <button class="btn btn-primary w-100" type="submit">Entrar</button>
+    </form>
+    <hr>
+    <ul class="small mb-0">
+      <li><a href="{% url 'portal:primer_acceso' %}">Primer acceso</a>: con el código de un solo uso de su acuse, defina su contraseña.</li>
+      <li><a href="{% url 'portal:consulta' %}">Consultar sin cuenta</a>: con el folio del expediente y el código de consulta del acuse.</li>
+      <li>¿Trabaja en PROBOSQUE? Entre por la <a href="{% url 'nucleo:entrar' %}">pantalla del personal</a>.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

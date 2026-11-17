@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,9 +14,19 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import Acuse, Documento, Estado, Programa, bandeja, expedientes_visibles, puede_ver_expediente
 
 
+class FormularioEntrarPersonal(AuthenticationForm):
+    """La entrada del personal no admite cuentas del portal: las personas beneficiarias entran por /portal/."""
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if hasattr(user, "cuenta_externa"):
+            raise ValidationError("Las personas beneficiarias entran por el portal.", code="externo")
+
+
 class Entrar(auth_views.LoginView):
     template_name = "nucleo/entrar.html"
     redirect_authenticated_user = True
+    authentication_form = FormularioEntrarPersonal
 
 
 def salud(request):

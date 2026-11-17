@@ -155,6 +155,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
+├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
 ├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 a 5.3): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
@@ -830,6 +831,27 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   (Protección Forestal en PEG).
 - **Aviso de faltantes sin plazo.** Si las reglas no dan plazo (PEG), el aviso de la Dirección sale sin fecha límite y lo dice («sin plazo en las reglas»).
 - **Textos.** Las pantallas ya no dicen «sprint»: nombran la historia que llenará cada cosa.
+
+### Portal de personas beneficiarias (S3-02c; decisión S2-05)
+
+- **App `portal`** (`portal/models.py`, migración `0001_cuentas_portal`: `CuentaExterna`, `AccesoExpediente`, `CodigoConsulta`;
+  servicio `portal/cuentas.py`; vistas, plantillas propias y `portal/middleware.py`). Rutas en `/portal/`.
+- **Alta al firmar.** `cuentas.al_firmar` (enganchado a `extensiones.AL_FIRMAR`): cuando la Delegación registra la firma del contrato
+  (HU-3.3) da de alta a la persona beneficiaria (en PEG, el Guardabosque) como **usuario externo sin unidad interna**: usuario = su CURP,
+  sin contraseña utilizable y con un **código de primer acceso de un solo uso**. También crea el **código de consulta** del expediente
+  (respaldo sin cuenta: folio + código). Los dos códigos se imprimen en el acuse «Acceso al portal de personas beneficiarias»
+  (tipo `alta_portal`, se entrega en persona: no hay correo ni SMS) y en la base quedan cifrados. Sin CURP válida (persona jurídico
+  colectiva, núcleo agrario) no hay cuenta, solo el respaldo. Si la persona ya tiene cuenta, se le suma el expediente.
+  `cuentas.dar_acceso(delegacion, expediente, persona, rol="prestador")` sirve también para el prestador de servicios forestales con RFN
+  (MFS); todavía sin pantalla.
+- **Entrada separada.** `/portal/entrar/` (CURP y contraseña), `/portal/primer-acceso/` (CURP, código y contraseña nueva: el código deja
+  de servir) y `/portal/consulta/` (folio y código, solo ese expediente en esa sesión). La entrada del personal (`/entrar/`) rechaza las
+  cuentas del portal y la del portal rechaza al personal; cada una enlaza a la otra.
+- **Qué ve un externo.** Solo SUS expedientes (`AccesoExpediente`): situación, apoyo y ministraciones, plazos con fecha, notificaciones
+  recibidas y sus acuses (descarga revisada contra el expediente). `SoloPortalMiddleware` regresa a «Mis expedientes» cualquier otra
+  pantalla (403 si no es GET); la página pública de resultados sigue abierta. Lo ajeno da 404. Las comprobaciones, reportes y avisos que
+  la persona podrá enviar desde el portal son de HU-4.1 a 4.3 y HU-6.1 y 6.2 (`AccesoExpediente.rol` distingue a la persona del prestador).
+- **Pruebas.** `pruebas/test_portal.py`.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
