@@ -9,11 +9,11 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from nucleo.models import TipoUnidad
+from nucleo.models import TipoUnidad, expedientes_visibles
 
 from .. import comprobaciones
 from ..formularios.comprobaciones import EnvioForm
-from ..models import Comprobacion
+from ..models import Comprobacion, Verificacion
 from .comun import expediente_visible, mensajes_error, responder_archivo
 
 TIPOS_QUE_VEN = (TipoUnidad.DELEGACION, TipoUnidad.DIRECCION, TipoUnidad.JURIDICA)
@@ -37,6 +37,10 @@ def lista(request):
     return render(request, "ejecucion/comprobaciones/lista.html", {
         "por_revisar": [c for c in todas if c.por_portal and c.revisada_en is None] if tipo == TipoUnidad.DELEGACION else [],
         "todas": todas, "es_delegacion": tipo == TipoUnidad.DELEGACION,
+        "por_verificar": list(expedientes_visibles(request.user).filter(estado__clave="comprobacion_enviada").select_related("persona_beneficiaria")
+                              .order_by("fecha_recepcion")[:300]),
+        "verificaciones": list(Verificacion.objects.filter(expediente__in=expedientes_visibles(request.user))
+                               .select_related("expediente", "acuse", "unidad").order_by("-registrada_en")[:300]),
     })
 
 

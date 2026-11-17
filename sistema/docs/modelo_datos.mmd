@@ -25,6 +25,8 @@ erDiagram
   Acuse |o--o{ SolicitudPago : acuse_envio
   Acuse |o--o{ ValePlanta : acuse
   Acuse |o--o{ Validacion : acuse
+  Acuse |o--o{ Verificacion : acuse
+  Comprobacion |o--o{ Verificacion : comprobacion
   Contrato ||--o{ Adendum : contrato
   Contrato ||--o| FirmaContrato : contrato
   CuentaExterna ||--o{ AccesoExpediente : cuenta
@@ -54,6 +56,7 @@ erDiagram
   Expediente ||--o{ Documento : expediente
   Expediente ||--o{ Evento : expediente
   Expediente ||--o{ Hito : expediente
+  Expediente ||--o{ Incidencia : expediente
   Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Pago : expediente
   Expediente ||--o{ Poligono : expediente
@@ -64,6 +67,7 @@ erDiagram
   Expediente ||--o{ SolicitudPago : expediente
   Expediente ||--o{ ValePlanta : expediente
   Expediente ||--o{ Validacion : expediente
+  Expediente ||--o{ Verificacion : expediente
   Expediente ||--o| CodigoConsulta : expediente
   Expediente ||--o| Contrato : expediente
   Expediente ||--o| DictamenJuridico : expediente
@@ -115,6 +119,7 @@ erDiagram
   Unidad |o--o{ Municipio : delegacion
   Unidad |o--o{ Notificacion : unidad_origen
   Unidad |o--o{ Usuario : unidad
+  Unidad |o--o{ Verificacion : unidad
   Unidad ||--o{ Acuerdo : unidad_responsable
   Unidad ||--o{ Cheque : delegacion
   Unidad ||--o{ Expediente : delegacion
@@ -125,6 +130,7 @@ erDiagram
   ValePlanta ||--o{ RenglonVale : vale
   ValePlanta ||--o{ SalidaPlanta : vale
   Validacion }o--o{ RevisionRequisito : faltantes
+  Verificacion ||--o{ Incidencia : verificacion
   VersionModelo |o--o{ Adendum : version_modelo
   VersionModelo ||--o{ Contrato : version_modelo
   Vivero ||--o{ ValePlanta : vivero
@@ -421,6 +427,47 @@ erDiagram
     texto cambio_estado
     int revisada_por_id FK
     fecha_hora revisada_en
+    json datos
+  }
+  Incidencia {
+    int id PK
+    int verificacion_id FK
+    int expediente_id FK
+    texto tipo
+    texto descripcion
+    archivo archivo
+    texto huella
+    fecha_hora registrada_en
+    fecha_hora atendida_en
+    json datos
+  }
+  Verificacion {
+    int id PK
+    int expediente_id FK
+    int comprobacion_id FK
+    texto tipo_documento
+    texto nombre_documento
+    fecha fecha_visita
+    decimal superficie_aprobada_ha
+    decimal superficie_verificada_ha
+    decimal ajuste_pct
+    decimal sobrevivencia_pct
+    texto resultado
+    texto observaciones
+    archivo archivo
+    texto huella
+    int registrada_por_id FK
+    int unidad_id FK
+    fecha_hora registrada_en
+    fecha vence
+    bool en_plazo
+    texto plazo_texto
+    bool pago_proporcional
+    decimal total_verificado
+    decimal importe_ajustado
+    int ministracion_ajustada
+    decimal excedente_ministrado
+    int acuse_id FK
     json datos
   }
   Acuse {

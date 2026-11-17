@@ -19,7 +19,14 @@ auditoría; en PEG, Margarito Sánchez Ruiz envía por el portal sus reportes de
 por revisar en la Delegación) y la Delegación recaba su acuse de depósito; Ejido San Bartolo entrega en ventanilla los de junio y
 julio (le falta agosto). Del lote de pagos (``pagos/demo.py``): Predio La Ciénega (CC) avisa el término el 10-nov y entrega su
 Informe Final el 17-nov, Plantación La Mesa (PS) avisa el término el 28-sep y Manantial Alto (RHF, Restauración Forestal
-Integral Modalidad uno, que concluye en octubre) el 28-oct; los tres quedan por verificar.
+Integral Modalidad uno, que concluye en octubre) el 28-oct.
+
+**HU-4.2 · Verificación en campo** (``_verificaciones``): el área responsable revisa la Bitácora de Bosque Los Volcanes el 6-oct y
+su segunda ministración (30 %, $9,000) se paga el 14-oct; la Delegación de Toluca verifica Plantación La Mesa el 15-oct con 1.8 de
+2 ha (90 %), sobrevivencia del 78 % y una helada como caso fortuito con su acta, así que su segunda ministración queda por
+solicitar en $2,000 (la parte proporcional: 1.8 ha × $5,000 menos los $7,000 ya ministrados); Manantial Alto se verifica completo
+el 9-nov, en plazo por concluir en octubre; Predio La Ciénega (pago único) se verifica el 18-nov con el Informe Final firmado y
+el área da por concluidas sus actividades el 19-nov.
 """
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
@@ -187,6 +194,7 @@ def cargar_demo():
             hechas += _recibida(u, ejercicio, clave)
     _portal_demo()
     _comprobaciones(u)
+    _verificaciones(u)
     return hechas
 
 
@@ -244,3 +252,51 @@ def _comprobaciones(u):
         if exp.programa.clave == "CC":
             _envio(_delegacion(u, exp), exp, "informe_final", "2026-11-17", 12,
                    descripcion="Informe Final de Actividades FO-PB-509-A firmado por la persona beneficiaria y el técnico.")
+
+
+# ----------------------------------------------------------------------------- HU-4.2
+def _verificaciones(u):
+    """HU-4.2: resultados de la verificación (y su segunda ministración en MFS), idempotente por expediente."""
+    from datetime import date
+
+    from . import verificacion
+
+    def pendiente(nombre):
+        exp = Expediente.objects.filter(predio__nombre=nombre, estado__clave="comprobacion_enviada").first()
+        return exp if exp is not None and not exp.verificaciones.exists() else None
+
+    volcanes = pendiente("Bosque Los Volcanes")
+    if volcanes is not None:
+        with paso("2026-10-06", 11):
+            verificacion.registrar_verificacion(u["dir_drff"], volcanes, "revision_entregable",
+                                                archivo_demo("revision_bitacora.pdf", "Revisión de la Bitácora"),
+                                                observaciones="La Bitácora corresponde al Programa de Manejo del concepto aprobado.")
+        with paso("2026-10-08", 10):
+            sol = solicitudes.enviar_solicitud(u["dir_drff"], volcanes, 2, "Segunda ministración con la Bitácora.")
+        with paso("2026-10-12", 10):
+            pagos.revisar_solicitud(u["finanzas"], sol, "aceptada", "Soportes completos.")
+        with paso("2026-10-14", 11):
+            pagos.registrar_pago(u["finanzas"], sol, f"SPEI-{sol.pk:06d}", cuando("2026-10-14").date())
+    la_mesa = pendiente("Plantación La Mesa")
+    if la_mesa is not None:
+        with paso("2026-10-15", 12):
+            verificacion.registrar_verificacion(
+                _delegacion(u, la_mesa), la_mesa, "formato_verificacion", archivo_demo("formato_la_mesa.pdf", "Formato de verificación"),
+                fecha_visita=date(2026, 10, 13), superficie_verificada="1.8", sobrevivencia="78",
+                incidencias=[{"tipo": "caso_fortuito", "descripcion": "Helada en 0.2 ha del rodal norte.",
+                              "archivo": archivo_demo("acta_helada.pdf", "Acta de la helada")}])
+    manantial = pendiente("Manantial Alto")
+    if manantial is not None:
+        with paso("2026-11-09", 12):
+            verificacion.registrar_verificacion(
+                _delegacion(u, manantial), manantial, "formato_verificacion", archivo_demo("formato_manantial.pdf", "Formato"),
+                fecha_visita=date(2026, 11, 5), superficie_verificada="2", sobrevivencia="85")
+    cienega = pendiente("Predio La Ciénega")
+    if cienega is not None:
+        with paso("2026-11-18", 12):
+            verificacion.registrar_verificacion(
+                _delegacion(u, cienega), cienega, "informe_final_firmado", archivo_demo("informe_firmado.pdf", "Informe Final"),
+                fecha_visita=date(2026, 11, 13), superficie_verificada="4")
+        with paso("2026-11-19", 10):
+            verificacion.dar_por_concluida(u["dir_drff"], cienega)
+

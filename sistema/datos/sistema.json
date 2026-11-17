@@ -140,7 +140,7 @@
     "nota": "Qué plazos revisa manage.py revisar_plazos para avisar antes de vencer (5 días hábiles o menos) y al vencer, en qué estados del expediente y a qué unidad (panel «Por vencer» de su bandeja). Solo avisa: no cambia estados ni ejecuta nada (P-08).",
     "avisos": [
       {"uso": "fecha_limite_conclusion", "estados": ["contratada", "planta_entregada", "vale_entregado", "pagada", "cheque_entregado", "en_ejecucion"], "unidades": ["direccion", "delegacion"]},
-      {"uso": "entrega_comprobacion", "estados": ["contratada", "planta_entregada", "pagada", "cheque_entregado", "en_ejecucion"], "unidades": ["delegacion", "direccion"]},
+      {"uso": "entrega_comprobacion", "estados": ["contratada", "planta_entregada", "pagada", "cheque_entregado", "en_ejecucion", "comprobacion_enviada"], "unidades": ["delegacion", "direccion"]},
       {"uso": "interes_segunda_beneficiaria", "estados": ["sustitucion"], "unidades": ["delegacion", "direccion"]},
       {"uso": "subsanar_omisiones", "estados": ["omisiones_por_subsanar"], "unidades": ["delegacion", "direccion"]},
       {"uso": "reporte_mensual", "estados": ["contratada", "en_ejecucion", "pagada"], "unidades": ["delegacion", "direccion"]}

@@ -10,7 +10,7 @@ Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del e
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
-módulo M4, HU-4.1 Envío de comprobaciones.
+módulo M4, HU-4.1 Envío de comprobaciones y HU-4.2 Verificación en campo.
 Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
 beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
@@ -146,7 +146,10 @@ contratado y Ejido San Lorenzo recién recibido. **Comprobaciones (HU-4.1):** Bo
 (2-oct, por verificar); Margarito Sánchez Ruiz envió por el portal sus reportes de junio a octubre (el de octubre, por revisar en la
 Delegación de Amecameca) y Ejido San Bartolo entregó en ventanilla los de junio y julio (le falta agosto); Predio La Ciénega (CC),
 Plantación La Mesa (PS) y Manantial Alto (RHF, Modalidad uno: concluye en octubre) avisaron el término y La Ciénega entregó su
-Informe Final; los tres quedan por verificar. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+Informe Final. **Verificación (HU-4.2):** el área responsable revisó la Bitácora de Los Volcanes (6-oct) y su segunda ministración
+($9,000) está pagada; Plantación La Mesa se verificó con 1.8 de 2 ha (90 %), una helada como caso fortuito y su segunda ministración
+por solicitar en $2,000 (proporcional); Manantial Alto, completo y en plazo (concluye en octubre); Predio La Ciénega (pago único),
+verificado y con sus actividades concluidas. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -168,7 +171,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3; HU-4.1 hecha) y M6 (HU-6.1 a 6.3), listas: models/ (un módulo por historia,
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3; HU-4.1 y 4.2 hechas) y M6 (HU-6.1 a 6.3), listas: models/ (un módulo por historia,
 │                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
 │                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
@@ -952,6 +955,53 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - **Pruebas.** `pruebas/test_hu_4_1.py` (criterios, tipos por programa, plazos, caso fortuito, MFS, PEG, permisos, bandeja, portal y
   consulta sin cuenta) y el recorrido `pruebas/e2e/test_recorrido_hu_4_1.py` (capturas `hu_4_1_*` en `entregas/sprint_3/capturas/`);
   fixtures `pruebas/fixtures_m4.py` (`pagada`, `cuenta_portal`).
+
+### M4 · HU-4.2 Verificación en campo
+
+- **Organización.** `ejecucion/models/verificacion.py` (migración `0002_hu_4_2_verificacion`: `Verificacion`, `Incidencia`), servicio
+  `ejecucion/verificacion.py`, vistas `vistas/verificacion.py`, formularios `formularios/verificacion.py`, plantillas
+  `templates/ejecucion/verificacion/` y los datos por programa en `datos/ejecucion.json` → `verificacion` (con su fundamento).
+- **Quién y con qué documento.** CC: la Delegación, con el Informe Final FO-PB-509-A firmado o la minuta (8.1.1.1 fr. VII, línea 4180);
+  PS y RHF: la Delegación, con el formato de verificación (PS 7.2 criterios 6 y 7, líneas 5443 a 5449; RHF 10.1 n y t, líneas 3566 y
+  3592); PSAHEM: la Delegación, con la minuta de verificación (7.2, líneas 1376 a 1380); MFS: el área responsable revisa el
+  entregable (10.1.1 m, línea 8093; no hay visita de conclusión, R-17). El área responsable también puede registrarla en los demás.
+  PEG no tiene verificación en campo (su pago depende de la evaluación de reportes, HU-4.3). Solo se registra con la comprobación
+  entregada (estado `comprobacion_enviada`).
+- **Criterio 1: resultado, superficie y ajuste, dentro del plazo.** Se registran el documento (obligatorio, con huella), la fecha de la
+  visita, la superficie verificada (no mayor que la aprobada) y su **ajuste** (verificada entre aprobada), y la sobrevivencia en PS y
+  RHF (en el mantenimiento de PS es obligatoria y la mínima es 50 %, 7.2, línea 5377). El momento del registro es la **entrega del
+  documento de verificación** al área responsable: con él se califica el plazo de `entrega_comprobacion` (R-04: CC 15, PS 30 y RHF 10
+  días hábiles desde la fecha límite de conclusión; en RHF Modalidad uno, desde octubre; PSAHEM y MFS «sin plazo en las reglas»).
+  **Fuera de plazo se registra igual** y queda señalado. Resultado: «incumplimiento» si el ajuste queda debajo del 70 % (CC línea 4742,
+  PS línea 5456, RHF línea 3598, PSAHEM línea 2157), si la sobrevivencia no alcanza la mínima o si hay una incidencia de incumplimiento;
+  «cumple con ajuste» si se verificó menos de lo aprobado; si no, «cumple». Deja acuse (tipo `verificacion_campo`, con las incidencias en
+  su detalle), bitácora, el hito `verificacion_campo` y el estado `verificada`.
+- **Criterio 2: incidencias.** Cada una con su tipo (caso fortuito, incumplimiento; en MFS, incumplimiento y causa externa), su
+  descripción y el documento que la avala (sin documento no se registra). `extensiones.AL_INCIDENCIA` (nuevo) corre por cada incidencia:
+  es el gancho de HU-6.2 (omisiones, suspensión, cancelación y reintegro no se construyen aquí).
+- **Segunda ministración (regla del pago proporcional).** `ejecucion/registro.py` reemplaza la fuente `verificacion_campo` de
+  `pagos.solicitudes.FUENTES` (`verificacion.fuente_verificacion`): sin verificación, o con incumplimiento, la ministración no se solicita
+  y dice por qué. Donde las ROP dicen «o en su caso la parte proporcional del porcentaje realizado» —**CC 7.2, líneas 4098 a 4100; PS 7.2,
+  líneas 5371, 5372 y 5379; RHF 7.2.1.1 a) línea 2745, 7.2.1.2 a) línea 2756, 7.2.2 a) línea 2769 y Convocatoria base quinta VII,
+  líneas 843 y 844**— la ministración que depende de la verificación paga la superficie verificada por el monto por hectárea **menos
+  lo ya ministrado**, sin bajar de cero (RHF 8.1.9 b fr. 15, línea 3382: la superficie no trabajada se cancela sin poder ser menor al pago
+  de la primera ministración). Ejemplo: CC de 6 ha verificada en 5.4 ha → $10,800 − $8,400 = $2,400 en lugar de $3,600. Lo ministrado
+  de más (ajuste menor al 70 %) queda anotado en `Verificacion.excedente_ministrado` para el reintegro de HU-6.2. **PSAHEM no trae esa
+  frase** (7.2, líneas 1374 a 1380): paga el 30 % completo y la nota del monto lo dice (duda para el cliente). MFS y PEG no pagan por
+  superficie. El ajuste entra por `extensiones.AJUSTES_MONTO` (nuevo): `nucleo.montos.monto_aprobado(expediente)` sin superficie ni
+  condiciones explícitas ya da la ministración ajustada (pestañas, solicitud y pago); con superficie explícita da lo aprobado. No se usó
+  `SUPERFICIE_APROBADA`: recalcularía la primera ministración ya pagada y, en CC, el régimen (pago único hasta 5 ha). Una consulta solo
+  en los estados donde puede existir verificación (la prueba de volumen no crece).
+- **Estados.** `pagos.solicitudes` admite solicitar desde `verificada`. El área responsable puede **devolver la comprobación** con motivo
+  (`comprobacion_enviada → en_ejecucion`; la Delegación notifica las observaciones) y **dar por concluidas las actividades**
+  (`verificada → concluida`) cuando no quedan ministraciones por pagar (pago único de CC). No se agregaron transiciones. El aviso «Por
+  vencer» de `entrega_comprobacion` cubre también `comprobacion_enviada` (falta el documento de verificación).
+- **Pantallas.** Pestaña «Ejecución» (resultado con su acuse, documento, ajuste, sobrevivencia, importe ajustado e incidencias; formulario
+  con hasta dos incidencias; devolver y concluir), siguiente paso de la Delegación (o del área en MFS) y la página
+  «Comprobaciones y verificaciones» con lo que está por verificar y las verificaciones registradas.
+- **Pruebas.** `pruebas/test_hu_4_2.py`, el recorrido `pruebas/e2e/test_recorrido_hu_4_2.py` (capturas `hu_4_2_*`) y
+  `pruebas/test_sprint_3_recorrido_ejecucion.py`: CC (comprobación por el portal), PS, RHF, PSAHEM (cheque del 30 %) y MFS (con la
+  Bitácora) recorren de la primera ministración pagada a la segunda pagada, con estado, bandeja, acuse y bitácora en cada relevo.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

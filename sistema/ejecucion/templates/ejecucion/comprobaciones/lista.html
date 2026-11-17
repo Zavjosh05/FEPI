@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block titulo %}Comprobaciones{% endblock %}
+{% block titulo %}Comprobaciones y verificaciones{% endblock %}
 {% block contenido %}
 <div class="mb-3">
-  <h1 class="h4 mb-0">Comprobaciones</h1>
+  <h1 class="h4 mb-0">Comprobaciones y verificaciones</h1>
   <div class="small text-secondary">Avisos, informes, bitácoras, solicitudes de auditoría, reportes y acuses de depósito de las personas beneficiarias, enviados por el portal o entregados en la Delegación.</div>
 </div>
 {% if es_delegacion %}
@@ -11,6 +11,20 @@
   {% include "ejecucion/comprobaciones/_tabla.html" with filas=por_revisar revisar=True %}
 </div>
 {% endif %}
+<div class="tarjeta mb-3" data-prueba="por-verificar">
+  <div class="titulo-seccion">Comprobaciones por verificar ({{ por_verificar|length }})</div>
+  {% if por_verificar %}<ul class="small mb-0">{% for e in por_verificar %}<li><a href="{% url 'recepcion:expediente' e.folio %}?pestana=ejecucion">{{ e.folio }}</a> · {{ e.beneficiaria.nombre }} · {{ e.ejercicio.programa.nombre }}</li>{% endfor %}</ul>
+  {% else %}<div class="small text-secondary">Ninguna.</div>{% endif %}
+</div>
+<div class="tarjeta mb-3" data-prueba="verificaciones">
+  <div class="titulo-seccion">Verificaciones registradas ({{ verificaciones|length }})</div>
+  {% if verificaciones %}<div class="table-responsive"><table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Documento</th><th>Ajuste</th><th>Resultado</th><th>Entrega</th><th>Acuse</th></tr></thead>
+    <tbody>{% for v in verificaciones %}<tr><td><a href="{% url 'recepcion:expediente' v.expediente.folio %}?pestana=ejecucion">{{ v.expediente.folio }}</a></td><td>{{ v.nombre_documento }}</td>
+      <td>{% if v.ajuste_pct is not None %}{{ v.ajuste_pct|floatformat:"-2" }} %{% else %}—{% endif %}</td><td>{{ v.get_resultado_display }}</td>
+      <td class="text-nowrap">{{ v.registrada_en|date:"d/m/Y H:i" }} h · {{ v.situacion_plazo }}</td><td>{% if v.acuse %}<a href="{% url 'nucleo:acuse' v.acuse.folio %}" target="_blank">{{ v.acuse.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguna.</div>{% endif %}
+</div>
 <div class="tarjeta mb-3" data-prueba="todas-las-comprobaciones">
   <div class="titulo-seccion">Todas ({{ todas|length }})</div>
   {% include "ejecucion/comprobaciones/_tabla.html" with filas=todas %}

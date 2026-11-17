@@ -33,7 +33,7 @@ from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad, expedientes_v
 
 from .models import ComprobanteCuenta, EstadoSolicitud, OficioPago, SolicitudPago
 
-ESTADOS_PARA_SOLICITAR = ("contratada", "planta_entregada", "pagada", "cheque_entregado")
+ESTADOS_PARA_SOLICITAR = ("contratada", "planta_entregada", "pagada", "cheque_entregado", "verificada")  # verificada: HU-4.2
 EN_CURSO = (EstadoSolicitud.ENVIADA, EstadoSolicitud.ACEPTADA, EstadoSolicitud.REMITIDA, EstadoSolicitud.PAGADA)
 EXTENSIONES = (".pdf", ".jpg", ".jpeg", ".png")
 

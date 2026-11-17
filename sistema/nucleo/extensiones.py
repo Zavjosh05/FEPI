@@ -30,6 +30,11 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   aunque su estado esté asignado a otra unidad (PSAHEM: la solicitud aceptada que la Secretaría Técnica debe remitir, P-26).
 - SECCIONES_PORTAL: funciones ``(request, expediente, con_cuenta) -> {"plantilla", "contexto"} | None`` con una sección más
   de la pantalla del expediente en el portal de personas beneficiarias (HU-4.1: los envíos a la Delegación).
+- AJUSTES_MONTO: funciones ``(expediente, monto) -> MontoAprobado | None`` que ajustan el monto del expediente
+  (``nucleo.montos.monto_aprobado`` sin superficie ni condiciones explícitas). HU-4.2: la ministración que depende de la
+  verificación se paga por lo verificado donde las reglas lo dicen.
+- AL_INCIDENCIA: funciones ``(incidencia) -> None`` que corren al registrar una incidencia de la verificación en campo
+  (HU-4.2); HU-6.2 conecta aquí el seguimiento de los incumplimientos.
 """
 
 FILTROS_BANDEJA = []
@@ -48,3 +53,5 @@ SIGUIENTES_PASOS = []
 AL_FIRMAR = []
 AL_LIBERAR_RECURSO = []
 SECCIONES_PORTAL = []
+AJUSTES_MONTO = []
+AL_INCIDENCIA = []

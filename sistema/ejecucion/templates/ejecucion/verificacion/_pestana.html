@@ -1,0 +1,74 @@
+{% load moneda %}
+{% if verificacion_aplica %}
+<div class="titulo-seccion mt-3">Verificación en campo (HU-4.2)</div>
+<div class="small text-secondary mb-2">{{ config_verificacion.fundamento }}
+  {% if plazo_entrega %}<br>Plazo de entrega del documento de verificación: <strong data-prueba="plazo-entrega-verificacion">{{ plazo_entrega.texto }}</strong> (mide la entrega, no la visita).{% endif %}</div>
+
+{% for v in verificaciones %}
+<div class="tarjeta mb-3" data-prueba="verificacion">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div><strong>{{ v.nombre_documento }}</strong>
+      <span class="badge text-bg-{% if v.resultado == 'cumple' %}success{% elif v.resultado == 'ajuste' %}warning{% else %}danger{% endif %}" data-prueba="resultado-verificacion">{{ v.get_resultado_display }}</span>
+      {% if v.en_plazo is True %}<span class="badge text-bg-success" data-prueba="plazo-verificacion">Entregado en plazo</span>{% elif v.en_plazo is False %}<span class="badge text-bg-danger" data-prueba="plazo-verificacion">Entregado fuera de plazo</span>{% endif %}
+      {% if not forloop.first %}<span class="badge text-bg-secondary">anterior</span>{% endif %}</div>
+    <div class="small text-nowrap">Entregado el {{ v.registrada_en|date:"d/m/Y H:i" }} h por {{ v.unidad.nombre }}{% if v.acuse %} · <a href="{% url 'nucleo:acuse' v.acuse.folio %}" target="_blank">{{ v.acuse.folio }}</a>{% endif %} · <a href="{% url 'ejecucion:verificacion_archivo' v.pk %}" target="_blank">documento</a></div>
+  </div>
+  <div class="small mt-1">
+    {% if v.fecha_visita %}Visita del {{ v.fecha_visita|date:"d/m/Y" }}. {% endif %}
+    {% if v.superficie_verificada_ha is not None %}<span data-prueba="superficie-verificada">Superficie verificada {{ v.verificada_texto }} ha de {{ v.aprobada_texto }} aprobadas: ajuste del <strong>{{ v.ajuste_pct|floatformat:"-2" }} %</strong></span>.{% endif %}
+    {% if v.sobrevivencia_pct is not None %} Sobrevivencia {{ v.sobrevivencia_pct|floatformat:"-2" }} %.{% endif %}
+    {% if v.importe_ajustado is not None %}<div data-prueba="importe-ajustado">Ministración {{ v.ministracion_ajustada }}: <strong>{{ v.importe_ajustado|moneda }}</strong> (lo verificado, {{ v.total_verificado|moneda }}, menos lo ya ministrado){% if v.excedente_ministrado %}; ministrado de más: {{ v.excedente_ministrado|moneda }} (lo atiende HU-6.2){% endif %}.</div>{% endif %}
+    {% if v.datos.motivos_incumplimiento %}<div class="text-danger">Incumplimiento: {{ v.datos.motivos_incumplimiento|join:"; " }}.</div>{% endif %}
+    <div class="text-secondary">{{ v.plazo_texto }}</div>
+    {% if v.observaciones %}<div>{{ v.observaciones }}</div>{% endif %}
+  </div>
+  {% with incs=v.incidencias.all %}{% if incs %}
+  <table class="table table-sm small mt-2 mb-0" data-prueba="incidencias">
+    <thead class="table-light"><tr><th>Incidencia</th><th>Descripción</th><th>Documento que la avala</th></tr></thead>
+    <tbody>{% for i in incs %}<tr data-incidencia="{{ i.tipo }}"><td>{{ i.nombre_tipo }}</td><td>{{ i.descripcion }}</td>
+      <td><a href="{% url 'ejecucion:incidencia_archivo' i.pk %}" target="_blank">{{ i.nombre_archivo }}</a></td></tr>{% endfor %}</tbody>
+  </table>{% endif %}{% endwith %}
+</div>
+{% empty %}
+<div class="small text-secondary mb-2" data-prueba="sin-verificacion">Todavía no hay verificación registrada.</div>
+{% endfor %}
+
+{% if puede_verificar %}
+<div class="tarjeta mb-3" data-prueba="registrar-verificacion">
+  <div class="fw-semibold mb-1">Registrar el resultado de la verificación</div>
+  <div class="small text-secondary mb-2">Al registrarlo queda la fecha y la hora de entrega del documento al área responsable; con ella se mide el plazo de las reglas.
+    {% if config_verificacion.ajuste_minimo_pct %} Un ajuste menor al {{ config_verificacion.ajuste_minimo_pct }} % es incumplimiento.{% endif %}
+    {% if sobrevivencia_minima %} Sobrevivencia mínima de esta modalidad: {{ sobrevivencia_minima|floatformat:"-2" }} %.{% endif %}
+    {{ config_verificacion.fundamento_pago }}</div>
+  <form method="post" action="{% url 'ejecucion:verificar' exp.folio %}" enctype="multipart/form-data" class="row g-2" id="form-verificacion">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_verificacion.tipo_documento.label_tag }}{{ form_verificacion.tipo_documento }}</div>
+    <div class="col-12 col-md-6">{{ form_verificacion.archivo.label_tag }}{{ form_verificacion.archivo }}</div>
+    <div class="col-6 col-md-3">{{ form_verificacion.fecha_visita.label_tag }}{{ form_verificacion.fecha_visita }}</div>
+    {% if form_verificacion.superficie_verificada %}<div class="col-6 col-md-3">{{ form_verificacion.superficie_verificada.label_tag }}{{ form_verificacion.superficie_verificada }}</div>{% endif %}
+    {% if form_verificacion.sobrevivencia %}<div class="col-6 col-md-3">{{ form_verificacion.sobrevivencia.label_tag }}{{ form_verificacion.sobrevivencia }}</div>{% endif %}
+    <div class="col-12">{{ form_verificacion.observaciones.label_tag }}{{ form_verificacion.observaciones }}</div>
+    {% for n in "12" %}
+    <div class="col-12 col-md-3">{% if n == "1" %}{{ form_verificacion.incidencia_1_tipo.label_tag }}{{ form_verificacion.incidencia_1_tipo }}{% else %}{{ form_verificacion.incidencia_2_tipo.label_tag }}{{ form_verificacion.incidencia_2_tipo }}{% endif %}</div>
+    <div class="col-12 col-md-5">{% if n == "1" %}{{ form_verificacion.incidencia_1_descripcion.label_tag }}{{ form_verificacion.incidencia_1_descripcion }}{% else %}{{ form_verificacion.incidencia_2_descripcion.label_tag }}{{ form_verificacion.incidencia_2_descripcion }}{% endif %}</div>
+    <div class="col-12 col-md-4">{% if n == "1" %}{{ form_verificacion.incidencia_1_archivo.label_tag }}{{ form_verificacion.incidencia_1_archivo }}{% else %}{{ form_verificacion.incidencia_2_archivo.label_tag }}{{ form_verificacion.incidencia_2_archivo }}{% endif %}</div>
+    {% endfor %}
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar el resultado con su acuse</button></div>
+  </form>
+</div>
+{% elif motivo_sin_verificar and exp.estado.clave == "comprobacion_enviada" %}
+<div class="small text-secondary mb-2" data-prueba="motivo-sin-verificar">{{ motivo_sin_verificar }}</div>
+{% endif %}
+
+{% if puede_devolver %}
+<form method="post" action="{% url 'ejecucion:devolver' exp.folio %}" class="tarjeta mb-3 d-flex flex-wrap gap-2 align-items-end" id="form-devolucion">{% csrf_token %}
+  <div class="flex-grow-1">{{ form_devolucion.motivo.label_tag }}{{ form_devolucion.motivo }}</div>
+  <button class="btn btn-sm btn-outline-danger" type="submit">Devolver la comprobación</button>
+</form>
+{% endif %}
+{% if puede_concluir %}
+<form method="post" action="{% url 'ejecucion:concluir' exp.folio %}" class="mb-3" id="form-concluir">{% csrf_token %}
+  <button class="btn btn-sm btn-success" type="submit">Dar por concluidas las actividades</button>
+  <span class="small text-secondary">Verificado el cumplimiento y pagadas las ministraciones.</span>
+</form>
+{% endif %}
+{% endif %}

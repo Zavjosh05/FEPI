@@ -1,12 +1,13 @@
 """Registro del módulo M4 (Ejecución y verificación) en los puntos de extensión del núcleo.
 
 Pestaña «Ejecución» del expediente, menú «Ejecución y verificación», paneles de bandeja, siguiente paso, la sección «Mis
-envíos» del portal y las fuentes de soporte de pago que llena cada historia (HU-4.1: ``entregable``), igual que
+envíos» del portal, las fuentes de soporte de pago que llena cada historia (HU-4.1: ``entregable``; HU-4.2:
+``verificacion_campo``) y el ajuste del monto a lo verificado (HU-4.2, ``extensiones.AJUSTES_MONTO``), igual que
 ``contrato/registro.py`` y ``pagos/registro.py``.
 """
 from django.urls import reverse
 
-from nucleo import extensiones
+from nucleo import extensiones, plazos
 from nucleo.models import TipoUnidad
 
 HISTORIAS = [
@@ -14,7 +15,7 @@ HISTORIAS = [
     ("HU-4.2", "Verificación en campo", "registra el resultado con la superficie verificada y su ajuste, y las incidencias con su tipo y documento, dentro del plazo de entrega"),
     ("HU-4.3", "Evaluación de reportes", "PEG: evaluación por Guardabosque y por periodo, e identifica quién no entregó su reporte"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-4.1"}
+HISTORIAS_CONSTRUIDAS = {"HU-4.1", "HU-4.2"}
 USOS_DE_PLAZO = ['fecha_limite_conclusion', 'entrega_comprobacion', 'reporte_mensual']
 
 
@@ -39,6 +40,21 @@ def siguiente_paso(usuario, exp):
         if pendiente is not None:
             return {"texto": f"Revisar lo recibido por el portal: {pendiente.nombre.lower()}", "url": _pestana(exp),
                     "ayuda": f"Llegó el {pendiente.enviada_en:%d/%m/%Y} con el acuse {pendiente.acuse.folio if pendiente.acuse else ''}."}
+    from . import verificacion
+
+    if exp.estado.clave == "comprobacion_enviada" and verificacion.puede_registrar(usuario, exp)[0]:
+        cfg = verificacion.config(exp)
+        if cfg["registra"] == "delegacion" and usuario.tipo_unidad == TipoUnidad.DIRECCION:
+            return None  # la visita es de la Delegación; el área responsable puede devolver la comprobación
+        v = plazos.vencimiento(exp, "entrega_comprobacion")
+        return {"texto": "Registrar el resultado de la verificación en campo" if cfg["registra"] == "delegacion"
+                else "Revisar el entregable y registrar el resultado", "url": _pestana(exp),
+                "ayuda": f"Entrega del documento de verificación: {v.texto}." if v else ""}
+    if usuario.tipo_unidad == TipoUnidad.DIRECCION and exp.estado.clave == "verificada":
+        v = verificacion.vigente(exp)
+        if v is not None and v.resultado != "incumplimiento" and not verificacion.ministraciones_pendientes(exp):
+            return {"texto": "Dar por concluidas las actividades", "url": _pestana(exp),
+                    "ayuda": "Verificado el cumplimiento y pagadas las ministraciones."}
     return None
 
 
@@ -75,6 +91,10 @@ def registrar():
     from .vistas.portal import seccion_portal
 
     solicitudes.FUENTES["entregable"] = comprobaciones.fuente_entregable  # HU-4.1: segunda ministración de MFS
+    from . import verificacion
+
+    solicitudes.FUENTES["verificacion_campo"] = verificacion.fuente_verificacion  # HU-4.2: CC, PS, RHF y PSAHEM
+    extensiones.AJUSTES_MONTO.append(verificacion.ajustar_monto)  # HU-4.2: pago proporcional a lo verificado
     extensiones.SECCIONES_PORTAL.append(seccion_portal)
     extensiones.DEMOS.append(cargar_demo)
 

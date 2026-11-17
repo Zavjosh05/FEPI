@@ -5,7 +5,7 @@
 - ``reportes.py``  HU-4.3 Evaluación de reportes
 
 Cada historia crea su archivo, lo importa aquí y genera su migración con
-``python manage.py makemigrations ejecucion -n hu_4_1_comprobaciones``. Hechos: HU-4.1 (``Comprobacion``).
+``python manage.py makemigrations ejecucion -n hu_4_1_comprobaciones``. Hechos: HU-4.1 (``Comprobacion``) y HU-4.2 (``Verificacion``, ``Incidencia``).
 
 Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo):
 
@@ -23,3 +23,4 @@ Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo
   ``nucleo.montos`` ajuste la segunda ministración.
 """
 from .comprobaciones import Comprobacion, MedioEnvio  # noqa: E402,F401
+from .verificacion import Incidencia, ResultadoVerificacion, Verificacion  # noqa: E402,F401

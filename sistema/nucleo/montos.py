@@ -54,6 +54,7 @@ class MontoAprobado:
     tipo_monto: str = POR_HECTAREA
     cantidad: Decimal = Decimal("0")  # hectáreas, apoyos o personas, según el tipo de monto
     supuesto: bool = False  # alguna ministración es un supuesto del archivo de reglas (PEG)
+    ajuste: dict = field(default_factory=dict)  # HU-4.2: lo verificado y la ministración ajustada (vacío si no hay)
 
     @property
     def sin_dinero(self):
@@ -198,7 +199,16 @@ def ministraciones(expediente, total, regimen):
 
 def monto_aprobado(expediente, superficie=None, condiciones=()):
     """Monto del apoyo del expediente (superficie × monto por hectárea, monto fijo por apoyo o monto por persona) con
-    sus ministraciones."""
+    sus ministraciones. Sin superficie ni condiciones explícitas, es el monto del expediente y pasa por
+    ``extensiones.AJUSTES_MONTO`` (HU-4.2: la ministración que depende de la verificación se ajusta a lo verificado)."""
+    monto = _monto_aprobado(expediente, superficie, condiciones)
+    if superficie is None and not condiciones:
+        for ajuste in extensiones.AJUSTES_MONTO:
+            monto = ajuste(expediente, monto) or monto
+    return monto
+
+
+def _monto_aprobado(expediente, superficie=None, condiciones=()):
     superficie = Decimal(superficie) if superficie is not None else superficie_aprobada(expediente)
     concepto = concepto_de_monto(expediente, condiciones)
     regimen = regimen_de_pago(expediente, superficie)

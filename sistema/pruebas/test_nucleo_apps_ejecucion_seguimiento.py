@@ -22,7 +22,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
     assert apps.is_installed("ejecucion") and apps.is_installed("seguimiento")
     claves = [p["clave"] for p in extensiones.PESTANAS_EXPEDIENTE]
     assert {"ejecucion", "seguimiento"} <= set(claves) and claves.index("pagos") < claves.index("ejecucion")
-    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == ["HU-4.2", "HU-4.3"]   # HU-4.1 ya construida
+    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == ["HU-4.3"]   # HU-4.1 y HU-4.2 ya construidas
     assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.1", "HU-6.2", "HU-6.3"]
     assert apps.get_app_config("ejecucion").get_models() is not None
 
@@ -30,7 +30,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
 def test_nucleo_pestanas_ejecucion_y_seguimiento_dicen_que_historia_las_llenara(contratadas, client, contrasena):
     _, (exp,) = contratadas("CC")
     client.login(username="dir_drff", password=contrasena)
-    for pestana, historia, plazo in (("ejecucion", "HU-4.2 Verificación en campo", "Entrega del informe final"),
+    for pestana, historia, plazo in (("ejecucion", "HU-4.3 Evaluación de reportes", "Entrega del informe final"),
                                      ("seguimiento", "HU-6.2 Incumplimientos y reintegros", "Subsanar las omisiones")):
         html = client.get(reverse("recepcion:expediente", args=[exp.folio]) + f"?pestana={pestana}").content.decode()
         assert historia in html and plazo in html and 'data-prueba="monto-aprobado"' in html, pestana
@@ -46,13 +46,12 @@ def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
         assert demo.cargar_demo() == 8
         assert demo.cargar_demo() == 0
     pagadas = Expediente.objects.filter(estado__clave="pagada")
-    assert {e.predio.nombre for e in pagadas} == {"Aserradero La Cumbre", "Ejido San Juan", "Ejido San Bartolo"}
-    volcanes = Expediente.objects.get(predio__nombre="Bosque Los Volcanes")
-    # HU-4.1: la Bitácora entregada en la Delegación deja a Los Volcanes por verificar y con el soporte de su segunda ministración.
-    assert volcanes.estado.clave == "comprobacion_enviada" and volcanes.comprobaciones.get().tipo == "bitacora_etf"
-    from pagos import solicitudes
-    assert next(s for s in solicitudes.soportes(volcanes, 2) if s["clave"] == "entregable_etf")["cumple"]
-    assert volcanes.pagos.get().importe == Decimal("21000.00")                          # 70 % de $30,000 (ETF)
+    assert {e.predio.nombre for e in pagadas} == {"Bosque Los Volcanes", "Aserradero La Cumbre", "Ejido San Juan",
+                                                  "Ejido San Bartolo"}
+    volcanes = pagadas.get(predio__nombre="Bosque Los Volcanes")
+    # HU-4.1 y HU-4.2: Los Volcanes entrega su Bitácora en la Delegación, el área la revisa y se paga la segunda ministración.
+    assert volcanes.comprobaciones.get().tipo == "bitacora_etf" and volcanes.verificaciones.get().resultado == "cumple"
+    assert [p.importe for p in volcanes.pagos.order_by("solicitud__ministracion")] == [Decimal("21000.00"), Decimal("9000.00")]
     assert volcanes.poligonos.get(vigente=True).levantado_por == "prestador"
     assert pagadas.get(predio__nombre="Aserradero La Cumbre").pagos.get().importe == Decimal("70000.00")  # 50 % FSC
     san_juan = pagadas.get(predio__nombre="Ejido San Juan")
