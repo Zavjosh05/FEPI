@@ -8,23 +8,24 @@ from django.utils import timezone
 
 from nucleo import dias_habiles
 from nucleo.demo import _pdf_demo, completar_requisitos, cuadro_en_municipio
-from nucleo.models import Ejercicio, Ministracion, Municipio, Plazo, Requisito, TipoPersona
+from nucleo.models import Ejercicio, Ministracion, Municipio, Plazo, Requisito, TipoPersona, TipoPersonaGeneral
 from recepcion import servicios as recepcion
 
-__all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "fecha_sesion", "despues_de", "documento_sesion"]
+__all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "registrar_peg", "fecha_sesion", "despues_de",
+           "documento_sesion"]
 
 
 def registrar_validada(usuarios, ejercicio, municipio="Amecameca", nombre="Predio M2", ha=6, desplazamiento=(0, 0),
                        usuario="del_amecameca", direccion="dir_drff", tipo="fisica", modalidad="reforestacion",
-                       refrendo=False, curp="", solicitante="Persona Solicitante M2"):
+                       refrendo=False, curp="", solicitante="Persona Solicitante M2", solicitante_tipo=None):
     """Solicitud registrada, completa, con polígono, enviada y validada (con los servicios del sistema)."""
     deleg = usuarios[usuario]
     datos = recepcion.DatosSolicitud(
         ejercicio=ejercicio, municipio=Municipio.objects.get(nombre=municipio), nombre_predio=nombre,
         tipo_persona=ejercicio.tipos_persona.get(clave=tipo),
         modalidad=ejercicio.modalidades.filter(clave=modalidad).first() if modalidad else None,
-        solicitante_nombre=solicitante, solicitante_tipo="fisica", es_refrendo=refrendo, curp=curp,
-        superficie_solicitada_ha=Decimal(ha),
+        solicitante_nombre=solicitante, solicitante_tipo=solicitante_tipo or (tipo if tipo in TipoPersonaGeneral.values else "fisica"), es_refrendo=refrendo, curp=curp,
+        superficie_solicitada_ha=Decimal(ha) if ha is not None else None,
     )
     exp = recepcion.registrar_solicitud(deleg, datos)
     completar_requisitos(deleg, exp, fecha_archivo=timezone.localdate() - timedelta(days=300) if refrendo else None)
@@ -73,16 +74,21 @@ def _reglas_minimas(clave, catalogos):
 
 @pytest.fixture
 def peg(catalogos):
-    """PEG 2026 con el plazo de dictaminación de su Convocatoria (base quinta, fr. II: 45 días hábiles)."""
-    ej = _reglas_minimas("PEG", catalogos)
-    Plazo.objects.get_or_create(
-        ejercicio=ej, clave="dictaminacion_tecnica_juridica",
-        defaults={"descripcion": "Integración, revisión y dictaminación técnica y jurídica", "cantidad": 45,
-                  "unidad": "dias_habiles", "corre_desde": "Recepción de la Solicitud Única",
-                  "fundamento": "Convocatoria PEG, base quinta, fr. II", "linea_rop": 9516})
-    ej.datos = {**(ej.datos or {}), "periodos_reportes": ["2026-T1", "2026-T2", "2026-T3", "2026-T4"]}
-    ej.save()
+    """PEG 2026 con sus reglas reales (``reglas/PEG.json``): quien solicita es el núcleo agrario, la persona
+    beneficiaria es el Guardabosque, sin polígono; dictamen en 45 días hábiles (Convocatoria base quinta, fr. II)."""
+    ej = Ejercicio.objects.get(programa__clave="PEG", anio=2026)
+    assert ej.tiene_reglas and ej.tipos_persona.filter(clave="nucleo_agrario").exists()
     return ej
+
+
+def registrar_peg(usuarios, ejercicio, nombre="Ejido San Juan", solicitante="Ejido San Juan", **kw):
+    """Solicitud de Guardabosques validada: la registra el núcleo agrario (tipo de las reglas), en la modalidad única
+    del programa, sin superficie ni polígono, y la valida la Dirección de Protección Forestal."""
+    kw.setdefault("direccion", "dir_dpf")
+    kw.setdefault("tipo", "nucleo_agrario")
+    kw.setdefault("modalidad", "apoyo_monetario_guardabosque")
+    kw.setdefault("ha", None)
+    return registrar_validada(usuarios, ejercicio, nombre=nombre, solicitante=solicitante, **kw)
 
 
 @pytest.fixture

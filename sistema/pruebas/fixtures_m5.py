@@ -1,16 +1,15 @@
 """Fixtures del módulo M5 (HU-5.x): expedientes con el contrato firmado y sus soportes de pago."""
-from decimal import Decimal
 
 import pytest
 
 from contrato import firma
 from dictamen import seguimiento, sesiones
 from dictamen.models import TipoSesion
-from nucleo.models import Ministracion, MontoApoyo, Unidad
+from nucleo.models import Unidad
 from pagos import pagos, solicitudes
 
 from .fixtures_m2 import documento_sesion, fecha_sesion
-from .fixtures_m3 import SOLICITUDES_M3, delegado_de
+from .fixtures_m3 import PEG_SOLICITUD, SOLICITUDES_M3, delegado_de
 
 __all__ = ["con_soportes", "instruir_pago", "solicitada", "aceptada", "peg_contratado", "remitida", "entregado"]
 
@@ -77,15 +76,11 @@ def aceptada(solicitada, usuarios):
 
 @pytest.fixture
 def peg_contratado(peg, contrato_manual, usuarios, pdf):
-    """Guardabosques (PEG, sin archivo de reglas) con su contrato firmado, un monto de 5,000 por hectárea y cuatro
-    ministraciones de 25 %: sirve para probar el tipo de pago «depósito»."""
+    """Guardabosques (PEG, con sus reglas) con su contrato firmado: $25,550 por Guardabosque al año en cuatro
+    ministraciones (25 % cada una, supuesto de las reglas); sirve para probar el tipo de pago «depósito»."""
 
     def _crear():
-        MontoApoyo.objects.create(ejercicio=peg, concepto="Apoyo al Guardabosque (prueba)", monto=Decimal("5000"),
-                                  unidad="por hectárea")
-        for n in range(1, 5):
-            Ministracion.objects.create(ejercicio=peg, numero=n, porcentaje=Decimal("25"), regimen="anual")
-        exp = contrato_manual(peg, direccion="dir_dpf", modalidad=None)
+        exp = contrato_manual(peg, direccion="dir_dpf", **PEG_SOLICITUD)
         firma.registrar_firma(
             delegado_de(usuarios, exp), exp, None, "persona", "Guardabosque", pdf("firmado.pdf"),
             [p["clave"] for p in firma.puntos_de_verificacion(exp)],

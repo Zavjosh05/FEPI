@@ -3,7 +3,7 @@ from playwright.sync_api import expect
 
 from dictamen import juridico, tecnico
 from nucleo.models import Ejercicio, Usuario
-from pruebas.fixtures_m2 import peg, registrar_validada  # noqa: F401
+from pruebas.fixtures_m2 import peg, registrar_peg, registrar_validada  # noqa: F401
 
 
 def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, entrar, captura):  # noqa: F811
@@ -42,8 +42,7 @@ def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, en
     expect(page.locator("#tabla-listado")).to_contain_text("No factible")
     captura("hu_2_1_04_listado_preliminar")
 
-    guardabosque = registrar_validada(u, peg, nombre="Ejido San Juan (Guardabosques)", direccion="dir_dpf", modalidad=None,
-                                      solicitante="Margarito Sánchez Ruiz")
+    guardabosque = registrar_peg(u, peg, nombre="Ejido San Juan (Guardabosques)", solicitante="Ejido San Juan")
     entrar("dir_dpf")
     page.goto(f"{live_server.url}/recepcion/expediente/{guardabosque.folio}/?pestana=dictamenes")
     expect(page.locator("[data-prueba=plazo-dictamen]")).to_contain_text("45 días hábiles")

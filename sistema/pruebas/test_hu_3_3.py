@@ -205,7 +205,7 @@ def test_hu_3_3_mfs_exige_contrato_de_servicios_tecnicos_con_rfn_y_carta_comprom
 
 
 def test_hu_3_3_peg_exige_la_credencial_del_guardabosque_entregada(peg, contrato_manual, usuarios, pdf):
-    exp = contrato_manual(peg, direccion="dir_dpf", modalidad=None)
+    exp = contrato_manual(peg, direccion="dir_dpf", **PEG_SOLICITUD)
     assert [e["clave"] for e in firma.formalizacion_propia(exp)["elementos"]] == ["credencial_guardabosque"]
     deleg = delegado_de(usuarios, exp)
     base = dict(firmado_en=None, firmante="persona", firmante_nombre="Guardabosque", archivo=pdf(), verificacion=verificar(exp))

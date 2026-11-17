@@ -340,6 +340,8 @@ class Ministracion(models.Model):
     regimen = models.CharField(max_length=60, blank=True)
     condicion = models.TextField(blank=True)
     fundamento = models.CharField(max_length=200, blank=True)
+    supuesto = models.BooleanField(default=False, help_text="El porcentaje no está en las ROP: es un supuesto del archivo "
+                                                            "de reglas por confirmar (PEG).")
 
     class Meta:
         verbose_name = "ministración (regla)"

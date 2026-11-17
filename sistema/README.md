@@ -3,7 +3,8 @@
 Prototipo de los sprints 1 y 2 (módulos M1, Recepción y expediente; M2, Dictamen y Comité; M3, Publicación y contrato, y M5, Pagos) del sistema que lleva el trámite de los
 seis programas de apoyo de PROBOSQUE: Capturando Carbono (CC), Manejo Forestal Sustentable (MFS),
 Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), PSAHEM (PSA) y
-Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG existen en el catálogo sin archivo de reglas.
+Guardabosques (PEG). Los seis programas tienen reglas cargadas (`reglas/<CLAVE>.json`; MFS y PEG desde la base de
+ejecución y seguimiento).
 
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
@@ -90,8 +91,10 @@ Cada criterio de aceptación tiene al menos una prueba con el ID de su historia 
 (`pruebas/test_hu_1_1.py` … `test_hu_5_3.py`); las del núcleo están en `pruebas/test_nucleo_*.py`.
 Los recorridos de Playwright están en `pruebas/e2e/` (uno por historia; los de M2 en archivos
 `test_recorrido_hu_2_*.py`) y corren con Chromium en español de México (`--lang=es-MX`, zona horaria de
-la Ciudad de México). PEG, que no tiene archivo de reglas, se prueba con fixtures
-(`pruebas/fixtures_m2.py`) que crean su programa-ejercicio, su plazo y sus ministraciones.
+la Ciudad de México). Guardabosques se prueba con sus reglas reales (`reglas/PEG.json`): la fixture `peg` solo devuelve
+su ejercicio y `registrar_peg` (`pruebas/fixtures_m2.py`) registra como el núcleo agrario, en la modalidad única del programa,
+sin superficie ni polígono, y valida con la Dirección de Protección Forestal (`PEG_SOLICITUD` en `fixtures_m3.py` para los
+contratos).
 
 ## Usuarios de demostración
 
@@ -403,8 +406,14 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   27-mar-2026), no se topa: se marca `evento_despues_del_tope` y el acuse lo avisa. M1 ya usa el servicio
   (acuse de recepción, aviso de faltantes, revisión de plazos).
 - **Monto aprobado.** `nucleo.montos.monto_aprobado(expediente, superficie=None, condiciones=())` devuelve
-  `MontoAprobado` (`superficie_ha`, `monto_ha`, `total`, `regimen`, `ministraciones` con número, porcentaje,
-  importe y condición). Superficie: la que se pase o la factible del dictamen técnico
+  `MontoAprobado` (`superficie_ha`, `monto_ha` —el monto unitario—, `total`, `tipo_monto`, `cantidad`, `regimen`,
+  `ministraciones` con número, porcentaje, importe, condición y `supuesto`; `texto_base` y `texto_calculo` para pantallas).
+  **Tipo de monto** (S3-02, `datos/sistema.json` → `tipos_de_monto`, por la unidad del monto en las reglas): por hectárea
+  (CC, PS, RHF, PSAHEM), **por apoyo** (MFS: monto fijo por concepto, $25,000 a $175,000; en la certificación FSC grupal se
+  suman sus tres componentes, lectura por confirmar, R-17) y **por persona** (PEG: $25,550 por Guardabosque al año, una
+  persona por núcleo agrario, 8.1.2 k). Régimen de MFS por el mapa de sus reglas (`regimen_pago_por_modalidad`: `etf` 70/30,
+  `fsc` 50/50); PEG fijo, hasta cuatro ministraciones de 25 % marcadas `supuesto` en sus reglas (`Ministracion.supuesto`):
+  la nota del monto lo dice. Superficie: la que se pase o la factible del dictamen técnico
   (`extensiones.SUPERFICIE_APROBADA`, la registra M2) o la solicitada. Monto por hectárea: el de la modalidad
   del expediente o, si no tiene propio, el general del ejercicio; un concepto sin dinero da 0 sin
   ministraciones (PS, navideñas). `MontoApoyo.modalidad` se llena al cargar las reglas: con la clave del

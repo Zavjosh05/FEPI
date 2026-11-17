@@ -64,6 +64,9 @@ def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_re
             raise ValidationError(f"El programa no tiene la ministración {ministracion}.")
     if definicion.get("pide") == "periodo" and not (periodo or "").strip():
         raise ValidationError("La validación de reportes se da por periodo: indique cuál.")
+    claves_periodo = periodos_de_reportes(sesion.ejercicio)
+    if definicion.get("pide") == "periodo" and claves_periodo and periodo.strip() not in claves_periodo:
+        raise ValidationError(f"«{periodo}» no es un periodo de reportes del programa (son {', '.join(claves_periodo)}).")
     if not (descripcion or "").strip():
         raise ValidationError("Escriba el texto del acuerdo.")
     with transaction.atomic():
@@ -130,9 +133,14 @@ def ministraciones_sin_instruccion(expediente):
     return [n for n in numeros if n not in con_instruccion]
 
 
+def periodos_de_reportes(ejercicio):
+    """PEG: claves de los periodos de reportes de las reglas (``periodos_reportes``: renglones con ``clave`` o textos)."""
+    return [p["clave"] if isinstance(p, dict) else p for p in (ejercicio.datos or {}).get("periodos_reportes", [])]
+
+
 def periodos_sin_validacion(ejercicio):
     """PEG: periodos de reportes (datos del ejercicio) que aún no tienen validación del Comité."""
-    periodos = (ejercicio.datos or {}).get("periodos_reportes", [])
+    periodos = periodos_de_reportes(ejercicio)
     validados = set(Acuerdo.objects.filter(tipo="validacion_reportes", sesion__ejercicio=ejercicio)
                     .values_list("periodo", flat=True))
     return [p for p in periodos if p not in validados]

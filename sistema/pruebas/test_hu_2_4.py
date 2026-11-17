@@ -90,14 +90,19 @@ def test_hu_2_4_psahem_existe_instruccion_de_pago_por_ministracion(psa, usuarios
 
 def test_hu_2_4_peg_existe_validacion_de_cada_periodo_de_reportes(peg, usuarios):
     """Criterio 2 (PEG): existe la validación de la evaluación de reportes de cada periodo."""
-    exp = registrar_validada(usuarios, peg, nombre="Guardabosque", direccion="dir_dpf", modalidad=None)
+    exp = registrar_peg(usuarios, peg, nombre="Guardabosque")
     s = _sesion(usuarios, peg)
     with pytest.raises(ValidationError, match="periodo"):
         seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes", "Validar", [exp])
+    with pytest.raises(ValidationError, match="no es un periodo de reportes"):
+        seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes", "Validar", [exp], periodo="2026-T1")
+    # Los periodos son los 12 meses del ejercicio que trae reglas/PEG.json (derivados: las ROP no publican el calendario).
+    assert len(seguimiento.periodos_sin_validacion(peg)) == 12
     acuerdo = seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes",
-                                            "Se valida la evaluación de reportes del primer trimestre", [exp], periodo="2026-T1")
+                                            "Se valida la evaluación de los reportes de enero", [exp], periodo="2026-01")
     assert acuerdo.unidad_responsable.clave == "DPF"
-    assert seguimiento.periodos_sin_validacion(peg) == ["2026-T2", "2026-T3", "2026-T4"]
+    assert seguimiento.periodos_sin_validacion(peg)[:2] == ["2026-02", "2026-03"]
+    assert len(seguimiento.periodos_sin_validacion(peg)) == 11
 
 
 def test_hu_2_4_acuerdos_propios_de_otro_programa_no_aplican(cc, validada, usuarios):

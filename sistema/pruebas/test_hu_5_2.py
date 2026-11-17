@@ -182,7 +182,8 @@ def test_hu_5_2_segunda_ministracion_tiene_su_propia_solicitud_y_su_propio_pago(
 def test_hu_5_2_peg_el_pago_es_un_deposito_al_guardabosque(peg_contratado, usuarios):
     exp = peg_contratado()
     sol = solicitudes.enviar_solicitud(usuarios["dir_dpf"], exp, 1)
-    assert sol.tipo_pago == "deposito" and sol.importe == Decimal("7500.00")
+    # $25,550 por Guardabosque al año (7.2.1) en cuatro ministraciones; el 25 % es un supuesto marcado en las reglas.
+    assert sol.tipo_pago == "deposito" and sol.importe == Decimal("6387.50") and sol.porcentaje == Decimal("25")
     pagos.revisar_solicitud(usuarios["finanzas"], sol, "aceptada")
     with pytest.raises(ValidationError, match="Forma de pago no válida"):
         pagar(usuarios, sol, tipo="transferencia")

@@ -38,7 +38,27 @@
     },
     "PSA": {
       "regimen_pago": {"fijo": "dos_ministraciones"}
+    },
+    "MFS": {
+      "regimen_pago": {"mapa_de_reglas": "regimen_pago_por_modalidad"},
+      "nota": "MFS paga un monto fijo por apoyo según el concepto (7.2 A y B) y el régimen sale del mapa de las reglas: estudio técnico forestal (etf) 70 % y 30 %, certificación FSC (fsc) 50 % y 50 % (R-17)."
+    },
+    "PEG": {
+      "regimen_pago": {"fijo": "hasta_cuatro_ministraciones"},
+      "nota": "PEG paga $25,550 por Guardabosque al año hasta en cuatro ministraciones (7.1.1, 7.2.1); el reparto (25 % cada una) es un supuesto marcado en las reglas (R-18)."
     }
+  },
+  "tipos_de_monto": {
+    "nota": "Cómo se calcula el monto según su unidad en las reglas (nucleo/montos.py). Gana la primera regla cuyo texto aparezca en la unidad (sin distinguir mayúsculas). por_hectarea: superficie aprobada × monto; por_apoyo: monto fijo por concepto (MFS); por_persona: monto × personas beneficiarias del expediente (PEG: un Guardabosque por núcleo agrario, 8.1.2 k).",
+    "reglas": [
+      {"contiene": "hectárea", "tipo": "por_hectarea"},
+      {"contiene": "hectarea", "tipo": "por_hectarea"},
+      {"contiene": "apoyo único", "tipo": "por_apoyo"},
+      {"contiene": "por apoyo", "tipo": "por_apoyo"},
+      {"contiene": "por guardabosque", "tipo": "por_persona"},
+      {"contiene": "por persona", "tipo": "por_persona"}
+    ],
+    "nombres": {"por_hectarea": "por hectárea", "por_apoyo": "por apoyo", "por_persona": "por persona beneficiaria al año"}
   },
   "plazos_del_sistema": {
     "vigencia_refrendo": "vigencia_documentacion_legal_refrendo"
@@ -47,7 +67,10 @@
     "nota": "Nombre legible de los regímenes de pago que no son una modalidad (los de modalidad usan el nombre de la modalidad).",
     "pago_unico_hasta_5_ha": "Pago único (superficie de hasta 5 ha)",
     "dos_ministraciones_mas_de_5_ha": "Dos ministraciones, 70 % y 30 % (más de 5 ha)",
-    "dos_ministraciones": "Dos ministraciones, 70 % y 30 %"
+    "dos_ministraciones": "Dos ministraciones, 70 % y 30 %",
+    "etf": "Estudio técnico forestal: dos ministraciones, 70 % y 30 %",
+    "fsc": "Certificación FSC: dos ministraciones, 50 % y 50 %",
+    "hasta_cuatro_ministraciones": "Hasta cuatro ministraciones (25 % cada una: supuesto, el reparto no está en las ROP)"
   },
   "usos_de_plazo": {
     "nota": "Qué plazo de las reglas usa el sistema para cada cosa y qué evento lo arranca, por programa (nucleo/plazos.py). por_omision vale para todos; cada programa cambia solo lo suyo (false = el programa no tiene ese plazo). Eventos: recepcion_solicitud, aviso_direccion, notificacion_persona (con tipo_notificacion), y los hitos que registran los módulos (publicacion_resultados, firma_contrato, entrega_vale, entrega_cheque, solicitud_pago_fiduciaria…). Si el evento no ha ocurrido, el vencimiento queda «sin fecha todavía».",

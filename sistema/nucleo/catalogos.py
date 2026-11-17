@@ -265,6 +265,7 @@ def cargar_reglas_programa(ruta, sistema=None):
             Ministracion.objects.create(
                 ejercicio=ejercicio, numero=m["numero"], porcentaje=Decimal(str(m["porcentaje"])),
                 regimen=m.get("regimen", ""), condicion=m.get("condicion", ""), fundamento=_numeral(m),
+                supuesto=bool(m.get("supuesto")),
             )
     return ejercicio
 

@@ -11,7 +11,7 @@ from nucleo.models import Ejercicio
 
 from .fixtures_m2 import documento_sesion
 
-__all__ = ["aprobadas", "notificadas", "en_delegacion", "contratadas", "catalogo_planta", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
+__all__ = ["PEG_SOLICITUD", "aprobadas", "notificadas", "en_delegacion", "contratadas", "catalogo_planta", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
            "SOLICITUDES_M3"]
 
 # programa: (usuario Delegación, municipio, predio, persona, modalidad, hectáreas)
@@ -26,6 +26,11 @@ SOLICITUDES_M3 = {
     "PSA": [("del_toluca", "Ocoyoacac", "Bosque El Zarco", "Felipe Hernández Ramos", "cuenca_alta", 30),
             ("del_valle", "Villa Victoria", "Monte La Loma", "Josefina Colín Becerril", "cuenca_media_baja", 25)],
 }
+
+
+# Guardabosques: la registra el núcleo agrario, en la modalidad única del programa y sin superficie (reglas/PEG.json).
+PEG_SOLICITUD = {"tipo": "nucleo_agrario", "modalidad": "apoyo_monetario_guardabosque", "ha": None,
+                 "solicitante": "Ejido San Juan"}
 
 
 @pytest.fixture
@@ -126,7 +131,8 @@ def mfs(catalogos):
 @pytest.fixture
 def contrato_manual(usuarios):
     """``contrato_manual(ejercicio, direccion="dir_drff", **kw)`` → expediente de un programa sin reglas completas
-    (MFS, PEG) en ``contrato_en_delegacion``, con su contrato ya enviado. Se arma directo en la base."""
+    (MFS, PEG) en ``contrato_en_delegacion``, con su contrato ya enviado. Se arma directo en la base (para PEG, con
+    ``**PEG_SOLICITUD``)."""
     from django.core.files.base import ContentFile
     from django.utils import timezone
 

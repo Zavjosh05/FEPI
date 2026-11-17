@@ -78,3 +78,31 @@ def test_nucleo_superficie_del_dictamen_o_la_solicitada(exp_con):
         assert montos.monto_aprobado(exp).total == D("5000.00")
     finally:
         extensiones.SUPERFICIE_APROBADA.pop(0)
+
+
+# ----------------------------------------------------------------------------- MFS y PEG (S3-02)
+def test_nucleo_mfs_monto_fijo_por_apoyo_y_regimen_por_modalidad(exp_con):
+    """MFS paga un monto fijo por concepto (7.2 A y B), no por hectárea; el régimen sale del mapa de las reglas."""
+    m = montos.monto_aprobado(exp_con("MFS", "etf_pmf_maderable_95_250"), D("120"))
+    assert m.tipo_monto == montos.POR_APOYO and m.total == D("65000.00") and m.regimen == "etf"
+    assert _importes(m) == [(1, D("70"), D("45500.00")), (2, D("30"), D("19500.00"))]
+    assert montos.monto_aprobado(exp_con("MFS", "etf_pmf_maderable_95_250"), D("200")).total == D("65000.00")
+    assert "Bitácora" in m.ministraciones[1].condicion and "monto fijo por apoyo" in m.texto_calculo
+    m = montos.monto_aprobado(exp_con("MFS", "fsc_certificacion_cadena_custodia"), D("10"))
+    assert m.regimen == "fsc" and [x.porcentaje for x in m.ministraciones] == [D("50"), D("50")]
+    assert "50 %" in m.regimen_nombre
+
+
+def test_nucleo_mfs_certificacion_grupal_suma_sus_componentes(exp_con):
+    m = montos.monto_aprobado(exp_con("MFS", "fsc_certificacion_manejo_grupal"), D("300"))
+    assert m.total == D("600000.00") and "componentes" in m.nota  # 210,000 + 350,000 + 40,000 (cuadro por confirmar)
+
+
+def test_nucleo_peg_monto_por_guardabosque_en_cuatro_ministraciones_supuestas(exp_con):
+    m = montos.monto_aprobado(exp_con("PEG", "apoyo_monetario_guardabosque"))
+    assert m.tipo_monto == montos.POR_PERSONA and m.cantidad == 1 and m.total == D("25550.00")
+    assert _importes(m) == [(n, D("25"), D("6387.50")) for n in (1, 2, 3, 4)]
+    assert m.supuesto and all(x.supuesto for x in m.ministraciones) and "supuesto" in m.nota
+    assert m.texto_base == "$25,550.00 por persona beneficiaria al año"
+    cc = montos.monto_aprobado(exp_con("CC", "reforestacion"), D("4"))
+    assert not cc.supuesto and cc.texto_calculo == "4 ha × $2,000.00 = $8,000.00"

@@ -1,0 +1,1651 @@
+{
+  "clave": "PEG",
+  "nombre": "Programa Estatal de Guardabosques (PEG)",
+  "ejercicio": 2026,
+  "fuente": {
+    "documento": "Acuerdo del Director General de PROBOSQUE por el que se emiten las Reglas de Operación del Programa Estatal de Guardabosques (Gaceta del Gobierno, lunes 23-mar-2026, dado en Metepec el 19-mar-2026), más la Convocatoria a los Núcleos Agrarios que cuenten con superficie forestal a participar en el PEG (bases primera a octava). Las Reglas fueron aprobadas por el CASPEG (acuerdo CASPEG/002-1/17022026, 17-feb-2026, línea 9317) y la Convocatoria validada por la Unidad Jurídica (Oficio 225C0201000100S/0007/2026) y por el CASPEG (acuerdo CASPEG/003-1/17022026, líneas 9598-9602)",
+    "fecha_publicacion": "2026-03-23",
+    "archivo": "sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt",
+    "lineas": [
+      8230,
+      9170
+    ],
+    "lineas_reglas": [
+      8389,
+      9170
+    ],
+    "lineas_convocatoria": [
+      9172,
+      9620
+    ],
+    "lineas_formatos": [],
+    "nota": "El texto de formatos del Manual (líneas 11972-12337) cubre PSAHEM, RHF, PS y CC; no trae ningún formato del PEG (solicitud única del PEG, contrato de adhesión, reporte mensual, Anexo Técnico)."
+  },
+  "definicion": {
+    "texto": "El Programa Estatal de Guardabosques (PEG) tiene como propósito impulsar la participación de núcleos agrarios que cuenten con superficie forestal en el Estado de México, en la protección, conservación, reforestación, vigilancia y gestión hídrica sustentable de sus recursos forestales, mediante un apoyo monetario que otorga PROBOSQUE a las personas que funjan como Guardabosques.",
+    "numeral": "1.1",
+    "linea": 8401,
+    "derechos_o_dimensiones": "Contar con un ambiente sano para su desarrollo y bienestar, así como la no discriminación (numeral 2, línea 8406).",
+    "particularidad": "El PEG paga a una PERSONA (el o la Guardabosque) por actividades de vigilancia y protección mensuales, no por una superficie ni por una obra: no usa polígono, planta, vale, superficie en hectáreas, sobrevivencia ni diagnóstico técnico. La lista de espera existe, como relación de solicitantes sin cobertura presupuestal (glosario, línea 8440)."
+  },
+  "instancias": {
+    "normativa": "Comité de Admisión y Seguimiento del Programa Estatal de Guardabosques (CASPEG): responsable de normar el programa e interpretar las Reglas (numerales 3 y 9.3, líneas 8438 y 8899-8901)",
+    "ejecutora": "Dirección de Protección Forestal de PROBOSQUE (numerales 3 y 9.2, líneas 8437 y 8897-8898), con las Delegaciones Regionales Forestales (recepción de solicitudes, entrega de reportes, acuses de depósito) y la Coordinación de Delegaciones Regionales (seguimiento, numeral 15, línea 9094)",
+    "responsable": "Protectora de Bosques del Estado de México (PROBOSQUE) (numerales 3 y 9.1, líneas 8439 y 8895-8896)",
+    "convocante": "La SECAMPO, a través de la Instancia Ejecutora, emite la convocatoria del programa para la incorporación de nuevas personas beneficiarias, siempre que haya suficiencia presupuestal y no exista lista de espera (10.1, fr. I, líneas 8995-8997)",
+    "comite": {
+      "nombre": "Comité de Admisión y Seguimiento del Programa Estatal de Guardabosques (CASPEG)",
+      "numeral": "9.4",
+      "linea": 8902,
+      "funcion": "Órgano encargado de emitir las opiniones consensadas respecto al desarrollo y operación del Programa y de resolver los aspectos no considerados en las Reglas (9.4.1, líneas 8904-8906)",
+      "presidencia": "La persona servidora pública titular de la SECAMPO (9.4.1, fr. I, línea 8916); voto de calidad en caso de empate (línea 8932)",
+      "secretaria_tecnica": "La persona servidora pública titular de PROBOSQUE (9.4.1, fr. II, línea 8917). Convoca, conduce y desarrolla las sesiones; presenta los acuerdos; elabora el acta; da seguimiento a los acuerdos; informa mediante oficio al núcleo agrario cuando hay incumplimiento y/o baja del guardabosque (líneas 8980-8986)",
+      "vocales_con_voz_y_voto": [
+        "Dirección de Protección Forestal",
+        "Dirección de Administración, Finanzas y Gestión Documental",
+        "Unidad de Información, Planeación, Programación y Evaluación",
+        "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia",
+        "Subdirección de Atención a Zonas Críticas",
+        "Coordinación de Delegaciones Regionales"
+      ],
+      "invitados_permanentes_solo_voz": [
+        "Órgano Interno de Control",
+        "Representante del Organismo que llevará a cabo la ejecución del programa"
+      ],
+      "invitados_especiales_solo_voz": "Previo acuerdo de la presidencia, otras personas representantes de núcleos agrarios, de la sociedad civil o institución académica, y titulares de unidades administrativas relacionadas con los asuntos de su competencia (9.4.1, fr. V, líneas 8928-8930; participación social, numeral 12, línea 9071)",
+      "cargo": "Honorífico (línea 8931). Tienen voz y voto la Presidencia y las Vocalías (línea 8931)",
+      "suplencia": "Cada integrante puede designar a una persona servidora pública suplente, que acredita su representación mediante oficio de la persona integrante dirigido a la Secretaría Técnica (líneas 8933-8936)",
+      "sesiones": "Ordinarias y extraordinarias, por invitación de la Secretaría Técnica por acuerdo de la Presidencia y conforme a las fechas acordadas por el CASPEG: CINCO DÍAS HÁBILES de anticipación mínimo para ordinarias y UN DÍA para extraordinarias; la invitación trae lugar o plataforma digital, fecha, hora y Orden del Día (9.4.2, líneas 8938-8942). Quórum: la mitad más uno de sus integrantes, siempre que esté presente la Presidencia y/o la Secretaría Técnica y/o sus suplentes acreditadas (líneas 8943-8945). El acta registra cada acuerdo y, previa aprobación, la firman las personas integrantes (líneas 8946-8947). Resoluciones por mayoría de votos; en empate, voto de calidad de la Presidencia (8.1.2 j, línea 8598)",
+      "atribuciones": [
+        {
+          "texto": "Aprobar la lista de espera y el padrón de personas beneficiarias del programa.",
+          "numeral": "9.4.3 a)",
+          "linea": 8950
+        },
+        {
+          "texto": "Aprobar la inclusión de nuevas personas beneficiarias, en sustitución de las bajas, y las ratificaciones que se presenten durante la ejecución del PEG.",
+          "numeral": "9.4.3 b)",
+          "linea": 8951
+        },
+        {
+          "texto": "Aprobar la suspensión de la entrega del apoyo monetario a las personas beneficiarias del PEG.",
+          "numeral": "9.4.3 c)",
+          "linea": 8953
+        },
+        {
+          "texto": "Aprobar la baja de personas beneficiarias en el PEG.",
+          "numeral": "9.4.3 d)",
+          "linea": 8954
+        },
+        {
+          "texto": "Establecer mecanismos para dar seguimiento a la operación del PEG, así como para el cumplimiento de sus objetivos.",
+          "numeral": "9.4.3 e)",
+          "linea": 8955
+        },
+        {
+          "texto": "Invitar a la persona representante de núcleo agrario, de la sociedad civil o institución académica, que formará parte como invitado especial del CASPEG.",
+          "numeral": "9.4.3 f)",
+          "linea": 8956
+        },
+        {
+          "texto": "Emitir y modificar sus lineamientos internos.",
+          "numeral": "9.4.3 g)",
+          "linea": 8958
+        },
+        {
+          "texto": "Sesionar y someter puntos de acuerdo con la votación de las personas integrantes, a fin de que los acuerdos emitidos tengan efectos plenos ante terceros, aun cuando se trate de modificaciones o elementos que no se encuentren establecidos en las Reglas.",
+          "numeral": "9.4.3 h)",
+          "linea": 8959
+        },
+        {
+          "texto": "Aprobar las modificaciones necesarias a las reglas para garantizar la correcta operación del PEG.",
+          "numeral": "9.4.3 i)",
+          "linea": 8962
+        },
+        {
+          "texto": "Resolver los casos específicos, no previstos en las presentes reglas.",
+          "numeral": "9.4.3 j)",
+          "linea": 8963
+        },
+        {
+          "texto": "Las demás que determine el Comité.",
+          "numeral": "9.4.3 k)",
+          "linea": 8964
+        }
+      ],
+      "funciones_presidencia": [
+        "Declarar quórum legal y presidir las sesiones",
+        "Poner a consideración el Orden del Día",
+        "Determinar con la Secretaría Técnica los asuntos del Orden del Día",
+        "Autorizar la celebración de sesiones extraordinarias",
+        "Emitir el voto de calidad en caso de empate",
+        "Las demás que determine el Comité"
+      ],
+      "funciones_otros_integrantes": [
+        "Proponer asuntos al Orden del Día",
+        "Tomar conocimiento del seguimiento de acuerdos",
+        "Proponer sesiones extraordinarias",
+        "Emitir su voto",
+        "Proponer áreas de oportunidad para la mejora del CASPEG"
+      ],
+      "instalacion": "El CASPEG debe instalarse dentro de los 15 días hábiles siguientes a la publicación de las Reglas en la Gaceta y emitir sus Lineamientos Internos dentro de los 15 días hábiles siguientes a su instalación (Transitorios séptimo y octavo, líneas 9155-9158). Ya había aprobado las Reglas el 17-feb-2026 (línea 9317): VER DUDAS",
+      "lineamientos_internos": "Los emite y modifica el propio CASPEG (9.4.3 g, línea 8958; transitorio octavo); no están en el texto"
+    },
+    "otras_unidades_que_intervienen": [
+      "Delegaciones Regionales Forestales: reciben las solicitudes y son responsables de la correcta integración de la documentación (8.1.3; 10.1, fr. V, líneas 9006-9009); reciben los reportes mensuales (8.1.7 l, línea 8814); hacen firmar el contrato de adhesión (10.1, fr. XII, líneas 9021-9023); recaban la firma de acuse de recibo del depósito (10.1, fr. XV, líneas 9028-9030)",
+      "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia: dictaminación jurídica de la documentación legal de cada solicitud única (10.1, fr. III, líneas 9000-9002); requerimiento de pago y gestión del reintegro, previo acuerdo del CASPEG (8.1.9.3; 10.1, fr. IV)",
+      "Dirección de Administración, Finanzas y de Gestión Documental: administración y emisión de los recursos económicos (10.1, fr. II, líneas 8998-8999); entrega del apoyo por transferencia con la Instancia Ejecutora (fr. XIV); recibe los acuses de recibo (fr. XV); proporciona la cuenta para reintegros (8.1.9.3, línea 8869); suspende o cancela el apoyo cuando la Instancia Ejecutora se lo solicita (fr. XVIII y XIX)",
+      "Enlace administrativo: con la Instancia Ejecutora genera la solicitud del recurso (fr. XIII, línea 9024) e informa al CASPEG los resultados finales (fr. XVI, línea 9031)",
+      "Coordinación de Delegaciones Regionales: seguimiento del PEG con las Delegaciones (numeral 15, línea 9094)"
+    ]
+  },
+  "poblacion_objetivo": {
+    "texto": "Núcleos agrarios que cuenten con superficie forestal en el Estado de México. Población potencial: miembros de los Núcleos Agrarios designados en Asamblea General como candidatos a ser Guardabosques. Población universo: población del Estado de México.",
+    "numeral": "5",
+    "linea": 8481,
+    "cobertura": "1’080,374.9 hectáreas de superficie con vocación forestal de la Entidad, según el Inventario Estatal Forestal y de Suelos del Estado de México 2022 (numeral 6, línea 8487)",
+    "quien_solicita": "Las personas representantes de los Núcleos Agrarios (Comisariado) que presentan la Solicitud Única a fin de obtener el ingreso al PEG (glosario «Personas solicitantes», líneas 8463-8464; 8.1.1.2 a)",
+    "quien_es_beneficiaria": "La persona designada por la Asamblea General de cada núcleo agrario que cuente con terrenos forestales en el Estado de México, aprobada y validada por el CASPEG: el o la Guardabosque (glosario, líneas 8458-8460; 8.1, línea 8519). Una sola persona por núcleo agrario (8.1.2 k, línea 8600)"
+  },
+  "tipos_persona": [
+    {
+      "clave": "nucleo_agrario",
+      "nombre": "Núcleo agrario (ejido o comunidad), por conducto de las personas que integran su Comisariado u órgano de representación: es quien SOLICITA",
+      "numeral": "3 (glosario «Núcleo agrario», «Personas solicitantes»); 8.1.1.2 a)",
+      "linea": 8444
+    },
+    {
+      "clave": "guardabosque",
+      "nombre": "Persona designada por la Asamblea General del núcleo agrario para fungir como Guardabosque: es la persona BENEFICIARIA (recibe el apoyo monetario)",
+      "numeral": "3 (glosario «Personas beneficiarias»); 8.1; 8.1.1.2 b)",
+      "linea": 8458
+    }
+  ],
+  "modalidades": [
+    {
+      "clave": "apoyo_monetario_guardabosque",
+      "nombre": "Apoyo monetario individual para cada Guardabosque registrado",
+      "descripcion": "Única forma de apoyo del PEG: transferencia de recursos monetarios por $25,550.00 al año por Guardabosque, hasta en cuatro ministraciones, previa entrega de reportes mensuales de actividades (7.1, 7.1.1 y 7.2.1). Una persona por núcleo agrario (8.1.2 k).",
+      "numeral": "7.1; 7.1.1; 7.2.1; Convocatoria base primera y tercera",
+      "linea": 8491,
+      "seleccionable": true
+    }
+  ],
+  "nota_modalidades": "Las ROP del PEG no definen modalidades de apoyo. El numeral 8.1.3 se titula «Modalidades de registro» pero solo dice que el trámite es presencial en las Delegaciones Regionales Forestales según el municipio (línea 8608). Se declara una sola modalidad (el apoyo monetario individual del numeral 7.1) para que el sistema tenga qué elegir; no representa una distinción de las reglas. No hay refrendo como modalidad: ver «refrendo».",
+  "superficie": {
+    "aplica": false,
+    "descripcion": "El PEG no fija superficie mínima ni máxima por solicitud ni paga por hectárea: el apoyo es por persona. La única referencia es la cobertura del programa (1’080,374.9 ha de superficie con vocación forestal del Estado, numeral 6, línea 8487) y que el núcleo agrario cuente con superficie forestal (8.1.1.1).",
+    "minima_ha": null,
+    "maxima_ha": null,
+    "numeral": "6; 8.1.1.1",
+    "linea": 8486
+  },
+  "requisitos": [
+    {
+      "clave": "PEG-REQ-01",
+      "texto": "Solicitud única del núcleo agrario: para la integración al PEG, dirigida a la Dirección General de PROBOSQUE, especificando el periodo de vigencia de representación de las autoridades correspondientes firmada y sellada por el Órgano de Representación.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": "Solicitud Única (formato de PROBOSQUE; el del PEG no está en el texto)",
+      "numeral": "8.1.1.2 a), fr. I",
+      "linea": 8529,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-02",
+      "texto": "Acreditar la legal propiedad o posesión del terreno forestal del núcleo agrario (carpeta básica o en su caso acta de delimitación, destino y asignación de tierras ejidales o comunales (ADDATE o ADDATBC). En caso de que la documentación en archivos físicos o digitales obre en poder de algún área de PROBOSQUE se considerará por cumplido.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2 a), fr. II",
+      "linea": 8532,
+      "requiere_documento": true,
+      "condicion": "Se considera cumplido si la documentación ya obra en archivos de PROBOSQUE"
+    },
+    {
+      "clave": "PEG-REQ-03",
+      "texto": "Acta de asamblea inscrita ante el RAN. En el supuesto de no encontrarse aún inscrita, deberán presentar dicha acta acompañada con el acuse de trámite ante el RAN, en la que se designe la persona propuesta para fungir como Guardabosque.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2 a), fr. III",
+      "linea": 8536,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-04",
+      "texto": "Presentar carta firmada por todos los integrantes del Comisariado, en la que manifiesten bajo protesta de decir verdad, que no cuenta con sanciones administrativas o adeudo con PROBOSQUE.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 a), fr. IV",
+      "linea": 8539,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-05",
+      "texto": "Presentar un escrito libre bajo protesta de decir verdad de la no existencia de ningún tipo de conflicto en el núcleo agrario.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 a), fr. V",
+      "linea": 8541,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-06",
+      "texto": "Carta Compromiso de Protección de Afluentes, firmada por el Comisariado, donde el Núcleo Agrario se compromete bajo protesta de decir verdad a no realizar obras de represamiento total o entubamiento hermético que eliminen el 100% del flujo superficial en los manantiales bajo custodia del Guardabosque, garantizando el acceso al agua para la biodiversidad local y deslindándose de actividades de venta ilegal de recursos hídricos.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 a), fr. VI",
+      "linea": 8543,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-07",
+      "texto": "Certificado parcelario (expedido a nombre de la persona propuesta como Guardabosque) o constancia de pertenecer a un núcleo agrario (emitida por la asamblea).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": true,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. I",
+      "linea": 8548,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-08",
+      "texto": "Informe de no antecedentes penales, expedido por la FGJEM que no exceda una vigencia de 90 días naturales.",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. II",
+      "linea": 8550,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-09",
+      "texto": "De ser asignado como persona beneficiaria del programa, deberá presentar copia legible del contrato de apertura o estado de cuenta vigente a su nombre, que contenga el nombre de la institución bancaria, número de cuenta y CLABE interbancaria.",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. III",
+      "linea": 8551,
+      "requiere_documento": true,
+      "opcional": true,
+      "condicion": "Solo si es asignada como persona beneficiaria (el apoyo se paga por transferencia a esa cuenta)"
+    },
+    {
+      "clave": "PEG-REQ-10",
+      "texto": "Estar físicamente sano (Certificado médico que no exceda de 90 días naturales).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. IV",
+      "linea": 8554,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-11",
+      "texto": "Ser de nacionalidad mexicana (Copia del Acta de nacimiento certificada).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. V",
+      "linea": 8555,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-12",
+      "texto": "Radicar en el área de influencia donde se realizará la actividad como Guardabosque (Comprobante de domicilio que no exceda de 90 días naturales).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. VI",
+      "linea": 8556,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-13",
+      "texto": "Ser mayor de edad.",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. VII",
+      "linea": 8558,
+      "requiere_documento": false,
+      "condicion": "Se acredita con la identificación oficial y el acta de nacimiento (PEG-REQ-11 y PEG-REQ-16); las reglas no piden un documento aparte"
+    },
+    {
+      "clave": "PEG-REQ-14",
+      "texto": "Contrato de Adhesión para realizar la función de Guardabosque (formato).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": "Contrato de adhesión",
+      "numeral": "8.1.1.2 b), fr. VIII",
+      "linea": 8559,
+      "requiere_documento": true,
+      "opcional": true,
+      "condicion": "La Instancia Ejecutora lo elabora tras la aprobación del CASPEG y se firma en las Delegaciones (10.1, fr. XII; Convocatoria base quinta, fila V)"
+    },
+    {
+      "clave": "PEG-REQ-15",
+      "texto": "Copia de la CURP actualizada.",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. IX",
+      "linea": 8560,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-16",
+      "texto": "Copia de Identificación oficial vigente con fotografía.",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. X",
+      "linea": 8561,
+      "requiere_documento": true
+    },
+    {
+      "clave": "PEG-REQ-17",
+      "texto": "Fotografía tamaño infantil reciente (digital formato JPG, tamaño 160 x 200 pixeles).",
+      "tipos_persona": [
+        "guardabosque"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": false,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.1.2 b), fr. XI",
+      "linea": 8562,
+      "requiere_documento": true,
+      "condicion": "Archivo digital JPG de 160 x 200 píxeles"
+    },
+    {
+      "clave": "PEG-REQ-18",
+      "texto": "Escrito de ratificación como Guardabosque firmado por las personas del órgano de representación del núcleo agrario, mientras sigan vigentes.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": true,
+      "es_documento_legal": false,
+      "formato": null,
+      "numeral": "8.1.2 k)",
+      "linea": 8600,
+      "requiere_documento": true,
+      "opcional": true,
+      "condicion": "Solo para refrendar la participación en el PEG al año siguiente; en ese caso es lo único que se pide",
+      "nota_refrendo": "Refrendo: «únicamente presentando un escrito de ratificación» (8.1.2 k, líneas 8600-8603)"
+    }
+  ],
+  "reglas_generales_requisitos": [
+    {
+      "texto": "Pertenecer a un núcleo agrario que cuente con superficie forestal en el Estado de México, ser de nacionalidad mexicana y designado por la Asamblea General Ejidal o Comunal para fungir como Guardabosque en la protección, conservación, reforestación y vigilancia de sus recursos forestales. (Criterios de selección)",
+      "numeral": "8.1.1.1",
+      "linea": 8524
+    },
+    {
+      "texto": "Si se determina con posterioridad que por cualquier supuesto para alguna solicitud única es necesario que se presente nuevamente la documentación o requiere de información o documentos complementarios, se le notificará a la persona solicitante dentro del plazo de 10 días naturales.",
+      "numeral": "8.1.1.2 b), fr. XII; 10.1, fr. VII",
+      "linea": 8563
+    },
+    {
+      "texto": "La documentación deberá estar completa; horario de atención de 9:00 a 18:00 horas, de lunes a viernes, en las Delegaciones Regionales Forestales (el trámite es presencial).",
+      "numeral": "Convocatoria base cuarta; 8.1.3",
+      "linea": 9362
+    },
+    {
+      "texto": "La oficina receptora entregará al solicitante comprobante de recepción, con el nombre y firma de quien le recibe, siempre y cuando cumplan con todos los requisitos señalados en las Reglas. Se atienden las solicitudes debidamente integradas en el orden cronológico de registro; la recepción no implica compromiso de otorgar el apoyo.",
+      "numeral": "Convocatoria base cuarta",
+      "linea": 9494
+    },
+    {
+      "texto": "Si la solicitud no cumple la Convocatoria y las Reglas, no se acuerda a favor y queda fuera de los apoyos monetarios del Programa.",
+      "numeral": "Convocatoria base séptima",
+      "linea": 9549
+    },
+    {
+      "texto": "La selección de las personas beneficiarias es limitada a una persona por núcleo agrario y su vigencia es durante el periodo de la representación de los órganos de representación solicitante.",
+      "numeral": "8.1.2 k)",
+      "linea": 8600
+    },
+    {
+      "texto": "El núcleo agrario debe informar en la solicitud si ya recibe otro apoyo federal, estatal o municipal con el mismo propósito.",
+      "numeral": "8.1.7 f)",
+      "linea": 8801
+    }
+  ],
+  "criterios_seleccion": [
+    {
+      "texto": "a) Personas que pertenezcan a núcleos agrarios con superficie forestal, y que preferentemente pertenezcan a comunidades y pueblos originarios.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 a)",
+      "linea": 8578
+    },
+    {
+      "texto": "b) Personas que pertenezcan a núcleos agrarios con superficie forestal que no cuenten con algún otro apoyo de programa otorgado por PROBOSQUE.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 b)",
+      "linea": 8580
+    },
+    {
+      "texto": "c) Núcleos agrarios con superficie forestal y ubicada en zonas consideradas críticas de tala ilegal, incendios forestales y plagas y enfermedades forestales.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 c)",
+      "linea": 8582
+    },
+    {
+      "texto": "d) Núcleos agrarios que acrediten contar con infraestructura activa de Recarga y Cosecha de Agua Pluvial (tinas ciegas, presas de gavión, zanjas de infiltración o bordos de tierra compactada) que funcionen como puntos de hidratación mixta (ganado/fauna) y ayuden a disminuir la presión de extracción sobre los manantiales naturales.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 d)",
+      "linea": 8584
+    },
+    {
+      "texto": "e) Núcleos agrarios que cuenten con superficie forestal dentro de las ANP estatales.",
+      "puntaje": 4,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 e)",
+      "linea": 8588
+    },
+    {
+      "texto": "f) Núcleos agrarios cuya superficie forestal se encuentre dentro de la poligonal identificada como «Bosque de Agua» o zonas estratégicas de recarga hídrica de las Cuencas de Lerma, Balsas y Panuco, por su importancia en la Seguridad Nacional Hídrica.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 f)",
+      "linea": 8589
+    },
+    {
+      "texto": "g) Núcleos agrarios con superficie forestal, que consideren la participación de mujeres como Guardabosques.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 g)",
+      "linea": 8592
+    },
+    {
+      "texto": "h) Núcleos agrarios con superficie forestal que consideren la participación de personas víctimas u ofendidas en delitos investigados o juzgados con perspectiva de género.",
+      "puntaje": 5,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 h)",
+      "linea": 8594
+    },
+    {
+      "texto": "i) Núcleos agrarios con superficie forestal que consideren la participación de jóvenes (18 a 29 años de edad).",
+      "puntaje": 3,
+      "tipo": "puntaje",
+      "opciones": [],
+      "numeral": "8.1.2 i)",
+      "linea": 8596
+    },
+    {
+      "texto": "Las personas designadas serán las que alcancen su mayor puntaje acumulado, seleccionadas en orden descendente hasta alcanzar la capacidad de atención programada conforme a los recursos disponibles. El CASPEG adopta sus resoluciones por mayoría de votos; en caso de empate, la Presidencia tiene voto de calidad.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "opciones": [],
+      "numeral": "8.1.2 (encabezado) y j)",
+      "linea": 8567
+    },
+    {
+      "texto": "Los apoyos se otorgan sin distinción de género, etnia, religión, condición socioeconómica u otro factor que implique discriminación.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "opciones": [],
+      "numeral": "8.1.2 l)",
+      "linea": 8604
+    },
+    {
+      "texto": "Los demás que determine la instancia normativa.",
+      "puntaje": null,
+      "tipo": "priorizacion",
+      "opciones": [],
+      "numeral": "8.1.2 m)",
+      "linea": 8606
+    }
+  ],
+  "criterios_elegibilidad_tecnica": [
+    {
+      "texto": "No hay elegibilidad técnica de superficie: no se levanta polígono ni se verifica cobertura. La elegibilidad es documental y jurídica: la Unidad Jurídica dictamina la procedencia de la documentación legal de cada solicitud única (10.1, fr. III) y la Instancia Ejecutora revisa, registra, integra, valida y digitaliza los expedientes (fr. VI). Se emite un listado preliminar de solicitudes factibles y no factibles (fr. VIII) que analiza, valida y autoriza el CASPEG (fr. IX).",
+      "numeral": "10.1, fr. III, VI, VIII y IX",
+      "linea": 9000
+    }
+  ],
+  "inelegibles": [],
+  "montos": [
+    {
+      "concepto": "Apoyo monetario por Guardabosque, por ejercicio fiscal, dividido hasta en cuatro ministraciones según la disponibilidad presupuestal autorizada; se entrega mediante transferencia interbancaria previa entrega de reportes mensuales de actividades de protección, conservación, restauración y fomento forestal",
+      "monto": 25550,
+      "unidad": "pesos por Guardabosque al año",
+      "modalidad": "apoyo_monetario_guardabosque",
+      "numeral": "7.2.1; Convocatoria base tercera",
+      "linea": 8497,
+      "textual": "$25,550.00 (Veinticinco Mil Quinientos Cincuenta pesos 00/100 m.n.) por Guardabosque",
+      "forma_de_pago": "Transferencia interbancaria; solo en casos excepcionales y mediante causa justificada, cheque, solicitado por la Delegación Regional Forestal correspondiente y autorizado por la Dirección de Protección Forestal (7.2.1, líneas 8502-8504)",
+      "origen": "Presupuesto de Egresos del Gobierno del Estado de México, de origen estatal (7.3, línea 8514)"
+    }
+  ],
+  "ministraciones": [
+    {
+      "numero": 1,
+      "porcentaje": 25,
+      "regimen": "hasta_cuatro_ministraciones",
+      "supuesto": true,
+      "condicion": "Ministración 1 de hasta 4 del apoyo de $25,550.00 por Guardabosque. EL REPARTO NO ESTÁ EN LAS REGLAS: el 25 % (partes iguales, $6,387.50) es un supuesto del archivo para poder cargar el número, por confirmar con el cliente; tampoco dicen qué meses cubre cada ministración ni cuándo se paga. Condición común de la entrega: reportes mensuales de actividades entregados en la Delegación Regional Forestal (formato preestablecido), evaluados internamente por la Instancia Ejecutora (10.1, fr. XIII) y con la aprobación/validación del CASPEG (Convocatoria base tercera y cuarta); sin incumplimientos que ameriten suspensión (8.1.9.1, «por ministración»); sujeta a disponibilidad presupuestal. Se paga por transferencia a la cuenta de la persona beneficiaria y la Delegación recaba el acuse de recibo del depósito (10.1, fr. XIV y XV).",
+      "numeral": "7.1.1; 7.2.1; 10.1, fr. XIII a XV; Convocatoria base tercera y quinta (fila VI)",
+      "linea": 8493,
+      "periodo_que_cubre": null,
+      "monto_pesos": null
+    },
+    {
+      "numero": 2,
+      "porcentaje": 25,
+      "regimen": "hasta_cuatro_ministraciones",
+      "supuesto": true,
+      "condicion": "Ministración 2 de hasta 4 del apoyo de $25,550.00 por Guardabosque. EL REPARTO NO ESTÁ EN LAS REGLAS: el 25 % (partes iguales, $6,387.50) es un supuesto del archivo para poder cargar el número, por confirmar con el cliente; tampoco dicen qué meses cubre cada ministración ni cuándo se paga. Condición común de la entrega: reportes mensuales de actividades entregados en la Delegación Regional Forestal (formato preestablecido), evaluados internamente por la Instancia Ejecutora (10.1, fr. XIII) y con la aprobación/validación del CASPEG (Convocatoria base tercera y cuarta); sin incumplimientos que ameriten suspensión (8.1.9.1, «por ministración»); sujeta a disponibilidad presupuestal. Se paga por transferencia a la cuenta de la persona beneficiaria y la Delegación recaba el acuse de recibo del depósito (10.1, fr. XIV y XV).",
+      "numeral": "7.1.1; 7.2.1; 10.1, fr. XIII a XV; Convocatoria base tercera y quinta (fila VI)",
+      "linea": 8493,
+      "periodo_que_cubre": null,
+      "monto_pesos": null
+    },
+    {
+      "numero": 3,
+      "porcentaje": 25,
+      "regimen": "hasta_cuatro_ministraciones",
+      "supuesto": true,
+      "condicion": "Ministración 3 de hasta 4 del apoyo de $25,550.00 por Guardabosque. EL REPARTO NO ESTÁ EN LAS REGLAS: el 25 % (partes iguales, $6,387.50) es un supuesto del archivo para poder cargar el número, por confirmar con el cliente; tampoco dicen qué meses cubre cada ministración ni cuándo se paga. Condición común de la entrega: reportes mensuales de actividades entregados en la Delegación Regional Forestal (formato preestablecido), evaluados internamente por la Instancia Ejecutora (10.1, fr. XIII) y con la aprobación/validación del CASPEG (Convocatoria base tercera y cuarta); sin incumplimientos que ameriten suspensión (8.1.9.1, «por ministración»); sujeta a disponibilidad presupuestal. Se paga por transferencia a la cuenta de la persona beneficiaria y la Delegación recaba el acuse de recibo del depósito (10.1, fr. XIV y XV).",
+      "numeral": "7.1.1; 7.2.1; 10.1, fr. XIII a XV; Convocatoria base tercera y quinta (fila VI)",
+      "linea": 8493,
+      "periodo_que_cubre": null,
+      "monto_pesos": null
+    },
+    {
+      "numero": 4,
+      "porcentaje": 25,
+      "regimen": "hasta_cuatro_ministraciones",
+      "supuesto": true,
+      "condicion": "Ministración 4 de hasta 4 del apoyo de $25,550.00 por Guardabosque. EL REPARTO NO ESTÁ EN LAS REGLAS: el 25 % (partes iguales, $6,387.50) es un supuesto del archivo para poder cargar el número, por confirmar con el cliente; tampoco dicen qué meses cubre cada ministración ni cuándo se paga. Condición común de la entrega: reportes mensuales de actividades entregados en la Delegación Regional Forestal (formato preestablecido), evaluados internamente por la Instancia Ejecutora (10.1, fr. XIII) y con la aprobación/validación del CASPEG (Convocatoria base tercera y cuarta); sin incumplimientos que ameriten suspensión (8.1.9.1, «por ministración»); sujeta a disponibilidad presupuestal. Se paga por transferencia a la cuenta de la persona beneficiaria y la Delegación recaba el acuse de recibo del depósito (10.1, fr. XIV y XV).",
+      "numeral": "7.1.1; 7.2.1; 10.1, fr. XIII a XV; Convocatoria base tercera y quinta (fila VI)",
+      "linea": 8493,
+      "periodo_que_cubre": null,
+      "monto_pesos": null
+    }
+  ],
+  "plazos": [
+    {
+      "clave": "recepcion_solicitudes",
+      "descripcion": "Recepción y registro de solicitudes: a partir del día hábil siguiente de la publicación de la Convocatoria, y estará abierta de manera permanente durante el ejercicio fiscal vigente. Horario 9:00 a 18:00 horas, de lunes a viernes, en la Delegación que corresponda al municipio.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Día hábil siguiente a la publicación de la Convocatoria (Gaceta del 23-mar-2026, es decir desde el 24-mar-2026)",
+      "responsable": "Delegación Regional Forestal",
+      "numeral": "Convocatoria base quinta, actividad I; base cuarta",
+      "linea": 9512,
+      "textual": "Recepción y registro de solicitudes. A partir del día hábil siguiente de la publicación de la Convocatoria, y estará abierta de manera permanente durante el ejercicio fiscal vigente.",
+      "fecha_inicio": "2026-03-24"
+    },
+    {
+      "clave": "complemento_documentacion_faltante",
+      "descripcion": "Las reglas del PEG NO fijan un plazo para que el núcleo agrario complete la documentación faltante (no hay los «5 días hábiles» de los otros programas): piden que la documentación esté completa al presentar la solicitud (Convocatoria base cuarta) y dan solo el plazo de 10 días naturales para que la Instancia Ejecutora notifique documentos nuevos o complementarios (ver aviso_faltantes_en_evaluacion). VER DUDAS.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Sin plazo: no está en las reglas",
+      "responsable": "Persona solicitante (núcleo agrario)",
+      "numeral": "8.1.1.2 b), fr. XII; Convocatoria base cuarta",
+      "linea": 9362
+    },
+    {
+      "clave": "aviso_faltantes_en_evaluacion",
+      "descripcion": "Si con posterioridad se determina que es necesario presentar nuevamente la documentación o que se requiere información o documentos complementarios, se notifica a la persona solicitante dentro del plazo de 10 días naturales (la mecánica añade: durante el periodo de vigencia de la convocatoria).",
+      "cantidad": 10,
+      "unidad": "dias_naturales",
+      "fecha_fin": null,
+      "corre_desde": "No dice desde cuándo (¿desde la recepción de la solicitud única?, ¿desde la detección?)",
+      "responsable": "Instancia Ejecutora (Dirección de Protección Forestal)",
+      "numeral": "8.1.1.2 b), fr. XII; 10.1, fr. VII",
+      "linea": 8563,
+      "textual": "se le notificará a la persona solicitante dentro del plazo de 10 días naturales."
+    },
+    {
+      "clave": "evaluacion_y_dictaminacion",
+      "descripcion": "Integración, revisión y dictaminación técnica y jurídica de la Solicitud Única: no excederá un plazo de 45 días hábiles, para ser sometida al CASPEG para su aprobación.",
+      "cantidad": 45,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Una vez recibida la Solicitud Única de ingreso al Programa",
+      "responsable": "Instancia Ejecutora (Dirección de Protección Forestal) y Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia",
+      "numeral": "Convocatoria base quinta, actividad II",
+      "linea": 9514,
+      "textual": "Una vez recibida la Solicitud Única de ingreso al Programa, la integración, revisión, dictaminación técnica y jurídica no excederá un plazo de 45 días hábiles, para ser sometida al Comité de Admisión y Seguimiento del Programa Estatal de Guardabosques para su aprobación."
+    },
+    {
+      "clave": "dictaminacion_tecnica_juridica",
+      "descripcion": "Mismo plazo que evaluacion_y_dictaminacion (clave de compatibilidad con RHF y PS): 45 días hábiles desde que se recibe la Solicitud Única.",
+      "cantidad": 45,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Una vez recibida la Solicitud Única de ingreso al Programa",
+      "responsable": "Instancia Ejecutora y Unidad Jurídica",
+      "numeral": "Convocatoria base quinta, actividad II",
+      "linea": 9514
+    },
+    {
+      "clave": "aprobacion_solicitudes",
+      "descripcion": "La aprobación de las solicitudes se realiza en las sesiones del CASPEG, en los plazos que determine el Comité.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Sesión del CASPEG (plazos que determine el Comité)",
+      "responsable": "CASPEG",
+      "numeral": "Convocatoria base quinta, actividad III",
+      "linea": 9520
+    },
+    {
+      "clave": "publicacion_resultados",
+      "descripcion": "Posterior a la fecha de aprobación de las solicitudes, los resultados se publican en la página https://probosque.edomex.gob.mx y están disponibles en Oficinas Centrales y Delegaciones Regionales. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Posterior a la fecha de aprobación de las solicitudes por el CASPEG",
+      "responsable": "PROBOSQUE (la Instancia Ejecutora tramita la publicación, 10.1 fr. XI)",
+      "numeral": "Convocatoria base quinta, actividad IV y base sexta",
+      "linea": 9523
+    },
+    {
+      "clave": "firma_contrato",
+      "descripcion": "Elaboración y firma del Contrato de Adhesión: se llevará a cabo 10 días hábiles posteriores a la aprobación de las solicitudes.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Aprobación de las solicitudes por el CASPEG (no la publicación de resultados ni la notificación)",
+      "responsable": "La Instancia Ejecutora elabora; la persona beneficiaria y el núcleo agrario firman y sellan en la Delegación Regional Forestal",
+      "numeral": "Convocatoria base quinta, actividad V; 8.1.7 c); 10.1, fr. XII",
+      "linea": 9525,
+      "textual": "Se llevará a cabo 10 días hábiles posteriores a la aprobación de las solicitudes."
+    },
+    {
+      "clave": "convocatoria_sesion_comite",
+      "descripcion": "La Secretaría Técnica emite la invitación a sesión con cinco días hábiles de anticipación como mínimo para sesiones ordinarias y con un día de anticipación para extraordinarias.",
+      "cantidad": 5,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Fecha de la sesión (anticipación mínima)",
+      "responsable": "Secretaría Técnica del CASPEG",
+      "numeral": "9.4.2",
+      "linea": 8938,
+      "cantidad_extraordinaria_dias": 1
+    },
+    {
+      "clave": "instalacion_comite",
+      "descripcion": "El CASPEG debe instalarse dentro de los 15 días hábiles siguientes a la publicación de las Reglas en la Gaceta.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Publicación de las Reglas en la Gaceta del Gobierno (23-mar-2026)",
+      "responsable": "CASPEG",
+      "numeral": "Transitorio séptimo",
+      "linea": 9155
+    },
+    {
+      "clave": "lineamientos_internos_comite",
+      "descripcion": "El CASPEG debe emitir sus Lineamientos Internos dentro de los 15 días hábiles siguientes a su instalación.",
+      "cantidad": 15,
+      "unidad": "dias_habiles",
+      "fecha_fin": null,
+      "corre_desde": "Instalación del CASPEG",
+      "responsable": "CASPEG",
+      "numeral": "Transitorio octavo",
+      "linea": 9157
+    },
+    {
+      "clave": "entrega_reporte_mensual",
+      "descripcion": "Entrega de reportes mensuales de las actividades realizadas, en las oficinas de las Delegaciones Regionales Forestales y en formato preestablecido. Las reglas dicen que la entrega es «de acuerdo al calendario establecido para tal fin» pero no traen ni el día de cada mes ni el calendario. VER DUDAS.",
+      "cantidad": null,
+      "unidad": "otro",
+      "fecha_fin": null,
+      "corre_desde": "Cada mes del ejercicio, a partir de la firma del Contrato de Adhesión (Convocatoria base quinta, actividad VII); el día de vencimiento no está en las reglas",
+      "responsable": "Persona beneficiaria (Guardabosque), ante la Delegación Regional Forestal",
+      "numeral": "8.1.7 l); 8.1.8 a); Convocatoria base tercera y quinta (VII)",
+      "linea": 8814,
+      "periodicidad": "mensual",
+      "dia_de_vencimiento": null
+    },
+    {
+      "clave": "revision_mensual_reporte",
+      "descripcion": "A partir de la firma del Contrato de Adhesión, mensualmente se realiza la revisión del reporte de actividades de Guardabosques (verificación de la ejecución de las actividades comprometidas).",
+      "cantidad": null,
+      "unidad": "otro",
+      "fecha_fin": null,
+      "corre_desde": "Firma del Contrato de Adhesión",
+      "responsable": "Instancia Ejecutora con las Delegaciones Regionales Forestales",
+      "numeral": "Convocatoria base quinta, actividad VII",
+      "linea": 9534,
+      "periodicidad": "mensual"
+    },
+    {
+      "clave": "evaluacion_interna_reportes",
+      "descripcion": "La solicitud del recurso económico se genera posterior a la evaluación interna de participación de Guardabosques (verificación, análisis y valoración de los reportes). No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Entrega de los reportes mensuales",
+      "responsable": "Instancia Ejecutora (Dirección de Protección Forestal) con el enlace administrativo",
+      "numeral": "3 (glosario «Evaluación interna»); 10.1, fr. XIII",
+      "linea": 8433
+    },
+    {
+      "clave": "entrega_apoyo_monetario",
+      "descripcion": "La entrega del apoyo monetario se realiza mediante transferencia bancaria a la cuenta de la persona beneficiaria, durante los meses del año fiscal en ejercicio, dependiendo de la asignación de recursos financieros al Programa. No fija días ni fechas por ministración.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Ejercicio fiscal en curso, según asignación de recursos",
+      "responsable": "Instancia Ejecutora con la Dirección de Administración, Finanzas y de Gestión Documental",
+      "numeral": "Convocatoria base quinta, actividad VI; 10.1, fr. XIV",
+      "linea": 9528
+    },
+    {
+      "clave": "acuse_recibo_deposito",
+      "descripcion": "La Delegación Regional Forestal recaba la firma de acuse de recibo del depósito realizado a la persona beneficiaria y la Instancia Ejecutora entrega los acuses a la Dirección de Administración, Finanzas y de Gestión Documental. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "fecha_fin": null,
+      "corre_desde": "Depósito realizado a la persona beneficiaria",
+      "responsable": "Delegaciones Regionales Forestales / Instancia Ejecutora",
+      "numeral": "10.1, fr. XV",
+      "linea": 9028
+    },
+    {
+      "clave": "evidencia_informe_a_nucleo_agrario",
+      "descripcion": "La persona beneficiaria presenta evidencia documental de que informó a su núcleo agrario de las actividades que realizó como Guardabosque, al final del ejercicio fiscal o término de sus funciones.",
+      "cantidad": null,
+      "unidad": "fin_del_ejercicio_fiscal",
+      "fecha_fin": null,
+      "corre_desde": "Final del ejercicio fiscal o término de sus funciones",
+      "responsable": "Persona beneficiaria (Guardabosque)",
+      "numeral": "8.1.7 k)",
+      "linea": 8812
+    },
+    {
+      "clave": "vigencia_comprobantes",
+      "descripcion": "Vigencia máxima del informe de no antecedentes penales (FGJEM), el certificado médico y el comprobante de domicilio: no exceden 90 días naturales.",
+      "cantidad": 90,
+      "unidad": "dias_naturales",
+      "fecha_fin": null,
+      "corre_desde": "Fecha de expedición del documento",
+      "responsable": "Persona beneficiaria (Guardabosque)",
+      "numeral": "8.1.1.2 b), fr. II, IV y VI",
+      "linea": 8550,
+      "claves_requisito": [
+        "PEG-REQ-08",
+        "PEG-REQ-10",
+        "PEG-REQ-12"
+      ]
+    },
+    {
+      "clave": "vigencia_representacion_beneficiaria",
+      "descripcion": "La vigencia de la persona beneficiaria es durante el periodo de la representación de los órganos de representación solicitante; deja de ser Guardabosque al finalizar ese periodo o al término de sus obligaciones. Puede refrendar al año siguiente con escrito de ratificación mientras la representación siga vigente.",
+      "cantidad": null,
+      "unidad": "otro",
+      "fecha_fin": null,
+      "corre_desde": "Inicio y fin del periodo de la representación del núcleo agrario (indicado en la solicitud única)",
+      "responsable": "Núcleo agrario / CASPEG",
+      "numeral": "8.1.2 k); 8.2",
+      "linea": 8600
+    },
+    {
+      "clave": "reintegro",
+      "descripcion": "El monto reintegrado debe depositarse de manera inmediata a partir de la fecha de notificación de reintegro, a la cuenta bancaria de PROBOSQUE que proporciona la Dirección de Administración, Finanzas y de Gestión Documental; el requerimiento de pago lo emite la Unidad Jurídica previo acuerdo del CASPEG. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "inmediato",
+      "fecha_fin": null,
+      "corre_desde": "Notificación de reintegro (requerimiento de pago de la Unidad Jurídica, previo acuerdo del CASPEG)",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.9.3 (último párrafo); 8.1.7 d)",
+      "linea": 8880
+    },
+    {
+      "clave": "informe_anual_comite",
+      "descripcion": "En la primera sesión ordinaria del ejercicio fiscal siguiente, la Instancia Ejecutora presenta un informe anual a la Instancia Normativa sobre la ejecución del programa del ejercicio inmediato anterior. En cada sesión ordinaria rinde un informe de actividades.",
+      "cantidad": null,
+      "unidad": "otro",
+      "fecha_fin": null,
+      "corre_desde": "Primera sesión ordinaria del ejercicio fiscal siguiente",
+      "responsable": "Instancia Ejecutora",
+      "numeral": "15",
+      "linea": 9096
+    }
+  ],
+  "calendario_convocatoria": [
+    {
+      "evento": "Publicación de las Reglas de Operación y de la Convocatoria del PEG en la Gaceta del Gobierno (dadas en Metepec el 19-mar-2026)",
+      "inicio": "2026-03-23",
+      "fin": "2026-03-23",
+      "linea": 9144
+    },
+    {
+      "evento": "Recepción y registro de solicitudes (permanente durante el ejercicio fiscal vigente, desde el día hábil siguiente a la publicación; sin fecha límite)",
+      "inicio": "2026-03-24",
+      "fin": null,
+      "linea": 9512
+    },
+    {
+      "evento": "Instalación del CASPEG (15 días hábiles siguientes a la publicación de las Reglas)",
+      "inicio": null,
+      "fin": null,
+      "linea": 9155
+    },
+    {
+      "evento": "Lineamientos Internos del CASPEG (15 días hábiles siguientes a su instalación)",
+      "inicio": null,
+      "fin": null,
+      "linea": 9157
+    }
+  ],
+  "formatos": [
+    {
+      "clave": null,
+      "nombre": "Formato de Registro de Información",
+      "uso": "Registro de la persona solicitante/beneficiaria (formato general de PROBOSQUE; el del PEG no está en el texto)",
+      "en_texto": false,
+      "linea": 8745
+    },
+    {
+      "clave": null,
+      "nombre": "Solicitud Única (PEG)",
+      "uso": "Solicitud del núcleo agrario para integrar a la persona designada al PEG, dirigida a la Dirección General de PROBOSQUE, con el periodo de vigencia de la representación, firmada y sellada por el Órgano de Representación; disponible en las Delegaciones y en la página web de PROBOSQUE",
+      "en_texto": false,
+      "linea": 8746
+    },
+    {
+      "clave": null,
+      "nombre": "Contrato de adhesión (Guardabosque)",
+      "uso": "Compromiso formal de la persona beneficiaria, bajo protesta de decir verdad, de cumplir las obligaciones adquiridas; lo elabora la Instancia Ejecutora tras la aprobación del CASPEG y se firma y sella en la Delegación",
+      "en_texto": false,
+      "linea": 8747
+    },
+    {
+      "clave": null,
+      "nombre": "Anexo Técnico (incluye el Reporte de Integridad Territorial con evidencia fotográfica georreferenciada para núcleos agrarios en zonas estratégicas)",
+      "uso": "Anexo del reporte mensual de núcleos en zonas estratégicas: demuestra la no expansión de la frontera agrícola o urbana",
+      "en_texto": false,
+      "linea": 8748
+    },
+    {
+      "clave": null,
+      "nombre": "Formato preestablecido de reporte mensual de actividades",
+      "uso": "Reporte mensual de las actividades realizadas de protección, conservación, restauración y fomento forestal, que se entrega en la Delegación Regional Forestal",
+      "en_texto": false,
+      "linea": 8815
+    },
+    {
+      "clave": null,
+      "nombre": "Comprobante de recepción de la solicitud",
+      "uso": "Lo entrega la oficina receptora, con nombre y firma de quien recibe, cuando se cumplen todos los requisitos",
+      "en_texto": false,
+      "linea": 9494
+    },
+    {
+      "clave": null,
+      "nombre": "Acuse de recibo del depósito",
+      "uso": "Firma de la persona beneficiaria por el depósito recibido; lo recaba la Delegación y lo entrega la Instancia Ejecutora a la Dirección de Administración, Finanzas y de Gestión Documental",
+      "en_texto": false,
+      "linea": 9028
+    },
+    {
+      "clave": null,
+      "nombre": "Credencial de Guardabosque",
+      "uso": "Credencial gratuita que identifica a la persona beneficiaria como Guardabosque (derecho 8.1.6 g); las reglas no dicen quién la emite ni cuándo",
+      "en_texto": false,
+      "linea": 8770
+    },
+    {
+      "clave": null,
+      "nombre": "Los que determine la Instancia Normativa",
+      "uso": "Formatos adicionales que fije el CASPEG",
+      "en_texto": false,
+      "linea": 8749
+    }
+  ],
+  "derechos": [
+    {
+      "texto": "Recibir la información necesaria en tiempo y forma respecto a la aplicación de la Convocatoria y las presentes Reglas de Operación, a través de la instancia ejecutora y del personal de las Delegaciones Regionales Forestales de PROBOSQUE.",
+      "numeral": "8.1.6 a)",
+      "linea": 8758
+    },
+    {
+      "texto": "Recibir de conformidad, en caso de ser aprobado, el apoyo monetario de acuerdo con la suficiencia presupuestal del Programa Estatal de Guardabosques.",
+      "numeral": "8.1.6 b)",
+      "linea": 8761
+    },
+    {
+      "texto": "Reserva y privacidad de datos personales conforme a la Ley de Transparencia y Acceso a la Información Pública del Estado de México y Municipios y a la Ley de Protección de Datos Personales en Posesión de sujetos Obligados del Estado de México y Municipios.",
+      "numeral": "8.1.6 c)",
+      "linea": 8763
+    },
+    {
+      "texto": "Ser tratados con respeto, equidad y con base en el derecho a la no discriminación.",
+      "numeral": "8.1.6 d)",
+      "linea": 8766
+    },
+    {
+      "texto": "Los apoyos deberán ser otorgados sin distinción de género, raza, etnia, credo religioso, condición socioeconómica, filiación política u otra causa que implique discriminación.",
+      "numeral": "8.1.6 e)",
+      "linea": 8767
+    },
+    {
+      "texto": "Recibir información y capacitación de forma gratuita, respecto a las actividades a desarrollar como Guardabosque.",
+      "numeral": "8.1.6 f)",
+      "linea": 8769
+    },
+    {
+      "texto": "Recibir de forma gratuita una credencial que lo identifica como Guardabosque.",
+      "numeral": "8.1.6 g)",
+      "linea": 8770
+    },
+    {
+      "texto": "Designar persona cobeneficiaria, para gestionar el apoyo monetario en caso de enfermedad grave, que le impida recibir el apoyo monetario o en caso de defunción, respecto a las actividades ya realizadas y reportadas en el informe mensual de actividades.",
+      "numeral": "8.1.6 h)",
+      "linea": 8771
+    },
+    {
+      "texto": "Desistir de fungir como Guardabosque de manera voluntaria, cuando considere necesario.",
+      "numeral": "8.1.6 i)",
+      "linea": 8774
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.6 j)",
+      "linea": 8775
+    }
+  ],
+  "obligaciones": [
+    {
+      "texto": "Proporcionar la información y/o documentación completa y legible de manera veraz y oportuna que le sea requerida de acuerdo con los términos establecidos.",
+      "numeral": "8.1.7 a)",
+      "linea": 8787
+    },
+    {
+      "texto": "Asistir al lugar designado por PROBOSQUE para recibir de manera gratuita la capacitación en temas relacionados a la actividad que tienen que desarrollar y relativo a los derechos y obligaciones que adquiere como persona beneficiaria, conforme a las presentes reglas. Los lugares y fechas de capacitación se darán a conocer en las Delegaciones Regionales Forestales de PROBOSQUE, así como en las Oficinas Centrales del Organismo.",
+      "numeral": "8.1.7 b)",
+      "linea": 8789
+    },
+    {
+      "texto": "Suscribir en tiempo y forma el contrato de adhesión posterior a la aprobación por el CASPEG, en apego a los tiempos establecidos en la convocatoria, así como dar cumplimiento a la misma.",
+      "numeral": "8.1.7 c)",
+      "linea": 8793
+    },
+    {
+      "texto": "Reintegrar los recursos económicos recibidos que no correspondan al apoyo monetario asignado o incumplimiento a lo establecido en el contrato de adhesión, a la cuenta bancaria de PROBOSQUE y que será proporcionada por la Dirección de Administración, Finanzas y de Gestión Documental, una vez que le sea notificada dicha situación por cualquier medio, caso contrario se procederá a someter al CASPEG y notificación por la Unidad Jurídica, de igualdad de Género y Erradicación de la Violencia.",
+      "numeral": "8.1.7 d)",
+      "linea": 8795
+    },
+    {
+      "texto": "Responder encuestas que aplique PROBOSQUE en caso de ser requerida.",
+      "numeral": "8.1.7 e)",
+      "linea": 8800
+    },
+    {
+      "texto": "En la solicitud del programa deberá informar si el núcleo agrario se encuentra beneficiado por otro programa federal, estatal o municipal, con el mismo propósito.",
+      "numeral": "8.1.7 f)",
+      "linea": 8801
+    },
+    {
+      "texto": "Realizar recorridos de vigilancia forestal, en forma sistemática en su área de influencia para la detección oportuna de tala ilegal, incendios forestales, daños a la reforestación, presencia de plagas y enfermedades forestales, con énfasis especial en la detección temprana y reporte inmediato de cambio de uso del suelo no autorizado, asentamientos irregulares incipientes, ollas de agua ilegales, entre otras.",
+      "numeral": "8.1.7 g)",
+      "linea": 8803
+    },
+    {
+      "texto": "Participar en las actividades de protección, conservación, restauración hidrológica forestal, fomento forestal, actividades silviculturales y manejo de combustibles.",
+      "numeral": "8.1.7 h)",
+      "linea": 8807
+    },
+    {
+      "texto": "Asistir a eventos forestales para los que sean convocados por PROBOSQUE.",
+      "numeral": "8.1.7 i)",
+      "linea": 8809
+    },
+    {
+      "texto": "Hacer del conocimiento de las autoridades competentes, la comisión de irregularidades en materia forestal dentro de su área de influencia.",
+      "numeral": "8.1.7 j)",
+      "linea": 8810
+    },
+    {
+      "texto": "Presentar evidencia documental de que informó a su núcleo agrario de las actividades que realizó como Guardabosque, al final del ejercicio fiscal o término de sus funciones.",
+      "numeral": "8.1.7 k)",
+      "linea": 8812
+    },
+    {
+      "texto": "Entregar reportes mensuales de las actividades realizadas, en las oficinas de las Delegaciones Regionales Forestales (en formato preestablecido). Para los núcleos agrarios ubicados en zonas estratégicas, será requisito indispensable anexar el Reporte de Integridad Territorial (Anexo Técnico) con evidencia fotográfica georreferenciada que demuestre la no expansión de la frontera agrícola o urbana.",
+      "numeral": "8.1.7 l)",
+      "linea": 8814
+    },
+    {
+      "texto": "En los predios donde existan manantiales, ojos de agua o escurrimientos aprovechados por la comunidad, el Guardabosque deberá vigilar y garantizar la existencia de un «Caudal de Supervivencia» para la fauna silvestre (rebosaderos, sangrías o bebederos rústicos a nivel de suelo antes de la captación o entubamiento principal). Queda estrictamente prohibido y será causal de baja del Programa permitir la desviación de dichos afluentes para venta clandestina de agua (piperos) o para el llenado de estanques acuícolas (trucheros) comerciales sin sistemas de retorno de agua al cauce o que comprometan el abasto ecológico durante el estiaje.",
+      "numeral": "8.1.7 m)",
+      "linea": 8818
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.7 n)",
+      "linea": 8825
+    }
+  ],
+  "causas_incumplimiento": [
+    {
+      "texto": "No entregar el reporte mensual de las actividades realizadas en tiempo y forma de acuerdo al calendario establecido para tal fin.",
+      "numeral": "8.1.8 a)",
+      "linea": 8827
+    },
+    {
+      "texto": "Faltar a las reuniones de trabajo y capacitación convocadas de acuerdo al calendario establecido para tal fin, por causa injustificada en tres ocasiones durante el ejercicio fiscal anual.",
+      "numeral": "8.1.8 b)",
+      "linea": 8829
+    },
+    {
+      "texto": "No asistir a eventos forestales para los que sean convocados por PROBOSQUE, por causa injustificada.",
+      "numeral": "8.1.8 c)",
+      "linea": 8831
+    },
+    {
+      "texto": "Cuando no se cumpla con las obligaciones establecidas en el contrato de adhesión y las presentes reglas.",
+      "numeral": "8.1.8 d)",
+      "linea": 8832
+    },
+    {
+      "texto": "Delegar las funciones propias de Guardabosque a terceras personas.",
+      "numeral": "8.1.8 e)",
+      "linea": 8833
+    },
+    {
+      "texto": "Hacer uso indebido de su función como Guardabosque.",
+      "numeral": "8.1.8 f)",
+      "linea": 8834
+    },
+    {
+      "texto": "Estar sujeto a un proceso penal.",
+      "numeral": "8.1.8 g)",
+      "linea": 8835
+    },
+    {
+      "texto": "Proporcionar información o documentación falsa o apócrifa para su inscripción en el programa, o bien, se oculten datos esenciales para la determinación del otorgamiento del apoyo monetario.",
+      "numeral": "8.1.8 h)",
+      "linea": 8836
+    },
+    {
+      "texto": "No presentar tres informes mensuales de actividades de manera continua durante el ejercicio fiscal.",
+      "numeral": "8.1.8 i)",
+      "linea": 8838
+    },
+    {
+      "texto": "No cumplir con las demás obligaciones establecidas en las presentes reglas de operación.",
+      "numeral": "8.1.8 j)",
+      "linea": 8839
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "8.1.8 k)",
+      "linea": 8840
+    }
+  ],
+  "causas_cancelacion": [
+    {
+      "texto": "Cuando no se cumpla con las obligaciones establecidas en el contrato de adhesión y las presentes reglas.",
+      "numeral": "8.1.9.2 a)",
+      "linea": 8858
+    },
+    {
+      "texto": "Delegar las funciones propias de Guardabosque a terceras personas.",
+      "numeral": "8.1.9.2 b)",
+      "linea": 8859
+    },
+    {
+      "texto": "Hacer uso indebido de su función como Guardabosque.",
+      "numeral": "8.1.9.2 c)",
+      "linea": 8860
+    },
+    {
+      "texto": "Estar sujeto a un proceso penal.",
+      "numeral": "8.1.9.2 d)",
+      "linea": 8861
+    },
+    {
+      "texto": "Proporcionar información o documentación falsa o apócrifa para su inscripción en el programa, o bien, se oculten datos esenciales para la determinación del otorgamiento del apoyo monetario.",
+      "numeral": "8.1.9.2 e)",
+      "linea": 8862
+    },
+    {
+      "texto": "En caso de no presentar tres informes mensuales de actividades durante el ejercicio fiscal.",
+      "numeral": "8.1.9.2 f)",
+      "linea": 8864
+    },
+    {
+      "texto": "En caso de defunción de la persona beneficiaria.",
+      "numeral": "8.1.9.2 g)",
+      "linea": 8865
+    },
+    {
+      "texto": "No cumplir con las demás obligaciones establecidas en las presentes reglas de operación.",
+      "numeral": "8.1.9.2 h)",
+      "linea": 8866
+    }
+  ],
+  "sanciones": [
+    {
+      "clave": "suspension_temporal",
+      "texto": "Suspensión temporal del otorgamiento del apoyo monetario (de acuerdo a incumplimiento mensual por ministración), en los supuestos: a) No entregar el reporte mensual de las actividades realizadas en tiempo y forma de acuerdo al calendario establecido para tal fin. b) Faltar a las reuniones de trabajo y capacitación convocadas de acuerdo al calendario establecido para tal fin, por causa injustificada en tres ocasiones durante el ejercicio fiscal anual. c) No asistir a eventos forestales para los que sean convocados por PROBOSQUE, por causa injustificada. Cuando incurra sin causa justificada, la Instancia Ejecutora solicita a la Dirección de Administración, Finanzas y de Gestión Documental suspender el apoyo monetario, informando de dicha situación; el CASPEG aprueba la suspensión (9.4.3 c).",
+      "numeral": "8.1.9.1; 10.1, fr. XVIII; 9.4.3 c)",
+      "linea": 8842,
+      "supuestos": [
+        {
+          "texto": "No entregar el reporte mensual de las actividades realizadas en tiempo y forma de acuerdo al calendario establecido para tal fin.",
+          "numeral": "8.1.9.1 a)",
+          "linea": 8852
+        },
+        {
+          "texto": "Faltar a las reuniones de trabajo y capacitación convocadas de acuerdo al calendario establecido para tal fin, por causa injustificada en tres ocasiones durante el ejercicio fiscal anual.",
+          "numeral": "8.1.9.1 b)",
+          "linea": 8854
+        },
+        {
+          "texto": "No asistir a eventos forestales para los que sean convocados por PROBOSQUE, por causa injustificada.",
+          "numeral": "8.1.9.1 c)",
+          "linea": 8856
+        }
+      ]
+    },
+    {
+      "clave": "cancelacion_baja",
+      "texto": "Cancelación o baja del PEG en los supuestos de 8.1.9.2 (causas_cancelacion). Cuando incurra sin causa justificada, la Instancia Ejecutora cancela el apoyo monetario, informando a la Dirección de Administración, Finanzas y de Gestión Documental; la baja se somete al CASPEG para su aprobación; la Secretaría Técnica informa mediante oficio al núcleo agrario.",
+      "numeral": "8.1.9.2; 10.1, fr. XIX y XX; 9.4.3 d); Secretaría Técnica 5)",
+      "linea": 8857
+    },
+    {
+      "clave": "reintegro",
+      "texto": "Reintegro de los recursos a la cuenta bancaria de PROBOSQUE que proporciona la Dirección de Administración, Finanzas y de Gestión Documental, una vez notificado mediante el requerimiento de pago de la Unidad Jurídica, previo acuerdo del CASPEG, en los supuestos: a) Cuando se determine el incumplimiento a las reglas de operación, previo acuerdo del Comité. b) Cuando se detecte que se ha falseado la información, o existan evidencias de conflictos de propiedad, posesión, representación o litigio de cualquier índole presente en el predio, que provengan de autoridad competente. c) En caso de recibir apoyo monetario fuera de lo establecido en el contrato de adhesión. d) Cuando la autoridad competente certifique que, dentro del área de vigilancia asignada, se consolidó un cambio de uso de suelo (asentamiento humano o agrícola) que no fue reportado oportunamente en los informes mensuales, o se detecte complicidad en la venta ilegal de agua. e) Las demás que determine la instancia normativa. El monto reintegrado se deposita de manera inmediata desde la notificación y, en su caso, puede reasignarse a otro Guardabosque del ejercicio en curso que resulte factible, previo acuerdo del CASPEG.",
+      "numeral": "8.1.9.3; 10.1, fr. IV",
+      "linea": 8867,
+      "supuestos": [
+        {
+          "texto": "Cuando se determine el incumplimiento a las reglas de operación, previo acuerdo del Comité.",
+          "numeral": "8.1.9.3 a)",
+          "linea": 8872
+        },
+        {
+          "texto": "Cuando se detecte que se ha falseado la información, o existan evidencias de conflictos de propiedad, posesión, representación o litigio de cualquier índole presente en el predio, que provengan de autoridad competente.",
+          "numeral": "8.1.9.3 b)",
+          "linea": 8873
+        },
+        {
+          "texto": "En caso de recibir apoyo monetario fuera de lo establecido en el contrato de adhesión.",
+          "numeral": "8.1.9.3 c)",
+          "linea": 8875
+        },
+        {
+          "texto": "Cuando la autoridad competente certifique que, dentro del área de vigilancia asignada, se consolidó un cambio de uso de suelo (asentamiento humano o agrícola) que no fue reportado oportunamente en los informes mensuales, o se detecte complicidad en la venta ilegal de agua.",
+          "numeral": "8.1.9.3 d)",
+          "linea": 8876
+        },
+        {
+          "texto": "Las demás que determine la instancia normativa.",
+          "numeral": "8.1.9.3 e)",
+          "linea": 8879
+        }
+      ]
+    },
+    {
+      "clave": "sustitucion",
+      "texto": "En caso de baja por los supuestos de 8.1.9.2, el CASPEG aprueba las sustituciones a partir de la lista de espera o de quienes hayan realizado su registro y cumplan los requisitos, previa revisión de la Instancia Ejecutora; la Instancia Ejecutora comunica por oficio a las nuevas personas beneficiarias la aprobación; el apoyo monetario se da a partir de su incorporación, de acuerdo con la disponibilidad presupuestal y la aprobación del CASPEG.",
+      "numeral": "10.2; 10.1, fr. XXI",
+      "linea": 9057
+    },
+    {
+      "clave": "baja_voluntaria_y_cobeneficiaria",
+      "texto": "La persona beneficiaria puede desistir de fungir como Guardabosque de manera voluntaria (8.1.6 i) y designar persona cobeneficiaria para gestionar el apoyo en caso de enfermedad grave o defunción, respecto a las actividades ya realizadas y reportadas en el informe mensual (8.1.6 h). La defunción es también causa de baja (8.1.9.2 g).",
+      "numeral": "8.1.6 h) e i); 8.1.9.2 g)",
+      "linea": 8771
+    }
+  ],
+  "refrendo": {
+    "descripcion": "Refrendo: las personas beneficiarias pueden refrendar su participación en el PEG en el siguiente año únicamente presentando un escrito de ratificación como Guardabosque firmado por las personas del órgano de representación del núcleo agrario, mientras sigan vigentes. El CASPEG aprueba las ratificaciones (9.4.3 b). La vigencia es durante el periodo de la representación; si cambia el órgano de representación, la persona deja de ser Guardabosque (8.2).",
+    "numeral": "8.1.2 k); 9.4.3 b); 8.2",
+    "linea": 8600,
+    "requisitos": [
+      "PEG-REQ-18"
+    ],
+    "vigencia_documentacion_legal": null
+  },
+  "padron": {
+    "descripcion": "Padrón de personas beneficiarias: relación de personas designadas por los representantes de Núcleos Agrarios que cuenten con terrenos forestales y sean aprobados y validados por el CASPEG para fungir como Guardabosques y recibir el apoyo monetario (glosario, líneas 8446-8448).",
+    "integracion": "La Instancia Ejecutora integra y actualiza el Padrón conforme a los Lineamientos y Criterios para la Integración y Actualización de los Padrones de las Personas Beneficiarias, publicados el 28-nov-2025 en la Gaceta (8.1.5, líneas 8750-8755; 10.1, fr. X, línea 9018).",
+    "aprobacion": "El CASPEG aprueba la lista de espera y el padrón (9.4.3 a, línea 8950).",
+    "altas": "Aprobación de solicitudes factibles por el CASPEG (10.1, fr. IX); inclusión de nuevas personas beneficiarias en sustitución de las bajas y ratificaciones (9.4.3 b, línea 8951).",
+    "bajas": "Por las causas de 8.1.9.2, previo acuerdo del CASPEG (9.4.3 d; 10.1, fr. XX); la Secretaría Técnica informa mediante oficio al núcleo agrario (línea 8985).",
+    "sustituciones": "10.2 y 10.1 fr. XXI (líneas 9057-9064 y 9051-9055): a partir de la lista de espera o de quien haya hecho su registro y cumpla requisitos, previa revisión de la Instancia Ejecutora y aprobación del CASPEG; el apoyo corre desde su incorporación.",
+    "una_persona_por_nucleo": "La selección está limitada a una persona por núcleo agrario (8.1.2 k, línea 8600).",
+    "datos_clasificados": "Las personas beneficiarias vulnerables ante un ilícito por el apoyo monetario aprobado se consideran información clasificada (numeral 14, línea 9091).",
+    "numeral": "8.1.5; 10.1 fr. X; 9.4.3; 10.2",
+    "linea": 8750
+  },
+  "lista_espera": {
+    "descripcion": "Relación de personas solicitantes que, cumpliendo los requisitos, no son sujetos de apoyo monetario en ese momento por haberse cumplido la meta de personas beneficiarias programada o por no existir suficiencia presupuestal (glosario, líneas 8440-8443). El CASPEG la aprueba (9.4.3 a). Se usa para sustituciones y reasignación de recursos (Convocatoria base sexta, líneas 9544-9546) y, ante una ampliación presupuestal, se puede asignar recurso a solicitudes en lista de espera (Transitorio tercero, líneas 9147-9149). La convocatoria para nuevas personas beneficiarias se emite solo si hay suficiencia presupuestal y no existe lista de espera (10.1, fr. I).",
+    "numeral": "3 (glosario); 9.4.3 a); 10.1 fr. I y XXI; Convocatoria base sexta; Transitorio tercero",
+    "linea": 8440,
+    "ordenamiento": "Las reglas no dicen cómo se ordena la lista (por puntaje de 8.1.2 o por fecha de registro; la Convocatoria base cuarta dice que se atienden las solicitudes integradas en orden cronológico de registro): VER DUDAS."
+  },
+  "reportes_mensuales": {
+    "descripcion": "Reportes mensuales de las actividades realizadas de protección, conservación, restauración y fomento forestal, que la persona beneficiaria entrega en las oficinas de la Delegación Regional Forestal en formato preestablecido (7.2.1, líneas 8499-8501; 8.1.7 l, líneas 8814-8815).",
+    "contenido": "Actividades realizadas por el Guardabosque: recorridos de vigilancia forestal sistemáticos (tala ilegal, incendios, daños a la reforestación, plagas y enfermedades, cambio de uso del suelo, asentamientos irregulares, ollas de agua ilegales: 8.1.7 g), participación en actividades de protección, conservación, restauración hidrológica forestal, fomento forestal, silvicultura y manejo de combustibles (8.1.7 h), denuncia de irregularidades (8.1.7 j), garantía del «Caudal de Supervivencia» (8.1.7 m) y cualquier cambio de uso de suelo, que si no se reporta oportunamente en los informes mensuales es causa de reintegro (8.1.9.3 d). El contenido exacto lo fija el formato preestablecido, que no está en el texto.",
+    "anexo_zonas_estrategicas": "Para los núcleos agrarios ubicados en zonas estratégicas es requisito indispensable anexar el Reporte de Integridad Territorial (Anexo Técnico) con evidencia fotográfica georreferenciada que demuestre la no expansión de la frontera agrícola o urbana (8.1.7 l, líneas 8815-8817). Las reglas no dicen cuáles son las «zonas estratégicas» (la prioridad f menciona el «Bosque de Agua»).",
+    "entrega": "En las oficinas de las Delegaciones Regionales Forestales, cada mes (8.1.7 l); no se fija el día de vencimiento («de acuerdo al calendario establecido para tal fin», 8.1.8 a, línea 8827).",
+    "a_quien": "Delegación Regional Forestal (recibe); Instancia Ejecutora (Dirección de Protección Forestal) los evalúa; el CASPEG valida el otorgamiento (Convocatoria base cuarta, líneas 9505-9506).",
+    "revision": "A partir de la firma del Contrato de Adhesión, mensualmente se revisa el reporte de actividades (Convocatoria base quinta, actividad VII, líneas 9534-9538).",
+    "incumplimientos": "No entregar el reporte mensual en tiempo y forma: suspensión temporal por ministración (8.1.9.1 a). No presentar tres informes mensuales (de manera continua según 8.1.8 i; «durante el ejercicio fiscal» según 8.1.9.2 f): baja.",
+    "numeral": "7.2.1; 8.1.7 l); 8.1.8 a) e i); Convocatoria base tercera, cuarta y quinta (VII)",
+    "linea": 8499
+  },
+  "evaluacion_de_reportes": {
+    "descripcion": "Evaluación interna: proceso de verificación, análisis y valoración que realiza la Dirección de Protección Forestal a los reportes emitidos por los Guardabosques, para constatar el cumplimiento de las actividades comprometidas (glosario, líneas 8433-8434). Tras ella, la Instancia Ejecutora, en coordinación con el enlace administrativo, genera la solicitud del recurso económico (10.1, fr. XIII, líneas 9024-9025). La Convocatoria dice que el otorgamiento de los apoyos es «con base en la revisión documental de los reportes de actividades mensuales entregados, lo cual será validado por el Comité» (líneas 9505-9506) y la base tercera lo llama condición «previa aprobación del Comité» (líneas 9350-9352).",
+    "flujo": [
+      "Persona beneficiaria entrega el reporte mensual en la Delegación (8.1.7 l)",
+      "Instancia Ejecutora: revisión documental y evaluación interna de participación (Convocatoria base quinta VII; glosario)",
+      "CASPEG valida/aprueba el otorgamiento (Convocatoria base tercera y cuarta); si hay incumplimiento sin causa justificada, aprueba la suspensión (9.4.3 c)",
+      "Instancia Ejecutora genera la solicitud del recurso con el enlace administrativo (10.1 XIII)",
+      "Dirección de Administración, Finanzas y de Gestión Documental emite el pago por transferencia (10.1 XIV)",
+      "Delegación recaba el acuse de recibo del depósito y lo entrega a la Dirección de Administración (10.1 XV)",
+      "Instancia Ejecutora informa al CASPEG los resultados finales (10.1 XVI)"
+    ],
+    "numeral": "3 (glosario «Evaluación interna»); 10.1, fr. XIII a XVI; Convocatoria base tercera, cuarta",
+    "linea": 8433
+  },
+  "contrato_y_credencial": {
+    "instrumento": "Contrato de Adhesión: documento legal mediante el cual la persona se compromete formalmente, bajo protesta de decir verdad, a cumplir las obligaciones adquiridas (glosario, líneas 8425-8426). Es el único instrumento: las reglas del PEG no hablan de «convenio de concertación».",
+    "elaboracion_y_firma": "La Instancia Ejecutora lo elabora tras la aprobación de las solicitudes factibles por el CASPEG; las personas beneficiarias lo requisitan a través de las Delegaciones Regionales Forestales para su firma y sello del núcleo agrario por cada una de las partes (10.1, fr. XII, líneas 9021-9023). Se firma 10 días hábiles posteriores a la aprobación de las solicitudes (Convocatoria base quinta V, líneas 9525-9527). También figura como requisito de la persona (8.1.1.2 b, fr. VIII).",
+    "credencial": "Derecho de recibir de forma gratuita una credencial que lo identifica como Guardabosque (8.1.6 g, línea 8770). Las reglas no dicen cuándo se entrega, quién la emite ni su formato.",
+    "capacitacion": "Capacitación gratuita (8.1.6 f; obligación de asistir, 8.1.7 b, líneas 8789-8792).",
+    "numeral": "3; 8.1.1.2 b) fr. VIII; 8.1.6 f) y g); 10.1 fr. XII",
+    "linea": 8425
+  },
+  "periodos_reportes": [
+    {
+      "clave": "2026-01",
+      "nombre": "Enero 2026",
+      "inicio": "2026-01-01",
+      "fin": "2026-01-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-02",
+      "nombre": "Febrero 2026",
+      "inicio": "2026-02-01",
+      "fin": "2026-02-28",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-03",
+      "nombre": "Marzo 2026",
+      "inicio": "2026-03-01",
+      "fin": "2026-03-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-04",
+      "nombre": "Abril 2026",
+      "inicio": "2026-04-01",
+      "fin": "2026-04-30",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-05",
+      "nombre": "Mayo 2026",
+      "inicio": "2026-05-01",
+      "fin": "2026-05-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-06",
+      "nombre": "Junio 2026",
+      "inicio": "2026-06-01",
+      "fin": "2026-06-30",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-07",
+      "nombre": "Julio 2026",
+      "inicio": "2026-07-01",
+      "fin": "2026-07-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-08",
+      "nombre": "Agosto 2026",
+      "inicio": "2026-08-01",
+      "fin": "2026-08-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-09",
+      "nombre": "Septiembre 2026",
+      "inicio": "2026-09-01",
+      "fin": "2026-09-30",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-10",
+      "nombre": "Octubre 2026",
+      "inicio": "2026-10-01",
+      "fin": "2026-10-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-11",
+      "nombre": "Noviembre 2026",
+      "inicio": "2026-11-01",
+      "fin": "2026-11-30",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    },
+    {
+      "clave": "2026-12",
+      "nombre": "Diciembre 2026",
+      "inicio": "2026-12-01",
+      "fin": "2026-12-31",
+      "ministracion": null,
+      "derivado": true,
+      "nota": "Mes calendario del ejercicio fiscal 2026. Las reglas hablan de «reportes mensuales» y de «los meses del año fiscal en ejercicio», pero no publican el calendario de entrega ni qué meses cubre cada una de las hasta cuatro ministraciones; el primer mes que se reporta es el de la firma del contrato (Convocatoria base quinta VII).",
+      "numeral": "7.2.1; 8.1.7 l); Convocatoria base quinta, actividades VI y VII",
+      "linea": 8499
+    }
+  ],
+  "sin_poligono_ni_planta": {
+    "confirmado": true,
+    "texto": "El PEG no usa polígono, superficie en hectáreas, planta, vale de planta, sobrevivencia, diagnóstico técnico ni verificación en campo de actividades: esos términos no aparecen en 8.1.1.2, 10.1 ni la Convocatoria. La zona de trabajo es el «área de influencia» del Guardabosque («área de vigilancia asignada», 8.1.9.3 d) y no se delimita en las reglas. Lista de espera: sí existe (ver lista_espera).",
+    "numeral": "7; 8.1.1.2; 10.1",
+    "linea": 8489
+  },
+  "mecanica_operativa": [
+    {
+      "paso": "I",
+      "texto": "La SECAMPO, a través de la Instancia Ejecutora, emite la convocatoria del programa para la incorporación de nuevas personas beneficiarias, siempre y cuando se cuente con suficiencia presupuestal del ejercicio fiscal y no exista lista de espera.",
+      "numeral": "10.1, fr. I",
+      "linea": 8995
+    },
+    {
+      "paso": "II",
+      "texto": "La Dirección de Administración, Finanzas y de Gestión Documental de PROBOSQUE es la responsable de la administración y emisión de los recursos económicos.",
+      "numeral": "10.1, fr. II",
+      "linea": 8998
+    },
+    {
+      "paso": "III",
+      "texto": "La Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia lleva a cabo la dictaminación jurídica de la procedencia de la documentación legal de cada solicitud única del núcleo agrario participante.",
+      "numeral": "10.1, fr. III",
+      "linea": 9000
+    },
+    {
+      "paso": "IV",
+      "texto": "Si los beneficiarios reciben dinero que no les corresponde, la Instancia Ejecutora lo hace del conocimiento de la Unidad Jurídica para que, previo acuerdo e instrucción del CASPEG, gestione el reintegro.",
+      "numeral": "10.1, fr. IV",
+      "linea": 9003
+    },
+    {
+      "paso": "V",
+      "texto": "Publicadas la Convocatoria y las Reglas en la Gaceta, la Instancia Ejecutora, a través de las Delegaciones Regionales Forestales, recibe las solicitudes y es responsable de la correcta integración de la documentación.",
+      "numeral": "10.1, fr. V",
+      "linea": 9006
+    },
+    {
+      "paso": "VI",
+      "texto": "La Instancia Ejecutora revisa, registra, integra, valida y digitaliza los expedientes para asegurar su integración conforme a los requisitos.",
+      "numeral": "10.1, fr. VI",
+      "linea": 9010
+    },
+    {
+      "paso": "VII",
+      "texto": "Si con posterioridad se requiere presentar de nuevo la documentación o documentos complementarios, se notifica al solicitante dentro de 10 días naturales durante el periodo de vigencia de la convocatoria.",
+      "numeral": "10.1, fr. VII",
+      "linea": 9012
+    },
+    {
+      "paso": "VIII",
+      "texto": "La Instancia Ejecutora emite el listado preliminar de solicitudes factibles y no factibles.",
+      "numeral": "10.1, fr. VIII",
+      "linea": 9015
+    },
+    {
+      "paso": "IX",
+      "texto": "La Instancia Ejecutora convoca al CASPEG para conocimiento del ingreso de solicitudes; el Comité analiza, valida y autoriza las solicitudes factibles.",
+      "numeral": "10.1, fr. IX",
+      "linea": 9016
+    },
+    {
+      "paso": "X",
+      "texto": "La Instancia Ejecutora integra el Padrón de personas beneficiarias.",
+      "numeral": "10.1, fr. X",
+      "linea": 9018
+    },
+    {
+      "paso": "XI",
+      "texto": "La Instancia Ejecutora tramita la publicación de resultados y la remite al área correspondiente de PROBOSQUE para su difusión.",
+      "numeral": "10.1, fr. XI",
+      "linea": 9019
+    },
+    {
+      "paso": "XII",
+      "texto": "La Instancia Ejecutora elabora el contrato de adhesión posterior a la aprobación del CASPEG; las personas beneficiarias lo requisitan a través de las Delegaciones para su firma y sello del núcleo agrario por cada una de las partes.",
+      "numeral": "10.1, fr. XII",
+      "linea": 9021
+    },
+    {
+      "paso": "XIII",
+      "texto": "La Instancia Ejecutora, en coordinación con el enlace administrativo, genera la solicitud del recurso económico posterior a la evaluación interna de participación de Guardabosques.",
+      "numeral": "10.1, fr. XIII",
+      "linea": 9024
+    },
+    {
+      "paso": "XIV",
+      "texto": "La Instancia Ejecutora con la Dirección de Administración, Finanzas y de Gestión Documental emite y entrega el apoyo monetario mediante transferencia bancaria a la cuenta de la persona beneficiaria.",
+      "numeral": "10.1, fr. XIV",
+      "linea": 9026
+    },
+    {
+      "paso": "XV",
+      "texto": "La Instancia Ejecutora, a través de las Delegaciones, recaba la firma de acuse de recibo del depósito y entrega los acuses a la Dirección de Administración, Finanzas y de Gestión Documental.",
+      "numeral": "10.1, fr. XV",
+      "linea": 9028
+    },
+    {
+      "paso": "XVI",
+      "texto": "La Instancia Ejecutora, con el enlace administrativo, informa al CASPEG sobre los resultados finales.",
+      "numeral": "10.1, fr. XVI",
+      "linea": 9031
+    },
+    {
+      "paso": "XVII",
+      "texto": "La Instancia Ejecutora, de manera conjunta con las Delegaciones, es responsable de la operación y seguimiento del PEG.",
+      "numeral": "10.1, fr. XVII",
+      "linea": 9033
+    },
+    {
+      "paso": "XVIII",
+      "texto": "Si la persona beneficiaria incurre en 8.1.9.1 sin causa justificada, la Instancia Ejecutora solicita a la Dirección de Administración suspender el apoyo monetario, informando de ello.",
+      "numeral": "10.1, fr. XVIII",
+      "linea": 9035
+    },
+    {
+      "paso": "XIX",
+      "texto": "Si incurre en 8.1.9.2 sin causa justificada, la Instancia Ejecutora cancela el apoyo monetario, informando a la Dirección de Administración.",
+      "numeral": "10.1, fr. XIX",
+      "linea": 9046
+    },
+    {
+      "paso": "XX",
+      "texto": "Se somete al Comité la baja de las personas en alguno de los supuestos de 8.1.9.2, para su aprobación.",
+      "numeral": "10.1, fr. XX",
+      "linea": 9049
+    },
+    {
+      "paso": "XXI",
+      "texto": "En caso de baja, la Instancia Ejecutora realiza las sustituciones, previa aprobación del CASPEG, dando de alta a otra solicitante de la lista de espera o que haya hecho su registro y cumpla los requisitos, previa validación de la Instancia Ejecutora, para recibir desde ese momento los beneficios del PEG.",
+      "numeral": "10.1, fr. XXI",
+      "linea": 9051
+    },
+    {
+      "paso": "XXII",
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "numeral": "10.1, fr. XXII",
+      "linea": 9056
+    }
+  ],
+  "flujos_alternos": {
+    "A_expediente_incompleto": "La Convocatoria exige la documentación completa al presentar la solicitud y el comprobante de recepción se entrega solo si cumple todos los requisitos (líneas 9362-9364 y 9494-9496). Si después se requiere documentación nueva o complementaria, la Instancia Ejecutora notifica en 10 días naturales (8.1.1.2 b, fr. XII, línea 8563; 10.1 fr. VII). Las reglas no dicen cuántos días tiene el núcleo para entregar lo faltante ni que la solicitud se deseche: VER DUDAS.",
+    "B_suspension_por_incumplimiento_mensual": "Incumplimiento de 8.1.9.1 sin causa justificada: la Instancia Ejecutora pide suspender el apoyo; el CASPEG aprueba la suspensión (10.1 fr. XVIII; 9.4.3 c).",
+    "C_baja_y_sustitucion": "Causa de 8.1.9.2: la Instancia Ejecutora cancela el apoyo, el CASPEG aprueba la baja y la sustitución desde la lista de espera o de solicitudes registradas (10.1 fr. XIX a XXI; 10.2); la Secretaría Técnica informa por oficio al núcleo agrario.",
+    "D_reintegro": "8.1.9.3: requerimiento de pago de la Unidad Jurídica previo acuerdo del CASPEG; reintegro inmediato a la cuenta de PROBOSQUE; el monto puede reasignarse a otro Guardabosque, previo acuerdo del CASPEG.",
+    "E_defuncion_o_enfermedad_grave": "La persona cobeneficiaria gestiona el apoyo por actividades ya realizadas y reportadas en el informe mensual (8.1.6 h); la defunción es causa de baja (8.1.9.2 g).",
+    "F_pago_por_cheque": "Solo en casos excepcionales y por causa justificada, solicitado por la Delegación Regional Forestal y autorizado por la Dirección de Protección Forestal (7.2.1, líneas 8502-8504).",
+    "G_cambio_de_representacion": "La persona deja de ser Guardabosque al finalizar el periodo del órgano de representación del núcleo agrario o al término de sus obligaciones (8.2, líneas 8892-8893); refrendo con escrito de ratificación (8.1.2 k).",
+    "H_graduacion": "Se determina por el cumplimiento del proceso en sus etapas y cuando el CASPEG sesione y acuerde el cierre del PEG en el ejercicio fiscal (8.2, líneas 8889-8891)."
+  },
+  "dias_inhabiles": "Las ROP y la Convocatoria del PEG no mencionan días inhábiles ni calendario; usan «días hábiles» y «días naturales» sin definirlos. La recepción es de lunes a viernes de 9:00 a 18:00 horas (Convocatoria base cuarta, línea 9365).",
+  "dudas": [
+    "FIRMA DEL CONTRATO DE ADHESIÓN (¿desde cuándo corre?): la Convocatoria (base quinta, actividad V, líneas 9525-9527) dice: «Elaboración y Firma del Contrato de Adhesión. Se llevará a cabo 10 días hábiles posteriores a la aprobación de las solicitudes.» La obligación 8.1.7 c) (línea 8793) dice: «Suscribir en tiempo y forma el contrato de adhesión posterior a la aprobación por el CASPEG, en apego a los tiempos establecidos en la convocatoria» y 10.1 fr. XII (líneas 9021-9023): «elabora el contrato de adhesión, posterior a la aprobación de las solicitudes factibles por el CASPEG…». Es decir: corre desde la APROBACIÓN del CASPEG, no desde la publicación de resultados (como en CC/PSAHEM) ni desde la notificación a la persona (como en RHF/PS 8.1.9 b). La publicación de resultados es «posterior a la fecha de la aprobación» (base quinta IV) y puede ocurrir días después, así que el núcleo podría tener menos de 10 días hábiles desde que se entera. Las reglas no dicen qué pasa si no se firma en ese plazo (no es causa de incumplimiento ni de baja expresa) ni cómo se avisa la fecha de aprobación a la persona. Por confirmar con el cliente.",
+    "DOCUMENTACIÓN FALTANTE (¿desde cuándo corre y cuántos días?): el PEG no tiene el plazo de «5 días hábiles a partir de la recepción» de los otros programas. Lo único que dicen es 8.1.1.2 b), fr. XII (líneas 8563-8565): «Si se determina con posterioridad que por cualquier supuesto para alguna solicitud única es necesario que se presente nuevamente la documentación o requiere de información o documentos complementarios, se le notificará a la persona solicitante dentro del plazo de 10 días naturales.» y 10.1 fr. VII (líneas 9012-9014): «…se le notificará al solicitante dentro del plazo de 10 días naturales durante el periodo de vigencia de la convocatoria.» El plazo de 10 días naturales es para que PROBOSQUE NOTIFIQUE, no para que el núcleo complete, y no dice desde qué momento corre (¿recepción de la solicitud única?, ¿conclusión de la revisión?). La Convocatoria (base cuarta, líneas 9362-9364) pide que «la documentación deberá estar completa» y entrega comprobante de recepción solo «siempre y cuando cumplan con todos los requisitos» (líneas 9494-9496). Cuántos días tiene el núcleo para entregar lo faltante y si la solicitud se desecha: no está. El archivo trae complemento_documentacion_faltante sin cantidad. Por decidir con el cliente.",
+    "ENTREGA DEL REPORTE MENSUAL (¿cuándo vence?): 8.1.7 l) (líneas 8814-8815): «Entregar reportes mensuales de las actividades realizadas, en las oficinas de las Delegaciones Regionales Forestales (en formato preestablecido).» 8.1.8 a) (líneas 8827-8828): causa de incumplimiento «No entregar el reporte mensual de las actividades realizadas en tiempo y forma de acuerdo al calendario establecido para tal fin.» y Convocatoria base quinta VII (líneas 9537-9538): «A partir de la firma del Contrato de Adhesión, mensualmente se realizará la revisión del reporte de actividades de Guardabosques.» No hay día de vencimiento ni calendario publicado: el «calendario establecido para tal fin» no está en el texto (¿lo emite la Instancia Ejecutora o el CASPEG en sus lineamientos internos?). Tampoco dicen si el primer reporte es el del mes de la firma ni si se pierden los meses anteriores a ella.",
+    "MINISTRACIONES: las reglas dicen «dividido hasta en cuatro ministraciones, de acuerdo con la disponibilidad presupuestal» (7.2.1, líneas 8497-8499; Convocatoria base tercera, líneas 9356-9360) pero NO dicen el monto ni el porcentaje de cada una, qué meses o reportes cubre, ni cuándo se pagan. El archivo trae 4 ministraciones de 25 % (supuesto de partes iguales: $6,387.50) solo porque el cargador exige un porcentaje; es una decisión propia por confirmar. Tampoco está claro si «hasta cuatro» permite menos de cuatro ni qué pasa con una persona que ingresa a mitad de año (10.2: «el apoyo monetario del PEG se dará a partir de su incorporación», líneas 9063-9064: ¿se prorratea o se pagan las ministraciones restantes completas?).",
+    "PERIODOS DEL REPORTE: periodos_reportes lista los 12 meses de 2026 porque las reglas hablan de reportes mensuales y de «los meses del año fiscal en ejercicio»; no hay trimestres ni un calendario de ministraciones en las reglas. Es una derivación, marcada como tal (derivado: true); falta la correspondencia mes-ministración.",
+    "VALIDACIÓN DEL CASPEG ANTES DE CADA PAGO: la base tercera (líneas 9350-9352) pone como condición del apoyo la entrega de reportes «y previa aprobación del Comité»; la base cuarta (líneas 9505-9506) dice «revisión documental de los reportes… lo cual será validado por el Comité»; la mecánica 10.1 fr. XIII habla de «evaluación interna» de la Instancia Ejecutora y 9.4.3 no incluye entre las atribuciones del CASPEG validar los reportes (solo suspensión, baja, padrón, sustituciones). No se dice en qué sesión ni con qué periodicidad valida el CASPEG los reportes ni si cada ministración necesita su acuerdo.",
+    "CASPEG: la Secretaría Técnica es la titular de PROBOSQUE (9.4.1 fr. II) y el acta la levanta «la Secretaría del CASPEG» (línea 8946); no hay plazo para el acta ni periodicidad de las sesiones ordinarias (son «las fechas acordadas por el CASPEG», línea 8939; los lineamientos internos no están en el texto). El Transitorio séptimo ordena instalarlo en 15 días hábiles tras la publicación de las Reglas, pero las Reglas y la Convocatoria dicen haber sido aprobadas por el CASPEG el 17-feb-2026 (líneas 9317-9319 y 9601): hay un CASPEG previo a la publicación. Las sesiones extraordinarias se convocan «con un día de anticipación» (no dice hábil o natural).",
+    "SOLICITANTE Y BENEFICIARIA: la solicitud es del núcleo agrario (Comisariado); en el glosario las «personas solicitantes» son «las personas representantes de los Núcleos Agrarios» y la beneficiaria es la persona designada (Guardabosque). Los requisitos 8.1.1.2 a) los presenta el núcleo y los de b) la persona designada; el documento de la cuenta bancaria (b III) y el contrato de adhesión (b VIII) se piden «de ser asignado»/tras la aprobación pero están en la lista de requisitos: se marcaron opcional con condición. «Ser mayor de edad» (b VII) no pide documento propio.",
+    "CREDENCIAL: las reglas solo dicen que la persona tiene derecho a recibirla gratis (8.1.6 g); no hay plazo, formato, vigencia ni momento de entrega, ni se menciona en la mecánica operativa. Tampoco se dice para qué sirve la fotografía de 160 x 200 píxeles (b XI).",
+    "FORMATOS DEL PEG: el Manual de formatos del texto no trae ninguno del PEG (Solicitud Única del PEG, Contrato de adhesión, Anexo Técnico con Reporte de Integridad Territorial, formato preestablecido del reporte mensual, acuse de recibo del depósito): se piden al cliente. El «Formato de Registro de Información» (8.1.4 a) puede ser el FO-PB-502 de los otros programas, pero el texto no lo dice.",
+    "ZONAS ESTRATÉGICAS Y ZONAS CRÍTICAS: el Reporte de Integridad Territorial es indispensable «para los núcleos agrarios ubicados en zonas estratégicas» (8.1.7 l) y la priorización usa «zonas críticas», «Bosque de Agua» y «ANP estatales» (8.1.2 c, e, f), pero ni las reglas ni el texto traen la lista o capa de esas zonas: se piden al cliente para que el sistema calcule el puntaje y la obligatoriedad del anexo.",
+    "PRIORIZACIÓN: los puntos de 8.1.2 (5, 5, 5, 5, 4, 5, 5, 5, 3: máximo 42) se otorgan por núcleo agrario o por la persona; las reglas no dicen cómo se desempata más allá del voto de calidad ni si hay puntaje mínimo. Orden de la lista de espera: no dice si por puntaje o por registro cronológico (Convocatoria base cuarta: «orden cronológico en que hayan sido registradas»).",
+    "VIGENCIA Y REFRENDO: la persona dura mientras sigan vigentes las autoridades que la designaron (8.1.2 k, 8.2) y el refrendo es solo un escrito de ratificación, pero no se dice qué pasa si cambia el órgano de representación a mitad de año.",
+    "RECEPCIÓN PERMANENTE: la Convocatoria (base quinta I) deja la recepción abierta de manera permanente durante el ejercicio fiscal, mientras que 10.1 fr. I dice que la convocatoria para nuevas personas se emite «siempre y cuando se cuente con suficiencia presupuestal… y no exista lista de espera»: no hay fecha límite de recepción, por lo que recepcion_solicitudes no trae fecha_fin.",
+    "SUSPENSIÓN Y BAJA: 8.1.8 b) y c) (faltas injustificadas a reuniones y a eventos) llevan solo a suspensión (8.1.9.1), no a baja; 8.1.8 i) habla de tres informes mensuales «de manera continua» y 8.1.9.2 f) de tres informes «durante el ejercicio fiscal» sin decir continuos. No se dice por cuánto tiempo se suspende, cómo se reanuda el pago ni si lo suspendido se recupera al subsanar.",
+    "REINTEGRO: no hay plazo en días («de manera inmediata a partir de la fecha de notificación», línea 8880); 8.1.7 d) dice que la persona reintegra «una vez que le sea notificada dicha situación por cualquier medio» y 8.1.9.3 que es mediante requerimiento de pago de la Unidad Jurídica previo acuerdo del CASPEG: dos vías distintas.",
+    "COBENEFICIARIA: la persona cobeneficiaria puede gestionar el apoyo (8.1.6 h) pero no hay requisito, documento ni trámite para designarla.",
+    "ESTRUCTURA DEL ARCHIVO: se agregaron las claves padron, lista_espera, reportes_mensuales, evaluacion_de_reportes, contrato_y_credencial, periodos_reportes y sin_poligono_ni_planta, propias del PEG. Sin contenido propio (vacías o con aplica: false): superficie e inelegibles (las reglas no traen lista de inelegibles; la carta de no sanciones/adeudo es el requisito PEG-REQ-04)."
+  ]
+}

@@ -112,7 +112,7 @@ def test_hu_2_1_existe_listado_preliminar_con_resultado_tecnico_y_juridico(valid
 
 def test_hu_2_1_peg_dictamen_dentro_de_45_dias_habiles(peg, usuarios):
     """Criterio 3: en PEG, el dictamen existe dentro de los 45 días hábiles (plazo de los datos del programa)."""
-    exp = registrar_validada(usuarios, peg, nombre="Guardabosque Ejido San Juan", direccion="dir_dpf", modalidad=None)
+    exp = registrar_peg(usuarios, peg, nombre="Guardabosque Ejido San Juan")
     limite, plazo = tecnico.fecha_limite_dictamen(exp)
     assert plazo.cantidad == 45 and plazo.unidad == "dias_habiles"
     assert limite == dias_habiles.sumar_dias_habiles(exp.fecha_recepcion, 45)
@@ -125,7 +125,7 @@ def test_hu_2_1_peg_dictamen_dentro_de_45_dias_habiles(peg, usuarios):
 
 
 def test_hu_2_1_peg_dictamen_fuera_de_plazo_queda_senalado(peg, usuarios):
-    exp = registrar_validada(usuarios, peg, nombre="Guardabosque Tardío", direccion="dir_dpf", modalidad=None)
+    exp = registrar_peg(usuarios, peg, nombre="Guardabosque Tardío")
     exp.fecha_recepcion = timezone.now() - timedelta(days=120)
     exp.save()
     assert tecnico.situacion_plazo(exp)["situacion"] == "vencido"
@@ -139,7 +139,7 @@ def test_hu_2_1_peg_dictamen_fuera_de_plazo_queda_senalado(peg, usuarios):
 
 
 def test_hu_2_1_peg_por_vencer_se_avisa(peg, usuarios):
-    exp = registrar_validada(usuarios, peg, nombre="Guardabosque Por Vencer", direccion="dir_dpf", modalidad=None)
+    exp = registrar_peg(usuarios, peg, nombre="Guardabosque Por Vencer")
     limite, _ = tecnico.fecha_limite_dictamen(exp)
     assert tecnico.revisar_plazos_dictamen(limite - timedelta(days=1)) == 1
     assert exp.eventos.filter(tipo="plazo_dictamen_por_vencer").exists()

@@ -65,13 +65,13 @@ def test_hu_1_1_solo_la_delegacion_registra(cc, usuarios):
 
 
 def test_hu_1_1_programa_sin_reglas_no_recibe_solicitudes(catalogos, usuarios):
-    from nucleo.models import Ejercicio
+    """Los seis programas ya tienen reglas 2026; un ejercicio sin su archivo de reglas (2027) no recibe solicitudes."""
+    from nucleo.models import Ejercicio, Programa
 
-    peg = Ejercicio.objects.get(programa__clave="PEG", anio=2026)
-    if peg.tiene_reglas:
-        pytest.skip("PEG ya tiene reglas cargadas")
+    sin_reglas = Ejercicio.objects.create(programa=Programa.objects.get(clave="PEG"), anio=2027)
+    assert not sin_reglas.tiene_reglas
     datos = servicios.DatosSolicitud(
-        ejercicio=peg, municipio=Municipio.objects.get(nombre="Amecameca"), nombre_predio="X",
+        ejercicio=sin_reglas, municipio=Municipio.objects.get(nombre="Amecameca"), nombre_predio="X",
         tipo_persona=None, solicitante_nombre="Y", solicitante_tipo="fisica",
     )
     with pytest.raises(ValidationError):
