@@ -21,6 +21,7 @@
   --den-1: #24ab7e; --den-2: #088963; --den-3: #02684a; --den-4: #034933;
   --per-1: #a278e4; --per-2: #8c61cb; --per-3: #764ab2; --per-4: #61339a; --per-5: #4c1b82; --per-6: #380068;
   --linea: #088963; --tendencia: #767b6f;
+  --d-agricola: #d29a0c; --d-pecuario: #6f9a2b; --d-urbano: #6a4bb0; --d-otro: #8a6a4e; --d-sin: #8d8d84;
   --rayado: #bdbcb3; --contorno: #3f443a; --limites: #8a8d83; --sel: #13170f; --aviso-bg: #fbf1dc; --aviso-ink: #5c4300;
   --falla-bg: #fbe3e1; --falla-ink: #7a1712;
   --f-titulo: "Barlow Condensed", "Arial Narrow", "Segoe UI", sans-serif;
@@ -35,6 +36,7 @@
     --den-1: #047554; --den-2: #19966e; --den-3: #46b68c; --den-4: #69d6aa;
     --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
     --linea: #46b68c; --tendencia: #8b8f84;
+  --d-agricola: #f0b93a; --d-pecuario: #9bc24d; --d-urbano: #a58af0; --d-otro: #c9a27f; --d-sin: #7a7a72;
     --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
     --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
     color-scheme: dark;
@@ -48,6 +50,7 @@
   --den-1: #047554; --den-2: #19966e; --den-3: #46b68c; --den-4: #69d6aa;
   --per-1: #724aab; --per-2: #8760c3; --per-3: #9e77dc; --per-4: #b58ef6; --per-5: #c9acff; --per-6: #ddccfe;
   --linea: #46b68c; --tendencia: #8b8f84;
+  --d-agricola: #f0b93a; --d-pecuario: #9bc24d; --d-urbano: #a58af0; --d-otro: #c9a27f; --d-sin: #7a7a72;
   --rayado: #55574f; --contorno: #c0c4b8; --limites: #6c7066; --sel: #ffffff; --aviso-bg: #3a2f14; --aviso-ink: #f3d79a;
   --falla-bg: #3d1a19; --falla-ink: #f5bcb8;
   color-scheme: dark;
@@ -228,6 +231,24 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 .balance summary { cursor: pointer; color: var(--accent); width: fit-content; }
 .balance details table { margin-top: 6px; }
 @media (max-width: 760px) { .balance { grid-template-columns: minmax(0, 1fr); } }
+/* Uso al que pasó el terreno perdido (HU-7.4): barras horizontales, rótulo de estimación y años */
+.destino { grid-template-columns: minmax(0, 1fr); }
+.destino .estimacion { border-left: 4px solid var(--aviso-ink); }
+.destino .estimacion p { margin: 2px 0; }
+.destino .barras { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.destino .barras li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 11rem; gap: 4px 12px; align-items: center; font-variant-numeric: tabular-nums; }
+.destino .barras .pista { height: 18px; background: var(--sin-bosque); border-radius: 4px; overflow: hidden; }
+.destino .barras .relleno { display: block; height: 100%; min-width: 2px; border-radius: 4px; }
+.destino .barras .cifra { text-align: right; white-space: nowrap; font-weight: 600; }
+.destino .aparte { margin: 4px 0 0; color: var(--ink-2); }
+.destino table { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.destino td, .destino th { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+.destino td:first-child, .destino th:first-child, .destino #tabla-destino-anios td:nth-child(2), .destino #tabla-destino-anios th:nth-child(2) { text-align: left; }
+.destino .tabla-detalle { overflow-x: auto; }
+.destino td.sin-dato { color: var(--aviso-ink); background: var(--aviso-bg); text-align: left; }
+.destino details { font-size: .88rem; }
+.destino summary { cursor: pointer; color: var(--accent); width: fit-content; }
+@media (max-width: 520px) { .destino .barras li { grid-template-columns: minmax(0, 1fr) auto; } .destino #tabla-destino-anios { min-width: 480px; } .destino .barras .pista { grid-column: 1 / -1; grid-row: 2; } }
 /* Incendios (HU-7.3): capa de puntos, tabla y avisos de años sin capa de CONAFOR */
 .punto-inc { fill: var(--c-incendio); fill-opacity: .55; stroke: var(--sel); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; }
 .punto-inc:hover, .punto-inc:focus, .punto-inc.elegido { fill-opacity: .9; stroke-width: 2.4; outline: none; }
@@ -301,6 +322,8 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   <section class="tarjeta evolucion balance" id="balance" aria-labelledby="balance-titulo" hidden></section>
 
   <section class="tarjeta evolucion incendios" id="incendios" aria-labelledby="incendios-titulo" hidden></section>
+
+  <section class="tarjeta evolucion destino" id="destino" aria-labelledby="destino-titulo" hidden></section>
 
   <div class="principal">
     <div class="tarjeta mapa-tarjeta">
@@ -449,6 +472,14 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     { k: 3, nombre: "Otra pérdida, por verificar", token: "--c-otra", campo: "otras" },
     { k: 4, nombre: "Ganancia", token: "--c-ganancia", campo: "gan" },
   ];
+  // Destino de las otras pérdidas (HU-7.4); el valor k+1 en la cuadrícula destino_<periodo>.png
+  const DESTINOS = [
+    { k: "agricola", nombre: "Agrícola", token: "--d-agricola" },
+    { k: "pecuario", nombre: "Pecuario", token: "--d-pecuario" },
+    { k: "urbano", nombre: "Urbano", token: "--d-urbano" },
+    { k: "otro", nombre: "Otro uso", token: "--d-otro" },
+    { k: "sin_dato", nombre: "Sin dato", token: "--d-sin" },
+  ];
   const DENSIDAD = [
     { k: 1, nombre: "Menos de 25 % de la celda", token: "--den-1" },
     { k: 2, nombre: "25–50 %", token: "--den-2" },
@@ -516,6 +547,12 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const idx = Object.fromEntries(c.campos.map((k, j) => [k, j]));
     p.inc = { ...c, lista: c.lista.map(r => Object.fromEntries(c.campos.map((k, j) => [k, r[j]]))), idx };
   }
+  // Uso al que pasó el terreno perdido (HU-7.4): archivo propio por comparación
+  async function cargarDestino(i) {
+    const p = D.periodos[i];
+    if (p.destino) return;
+    p.destino = await leer(`destino/${p.id}.json`);
+  }
   const aniosCargados = new Set();
   async function cargarAnio(t) {
     if (aniosCargados.has(t)) return;
@@ -546,7 +583,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       if (i >= 0) tareas.push(cargarComparacion(i));
       if (e.sel) todosLosAnios();
     } else {
-      tareas.push(cargarComparacion(e.p));
+      tareas.push(cargarComparacion(e.p), cargarDestino(e.p));
       if (e.vista === "incendios" || e.incendios) tareas.push(cargarIncendios(e.p));
       if (e.sel) { D.periodos.forEach((p, i) => tareas.push(cargarComparacion(i))); todosLosAnios(); }
     }
@@ -572,7 +609,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     if (yo !== turno) return;
     ocultarFalla();
     Object.assign(st, nuevo);
-    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); pintarBalance(); pintarIncendios(); } else pintarTodo();
+    if (soloDetalle) { marcarSeleccion(); pintarDetalle(); pintarBalance(); pintarIncendios(); pintarDestino(); } else pintarTodo();
   }
 
   // ---------- Cabecera ----------
@@ -733,7 +770,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
 
   // Vistas del mapa según el modo
   const VISTAS = {
-    comparar: [["cobertura", "Cambio de cobertura"], ["neto", "Cambio neto por municipio"], ["incendios", "Incendios"]],
+    comparar: [["cobertura", "Cambio de cobertura"], ["neto", "Cambio neto por municipio"], ["incendios", "Incendios"], ["destino", "Destino de la pérdida"]],
     anio: [["bosque", "Bosque"], ["tendencia", "Tendencia por municipio"]],
   };
   if (S) { VISTAS.comparar.push(["perdida", "Año de pérdida"]); VISTAS.anio.push(["perdida", "Año de pérdida"]); }
@@ -775,6 +812,12 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       colores: Object.fromEntries(CLASES.map(c => [c.k, st.capas[c.k] ? c.token : null])) };
     if (st.vista === "incendios") return { clave: `cambio_${P().id}.png`, src: urlCuadricula(`cambio_${P().id}.png`), paso: D.pasos.clases,
       colores: { 1: "--c-estable", 2: null, 3: null, 4: null } };
+    if (st.vista === "destino") {
+      const hay = P().destino && P().destino.tiene_cuadricula;
+      const nombre = hay ? `destino_${P().id}.png` : `cambio_${P().id}.png`;
+      return { clave: nombre, src: urlCuadricula(nombre), paso: hay ? D.pasos.destino : D.pasos.clases,
+        colores: hay ? Object.fromEntries(DESTINOS.map((d, i) => [i + 1, d.token])) : { 1: null, 2: null, 3: null, 4: null } };
+    }
     if (st.vista === "bosque") return { clave: `bosque_${S.anios[st.t]}.png`, src: urlCuadricula(`bosque_${S.anios[st.t]}.png`), paso: D.pasos.clases,
       colores: Object.fromEntries(DENSIDAD.map(c => [c.k, c.token])) };
     if (st.vista === "perdida") return { clave: "anio_perdida.png", src: urlCuadricula("anio_perdida.png"), paso: S.paso_perdida,
@@ -1183,6 +1226,54 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     }
   }
 
+  // ---------- A qué uso pasó el terreno perdido (HU-7.4 / CF-DEV-04) ----------
+  // Es una estimación: un clasificador de imágenes Sentinel-2 del año final del periodo, entrenado con
+  // las zonas no forestales de la Serie VII de INEGI (2021). Se presenta con su exactitud medida, el año
+  // de las imágenes y la fuente. Lo que no se clasificó dice «sin dato», nunca cero. La pérdida por
+  // incendio va aparte porque su causa se conoce.
+  const pc = v => nf1.format(v * 100) + " %";
+  function exactitudTxt(d) {
+    return d.exactitud.length
+      ? d.exactitud.map(x => `${x.anio}: exactitud global ${pc(x.global)} (kappa ${nf2.format(x.kappa)}, ${nf.format(x.prueba)} muestras de prueba)`).join("; ")
+      : "sin medir";
+  }
+  function pintarDestino() {
+    const el = document.getElementById("destino");
+    if (enAnio()) { el.hidden = true; return; }
+    el.hidden = false;
+    const p = P(), d = p.destino, quien = st.sel || D.titulo;
+    const f = st.sel ? fila(st.sel, p) : null;
+    const hayInc = !esSinDatos(p), inc = st.sel ? (f ? f[I.inc] : null) : p.tot.inc;
+    const v = d.estado === "completo" ? (st.sel ? d.filas[st.sel] : d.total) : null;
+    const aparte = `<p class="aparte" id="destino-incendio">Pérdida por incendio, aparte: <strong>${!hayInc || inc == null ? "sin dato" : ha(inc) + (esParcial(p) ? "†" : "")}</strong>. Su causa se conoce (el incendio), así que no se clasifica.</p>`;
+    const anios = d.anios.map(a => a.estado === "clasificado"
+      ? `<tr data-anio="${a.anio}" data-estado="clasificado"><td>${esc(a.etiqueta)}</td><td>Sentinel-2 clasificado con la Serie VII (INEGI, ${d.serie_inegi})</td><td>${pc(d.exactitud.find(x => x.anio === a.anio).global)}</td></tr>`
+      : `<tr data-anio="${a.anio}" data-estado="sin_dato"><td>${esc(a.etiqueta)}</td><td class="sin-dato" colspan="2">sin dato${a.motivo ? ` (${esc(a.motivo)})` : ""}</td></tr>`).join("");
+    const aviso = `<div class="aviso estimacion" id="destino-estimacion" role="note">
+        <p><strong>Es una estimación</strong> por clasificación de imágenes Sentinel-2${d.anio_imagenes.length ? ` de ${listaAnios(d.anio_imagenes)}` : ""}, entrenada con las zonas no forestales de la Serie VII de uso del suelo y vegetación de INEGI (${d.serie_inegi}). Exactitud medida con muestras reservadas: ${exactitudTxt(d)}. Equivocarse en cerca de la mitad de los casos es esperable: sirve para ver el orden de magnitud de las causas, no para afirmar el uso de un terreno.</p>
+        <p>INEGI no ha publicado uso del suelo oficial posterior a la Serie VII (${d.serie_inegi}); por eso el destino se estima con imágenes. Un año o periodo sin clasificación dice «sin dato», no cero.${p.preliminar ? ` Preliminar: es otra temporada (${esc(p.meses)}); estas hectáreas no se comparan con las de los balances anuales.` : ""}</p></div>`;
+    let cuerpo;
+    if (!v) {
+      cuerpo = `<p class="vacio" id="destino-sin-dato"><strong>Sin dato.</strong> ${d.estado !== "completo" ? "Este periodo no tiene clasificación del uso del suelo." : `No hay otras pérdidas clasificadas en ${esc(quien)}.`} No significa que el terreno no haya cambiado de uso.</p>`;
+    } else {
+      const tot = v[0], max = Math.max(...v.slice(1), 1e-9);
+      const parte = x => tot > 0 ? pc(x / tot) : "—";
+      cuerpo = `<ul class="barras" id="barras-destino" aria-label="Otras pérdidas de ${esc(quien)} por uso al que pasó">${DESTINOS.map((c, i) => `<li data-destino="${c.k}"><span>${c.nombre}</span>
+          <span class="pista" aria-hidden="true"><span class="relleno" style="width:${(v[i + 1] / max * 100).toFixed(1)}%;background:var(${c.token})"></span></span>
+          <span class="cifra">${ha(v[i + 1])} · ${parte(v[i + 1])}</span></li>`).join("")}</ul>
+        <details><summary>Ver como tabla</summary><div class="tabla-detalle"><table id="tabla-destino"><thead><tr><th>Uso al que pasó</th><th>Hectáreas</th><th>% de las otras pérdidas</th></tr></thead><tbody>
+          ${DESTINOS.map((c, i) => `<tr data-destino="${c.k}"><td>${c.nombre}</td><td>${n0(v[i + 1])}</td><td>${parte(v[i + 1])}</td></tr>`).join("")}
+          <tr><td>Otras pérdidas</td><td>${n0(tot)}</td><td>${tot > 0 ? "100.0 %" : "—"}</td></tr></tbody></table></div></details>`;
+    }
+    const resumen = v ? `${quien}: de ${ha(v[0])} de otras pérdidas (${esc(p.etiqueta)}), ${DESTINOS.slice(0, 4).map((c, i) => `${v[0] > 0 ? pc(v[i + 1] / v[0]) : "—"} ${c.nombre.toLowerCase()}`).join(", ")}${v[5] > 0 ? `, ${pc(v[5] / v[0])} sin dato` : ""} (estimación).`
+      : `${quien}: sin dato del uso al que pasó el terreno perdido en ${esc(p.etiqueta)}.`;
+    el.innerHTML = `<header><h2 id="destino-titulo">A qué uso pasó el terreno perdido · ${esc(p.etiqueta)}${p.preliminar ? " (preliminar)" : ""}</h2>
+        <p id="destino-resumen">${resumen} ${st.sel ? "Quita la selección para ver el Estado." : "Elige un municipio para ver el suyo."}</p></header>
+      ${aviso}${cuerpo}${aparte}
+      <div class="grafica"><h3>Años y fuente</h3><div class="tabla-detalle"><table id="tabla-destino-anios"><thead><tr><th>Año de las imágenes</th><th>Fuente</th><th>Exactitud global</th></tr></thead><tbody>${anios}</tbody></table></div>
+        <p class="pie-graf">También en el mapa: vista «Destino de la pérdida».</p></div>`;
+  }
+
   // ---------- Leyenda ----------
   function pintarLeyenda() {
     const ul = document.getElementById("leyenda"), nota = document.getElementById("nota-mapa"), titulo = document.getElementById("leyenda-titulo");
@@ -1223,6 +1314,14 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
         st.perd[inp.dataset.t] = inp.checked; pintarLeyenda(); pintarRaster();
       }));
       nota.textContent = `“Perdido en ${S.anios[1]}” = era bosque en noviembre-diciembre de ${S.anios[0]} y ya no en el de ${S.anios[1]} (por incendio u otra causa). ${celdas} toma el año más reciente de pérdida que tenga, así que se ven más grandes de lo que son; las hectáreas son las del periodo. Sale de la serie nov-dic.`;
+    } else if (st.vista === "destino") {
+      const p = P(), d = p.destino;
+      titulo.textContent = "Destino de la pérdida (estimación)";
+      ul.innerHTML = DESTINOS.map((c, i) => `<li><span class="muestra" style="background:var(${c.token})"></span>${c.nombre}${d.total ? `<span class="cifra-ha">${ha(d.total[i + 1])}</span>` : ""}</li>`).join("") +
+        `<li><span class="muestra" style="background:var(--sin-bosque)"></span>Sin otra pérdida, o fuera de la zona forestal</li>`;
+      nota.textContent = d.total && d.tiene_cuadricula
+        ? `Estimación por clasificación de imágenes Sentinel-2 (exactitud: ${exactitudTxt(d)}). ${celdas} toma el uso más frecuente entre sus píxeles de otra pérdida, así que se ven más grandes de lo que son; las hectáreas son las del periodo. La pérdida por incendio no se clasifica.`
+        : "Sin dato: este periodo no tiene clasificación del uso al que pasó el terreno perdido.";
     } else if (st.vista === "incendios") {
       const p = P();
       titulo.textContent = "Incendios";
@@ -1343,7 +1442,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   }
   let pintado = false;
   function pintarTodo() {
-    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarBalance(); pintarIncendios(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
+    pintarVistas(); pintarCabecera(); pintarEvolucion(); pintarBalance(); pintarIncendios(); pintarDestino(); pintarEncabezados(); pintarCoropletas(); pintarLeyenda(); pintarTabla();
     marcarSeleccion(); pintarDetalle(); pintarRaster(); pintarPuntos(); pintarPie();
     pintado = true;
   }
@@ -1360,7 +1459,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       ["Qué mide", `<p>La superficie con cobertura arbórea (hectáreas) dentro de la zona forestal: un píxel de 10 m cuenta como bosque si su NDVI es de ${nf2.format(umbral)} o más. De un año a otro separa la pérdida por incendio (dentro de un polígono de CONAFOR con dNBR ≥ 0.27), las otras pérdidas y la ganancia. No mide biomasa, carbono, densidad del arbolado ni especies.</p>`],
       ["Dónde", `<p>${esc(D.titulo)}, por municipio, dentro de la zona forestal de INEGI Serie VII${zona}: bosques, selva baja caducifolia, matorrales y vegetación secundaria arbórea${S && S.clases ? ` (claves ${esc(S.clases)})` : ""}. Fuera de esa zona no se cuenta bosque.</p>`],
       ["Cuándo", `<p>Un compuesto de noviembre-diciembre por año (${anios.join(", ")}): sin lluvias, con las parcelas secas y antes de la temporada de incendios. Los incendios de cada periodo van del 1 de noviembre al 31 de octubre.${pre.length ? ` Además, un preliminar ${pre.map(p => `${p.meses} ${p.base} → ${p.actual}`).join("; ")}, de otra temporada, que no se compara con los anteriores.` : ""}</p>`],
-      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta ${D.conafor.ultimo}.</li><li>Uso de suelo y vegetación Serie VII de INEGI y límites municipales (IDEFOR).</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
+      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta ${D.conafor.ultimo}.</li><li>Uso de suelo y vegetación Serie VII de INEGI (2021) y límites municipales (IDEFOR). INEGI no ha publicado uso del suelo oficial posterior; el uso al que pasó el terreno perdido es una estimación con Sentinel-2 entrenada con esa serie.</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
     ];
     if (S) {
       const sin = S.sin_encadenar;

@@ -147,6 +147,61 @@ def _incendios(carpeta, clave):
     return i if len(i) else None
 
 
+# Uso al que pasó el terreno perdido (HU-7.4 / CF-DEV-04): estimación por clasificación de imágenes
+PASO_DESTINO = 50  # 1 agrícola, 2 pecuario, 3 urbano, 4 otro, 5 sin dato (0 no aplica)
+CAMPOS_DESTINO = ["otras", "agricola", "pecuario", "urbano", "otro", "sin_dato"]
+FUENTE_DESTINO = ("Clasificación de imágenes Sentinel-2 L2A del año final de cada periodo (bosque aleatorio), "
+                  "entrenada con las zonas no forestales de la Serie VII de uso del suelo y vegetación de INEGI (2021)")
+
+
+def _exactitud_destino(carpeta, a, b):
+    """Exactitud del clasificador de destino a→b según destino_exactitud_<a>_<b>.csv, o None."""
+    ruta = Path(carpeta) / f"destino_exactitud_{a}_{b}.csv"
+    if not ruta.exists():
+        return None
+    e = pd.read_csv(ruta)
+    g = e[e["clase"] == "global"].iloc[0]
+    return {"anio": b, "global": _num(g["exactitud_global"], 4), "kappa": _num(g["kappa"], 4),
+            "prueba": int(g["prueba"]), "entrenamiento": int(g["entrenamiento"]),
+            "clases": {str(r["clase"]): [_num(r["exactitud_productor"], 4), _num(r["exactitud_usuario"], 4)]
+                       for _, r in e[e["clase"] != "global"].iterrows()}}
+
+
+def _clase_dominante(c):
+    """Clase 1..5 más frecuente de cada celda (0 si ninguna aplica; en empate, la de menor número)."""
+    cuentas = np.stack([(c == k).sum(axis=(1, 3)) for k in range(1, 6)])
+    yield np.where(cuentas.max(axis=0) == 0, 0, cuentas.argmax(axis=0) + 1).astype(np.uint8)
+
+
+def preparar_destino(carpeta, clave, base, actual, etiquetas_anio, f):
+    """Datos de la tarjeta «A qué uso pasó el terreno perdido» de una comparación y su cuadrícula.
+    Regresa (dict, png o None). Sin destino_perdidas_<clave>.csv el periodo queda «sin dato»."""
+    carpeta = Path(carpeta)
+    ruta = carpeta / f"destino_perdidas_{clave}.csv"
+    exact = [x for x in (_exactitud_destino(carpeta, a, a + 1) for a in range(base, actual)) if x]
+    if not exact:  # el preliminar de otra temporada guarda el par completo (p. ej. 2025_2026)
+        x = _exactitud_destino(carpeta, base, actual)
+        exact = [x] if x else []
+    clasificados = {x["anio"] for x in exact}
+    anios = [{"anio": a, "etiqueta": etiquetas_anio[a],
+              "estado": "clasificado" if a in clasificados else "sin_dato",
+              "motivo": ("" if a in clasificados else
+                         "año base: no hay pérdida que clasificar" if a == base else "no se clasificó")}
+             for a in range(base, actual + 1)]
+    d = {"clave": clave, "campos": CAMPOS_DESTINO, "fuente": FUENTE_DESTINO, "anios": anios,
+         "exactitud": exact, "anio_imagenes": sorted(clasificados), "serie_inegi": 2021}
+    if not ruta.exists():
+        return {**d, "estado": "sin_datos", "filas": {}, "total": None}, None
+    t = pd.read_csv(ruta)
+    cols = ["otras_perdidas_ha", "agricola_ha", "pecuario_ha", "urbano_ha", "otro_ha", "sin_dato_ha"]
+    d["filas"] = {str(r["unidad"]): [_num(r[c]) for c in cols] for _, r in t.iterrows()}
+    d["total"] = [round(float(t[c].sum()), 2) for c in cols]
+    d["estado"] = "completo"
+    tif = carpeta / f"destino_{clave}.tif"
+    png = _png_clases(leer_por_celdas(tif, f, _clase_dominante)[0], paso=PASO_DESTINO)         if tif.exists() else None
+    return d, png
+
+
 def preparar_periodo(carpeta, clave, ancho_px):
     """Una comparación entre dos años. Las claves que empiezan con "_" no van a la página."""
     carpeta = Path(carpeta)
@@ -190,6 +245,8 @@ def preparar_periodo(carpeta, clave, ancho_px):
     # preliminar no choque con el balance anual del mismo par)
     ident = clave if not preliminar else f"{clave}_{ventana[0].replace('-', '')}_{ventana[1].replace('-', '')}"
     tipos = _tipos(carpeta, clave)
+    etq_anio = {a: (f"{a} ({meses_corto})" if preliminar else str(a)) for a in range(base, actual + 1)}
+    destino, png_destino = preparar_destino(carpeta, clave, base, actual, etq_anio, f)
     return {"id": ident, "clave": clave, "base": base, "actual": actual, "preliminar": preliminar,
             "serie": bool(corrida.get("serie")),
             "etiqueta": f"{base} → {actual}", "meses": meses,
@@ -199,13 +256,14 @@ def preparar_periodo(carpeta, clave, ancho_px):
             "umbral": round(float(bal["umbral_ndvi"].iloc[0]), 2), "escenas": escenas,
             "fuego_incompleto": any("incendios" in n for n in notas), "tiene_tipos": tipos is not None,
             "tot": tot, "filas": filas, "incendios": inc, "notas": notas, "tipos": tipos,
+            "destino_estado": destino["estado"], "_destino": destino, "_png_destino": png_destino,
             "_png": _png_clases(cambio), "_malla": (cambio.shape, f, limites, crs), "_ventana": ventana, "_inc": i}
 
 
 # Campos de una comparación que van en el índice (los demás van en su archivo)
 LIGEROS = ["id", "clave", "base", "actual", "preliminar", "serie", "etiqueta", "meses", "base_txt",
            "actual_txt", "corto", "sufijo", "umbral", "escenas", "fuego_incompleto", "tiene_tipos",
-           "anios_sin_capa", "incendios_estado"]
+           "anios_sin_capa", "incendios_estado", "destino_estado"]
 PESADOS = ["tot", "filas", "incendios", "notas", "tipos"]
 
 
@@ -440,6 +498,10 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, 
             "campos": list(CAMPOS.values()), "campos_tipo": list(CAMPOS_TIPO.values()),
             **{k: pp[k] for k in PESADOS}}
         archivos[f"cuadriculas/cambio_{pp['id']}.png"] = pp["_png"]
+        archivos[f"destino/{pp['id']}.json"] = {"id": pp["id"], "etiqueta": pp["etiqueta"], "preliminar": pp["preliminar"],
+                                                "tiene_cuadricula": pp["_png_destino"] is not None, **pp["_destino"]}
+        if pp["_png_destino"] is not None:
+            archivos[f"cuadriculas/destino_{pp['id']}.png"] = pp["_png_destino"]
 
     serie = None
     if carpeta_serie:
@@ -467,7 +529,8 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, 
         "conafor": {"anios": anios_pub or list(range(2019, ultimo + 1)), "ultimo": ultimo},
         "comparaciones": [{k: pp[k] for k in LIGEROS} for pp in periodos],
         "serie": serie, "validacion": _validacion(validacion),
-        "pasos": {"clases": PASO_CLASES, "perdida": PASO_PERDIDA},
+        "pasos": {"clases": PASO_CLASES, "perdida": PASO_PERDIDA, "destino": PASO_DESTINO},
+        "destinos": DESTINOS,
         "archivos": sorted(k for k in archivos if k != "indice.json")}
     return archivos
 

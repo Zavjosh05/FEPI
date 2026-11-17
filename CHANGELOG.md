@@ -4,6 +4,36 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.10.0] - 2026-11-17
+
+Sprint 3 de la Calculadora: cambio de uso del suelo (HU-7.4, necesidad CF-DEV-04 de las Tablas v12,
+M7.4). Solo cambia la página; los resultados de `resultados/` son los mismos.
+
+### Agregado
+
+- **A qué uso pasó el terreno perdido** (HU-7.4), tarjeta del modo "Comparar años" para el periodo
+  y el Estado o municipio elegido: hectáreas y % de las otras pérdidas que pasaron a uso agrícola,
+  pecuario, urbano, otro y sin dato (barras con sus cifras y tabla equivalente). Se presenta como
+  **estimación** (decisión C-07): clasificación de imágenes Sentinel-2 del año final del periodo,
+  entrenada con la Serie VII de INEGI (2021), con su exactitud global y kappa medidas con muestras
+  reservadas (54.9 %, kappa 0.39 en 2023→2024; el periodo 2023→2025 muestra la de 2024 y la de
+  2025). Aviso de que INEGI no ha publicado uso del suelo oficial posterior a 2021. Tabla de años y
+  fuente: un año sin clasificación (el año base de cada periodo) o un periodo sin archivo dice
+  «sin dato», nunca cero. La pérdida por incendio va aparte (su causa se conoce).
+- Vista «Destino de la pérdida» del mapa: cuadrícula de 90 m (PNG, clase dominante de cada celda,
+  armada de `destino_*.tif`), que se carga solo al consultarla. Colores agrícola, pecuario, urbano,
+  otro y sin dato para tema claro y oscuro.
+- Datos nuevos en `datos/destino/<periodo>.json` (~7 kB cada uno) y
+  `datos/cuadriculas/destino_<periodo>.png`; `destino_estado` en el índice; también embebidos en el
+  archivo único.
+- Pruebas `pruebas/calculadora/test_hu_7_4_cambio_de_uso_del_suelo.py` (16) y capturas en
+  `entregas/sprint_3/capturas/`.
+
+### Cambiado
+
+- La vista inicial también pide `destino/<periodo>.json` (la tarjeta está a la vista); se ajustó la
+  lista esperada de `test_hu_7_1_carga_diferida`.
+
 ## [0.9.0] - 2026-11-14
 
 Sprint 2 de la Calculadora: balance entre dos años con su histograma (HU-7.2, necesidad CF-DEV-02

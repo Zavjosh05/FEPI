@@ -313,6 +313,14 @@ En los dos:
   publica los incendios de 2025»): el periodo parcial lleva † y el que no tiene incendios
   publicados dice «sin dato», nunca 0. Sus datos están en `datos/incendios/<periodo>.json` y
   `mapa_interactivo.py` los arma con `--incendios` (por defecto `datos/edomex/incendios_conafor_edomex.gpkg`).
+- **A qué uso pasó el terreno perdido** (HU-7.4, CF-DEV-04; solo en "Comparar años"): tarjeta con
+  las otras pérdidas del Estado o del municipio elegido repartidas en agrícola, pecuario, urbano,
+  otro y sin dato (hectáreas y %, con tabla equivalente) y vista «Destino de la pérdida» del mapa
+  (cuadrícula de 90 m, clase más frecuente de cada celda). Es una **estimación** con la exactitud
+  del clasificador a la vista (global y kappa, del archivo `destino_exactitud_*.csv`), el año de las
+  imágenes (el final del periodo) y la fuente (Sentinel-2 entrenado con la Serie VII, 2021). Un año
+  o periodo sin clasificación dice «sin dato», no cero; la pérdida por incendio va aparte. Sus
+  datos están en `datos/destino/<periodo>.json` y `datos/cuadriculas/destino_<periodo>.png`.
 - **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
   por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
   años" muestra los años de la comparación elegida.

@@ -148,7 +148,8 @@ def test_hu_7_1_carga_diferida(abrir, indice, servidor):
     anuales = [c for c in indice["comparaciones"] if not c["preliminar"]]
     c0 = sorted(anuales, key=lambda c: (-c["actual"], c["actual"] - c["base"]))[0]
     esperado = {"indice.json", "municipios.topojson", f"comparaciones/{c0['id']}.json",
-                f"cuadriculas/cambio_{c0['id']}.png"}
+                f"cuadriculas/cambio_{c0['id']}.png",
+                f"destino/{c0['id']}.json"}  # la tarjeta de HU-7.4 (~7 kB) se ve en la vista inicial
     assert set(inicial) == esperado, inicial
     assert not [r for r in inicial if r.startswith("anios/")], "no debe pedir años al abrir"
     # Al elegir un año (botón «ver» de la evolución) se pide ese año y su cuadrícula, no los demás
