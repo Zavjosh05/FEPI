@@ -130,8 +130,8 @@ registra por separado; las que dicen «en paralelo» no tocan los mismos archivo
 | S3-06 | HU-6.1 Lista de espera y sustituciones | S3-05 | Pendiente | |
 | S3-07 | HU-6.2 Incumplimientos y reintegros | S3-06 | Pendiente | |
 | S3-08 | HU-6.3 Cierre del ejercicio y padrón | S3-07 | Pendiente | |
-| S3-09 | HU-7.4 Uso del suelo al que pasó el terreno perdido (Calculadora) | — (en paralelo) | En curso | |
-| S3-10 | HU-7.5 Especies por municipio (Calculadora) | S3-09 | Pendiente | |
+| S3-09 | HU-7.4 Uso del suelo al que pasó el terreno perdido (Calculadora) | — (en paralelo) | Hecho | `545b692` |
+| S3-10 | HU-7.5 Especies por municipio (Calculadora) | S3-09 | En curso | |
 | S3-11 | Cierre técnico: recorrido de un programa completo, de la solicitud al padrón, por servicios (seis programas) y por la interfaz; tropiezos; textos de la interfaz sin la palabra «sprint»; modelo de datos y README | S3-08 | Pendiente | |
 | S3-12 | Verificación final: batería con PDF reales, Calculadora, sitio con base nueva | S3-10, S3-11 | Pendiente | |
 | S3-13 | Resumen en PDF del sprint 3 (`sprint_3/Resumen_sprint_3.pdf`) | S3-12 | Pendiente | |
