@@ -1,0 +1,2745 @@
+{
+  "clave": "MFS",
+  "nombre": "Manejo Forestal Sustentable",
+  "ejercicio": 2026,
+  "fuente": {
+    "documento": "Acuerdo del Director General de PROBOSQUE por el que se emiten las modificaciones a las Reglas de Operación del Programa Manejo Forestal Sustentable (Gaceta del Gobierno, 27-ene-2026), más la Convocatoria 2026 (bases primera, tercera a séptima) y el Manual de formatos (FO-PB-501-B y FO-PB-502)",
+    "fecha_publicacion": "2026-01-27",
+    "archivo": "sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt",
+    "lineas": [
+      6332,
+      8229
+    ],
+    "lineas_reglas": [
+      6472,
+      8229
+    ],
+    "lineas_convocatoria_relacionadas": [
+      [
+        178,
+        223
+      ],
+      [
+        547,
+        637
+      ],
+      [
+        638,
+        772
+      ],
+      [
+        851,
+        902
+      ],
+      [
+        903,
+        920
+      ]
+    ],
+    "lineas_formatos": [
+      [
+        12114,
+        12243
+      ],
+      [
+        12244,
+        12337
+      ]
+    ],
+    "aprobacion": "Las ROP se publican en su totalidad «para su mejor comprensión» (transitorio CUARTO, línea 8213)."
+  },
+  "definicion": {
+    "texto": "El Programa Manejo Forestal Sustentable tiene como propósito asegurar la preservación y el valor de los bosques, a través de su incorporación al manejo forestal, mediante la provisión de un recurso económico, para la elaboración de estudios técnicos forestales, certificación internacional de manejo responsable y su mantenimiento, en el Estado de México.",
+    "numeral": "1.1",
+    "linea": 6477,
+    "cobertura": "Los 125 municipios del Estado de México que cuenten con predios forestales y/o centros de almacenamiento y de transformación de materias primas forestales (numeral 6, línea 6723)",
+    "tipo_de_apoyo": "Económico (monetario), por transferencia electrónica; solo en casos excepcionales con causa justificada, cheque solicitado por la Delegación con el visto bueno del titular de la Dirección de Restauración y Fomento Forestal (7.1, línea 6726). Dos conceptos: Estudios Técnicos Forestales (7.1.1, línea 6731) y Certificación Internacional FSC (7.1.2, línea 6743).",
+    "origen_recursos": "El Gobierno del Estado de México, a través de PROBOSQUE, aporta el 100 % de los recursos; los apoyos son gratuitos y están sujetos a disponibilidad presupuestal (7.2 y 7.3, líneas 6749 y 6891); puede haber concurrencia de recursos de otros niveles de gobierno o de la iniciativa privada (línea 6893).",
+    "derechos_o_dimensiones": "Medio ambiente sano, el trabajo y la no discriminación (numeral 2, línea 6482).",
+    "objetivos": "Promover los Estudios Técnicos Forestales para el aprovechamiento sostenible; impulsar la certificación internacional FSC de manejo forestal sostenible, cadena de custodia y servicios ecosistémicos; fomentar el mantenimiento de la certificación por un periodo de 5 años (numeral 4.2, líneas 6700-6708)."
+  },
+  "instancias": {
+    "normativa": "Comité de Admisión y Seguimiento del Programa Manejo Forestal Sustentable (numerales 3 y 9.3, líneas 6528 y 7965)",
+    "ejecutora": "Dirección de Restauración y Fomento Forestal de PROBOSQUE (numeral 9.2, línea 7963); opera mediante el «área responsable del programa» (el glosario la llama «Área técnica del Programa», línea 6512) y las nueve Delegaciones Regionales Forestales coordinadas por la Coordinación de Delegaciones Regionales (10.1.1 inciso p, línea 8104)",
+    "responsable": "Protectora de Bosques del Estado de México (PROBOSQUE) (numeral 9.1, línea 7961)",
+    "comite": {
+      "nombre": "Comité de Admisión y Seguimiento del Programa Manejo Forestal Sustentable",
+      "numeral": "9.4",
+      "linea": 7968,
+      "presidencia": "Persona titular de la Secretaría a la que dependa o esté adscrito PROBOSQUE; en suplencia, quien designe; voto de calidad en caso de empate (líneas 7971 y 8000)",
+      "secretaria_tecnica": "Persona titular de PROBOSQUE; en suplencia, quien designe (líneas 7972 y 8001)",
+      "vocales_con_voz_y_voto": [
+        "Representante de la Comisión Nacional Forestal (CONAFOR) en el Estado de México",
+        "Representante de la Secretaría de Medio Ambiente y Recursos Naturales (SEMARNAT) en el Estado de México",
+        "Representante del Colegio de Profesionistas Forestales del Estado de México, A. C.",
+        "Representante de la Asociación Mexicana de Profesionales Forestales A. C., Sección XIV Toluca",
+        "Representante de los Ejidos Comunes y Productores Forestales del Estado de México, A. C.",
+        "Representante de la Cámara Nacional de la Industria Maderera, A. C.",
+        "Representante de la Universidad Autónoma del Estado de México (UAEMex)"
+      ],
+      "invitados_especiales_solo_voz": [
+        "Titular de la Dirección de Administración, Finanzas y de Gestión Documental de PROBOSQUE",
+        "Titular de la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia de PROBOSQUE",
+        "Titular del Órgano Interno de Control de PROBOSQUE",
+        "Titular de la Dirección de Protección Forestal de PROBOSQUE",
+        "Titular del área responsable del programa de PROBOSQUE",
+        "Titular de la Coordinación de Delegaciones Regionales de PROBOSQUE"
+      ],
+      "sesiones": "La Secretaría Técnica expide la convocatoria con tres días hábiles de anticipación como mínimo para sesiones ordinarias y con 24 horas para las extraordinarias, con lugar o plataforma digital, fecha, hora y orden del día; quórum de la mitad más uno, estando presentes la Presidencia, la Secretaría Técnica y la persona representante de la Secretaría de la Contraloría o sus suplencias; la Secretaría Técnica levanta acta de acuerdos que, previa aprobación, firman los integrantes (numeral 9.4.2, líneas 8004-8012)",
+      "atribuciones": "Numeral 9.4.3, líneas 8013-8039: aprobar la Lista de Personas Beneficiarias, la Lista de espera y la de solicitudes no procedentes; determinar requisitos y modalidades; autorizar que se den a conocer las listas; confirmar el otorgamiento oportuno del recurso; analizar conflictos y decretar suspensión o cancelación con garantía de audiencia; validar incumplimientos y exigir la devolución por conducto de la Unidad Jurídica; emitir lineamientos internos; aprobar modificaciones a las Reglas; resolver lo no previsto."
+    },
+    "otras_unidades_que_intervienen": [
+      "Delegaciones Regionales Forestales (recepción, integración del expediente, levantamiento de poligonal, firma, oficio de solicitud de pago) (10.1.1 c, f, k)",
+      "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia (dictamen jurídico, validación del modelo de contrato y adendum, requerimiento de devolución) (10.1.1 b, f, j)",
+      "Dirección de Administración, Finanzas y de Gestión Documental (pagos y cuenta de reintegros) (10.1.1 a)",
+      "Coordinación de Delegaciones Regionales (10.1.1 p; numeral 15)",
+      "Prestador de servicios forestales o técnicos (elaboración del estudio o acompañamiento de la certificación) y entidad certificadora FSC"
+    ]
+  },
+  "poblacion_objetivo": {
+    "texto": "Las personas propietarias y/o poseedoras de terrenos forestales, susceptibles para aprovechamiento, y/o de centros de almacenamiento y de transformación de materias primas forestales, que cuenten con autorización dentro del territorio del Estado de México emitida por la SEMARNAT o PROBOSQUE, interesados en incorporar la superficie al manejo forestal sostenible, obtener o mantener la certificación internacional FSC y realizar la declaración de servicios ecosistémicos.",
+    "numeral": "5 c)",
+    "linea": 6717
+  },
+  "tipos_persona": [
+    {
+      "clave": "fisica",
+      "nombre": "Persona física (propietaria o poseedora de terreno forestal o de centro de almacenamiento y transformación, o su representante legal)",
+      "numeral": "3 (Personas Beneficiarias; Personas propietarias y/o poseedoras) y 8.1.1.2 fr. XI (Personas físicas y/o jurídico colectivas)",
+      "linea": 6637
+    },
+    {
+      "clave": "juridica_colectiva",
+      "nombre": "Persona jurídica colectiva (constituida conforme a las leyes mexicanas, por grupos de individuos)",
+      "numeral": "3 (Personas jurídicas colectivas) y 8.1.1.2 fr. XI (Personas físicas y/o jurídico colectivas)",
+      "linea": 6639
+    },
+    {
+      "clave": "nucleo_agrario",
+      "nombre": "Núcleo agrario (ejido o comunidad)",
+      "numeral": "3 (Núcleo Agrario) y 8.1.1.2 fr. XI (Núcleos agrarios)",
+      "linea": 6622
+    }
+  ],
+  "modalidades": [
+    {
+      "clave": "etf_pmf_maderable_mayor_250",
+      "nombre": "ETF 1. Programa de Manejo Forestal Maderable (predios o conjunto de predios mayores a 250 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $165,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 1); Convocatoria base tercera, MFS",
+      "linea": 6757
+    },
+    {
+      "clave": "etf_pmf_maderable_no_maderable_mayor_250",
+      "nombre": "ETF 2. PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 250 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $175,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 2); Convocatoria base tercera, MFS",
+      "linea": 6759
+    },
+    {
+      "clave": "etf_pmf_maderable_95_250",
+      "nombre": "ETF 3. Programa de Manejo Forestal Maderable (mayores a 95 ha y hasta 250 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $65,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 3); Convocatoria base tercera, MFS",
+      "linea": 6762
+    },
+    {
+      "clave": "etf_pmf_maderable_y_no_maderable_95_250",
+      "nombre": "ETF 4. PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 95 ha y hasta 250 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $75,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 4); Convocatoria base tercera, MFS",
+      "linea": 6766
+    },
+    {
+      "clave": "etf_pmf_maderable_7_95",
+      "nombre": "ETF 5. Programa de Manejo Forestal Maderable (mayores a 7 ha y hasta 95 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $30,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 5); Convocatoria base tercera, MFS",
+      "linea": 6771
+    },
+    {
+      "clave": "etf_pmf_maderable_y_no_maderable_7_95",
+      "nombre": "ETF 6. PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 7 ha y hasta 95 ha)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $30,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 6); Convocatoria base tercera, MFS",
+      "linea": 6775
+    },
+    {
+      "clave": "etf_no_maderables",
+      "nombre": "ETF 7. Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $25,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 7); Convocatoria base tercera, MFS",
+      "linea": 6780
+    },
+    {
+      "clave": "etf_dtu_maderable",
+      "nombre": "ETF 8. Documento Técnico Unificado de Aprovechamiento Forestal Maderable",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $175,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 8); Convocatoria base tercera, MFS",
+      "linea": 6782
+    },
+    {
+      "clave": "etf_uma",
+      "nombre": "ETF 9. Unidades de Manejo de Vida Silvestre (UMA)",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $30,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 9); Convocatoria base tercera, MFS",
+      "linea": 6784
+    },
+    {
+      "clave": "etf_informe_preventivo",
+      "nombre": "ETF 10. Informe Preventivo",
+      "descripcion": "Concepto Estudios Técnicos Forestales (ETF). Monto $30,000.00 por persona beneficiaria, máximo 1 apoyo. Se paga en dos ministraciones: 70 % tras la firma del Contrato de Adhesión y 30 % tras presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización). El recurso se destina al pago de un prestador de servicios forestales para elaborar el estudio.",
+      "seleccionable": true,
+      "concepto": "etf",
+      "numeral": "7.2 A) (cuadro, fila 10); Convocatoria base tercera, MFS",
+      "linea": 6786
+    },
+    {
+      "clave": "fsc_certificacion_manejo_grupal",
+      "nombre": "FSC 11. Certificación de manejo forestal sustentable FSC de forma grupal, administrador de recursos y acompañamiento a la certificación",
+      "descripcion": "Concepto Certificación Internacional FSC. Acompañamiento $210,000.00, certificación $350,000.00 y administrador de recursos $40,000.00; predios por grupo: igual o mayor a 3. Se otorga en forma grupal y se asigna proporcionalmente a los predios integrantes del grupo; se destina al pago de la entidad certificadora, el acompañamiento técnico y el administrador de recursos. Dos ministraciones: 50 % tras la firma del Contrato de Adhesión y 50 % tras presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría.",
+      "seleccionable": true,
+      "concepto": "fsc",
+      "numeral": "7.2 B) (cuadro, fila 11); 7.1.2; Convocatoria base tercera, MFS",
+      "linea": 6801
+    },
+    {
+      "clave": "fsc_certificacion_cadena_custodia",
+      "nombre": "FSC 12. Certificación de cadena de custodia FSC de centros de almacenamiento y de transformación de industria y acompañamiento a la certificación",
+      "descripcion": "Concepto Certificación Internacional FSC. Acompañamiento $60,000.00 y certificación $80,000.00; 1 persona beneficiaria. Se otorga de manera individual para pagar a la entidad certificadora y el acompañamiento técnico. Dos ministraciones: 50 % tras la firma del Contrato de Adhesión y 50 % tras presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría.",
+      "seleccionable": true,
+      "concepto": "fsc",
+      "numeral": "7.2 B) (cuadro, fila 12); 7.1.2; Convocatoria base tercera, MFS",
+      "linea": 6808
+    },
+    {
+      "clave": "fsc_mantenimiento_manejo_grupal",
+      "nombre": "FSC 13. Mantenimiento a la certificación de manejo forestal en forma grupal",
+      "descripcion": "Concepto Certificación Internacional FSC. $130,000.00; predios por grupo: igual o mayor a 2. Se otorga en forma grupal y se conjunta para el mantenimiento del certificado del grupo que corresponde al código de registro del certificado. Dos ministraciones: 50 % tras la firma del Contrato de Adhesión y 50 % tras presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría.",
+      "seleccionable": true,
+      "concepto": "fsc",
+      "numeral": "7.2 B) (cuadro, fila 13); 7.1.2; Convocatoria base tercera, MFS",
+      "linea": 6816
+    },
+    {
+      "clave": "fsc_mantenimiento_cadena_custodia",
+      "nombre": "FSC 14. Mantenimiento a la certificación de cadena de custodia",
+      "descripcion": "Concepto Certificación Internacional FSC. $95,600.00; 1 persona beneficiaria. Individual; se destina al pago de la entidad certificadora y el acompañamiento técnico. Dos ministraciones: 50 % tras la firma del Contrato de Adhesión y 50 % tras presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría.",
+      "seleccionable": true,
+      "concepto": "fsc",
+      "numeral": "7.2 B) (cuadro, fila 14); 7.1.2; Convocatoria base tercera, MFS",
+      "linea": 6821
+    },
+    {
+      "clave": "fsc_declaracion_servicios_ecosistemicos",
+      "nombre": "FSC 15. Declaración de servicios ecosistémicos",
+      "descripcion": "Concepto Certificación Internacional FSC. $20,000.00; 1 persona beneficiaria. Individual, siempre y cuando el predio se encuentre certificado; se destina al pago de la entidad certificadora y el acompañamiento técnico. Dos ministraciones: 50 % tras la firma del Contrato de Adhesión y 50 % tras presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría.",
+      "seleccionable": true,
+      "concepto": "fsc",
+      "numeral": "7.2 B) (cuadro, fila 15); 7.1.2; Convocatoria base tercera, MFS",
+      "linea": 6823
+    }
+  ],
+  "nota_modalidades": "Las ROP de MFS llaman «Concepto» a Estudios Técnicos Forestales (ETF) y Certificación Internacional FSC, y «Modalidad» a cada una de las 15 filas del cuadro de montos (10 de ETF y 5 de FSC). Aquí las 15 son modalidades del sistema, todas seleccionables al registrar; cada una trae su concepto. La Solicitud Única FO-PB-501-B ofrece las opciones de ETF agrupadas de otro modo (maderable, no maderable, PMF combinado, UMA, DTU, informe preventivo) más el rango de superficie del cuadro.",
+  "regimen_pago_por_modalidad": {
+    "etf_pmf_maderable_mayor_250": "etf",
+    "etf_pmf_maderable_no_maderable_mayor_250": "etf",
+    "etf_pmf_maderable_95_250": "etf",
+    "etf_pmf_maderable_y_no_maderable_95_250": "etf",
+    "etf_pmf_maderable_7_95": "etf",
+    "etf_pmf_maderable_y_no_maderable_7_95": "etf",
+    "etf_no_maderables": "etf",
+    "etf_dtu_maderable": "etf",
+    "etf_uma": "etf",
+    "etf_informe_preventivo": "etf",
+    "fsc_certificacion_manejo_grupal": "fsc",
+    "fsc_certificacion_cadena_custodia": "fsc",
+    "fsc_mantenimiento_manejo_grupal": "fsc",
+    "fsc_mantenimiento_cadena_custodia": "fsc",
+    "fsc_declaracion_servicios_ecosistemicos": "fsc"
+  },
+  "superficie": {
+    "minima_ha": 7,
+    "maxima_ha": null,
+    "poligono_minimo_ha": null,
+    "numeral": "7.2 A) filas 5 y 6; Convocatoria base tercera",
+    "linea": 6771,
+    "minima_ha_requisitos": 10,
+    "numeral_requisitos": "8.1.1.2 fr. XI A) filas 5 y 6",
+    "linea_requisitos": 7068,
+    "rangos_etf": [
+      {
+        "modalidad": "etf_pmf_maderable_mayor_250",
+        "desde_ha_exclusivo": 250,
+        "hasta_ha_inclusivo": null
+      },
+      {
+        "modalidad": "etf_pmf_maderable_no_maderable_mayor_250",
+        "desde_ha_exclusivo": 250,
+        "hasta_ha_inclusivo": null
+      },
+      {
+        "modalidad": "etf_pmf_maderable_95_250",
+        "desde_ha_exclusivo": 95,
+        "hasta_ha_inclusivo": 250
+      },
+      {
+        "modalidad": "etf_pmf_maderable_y_no_maderable_95_250",
+        "desde_ha_exclusivo": 95,
+        "hasta_ha_inclusivo": 250
+      },
+      {
+        "modalidad": "etf_pmf_maderable_7_95",
+        "desde_ha_exclusivo": 7,
+        "hasta_ha_inclusivo": 95
+      },
+      {
+        "modalidad": "etf_pmf_maderable_y_no_maderable_7_95",
+        "desde_ha_exclusivo": 7,
+        "hasta_ha_inclusivo": 95
+      }
+    ],
+    "predios_por_grupo": {
+      "fsc_certificacion_manejo_grupal": "igual o mayor a 3",
+      "fsc_mantenimiento_manejo_grupal": "igual o mayor a 2",
+      "otras_fsc": "1"
+    },
+    "nota": "Las superficies pueden integrarse en conjuntos prediales para elaborar DTU, ETF y/o certificaciones (8.1.1.1, línea 6917). Para las modalidades 7 a 10 de ETF las ROP no fijan rango de superficie. Hay una discrepancia 7 contra 10 ha (ver dudas)."
+  },
+  "sobrevivencia": {
+    "aplica": false,
+    "nota": "MFS no es un programa de plantación: no hay sobrevivencia ni cobertura arbórea máxima."
+  },
+  "requisitos": [
+    {
+      "clave": "MFS-REQ-01",
+      "texto": "Ser persona de nacionalidad mexicana o que haya adquirido la residencia mexicana, propietaria y/o poseedora legal de terrenos forestales susceptibles para aprovechamiento y/o de centros de almacenamiento y de transformación de materias primas forestales, interesada en participar en las modalidades de apoyo que se establezcan en la Convocatoria 2026 y de acuerdo con las Reglas.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": false,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. I",
+      "linea": 6974
+    },
+    {
+      "clave": "MFS-REQ-02",
+      "texto": "Presentar debidamente requisitada la Solicitud Única, en la oficina receptora de la Delegación Regional Forestal de PROBOSQUE que corresponda al municipio del predio. En ella se designa a una segunda persona beneficiaria y, en los conceptos de Estudios Técnicos Forestales, se integra la información del Asesor Técnico (prestador de servicios forestales) que elaborará el estudio.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": "FO-PB-501-B",
+      "numeral": "8.1.1.2, fr. II; 8.1.3; 8.1.4 inciso a)",
+      "linea": 6978
+    },
+    {
+      "clave": "MFS-REQ-03",
+      "texto": "Designar a una persona que fungirá como segunda persona beneficiaria (quien por imposibilidad del titular o por causa justificada puede recibir el recurso económico y cumplir las obligaciones del Contrato de Adhesión). En los núcleos agrarios debe recaer en algún integrante del órgano del comisariado o en sus suplentes.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": false,
+      "formato": "FO-PB-501-B",
+      "numeral": "8.1.1.2, frs. II y VI",
+      "linea": 6981
+    },
+    {
+      "clave": "MFS-REQ-04",
+      "texto": "Datos del prestador de servicios forestales propuesto (Asesor Técnico encargado de realizar el Programa de Manejo respectivo): nombre, Registro Forestal Nacional (libro, tipo, volumen, número y año), domicilio, teléfono y correo electrónico.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": false,
+      "formato": "FO-PB-501-B",
+      "numeral": "8.1.1.2, fr. II; Solicitud Única FO-PB-501-B, apartado III a)",
+      "linea": 12154,
+      "nota_refrendo": "Las ROP no dicen si el prestador propuesto es obligatorio al registrar; el formato lo pide en el apartado de ETF."
+    },
+    {
+      "clave": "MFS-REQ-05",
+      "texto": "Presentar el Registro de Información de la persona solicitante y/o beneficiaria, con toda la información catalogada como «obligatoria». Para núcleos agrarios, con la información de los integrantes del Comisariado (Presidente(a), Secretario(a) y Tesorero(a)) y de la segunda persona beneficiaria; para predios particulares se integra la información de la segunda persona beneficiaria cuando adquiera la titularidad del recurso.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": "FO-PB-502",
+      "numeral": "8.1.1.2, fr. III; 8.1.4 inciso b)",
+      "linea": 6986
+    },
+    {
+      "clave": "MFS-REQ-06",
+      "texto": "Copia legible de la identificación oficial vigente con fotografía.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. IV",
+      "linea": 7001
+    },
+    {
+      "clave": "MFS-REQ-07",
+      "texto": "Comprobante de domicilio (recibo de luz, teléfono, agua, predial, cable, etc.) con vigencia no mayor a tres meses, o constancia domiciliaria original emitida por la autoridad competente solo en los casos en que no se cuente con alguno de los anteriores, o credencial de nombramiento como autoridad del núcleo agrario expedida por el RAN, preferentemente a color.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. IV",
+      "linea": 7002,
+      "condicion": "La identificación oficial no trae el domicilio de la persona solicitante"
+    },
+    {
+      "clave": "MFS-REQ-08",
+      "texto": "Clave Única de Registro de Población (CURP) actualizada.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. V",
+      "linea": 7006
+    },
+    {
+      "clave": "MFS-REQ-09",
+      "texto": "Carta poder alterna (opcional) en original vigente, debidamente requisitada y signada por la persona otorgante, el apoderado y sus dos testigos, con copias simples de las identificaciones oficiales vigentes y legibles de quienes participan; permite continuar los trámites del Programa hasta su conclusión por causas de fuerza mayor; aplica únicamente al ejercicio fiscal en curso.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VII",
+      "linea": 7009,
+      "opcional": true,
+      "condicion": "Cuando la persona solicitante lo determine viable"
+    },
+    {
+      "clave": "MFS-REQ-10",
+      "texto": "Al momento de la firma del Contrato de Adhesión (si es asignada como persona beneficiaria): copia legible del documento emitido por la institución bancaria vigente a nombre de la persona beneficiaria, con nombre completo de la institución, número de cuenta y CLABE interbancaria, para la entrega del recurso por transferencia electrónica de las dos ministraciones. Puede solicitarse de nuevo; un cambio de cuenta se notifica por escrito.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VIII",
+      "linea": 7015,
+      "condicion": "Solo si resulta persona beneficiaria; se entrega al firmar el Contrato de Adhesión"
+    },
+    {
+      "clave": "MFS-REQ-11",
+      "texto": "Núcleos agrarios: copia legible del contrato donde se estipule que la cuenta bancaria es mancomunada entre los miembros de las autoridades vigentes.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. VIII",
+      "linea": 7018,
+      "condicion": "Solo si resulta persona beneficiaria; se entrega al firmar el Contrato de Adhesión"
+    },
+    {
+      "clave": "MFS-REQ-12",
+      "texto": "Núcleos agrarios, en contingencia sanitaria o fallecimiento de un integrante del comisariado (solo para la entrega del recurso): acta de defunción y manifestación bajo protesta de decir verdad de que se informó a los integrantes del núcleo agrario y están de acuerdo; mientras tanto el trámite lo continúa el suplente designado en el acta de elección, y la cartera acéfala se cubre mediante acta de asamblea con el acuse de recibido del RAN.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. IX; 8.1.7 inciso i)",
+      "linea": 7022,
+      "opcional": true,
+      "condicion": "Contingencia sanitaria o fallecimiento de un integrante del comisariado"
+    },
+    {
+      "clave": "MFS-REQ-13",
+      "texto": "Núcleos agrarios, si no puede celebrarse la asamblea por contingencia sanitaria: manifestación bajo protesta de decir verdad, suscrita por los integrantes del comisariado, de que se informó a los integrantes del núcleo agrario de su participación en el programa y que avalaron la gestión.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. X",
+      "linea": 7029,
+      "opcional": true,
+      "condicion": "No se puede llevar a cabo la asamblea por contingencia sanitaria"
+    },
+    {
+      "clave": "MFS-REQ-14",
+      "texto": "Núcleos agrarios: Carpeta Básica (Resolución Presidencial, Sentencia Ejecutoriada de los Tribunales Agrarios, Acta de Posesión y Deslinde y Plano Definitivo) o, en su caso, ADDATE. En la certificación de manejo forestal solo para los núcleos que cuenten con autorización del documento técnico unificado.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo",
+        "fsc_certificacion_manejo_grupal"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núm. 1; fr. XI B) fila 11",
+      "linea": 7040
+    },
+    {
+      "clave": "MFS-REQ-15",
+      "texto": "Núcleos agrarios: acta de asamblea de elección vigente de los órganos de representación, inscrita o presentada para su trámite ante el RAN, o en su caso credenciales expedidas por el RAN vigentes.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núm. 2 y fr. XI B) filas 11 a 15",
+      "linea": 7041
+    },
+    {
+      "clave": "MFS-REQ-16",
+      "texto": "Núcleos agrarios: acta de asamblea debidamente inscrita o presentada para su trámite ante el RAN, en la que se apruebe la incorporación a los beneficios del Programa, la cual no deberá tener fecha posterior al cierre de la Convocatoria.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núm. 3 y fr. XI B) filas 11 a 15",
+      "linea": 7045
+    },
+    {
+      "clave": "MFS-REQ-17",
+      "texto": "Polígono o polígonos en donde se propone realizar el estudio, debidamente georreferenciados, en formato shapefile.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núm. 4 (núcleos) y núm. 4 (personas físicas y/o jurídico colectivas); Solicitud Única FO-PB-501-B, checklist núm. 8",
+      "linea": 7050
+    },
+    {
+      "clave": "MFS-REQ-18",
+      "texto": "Personas físicas y/o jurídico colectivas: escritura pública, inmatriculación administrativa, sentencia ejecutoriada emitida por autoridad competente o, en su caso, acta constitutiva o documento legal con que se constituyó, protocolizado ante Notario Público, con facultades de administración, debidamente inscrito en el registro público correspondiente.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núm. 1 (personas físicas y/o jurídico colectivas)",
+      "linea": 7054
+    },
+    {
+      "clave": "MFS-REQ-19",
+      "texto": "Personas físicas y/o jurídico colectivas, en caso de representantes: documento vigente, conforme a la normatividad aplicable, que acredite la representación legal, emitido por Notario Público y debidamente protocolizado, en su caso con facultades de administración y/o dominio. Cuando se integren conjuntos prediales, el documento que acredite la representación debe ser poder notarial.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI A) núms. 2 y 3 (personas físicas y/o jurídico colectivas)",
+      "linea": 7085,
+      "condicion": "Actúa un representante; poder notarial si se integran conjuntos prediales"
+    },
+    {
+      "clave": "MFS-REQ-20",
+      "texto": "Oficio de Autorización del aprovechamiento de Recursos Forestales Maderables (PMF o DTU).",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [
+        "fsc_certificacion_manejo_grupal"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 11 (personas físicas y/o jurídico colectivas)",
+      "linea": 7128
+    },
+    {
+      "clave": "MFS-REQ-21",
+      "texto": "Núcleos agrarios: oficio de Autorización del aprovechamiento de Recursos Forestales Maderables.",
+      "tipos_persona": [
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_certificacion_manejo_grupal"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 11 (núcleos agrarios) núm. 3",
+      "linea": 7126
+    },
+    {
+      "clave": "MFS-REQ-22",
+      "texto": "Autorización de funcionamiento del centro de almacenamiento emitido por la SEMARNAT o código de cuantificación.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_certificacion_cadena_custodia"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 12",
+      "linea": 7139
+    },
+    {
+      "clave": "MFS-REQ-23",
+      "texto": "Carta de abastecimiento de la materia prima.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_certificacion_cadena_custodia"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 12",
+      "linea": 7141,
+      "condicion": "Su abastecimiento proviene de otros predios"
+    },
+    {
+      "clave": "MFS-REQ-24",
+      "texto": "Croquis de localización con las coordenadas en UTM de la ubicación de la industria.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_certificacion_cadena_custodia"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 12",
+      "linea": 7143
+    },
+    {
+      "clave": "MFS-REQ-25",
+      "texto": "Copia del certificado de manejo forestal.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_mantenimiento_manejo_grupal"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 13",
+      "linea": 7175
+    },
+    {
+      "clave": "MFS-REQ-26",
+      "texto": "Copia del certificado de cadena de custodia.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_mantenimiento_cadena_custodia"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 14",
+      "linea": 7191
+    },
+    {
+      "clave": "MFS-REQ-27",
+      "texto": "Copia del certificado internacional FSC del predio.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "fsc_declaracion_servicios_ecosistemicos"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) fila 15",
+      "linea": 7207
+    },
+    {
+      "clave": "MFS-REQ-28",
+      "texto": "Personas físicas y/o jurídico colectivas: escritura pública, inmatriculación administrativa, sentencia ejecutoriada emitida por autoridad competente o, en su caso, acta constitutiva, escritura, estatutos o documento legal con que se constituyó, protocolizado ante Notario Público, con facultades de administración, debidamente inscrito en el registro público correspondiente.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva"
+      ],
+      "modalidades": [
+        "fsc_certificacion_cadena_custodia",
+        "fsc_mantenimiento_manejo_grupal",
+        "fsc_mantenimiento_cadena_custodia",
+        "fsc_declaracion_servicios_ecosistemicos"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.1.2, fr. XI B) filas 12 a 15 (personas físicas y/o jurídico colectivas)",
+      "linea": 7145,
+      "condicion": "El nombre de quien firma la solicitud no corresponde con el nombre de la autorización o certificado"
+    },
+    {
+      "clave": "MFS-REQ-29",
+      "texto": "Copia de la carta compromiso bajo protesta de decir verdad de que el prestador de servicios técnicos contratado no se encuentra suspendido o revocado en su Registro Forestal Nacional (RFN), junto con copia de su registro, para acreditar al prestador acreditado por la SEMARNAT cuando no se consulte su inscripción en el listado público.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": false,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "8.1.6 inciso f)",
+      "linea": 7775,
+      "opcional": true,
+      "condicion": "La persona beneficiaria no acredita al prestador mediante la consulta del listado de la SEMARNAT"
+    },
+    {
+      "clave": "MFS-REQ-30",
+      "texto": "Contrato de Prestación de Servicios Técnicos entre la persona beneficiaria y el prestador de servicios, debidamente firmado y sellado por cada una de las partes (sellado en caso de núcleos agrarios); se requiere, junto con el Contrato de Adhesión, para que la Instancia Ejecutora emita y entregue el recurso económico.",
+      "tipos_persona": [
+        "fisica",
+        "juridica_colectiva",
+        "nucleo_agrario"
+      ],
+      "modalidades": [
+        "etf_pmf_maderable_mayor_250",
+        "etf_pmf_maderable_no_maderable_mayor_250",
+        "etf_pmf_maderable_95_250",
+        "etf_pmf_maderable_y_no_maderable_95_250",
+        "etf_pmf_maderable_7_95",
+        "etf_pmf_maderable_y_no_maderable_7_95",
+        "etf_no_maderables",
+        "etf_dtu_maderable",
+        "etf_uma",
+        "etf_informe_preventivo"
+      ],
+      "aplica_en_refrendo": null,
+      "es_documento_legal": true,
+      "requiere_documento": true,
+      "formato": null,
+      "numeral": "10.1.1 inciso l)",
+      "linea": 8090,
+      "opcional": true,
+      "condicion": "«En su caso»: si la persona beneficiaria contrata a un prestador de servicios técnicos"
+    }
+  ],
+  "reglas_generales_requisitos": [
+    {
+      "texto": "El registro de la solicitud se hace con base en la presentación y cumplimiento de todos los requisitos de la Convocatoria y de las Reglas. Los demás requisitos los determina la Instancia Normativa.",
+      "numeral": "8.1.1.2, fr. XII y párrafo siguiente",
+      "linea": 7216
+    },
+    {
+      "texto": "Para los requisitos de las fracciones IV y IX se entrega copia simple legible y, si se solicita, se presenta el original para cotejo o verificación, salvo los que deban presentarse en original.",
+      "numeral": "8.1.1.2 (párrafo posterior a la fr. XII)",
+      "linea": 7219
+    },
+    {
+      "texto": "La solicitud única debidamente requisitada y firmada se obtiene en las Delegaciones Regionales Forestales y en la página web de PROBOSQUE; la documentación debe estar completa; la Delegación informa conforme al acuse; cinco días hábiles desde la recepción para lo faltante sin exceder la fecha límite de recepción; se genera el folio; si no se complementa, se desecha. Horario: 9:00 a 17:00, de lunes a viernes.",
+      "numeral": "8.1.1.2 (párrafos finales); Convocatoria base cuarta",
+      "linea": 7222
+    },
+    {
+      "texto": "Los trámites de registro se hacen de manera personal, únicamente en la oficina receptora de la Delegación Regional Forestal que corresponda al municipio del predio; en ningún caso se reciben solicitudes en oficinas centrales ni en una Delegación que no corresponda.",
+      "numeral": "8.1.3",
+      "linea": 7593
+    },
+    {
+      "texto": "Si durante la evaluación o el ejercicio del Programa cambian los representantes, se presenta la documentación legal que lo acredite.",
+      "numeral": "8.1.1.2 (párrafo «Con la finalidad de mantener actualizado el expediente»)",
+      "linea": 7246
+    },
+    {
+      "texto": "Núcleos agrarios: si los titulares del comisariado concluyeron su periodo sin elecciones, los suplentes ocupan el cargo hasta por sesenta días naturales; después deben presentar copia del acta de elección con el acuse del registro ante el RAN (o calificación registral positiva y/o credenciales) y el Registro de Información de los nuevos representantes; si no, son dados de baja del Programa.",
+      "numeral": "8.1.1.2 (párrafo de suplentes)",
+      "linea": 7248
+    },
+    {
+      "texto": "Para el trámite de autorización de los ETF, el cotejo de la documentación se realiza en la dependencia según el trámite; la documentación entregada al Programa es solo para participar. Las personas beneficiarias aceptadas, al solicitar ante PROBOSQUE su autorización, deben presentar la documentación señalada en copia cotejada.",
+      "numeral": "8.1.1.2 (párrafo final); nota del cuadro A)",
+      "linea": 7259,
+      "lineas_adicionales": [
+        7095
+      ]
+    },
+    {
+      "texto": "La obtención del entregable (autorización, certificado) depende de las autoridades competentes o certificadoras; el otorgamiento del recurso por PROBOSQUE no garantiza su obtención.",
+      "numeral": "8.2 (último párrafo)",
+      "linea": 7956
+    }
+  ],
+  "criterios_seleccion": [
+    {
+      "texto": "Con base en el listado de solicitudes registradas que cumplieron los requisitos, la Instancia Ejecutora, a través del área responsable del programa, solicita los dictámenes al área técnica y a la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia; con ellos se determinan las solicitudes factibles y no factibles, que se presentan al Comité para que asigne los recursos.",
+      "puntaje": null,
+      "concepto": "todos",
+      "numeral": "8.1.1.1",
+      "linea": 6909
+    },
+    {
+      "texto": "Podrán ser apoyados los predios propiedad de Dependencias de la Administración Pública Federal, del Estado de México o Municipales que cumplan los requisitos, si hay suficiencia presupuestal; de lo contrario se incluyen en el listado de espera.",
+      "puntaje": null,
+      "concepto": "todos",
+      "numeral": "8.1.1.1",
+      "linea": 6914
+    },
+    {
+      "texto": "Las superficies podrán integrarse y conformar conjuntos prediales para elaborar DTU, Estudios Técnicos Forestales y/o certificaciones, conforme al tipo de bosque donde se ubiquen (matriz del cuadro de ubicación, no recuperable del texto: ver dudas).",
+      "puntaje": null,
+      "concepto": "todos",
+      "numeral": "8.1.1.1",
+      "linea": 6917
+    },
+    {
+      "texto": "Dictaminación técnica: el área responsable del programa revisa los polígonos, que deben contar con superficie arbolada factible para realizar el aprovechamiento forestal maderable y no maderable; verifica la ubicación respecto de las áreas naturales protegidas de competencia federal donde se permita el aprovechamiento, identifica sobreposiciones con predios que cuenten con algún programa, calcula la superficie total y arbolada, obtiene la superficie mínima requerida y emite la opinión sobre la procedencia. La dictaminación se hace en el orden en que ingresan las solicitudes a la ventanilla de Trámites Forestales.",
+      "puntaje": null,
+      "concepto": "todos",
+      "numeral": "8.1.1.3 inciso a)",
+      "linea": 7270
+    },
+    {
+      "texto": "Dictaminación jurídica: la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia revisa los formatos y la documentación legal, verifica el cumplimiento de los criterios y emite la opinión sobre la procedencia. Con el listado de solicitudes factibles y la opinión del Comité se asigna el recurso según disponibilidad.",
+      "puntaje": null,
+      "concepto": "todos",
+      "numeral": "8.1.1.3 inciso b)",
+      "linea": 7496
+    },
+    {
+      "texto": "ETF criterio 1: Predio o conjunto de predios con mayor superficie forestal por tipo de estudio (10 a 90 ha, 91 a 250 y mayores de 251). Superficie >10 ha a 50 ha = 5; 51 a 95 ha = 10. >95 a 150 ha = 5; 151 a 250 ha = 10. >250 a 500 ha = 5; >501 = 10. DTU >50 a 250 ha = 5; >251 = 10. Aprovechamiento no maderable >250 a 500 ha = 5; >501 = 10. UMA >250 a 500 ha = 5; >501 = 10. Informe preventivo >95 a 150 ha = 5; 151 a 250 ha = 10.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7292
+    },
+    {
+      "texto": "ETF criterio 2: Predios o conjunto de predios que soliciten las dos modalidades en un mismo estudio (maderable y no maderable).",
+      "puntaje": {
+        "si": 5,
+        "no": 5
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7303
+    },
+    {
+      "texto": "ETF criterio 3: Predios o conjunto de predios que cuenten con alguna certificación en manejo forestal.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7306
+    },
+    {
+      "texto": "ETF criterio 4: Predios o conjunto de predios que solicitan aprovechamiento por primera vez.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7308
+    },
+    {
+      "texto": "ETF criterio 5: Predios o conjunto de predios que se encuentren en zona de alto potencial para su aprovechamiento.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7310
+    },
+    {
+      "texto": "ETF criterio 6: Predios o conjunto de predios que se encuentren en ANP federal o estatal.",
+      "puntaje": {
+        "si": 8,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7313
+    },
+    {
+      "texto": "ETF criterio 7: El predio o conjunto de predios que no tiene sobreposición.",
+      "puntaje": {
+        "si": 4,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7315
+    },
+    {
+      "texto": "ETF criterio 8: El predio o conjunto de predios que no se encuentra sancionado por PROFEPA.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7316
+    },
+    {
+      "texto": "ETF criterio 9: Predios o conjunto de predios que se encuentren en comunidad indígena.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7317
+    },
+    {
+      "texto": "ETF criterio 10: El predio o conjunto de predios que no presenta problemas internos.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7319
+    },
+    {
+      "texto": "ETF criterio 11: El predio o conjunto de predios cuentan con infraestructura caminera.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7321
+    },
+    {
+      "texto": "ETF criterio 12: El predio o conjunto de predios cuyo titular o representante legal corresponde a una mujer.",
+      "puntaje": {
+        "si": 6,
+        "no": 3
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7323
+    },
+    {
+      "texto": "ETF criterio 13: El predio o conjunto de predios forma parte de una organización o asociación de silvicultores.",
+      "puntaje": {
+        "si": 8,
+        "no": 4
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7326
+    },
+    {
+      "texto": "ETF criterio 14: El predio o conjunto de predios cuyo titular o representante legal es una persona con enfermedades crónico degenerativas.",
+      "puntaje": {
+        "si": 6,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7328
+    },
+    {
+      "texto": "ETF criterio 15: El predio o conjunto de predios cuyo titular o representante legal es una persona víctima u ofendido del delito.",
+      "puntaje": {
+        "si": 6,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7331
+    },
+    {
+      "texto": "ETF criterio 16: El predio o conjunto de predios cuyo titular o representante legal es una persona repatriada.",
+      "puntaje": {
+        "si": 6,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7334
+    },
+    {
+      "texto": "ETF criterio 17: El predio o conjunto de predios cuyo titular o representante legal es una mujer cuidadora de hijas e hijos menores de edad, de mujeres privadas de su libertad por resolución judicial.",
+      "puntaje": {
+        "si": 6,
+        "no": 2
+      },
+      "concepto": "etf",
+      "numeral": "8.1.1.3 inciso a), cuadro A) Estudios Técnicos Forestales",
+      "linea": 7337
+    },
+    {
+      "texto": "Para la certificación de manejo forestal se deberá contar con programa de manejo forestal autorizado.",
+      "puntaje": null,
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7341
+    },
+    {
+      "texto": "FSC manejo forestal criterio 1: El predio o conjunto de predios se encuentra dentro de una organización o forma parte de una UMAFOR o de una Unión de Ejidos para incorporar a la certificación de manejo forestal.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7347
+    },
+    {
+      "texto": "FSC manejo forestal criterio 2: El predio o conjunto de predios cuenta con apoyos del Programa de Pago por Servicios Ambientales Hidrológicos del Estado de México.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7364
+    },
+    {
+      "texto": "FSC manejo forestal criterio 3: El predio o conjunto de predios se encuentra dentro de un ANP y en ésta se permite realizar el aprovechamiento maderable.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7367
+    },
+    {
+      "texto": "FSC manejo forestal criterio 4: El predio o conjunto de predios no se encuentra sancionado por PROFEPA en los últimos 3 años.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7372
+    },
+    {
+      "texto": "FSC manejo forestal criterio 5: El predio o conjunto de predios cuenta con documentación de los últimos 5 años relacionada al aprovechamiento forestal (remisiones forestales, informes anuales, ajustes, sanidad forestal, oficios de validación de remisiones, liberaciones de áreas de corta).",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7375
+    },
+    {
+      "texto": "FSC manejo forestal criterio 6: El predio o conjunto de predios cuenta con documentación de los últimos 5 años (declaraciones de Hacienda, pago de impuesto predial y actas de asamblea).",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7381
+    },
+    {
+      "texto": "FSC manejo forestal criterio 7: El predio o conjunto de predios cuyo titular o representante legal corresponde a una mujer.",
+      "puntaje": {
+        "si": 10,
+        "no": 5
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7386
+    },
+    {
+      "texto": "FSC manejo forestal criterio 8: El predio o conjunto de predios cuyo titular o representante legal es una persona con enfermedades crónico degenerativas.",
+      "puntaje": {
+        "si": 8,
+        "no": 4
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7389
+    },
+    {
+      "texto": "FSC manejo forestal criterio 9: El predio o conjunto de predios cuyo titular o representante legal es una persona víctima u ofendida del delito.",
+      "puntaje": {
+        "si": 8,
+        "no": 4
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7392
+    },
+    {
+      "texto": "FSC manejo forestal criterio 10: El predio o conjunto de predios cuyo titular o representante legal es una persona repatriada.",
+      "puntaje": {
+        "si": 7,
+        "no": 4
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7395
+    },
+    {
+      "texto": "FSC manejo forestal criterio 11: El predio o conjunto de predios cuyo titular o representante legal es una mujer cuidadora de hijas e hijos menores de edad, de mujeres privadas de su libertad por resolución judicial.",
+      "puntaje": {
+        "si": 7,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (manejo forestal)",
+      "linea": 7398
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 1: El centro de transformación corresponde a una empresa social.",
+      "puntaje": {
+        "si": 7,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7409
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 2: El centro de transformación cuenta con estufa de secado.",
+      "puntaje": {
+        "si": 6,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7411
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 3: El centro de transformación se encuentra constituido en una empresa social por varios núcleos agrarios.",
+      "puntaje": {
+        "si": 6,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7413
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 4: El centro de transformación y de almacenamiento está legalmente establecido.",
+      "puntaje": {
+        "si": 6,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7416
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 5: El centro de transformación no tiene sanciones por PROFEPA en los últimos 3 años.",
+      "puntaje": {
+        "si": 6,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7418
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 6: El centro de transformación actualmente se encuentra operando.",
+      "puntaje": {
+        "si": 7,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7421
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 7: El centro de transformación realiza facturación bruta anual de todos los productos derivados de la madera.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7423
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 8: El centro de transformación tiene su propio proceso administrativo.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7426
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 9: El centro de transformación presenta documento que acredita el abastecimiento de materia prima de aprovechamiento forestal maderable.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7428
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 10: El centro de transformación y de almacenamiento cuenta con la opinión del cumplimiento de sus obligaciones fiscales vigentes.",
+      "puntaje": {
+        "si": 7,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7442
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 11: El centro de transformación o cadena productiva se encuentra en comunidad indígena.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7445
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 12: El centro de transformación cuenta con documentación de los últimos 5 años (declaraciones de Hacienda, actas de asamblea, registro de entradas y salidas).",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7448
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 13: El centro de transformación cuyo titular o representante legal corresponde a una mujer.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7451
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 14: El centro de transformación cuyo titular o representante legal es una persona con enfermedades crónico degenerativas.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7453
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 15: El centro de transformación cuyo titular o representante legal es una persona víctima u ofendida del delito.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7456
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 16: El centro de transformación cuyo titular o representante legal es una persona repatriada.",
+      "puntaje": {
+        "si": 5,
+        "no": 3
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7459
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 17: El centro de transformación cuyo titular o representante legal es una mujer cuidadora de hijas e hijos menores de edad, de mujeres privadas de su libertad por resolución judicial.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7462
+    },
+    {
+      "texto": "FSC cadena de custodia criterio 18: El centro de transformación corresponde a una empresa social.",
+      "puntaje": {
+        "si": 5,
+        "no": 2
+      },
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadro B) Certificación FSC (cadena de custodia)",
+      "linea": 7465
+    },
+    {
+      "texto": "FSC mantenimiento de manejo forestal criterio 1: que el certificado de los predios participantes corresponda de forma grupal FSC.",
+      "puntaje": {
+        "si": 70,
+        "no": 30
+      },
+      "concepto": "fsc_mantenimiento_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7473
+    },
+    {
+      "texto": "FSC mantenimiento de manejo forestal criterio 2: certificado vigente.",
+      "puntaje": {
+        "si": 30,
+        "no": 20
+      },
+      "concepto": "fsc_mantenimiento_manejo_grupal",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7475
+    },
+    {
+      "texto": "FSC mantenimiento de cadena de custodia criterio 1: núcleo agrario con certificado en FSC.",
+      "puntaje": {
+        "si": 70,
+        "no": 30
+      },
+      "concepto": "fsc_mantenimiento_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7481
+    },
+    {
+      "texto": "FSC mantenimiento de cadena de custodia criterio 2: certificado vigente.",
+      "puntaje": {
+        "si": 30,
+        "no": 20
+      },
+      "concepto": "fsc_mantenimiento_cadena_custodia",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7482
+    },
+    {
+      "texto": "FSC declaración de servicios ecosistémicos criterio 1: que el certificado de los predios participantes corresponda de forma grupal FSC.",
+      "puntaje": {
+        "si": 70,
+        "no": 30
+      },
+      "concepto": "fsc_declaracion_servicios_ecosistemicos",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7490
+    },
+    {
+      "texto": "FSC declaración de servicios ecosistémicos criterio 2: certificado vigente.",
+      "puntaje": {
+        "si": 30,
+        "no": 20
+      },
+      "concepto": "fsc_declaracion_servicios_ecosistemicos",
+      "numeral": "8.1.1.3 inciso a), cuadros B) Mantenimiento y Declaración",
+      "linea": 7494
+    }
+  ],
+  "criterios_priorizacion": [
+    {
+      "texto": "Generales, en este orden: fecha de ingreso de la solicitud; predios de grupos de mujeres y/o indígenas; personas con enfermedades crónico-degenerativas; víctimas u ofendidas en delitos investigados o juzgados con perspectiva de género; personas repatriadas; mujeres cuidadoras de hijas e hijos menores de edad o de mujeres privadas de su libertad; comunidad y/o grupo que se autorreconozca afromexicano; predios que no son propiedad de Dependencias de la Administración Pública Federal, del Estado de México o Municipales.",
+      "numeral": "8.1.2",
+      "linea": 7549
+    },
+    {
+      "texto": "Sin cobertura presupuestal suficiente, la asignación va del puntaje más alto de manera descendente hasta donde alcance el recurso; en caso de empate de puntos, se toma en cuenta la fecha en que fue registrada la solicitud.",
+      "numeral": "8.1.2",
+      "linea": 7568
+    },
+    {
+      "texto": "ETF: predios con mayor superficie para incorporar al manejo forestal sustentable; predios en zonas prioritarias para el Manejo Forestal Sostenible; predios sin manejo forestal en los últimos 10 años.",
+      "numeral": "8.1.2 A)",
+      "linea": 7572
+    },
+    {
+      "texto": "FSC manejo forestal o mantenimiento: predios con industria de transformación de materias primas forestales; predios dentro de una organización, UMAFOR o Unión de Ejidos; predios dentro de ANP donde se permita el aprovechamiento maderable.",
+      "numeral": "8.1.2 B) 1",
+      "linea": 7577
+    },
+    {
+      "texto": "FSC cadena de custodia o mantenimiento: centros de transformación que correspondan a empresas sociales o estén constituidos en empresas sociales.",
+      "numeral": "8.1.2 B) 2",
+      "linea": 7583
+    },
+    {
+      "texto": "FSC servicios ecosistémicos: predios dentro de una organización, UMAFOR o Unión de Ejidos; predios dentro de ANP donde se permita el aprovechamiento maderable.",
+      "numeral": "8.1.2 B) 3",
+      "linea": 7586
+    }
+  ],
+  "criterios_elegibilidad_tecnica": [
+    {
+      "texto": "Los predios que iniciaron el proceso para el mantenimiento a la certificación de manejo forestal o de cadena de custodia son susceptibles de ser beneficiarios siempre que el pago realizado para ese fin se haya hecho en el mismo año de firma del Contrato de Adhesión y cumplan todos los requisitos.",
+      "numeral": "8.1.1.2 (último párrafo)",
+      "linea": 7266
+    },
+    {
+      "texto": "Dictamen técnico (ETF): superficie arbolada factible para el aprovechamiento maderable y no maderable; ubicación respecto de ANP federales donde se permita el aprovechamiento; sin sobreposición con predios que cuenten con algún programa; cálculo de superficie total y arbolada y de la superficie mínima requerida.",
+      "numeral": "8.1.1.3 inciso a)",
+      "linea": 7272
+    },
+    {
+      "texto": "Para la certificación de manejo forestal se deberá contar con programa de manejo forestal autorizado.",
+      "numeral": "8.1.1.3 inciso a), cuadro B)",
+      "linea": 7341
+    },
+    {
+      "texto": "La certificación de manejo forestal se otorga solo de forma grupal (3 o más predios por grupo; mantenimiento: 2 o más predios por grupo, bajo el mismo código de registro del certificado).",
+      "numeral": "7.1.2; 7.2 B)",
+      "linea": 6746
+    },
+    {
+      "texto": "La declaración de servicios ecosistémicos se otorga de manera individual, siempre y cuando el predio se encuentre certificado.",
+      "numeral": "7.2 (B)",
+      "linea": 6862
+    }
+  ],
+  "inelegibles": [
+    {
+      "texto": "Personas beneficiarias que presentan algún incumplimiento en los Programas y/o adeudo con PROBOSQUE, consultable en el Listado de Personas Beneficiarias Incumplidas.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso a)",
+      "linea": 7512
+    },
+    {
+      "texto": "Predios que no cumplan con los requisitos o proporcionen información incompleta, falsa o apócrifa para su inscripción.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso b)",
+      "linea": 7515
+    },
+    {
+      "texto": "Personas que ya hayan sido beneficiarias con anterioridad en el programa y para el mismo concepto.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso c)",
+      "linea": 7517
+    },
+    {
+      "texto": "Existencia de conflictos o litigios de cualquier índole, o evidencia clara en los archivos de PROBOSQUE de conflictos de propiedad, posesión o representación del predio que pueda poner en riesgo la aplicación de los recursos; la situación se pone a consideración de la Instancia Normativa.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso d)",
+      "linea": 7518
+    },
+    {
+      "texto": "Áreas que estén siendo beneficiadas con el mismo propósito del Programa con apoyos de la CONAFOR.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso e)",
+      "linea": 7523
+    },
+    {
+      "texto": "Núcleos agrarios que no tengan vigentes sus órganos de representación, con excepción del plazo otorgado por la Ley Agraria a los suplentes.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso f)",
+      "linea": 7525
+    },
+    {
+      "texto": "Personas servidoras públicas, cónyuges, parientes consanguíneos o civiles, o terceros con relaciones profesionales, laborales o de negocios, o socios o sociedades de las que formen parte.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso g)",
+      "linea": 7527
+    },
+    {
+      "texto": "Personas beneficiarias que hayan recibido recurso mayor al establecido en el contrato de adhesión en convocatorias anteriores y no lo hayan reintegrado a PROBOSQUE.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso h)",
+      "linea": 7531
+    },
+    {
+      "texto": "Las demás que determine la Instancia Normativa.",
+      "concepto": "todos",
+      "numeral": "8.1.1.3, Inelegibles generales, inciso i)",
+      "linea": 7534
+    },
+    {
+      "texto": "ETF: predios dentro de Áreas Naturales Protegidas donde no se permita el manejo forestal sostenible para el aprovechamiento maderable.",
+      "concepto": "etf",
+      "numeral": "8.1.1.3, Inelegibles específicos A) 1",
+      "linea": 7537
+    },
+    {
+      "texto": "ETF: predios que ya cuenten con autorización emitida por autoridad competente en el mismo predio donde se pretende el apoyo.",
+      "concepto": "etf",
+      "numeral": "8.1.1.3, Inelegibles específicos A) 2",
+      "linea": 7539
+    },
+    {
+      "texto": "FSC manejo forestal sostenible: predios que no tengan interés en conformar un grupo para su certificación.",
+      "concepto": "fsc_certificacion_manejo_grupal",
+      "numeral": "8.1.1.3, Inelegibles específicos B)",
+      "linea": 7542
+    },
+    {
+      "texto": "FSC cadena de custodia: centros de transformación de materias primas forestales que no cuenten con los permisos necesarios para su operación.",
+      "concepto": "fsc_certificacion_cadena_custodia",
+      "numeral": "8.1.1.3, Inelegibles específicos B)",
+      "linea": 7544
+    },
+    {
+      "texto": "FSC mantenimiento a la certificación: predios o centros de transformación que no cuenten con su certificación actual.",
+      "concepto": "fsc_mantenimiento_manejo_grupal y fsc_mantenimiento_cadena_custodia",
+      "numeral": "8.1.1.3, Inelegibles específicos B)",
+      "linea": 7546
+    },
+    {
+      "texto": "FSC declaración de servicios ecosistémicos: predios o conjunto de predios que no cuenten con certificado actual.",
+      "concepto": "fsc_declaracion_servicios_ecosistemicos",
+      "numeral": "8.1.1.3, Inelegibles específicos B)",
+      "linea": 7548
+    }
+  ],
+  "montos": [
+    {
+      "concepto": "ETF: Programa de Manejo Forestal Maderable (predios o conjunto de predios mayores a 250 ha)",
+      "monto": 165000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_mayor_250",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6758
+    },
+    {
+      "concepto": "ETF: PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 250 ha)",
+      "monto": 175000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_no_maderable_mayor_250",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6761
+    },
+    {
+      "concepto": "ETF: Programa de Manejo Forestal Maderable (mayores a 95 ha y hasta 250 ha)",
+      "monto": 65000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_95_250",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6765
+    },
+    {
+      "concepto": "ETF: PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 95 ha y hasta 250 ha)",
+      "monto": 75000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_y_no_maderable_95_250",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6770
+    },
+    {
+      "concepto": "ETF: Programa de Manejo Forestal Maderable (mayores a 7 ha y hasta 95 ha)",
+      "monto": 30000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_7_95",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6774
+    },
+    {
+      "concepto": "ETF: PMF Maderable y Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables (mayores a 7 ha y hasta 95 ha)",
+      "monto": 30000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_pmf_maderable_y_no_maderable_7_95",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6779
+    },
+    {
+      "concepto": "ETF: Estudio Técnico para el Aprovechamiento de Recursos Forestales no Maderables",
+      "monto": 25000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_no_maderables",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6781
+    },
+    {
+      "concepto": "ETF: Documento Técnico Unificado de Aprovechamiento Forestal Maderable",
+      "monto": 175000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_dtu_maderable",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6783
+    },
+    {
+      "concepto": "ETF: Unidades de Manejo de Vida Silvestre (UMA)",
+      "monto": 30000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_uma",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6785
+    },
+    {
+      "concepto": "ETF: Informe Preventivo",
+      "monto": 30000,
+      "unidad": "pesos por persona beneficiaria (apoyo único)",
+      "modalidad": "etf_informe_preventivo",
+      "numero_maximo_apoyos": 1,
+      "numeral": "7.2 A); Convocatoria base tercera, MFS",
+      "linea": 6787
+    },
+    {
+      "concepto": "FSC 11 Certificación de manejo forestal grupal: monto de acompañamiento",
+      "monto": 210000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_certificacion_manejo_grupal",
+      "componente": "acompanamiento",
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6806,
+      "predios_por_grupo_minimo": 3
+    },
+    {
+      "concepto": "FSC 11 Certificación de manejo forestal grupal: monto de certificación",
+      "monto": 350000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_certificacion_manejo_grupal",
+      "componente": "certificacion",
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6806,
+      "predios_por_grupo_minimo": 3
+    },
+    {
+      "concepto": "FSC 11 Certificación de manejo forestal grupal: monto para el administrador de recursos",
+      "monto": 40000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_certificacion_manejo_grupal",
+      "componente": "administrador_de_recursos",
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6806,
+      "predios_por_grupo_minimo": 3
+    },
+    {
+      "concepto": "FSC 12 Certificación de cadena de custodia: monto de acompañamiento",
+      "monto": 60000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_certificacion_cadena_custodia",
+      "componente": "acompanamiento",
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6814,
+      "numero_personas_beneficiarias": 1
+    },
+    {
+      "concepto": "FSC 12 Certificación de cadena de custodia: monto de certificación",
+      "monto": 80000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_certificacion_cadena_custodia",
+      "componente": "certificacion",
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6814,
+      "numero_personas_beneficiarias": 1
+    },
+    {
+      "concepto": "FSC 13 Mantenimiento a la certificación de manejo forestal en forma grupal",
+      "monto": 130000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_mantenimiento_manejo_grupal",
+      "componente": null,
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6819,
+      "predios_por_grupo_minimo": 2,
+      "columna_ambigua": true
+    },
+    {
+      "concepto": "FSC 14 Mantenimiento a la certificación de cadena de custodia",
+      "monto": 95600,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_mantenimiento_cadena_custodia",
+      "componente": null,
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6822,
+      "numero_personas_beneficiarias": 1,
+      "columna_ambigua": true
+    },
+    {
+      "concepto": "FSC 15 Declaración de servicios ecosistémicos",
+      "monto": 20000,
+      "unidad": "pesos por apoyo (columna según el cuadro)",
+      "modalidad": "fsc_declaracion_servicios_ecosistemicos",
+      "componente": null,
+      "numeral": "7.2 B); Convocatoria base tercera, MFS",
+      "linea": 6824,
+      "numero_personas_beneficiarias": 1,
+      "columna_ambigua": true
+    }
+  ],
+  "ministraciones": [
+    {
+      "numero": 1,
+      "porcentaje": 70,
+      "regimen": "etf",
+      "condicion": "Primera ministración del 70 %: posterior a la firma del Contrato de Adhesión (Convocatoria: «dependiendo de la disponibilidad del recurso»).",
+      "numeral": "7.2 (cuadro de entregables); Convocatoria base quinta (MFS), actividad VI",
+      "linea": 6869
+    },
+    {
+      "numero": 2,
+      "porcentaje": 30,
+      "regimen": "etf",
+      "condicion": "Segunda ministración del 30 % después de presentar copia de la Bitácora para la autorización del Programa de Manejo del concepto aprobado (o, en su caso, la autorización respectiva).",
+      "numeral": "7.2 (cuadro de entregables); 10.1.1 inciso m); Convocatoria base quinta (MFS), actividad VI",
+      "linea": 6871
+    },
+    {
+      "numero": 1,
+      "porcentaje": 50,
+      "regimen": "fsc",
+      "condicion": "Primera ministración del 50 %: posterior a la firma del Contrato de Adhesión; con este pago se realizan las acciones para obtener el Certificado de Manejo Forestal y/o Cadena de Custodia o la Declaración de servicios ecosistémicos.",
+      "numeral": "7.2 (cuadro de entregables); Convocatoria base quinta (MFS), actividad VII",
+      "linea": 6879
+    },
+    {
+      "numero": 2,
+      "porcentaje": 50,
+      "regimen": "fsc",
+      "condicion": "Segunda ministración del 50 % después de presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría (en mantenimiento, copia de la solicitud de la auditoría anual a la casa certificadora o el plan de auditoría).",
+      "numeral": "7.2 (cuadro de entregables); 8.1.7 incisos n) y o); 10.1.1 inciso m); Convocatoria base quinta (MFS), actividad VII",
+      "linea": 6885
+    }
+  ],
+  "plazos": [
+    {
+      "clave": "recepcion_solicitudes",
+      "descripcion": "Recepción y registro de solicitudes, a partir del día hábil siguiente de la publicación de la Convocatoria y hasta el 27 de marzo de 2026. Horario de atención: de 9:00 a 17:00, de lunes a viernes.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-03-27",
+      "lineas_adicionales": [
+        7236
+      ],
+      "corre_desde": "Día hábil siguiente a la publicación de la Convocatoria (27-ene-2026)",
+      "responsable": "Delegación Regional Forestal",
+      "numeral": "Convocatoria base quinta (MFS), actividad I; 8.1.1.2",
+      "linea": 853
+    },
+    {
+      "clave": "complemento_documentacion_faltante",
+      "descripcion": "Plazo de cinco días hábiles para presentar la documentación faltante, a partir de la recepción de la solicitud, siempre que este tiempo no exceda la fecha límite de recepción de solicitudes de la Convocatoria; se genera el folio de solicitud y, de no complementarse en los plazos establecidos, la solicitud se tiene por desechada.",
+      "cantidad": 5,
+      "unidad": "dias_habiles",
+      "lineas_adicionales": [
+        7241,
+        761
+      ],
+      "tope_fecha": "2026-03-27",
+      "corre_desde": "Recepción de la solicitud (el texto no dice que corra desde que la Delegación informa lo faltante; ver dudas)",
+      "responsable": "Persona solicitante (la Delegación informa conforme al acuse)",
+      "numeral": "8.1.1.2 (párrafos finales); Convocatoria base cuarta",
+      "linea": 7224
+    },
+    {
+      "clave": "aviso_faltantes_en_evaluacion",
+      "descripcion": "Si con posterioridad se determina que por cualquier supuesto es necesario presentar nuevamente documentación o información complementaria, se notifica a la persona solicitante dentro del plazo de la evaluación, validación y calificación en campo y gabinete de las solicitudes. No se fijan días.",
+      "cantidad": null,
+      "unidad": "plazo_de_evaluacion",
+      "lineas_adicionales": [
+        8069
+      ],
+      "corre_desde": "Durante la evaluación, validación y calificación de las solicitudes",
+      "responsable": "Instancia Ejecutora / Delegación Regional Forestal",
+      "numeral": "8.1.1.2 (párrafo «Si se determina con posterioridad…»); 10.1.1 inciso e)",
+      "linea": 7237
+    },
+    {
+      "clave": "evaluacion_y_dictaminacion",
+      "descripcion": "Evaluación, validación y calificación en campo; dictaminación técnica y jurídica: se realizan desde la apertura de la Convocatoria hasta el 15 de junio de 2026. La dictaminación se hace en el orden en que ingresan las solicitudes a la ventanilla de Trámites Forestales.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-06-15",
+      "lineas_adicionales": [
+        7270
+      ],
+      "corre_desde": "Apertura de la Convocatoria (28-ene-2026)",
+      "responsable": "Delegaciones Regionales Forestales, área técnica y Unidad Jurídica",
+      "numeral": "Convocatoria base quinta (MFS), actividad II; 8.1.1.3",
+      "linea": 855
+    },
+    {
+      "clave": "aprobacion_solicitudes",
+      "descripcion": "Con base en la disponibilidad de presupuesto del Programa se realiza la asignación correspondiente, hasta el 24 de junio de 2026, a partir de la conclusión de la dictaminación técnica y jurídica. El fallo es inapelable.",
+      "cantidad": null,
+      "unidad": "fecha_limite",
+      "fecha_fin": "2026-06-24",
+      "corre_desde": "Conclusión de la dictaminación técnica y jurídica",
+      "responsable": "Comité de Admisión y Seguimiento del Programa MFS",
+      "numeral": "Convocatoria base quinta (MFS), actividad III",
+      "linea": 869
+    },
+    {
+      "clave": "publicacion_resultados",
+      "descripcion": "Posterior a la fecha de la aprobación de las solicitudes por el Comité, los resultados se publican en la página web de PROBOSQUE y están disponibles en Oficinas Centrales y Delegaciones. Sin plazo en días ni fecha.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "lineas_adicionales": [
+        903,
+        8080
+      ],
+      "corre_desde": "Aprobación de las solicitudes por el Comité",
+      "responsable": "Instancia Ejecutora, a través del área responsable del programa",
+      "numeral": "Convocatoria base quinta (MFS), actividad IV; base sexta; 10.1.1 inciso h)",
+      "linea": 873
+    },
+    {
+      "clave": "firma_contrato",
+      "descripcion": "Elaboración y firma del Contrato de Adhesión: la Convocatoria la ubica posterior a la publicación de resultados, hasta el 15 de julio de 2026, después de la aprobación del Comité y antes del primer pago (reasignados: hasta el último día de septiembre de 2026). Las ROP dan de baja a quien no acuda a la firma en 10 días hábiles posteriores a la notificación de ser persona beneficiaria con recurso disponible.",
+      "cantidad": 10,
+      "unidad": "dias_habiles",
+      "fecha_limite_firma": "2026-07-15",
+      "fecha_limite_reasignados": "2026-09-30",
+      "lineas_adicionales": [
+        7884,
+        7798,
+        8082
+      ],
+      "corre_desde": "ROP 8.1.9.2 inciso e): notificación de ser persona beneficiaria con recurso disponible. Convocatoria: posterior a la publicación de resultados, sin días (ver dudas: no coinciden)",
+      "responsable": "Persona beneficiaria, con la Delegación Regional Forestal; contrato elaborado por el área responsable del programa",
+      "numeral": "Convocatoria base quinta (MFS), actividad V; 8.1.9.2 inciso e); 8.1.7 inciso f); 10.1.1 inciso i)",
+      "linea": 877
+    },
+    {
+      "clave": "primera_ministracion",
+      "descripcion": "Primera ministración, dependiendo de la disponibilidad del recurso: 70 % (ETF) o 50 % (FSC), posterior a la firma del Contrato de Adhesión y, en su caso, con el contrato de prestación de servicios técnicos firmado. Sin plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "lineas_adicionales": [
+        894,
+        8087,
+        8090
+      ],
+      "corre_desde": "Firma del Contrato de Adhesión",
+      "responsable": "Instancia Ejecutora con la Dirección de Administración, Finanzas y de Gestión Documental",
+      "numeral": "7.2; Convocatoria base quinta (MFS), actividades VI y VII; 10.1.1 incisos k) y l)",
+      "linea": 886
+    },
+    {
+      "clave": "segunda_ministracion",
+      "descripcion": "Segunda ministración: 30 % (ETF) después de presentar copia de la Bitácora para la autorización del Programa de Manejo (o la autorización respectiva); 50 % (FSC) después de presentar copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría. Sin plazo en días.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "lineas_adicionales": [
+        897,
+        8093
+      ],
+      "corre_desde": "Presentación del entregable (bitácora, autorización, solicitud de auditoría o plan de auditoría)",
+      "responsable": "Área responsable del programa / Dirección de Administración, Finanzas y de Gestión Documental",
+      "numeral": "7.2; Convocatoria base quinta (MFS), actividades VI y VII; 10.1.1 inciso m)",
+      "linea": 888
+    },
+    {
+      "clave": "verificacion_ejecucion_actividades",
+      "descripcion": "Verificación de la ejecución de los trabajos del Programa: a partir de la emisión del primer pago, hasta la recepción de la bitácora o la solicitud de auditoría o el Plan de auditoría. No se fijan días ni se dice quién verifica ni con qué documento (ver dudas).",
+      "cantidad": null,
+      "unidad": "otro",
+      "lineas_adicionales": [
+        7823,
+        8155
+      ],
+      "evento_inicio": "emision_primer_pago",
+      "evento_fin": "recepcion_bitacora_o_solicitud_auditoria_o_plan_auditoria",
+      "corre_desde": "Emisión del primer pago; termina con la recepción de la bitácora, la solicitud de auditoría o el Plan de auditoría",
+      "responsable": "No lo precisa el texto (el seguimiento es de la Instancia Ejecutora y las Delegaciones: numeral 15)",
+      "numeral": "Convocatoria base quinta (MFS), actividad VIII",
+      "linea": 899
+    },
+    {
+      "clave": "ampliacion_plazo_causa_externa",
+      "descripcion": "Si al término del Contrato de Adhesión no se cumple la meta establecida por algún motivo externo a la persona beneficiaria, el plazo puede ampliarse a través del instrumento legal correspondiente (el adendum del Contrato de Adhesión se menciona en 10.1.1 inciso j)). No se dice quién lo solicita ni quién lo autoriza, ni por cuánto tiempo.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "lineas_adicionales": [
+        8084
+      ],
+      "corre_desde": "Término del Contrato de Adhesión sin cumplimiento de la meta por motivo externo a la persona beneficiaria",
+      "responsable": "No lo precisa el texto (la Instancia Ejecutora elabora el contrato y el adendum con apoyo de la Unidad Jurídica)",
+      "numeral": "10.1.1 inciso n); 10.1.1 inciso j)",
+      "linea": 8100
+    },
+    {
+      "clave": "segunda_persona_beneficiaria_interes",
+      "descripcion": "Por fallecimiento del titular, la segunda persona beneficiaria debe notificar su interés en continuar con el programa en el término de 30 días hábiles; si no, procede la baja.",
+      "cantidad": 30,
+      "unidad": "dias_habiles",
+      "corre_desde": "Fallecimiento del titular",
+      "responsable": "Segunda persona beneficiaria",
+      "numeral": "8.1.9.2 inciso i)",
+      "linea": 7892
+    },
+    {
+      "clave": "suplentes_nucleo_agrario",
+      "descripcion": "Cuando los titulares del Órgano del Comisariado hayan concluido su periodo y no se hayan celebrado elecciones, los suplentes toman el cargo hasta por un plazo no mayor de sesenta días naturales (artículo 39 de la Ley Agraria); después deben presentar el acta de elección con el acuse de registro ante el RAN y el Registro de Información, o serán dados de baja del Programa.",
+      "cantidad": 60,
+      "unidad": "dias_naturales",
+      "lineas_adicionales": [
+        7898
+      ],
+      "corre_desde": "Conclusión del periodo de gestión de los titulares",
+      "responsable": "Núcleo agrario",
+      "numeral": "8.1.1.2 (párrafo de suplentes)",
+      "linea": 7248
+    },
+    {
+      "clave": "vigencia_comprobantes",
+      "descripcion": "El comprobante de domicilio debe tener vigencia no mayor a tres meses.",
+      "cantidad": 3,
+      "unidad": "meses",
+      "corre_desde": "Presentación de la solicitud (hacia atrás)",
+      "responsable": "Persona solicitante",
+      "numeral": "8.1.1.2, fr. IV",
+      "linea": 7002
+    },
+    {
+      "clave": "convocatoria_sesion_comite",
+      "descripcion": "La Secretaría Técnica expide la convocatoria a sesión con tres días hábiles de anticipación como mínimo para sesiones ordinarias y con 24 horas para extraordinarias.",
+      "cantidad": 3,
+      "unidad": "dias_habiles",
+      "cantidad_extraordinaria_horas": 24,
+      "corre_desde": "Fecha de la sesión (anticipación mínima)",
+      "responsable": "Secretaría Técnica del Comité",
+      "numeral": "9.4.2",
+      "linea": 8004
+    },
+    {
+      "clave": "reintegro",
+      "descripcion": "El monto no ejercido por cancelaciones y desistimientos debe reintegrarse de manera inmediata; los depósitos de más deben devolverse de manera obligatoria e inmediata, a la cuenta de PROBOSQUE que proporcione la Dirección de Administración, Finanzas y de Gestión Documental, en el momento en que se notifique por cualquier medio. No hay plazo en días.",
+      "cantidad": null,
+      "unidad": "inmediato",
+      "lineas_adicionales": [
+        7819,
+        7840,
+        7902
+      ],
+      "corre_desde": "Notificación de la situación a la persona beneficiaria, por cualquier medio",
+      "responsable": "Persona beneficiaria",
+      "numeral": "8.1.9.3; 8.1.7 incisos j) y t)",
+      "linea": 7916
+    },
+    {
+      "clave": "informe_anual_comite",
+      "descripcion": "La Instancia Ejecutora presenta un informe anual a la Instancia Normativa sobre la ejecución del Programa. Sin fecha.",
+      "cantidad": null,
+      "unidad": "otro",
+      "corre_desde": "No lo precisa el texto",
+      "responsable": "Instancia Ejecutora",
+      "numeral": "15",
+      "linea": 8160
+    },
+    {
+      "clave": "segunda_convocatoria",
+      "descripcion": "Si hay recursos disponibles al término de la aprobación de solicitudes, será posible emitir una segunda convocatoria.",
+      "cantidad": null,
+      "unidad": "sin_plazo_fijo",
+      "corre_desde": "Término de la aprobación de solicitudes",
+      "responsable": "PROBOSQUE",
+      "numeral": "Convocatoria base séptima",
+      "linea": 917
+    }
+  ],
+  "calendario_convocatoria": [
+    {
+      "evento": "Publicación de la Convocatoria y de las ROP en la Gaceta del Gobierno",
+      "inicio": "2026-01-27",
+      "fin": "2026-01-27",
+      "linea": 973
+    },
+    {
+      "evento": "Entrada en vigor de las ROP de MFS (al día siguiente de su publicación)",
+      "inicio": "2026-01-28",
+      "fin": null,
+      "linea": 8208
+    },
+    {
+      "evento": "Recepción y registro de solicitudes (a partir del día hábil siguiente a la publicación)",
+      "inicio": "2026-01-28",
+      "fin": "2026-03-27",
+      "nota": "El inicio se deriva: el 28-ene-2026 es miércoles",
+      "linea": 853
+    },
+    {
+      "evento": "Evaluación, validación y calificación en campo; dictaminación técnica y jurídica (desde la apertura de la Convocatoria)",
+      "inicio": "2026-01-28",
+      "fin": "2026-06-15",
+      "linea": 858
+    },
+    {
+      "evento": "Aprobación de solicitudes por el Comité (hasta el 24 de junio, a partir de la conclusión de la dictaminación)",
+      "inicio": null,
+      "fin": "2026-06-24",
+      "linea": 871
+    },
+    {
+      "evento": "Elaboración y firma del Contrato de Adhesión (posterior a la publicación de resultados)",
+      "inicio": null,
+      "fin": "2026-07-15",
+      "linea": 879
+    },
+    {
+      "evento": "Firma del Contrato de Adhesión de beneficiarios reasignados (último día del mes de septiembre; fecha derivada)",
+      "inicio": null,
+      "fin": "2026-09-30",
+      "linea": 881
+    }
+  ],
+  "formatos": [
+    {
+      "clave": "FO-PB-501-B",
+      "nombre": "Solicitud Única de Manejo Forestal Sustentable (versión 6, revisión 29-ene-2026); incluye datos del prestador de servicios forestales propuesto, comprobante de recepción, declaratoria de no litigio ni condicionante y checklist de documentación",
+      "uso": "Solicitud, tipo de persona, grupos prioritarios, datos del predio, concepto y modalidad a solicitar (ETF: maderable, no maderable, PMF combinado, UMA, DTU, informe preventivo; FSC: certificación y mantenimiento de manejo y de cadena de custodia, declaración de servicios ecosistémicos) y comprobante de recepción",
+      "en_texto": true,
+      "linea": 12114
+    },
+    {
+      "clave": "FO-PB-502",
+      "nombre": "Registro de Información de la persona solicitante y/o beneficiaria (con aviso de privacidad)",
+      "uso": "Datos personales de la persona solicitante, de los integrantes del comisariado y de la segunda persona beneficiaria",
+      "en_texto": true,
+      "linea": 12244
+    },
+    {
+      "clave": "Contrato de Adhesión",
+      "nombre": "Contrato de Adhesión (y adendum) que suscribe cada persona beneficiaria con PROBOSQUE; el modelo se valida con la Unidad Jurídica",
+      "uso": "Compromisos de la persona beneficiaria; su plazo puede ampliarse con el instrumento legal correspondiente por motivo externo",
+      "en_texto": false,
+      "linea": 8084
+    },
+    {
+      "clave": null,
+      "nombre": "Contrato de Prestación de Servicios Técnicos. Contrato entre la persona beneficiaria y el prestador de servicios técnicos; las ROP no traen modelo ni contenido",
+      "uso": "Se necesita firmado y sellado (sellado en caso de núcleos agrarios) para que se emita y entregue el recurso económico",
+      "en_texto": false,
+      "linea": 8090,
+      "nota": "Las ROP no le asignan clave de formato."
+    },
+    {
+      "clave": "Carta compromiso del prestador",
+      "nombre": "Carta compromiso bajo protesta de decir verdad de que el Registro Forestal Nacional del prestador no está suspendido ni revocado; las ROP no traen formato",
+      "uso": "Acredita al prestador de servicios técnicos acreditado por la SEMARNAT (junto con copia de su registro)",
+      "en_texto": false,
+      "linea": 7777
+    },
+    {
+      "clave": "Bitácora",
+      "nombre": "Copia de la Bitácora para la autorización del Programa de Manejo Forestal (o, en su caso, de la autorización del aprovechamiento)",
+      "uso": "Entregable del concepto ETF: condición de la segunda ministración (30 %) y de la graduación",
+      "en_texto": false,
+      "linea": 6871
+    },
+    {
+      "clave": null,
+      "nombre": "Solicitud de auditoría o Plan de auditoría. Copia de la solicitud de auditoría ante la entidad certificadora, o el Plan de auditoría (en mantenimiento, de la auditoría anual)",
+      "uso": "Entregable del concepto Certificación FSC: condición de la segunda ministración (50 %) y de la graduación",
+      "en_texto": false,
+      "linea": 6885,
+      "nota": "Las ROP no le asignan clave de formato."
+    },
+    {
+      "clave": "Oficio de solicitud de pago",
+      "nombre": "Oficio de solicitud de pago de la Delegación Regional correspondiente; las ROP no traen formato",
+      "uso": "Con él el área responsable genera la solicitud de entrega del recurso económico",
+      "en_texto": false,
+      "linea": 8087
+    }
+  ],
+  "prestador_servicios_forestales": {
+    "que_hace": "Elabora los Estudios Técnicos Forestales (Programa de Manejo Forestal Maderable, estudio de recursos no maderables, Documento Técnico Unificado, informe preventivo, UMA) y gestiona la autorización ante la SEMARNAT o PROBOSQUE (Asesor Técnico encargado de realizar el Programa de Manejo respectivo). El recurso de ETF se destina al pago de un prestador de servicios forestales. Para las certificaciones FSC hay un prestador de servicios técnicos que da el acompañamiento a la certificación y a la declaración de servicios ecosistémicos.",
+    "numerales": "7.2 A) y B); 8.1.1.2 fr. II; 8.1.6 incisos f) y g)",
+    "lineas": [
+      6847,
+      6985,
+      7775,
+      7779
+    ],
+    "quien_lo_elige": "La persona beneficiaria lo elige libremente (8.1.6 f y g, líneas 7775 y 7779); la solicitud lo propone (Solicitud Única FO-PB-501-B, línea 12154).",
+    "acreditacion_ETF": "Prestador de Servicios Técnicos acreditado por la SEMARNAT, con Registro Forestal Nacional (RFN) vigente: libro, tipo, volumen, número y año (FO-PB-501-B, línea 12156). Se consulta en el listado público (enlace) o se presenta copia de su registro y carta compromiso bajo protesta de decir verdad de que no se encuentra suspendido o revocado su RFN (8.1.6 inciso f, líneas 7775-7778).",
+    "acreditacion_FSC": "Debe tener experiencia en la Certificación Internacional de la FSC (8.1.6 inciso g, línea 7779); las entidades certificadoras acreditadas por el FSC se consultan en el enlace de las ROP (8.1.6 inciso h, línea 7782).",
+    "poligono_levantado": "Por 8.1.7 inciso c) (línea 7790) la persona solicitante, con apoyo de un técnico externo a PROBOSQUE, levanta el polígono para los ETF; el polígono se presenta georreferenciado en shapefile (8.1.1.2 fr. XI A, líneas 7050 y 7092). Pero 10.1.1 incisos c) y f) (líneas 8064 y 8076) dicen que las Delegaciones realizan el levantamiento en campo de la poligonal: ver dudas.",
+    "responsabilidad": "Si la persona beneficiaria y/o el prestador falsea la información de los estudios o certificaciones, la persona beneficiaria causa baja (8.1.9.2 b, línea 7878); las personas beneficiarias y los asesores técnicos son corresponsables de las condiciones de elegibilidad y desarrollo (8.1.10, línea 7921).",
+    "cambio_de_modalidad": "Si, ya aprobados los recursos, se requiere cambiar la modalidad del Programa de Manejo Forestal, se ajusta el pago con base en los montos del cuadro 7.2, previa autorización del Comité (línea 6849)."
+  },
+  "contrato_servicios_tecnicos": {
+    "que_es": "Contrato de Prestación de Servicios Técnicos entre la persona beneficiaria y el prestador de servicios técnicos. Las ROP lo nombran una sola vez: la Instancia Ejecutora, en coordinación con la Dirección de Administración, Finanzas y de Gestión Documental, emite y entrega el recurso económico «una vez que cuente con el Contrato de Adhesión y en su caso el contrato de Prestación de Servicios Técnicos debidamente firmado y sellado (en caso de núcleos agrarios) por cada una de las partes que intervienen en el mismo».",
+    "numeral": "10.1.1 inciso l)",
+    "linea": 8090,
+    "obligatorio": "Solo «en su caso»: las ROP no dicen cuándo existe ni si es obligatorio para todos los ETF y certificaciones.",
+    "no_dicen": "Modelo, contenido mínimo, plazo para entregarlo ni el formato de la carta compromiso (8.1.6 f)."
+  },
+  "prorroga_por_causa_externa": {
+    "texto": "Si al término del contrato de adhesión no se cumple con la meta establecida por algún motivo externo al beneficiario, el plazo puede ampliarse a través del instrumento legal correspondiente.",
+    "numeral": "10.1.1 inciso n)",
+    "linea": 8100,
+    "instrumento": "«Instrumento legal correspondiente»; el único instrumento nombrado es el adendum al Contrato de Adhesión, cuyo proyecto valida la Instancia Ejecutora con apoyo de la Unidad Jurídica (10.1.1 inciso j, línea 8084).",
+    "quien_pide": null,
+    "quien_autoriza": null,
+    "duracion": null,
+    "relacionado": "El Comité analiza los predios con conflictos de cualquier índole y decreta la suspensión o, en casos excepcionales, la cancelación, previa garantía de audiencia (9.4.3 inciso e, línea 8025); sustitución de la persona beneficiaria por desistimiento, cancelación o disminución de superficie con aprobación del Comité (10.2 inciso b, línea 8111). No hay en MFS aviso de caso fortuito, fuerza mayor ni «incidencias» con plazo en días."
+  },
+  "entregables": [
+    {
+      "concepto": "ETF",
+      "entregable": "Copia de la Bitácora para la autorización del Estudio Técnico aprobado, o de la autorización respectiva (autorización para el aprovechamiento de recursos forestales maderables o no maderables)",
+      "condiciona": "Segunda ministración (30 %) y graduación",
+      "numeral": "7.2; 8.1.7 inciso m); 8.2",
+      "linea": 6871,
+      "lineas_adicionales": [
+        7827,
+        7938
+      ]
+    },
+    {
+      "concepto": "Certificación Internacional FSC",
+      "entregable": "Copia de la solicitud de auditoría ante la entidad certificadora o el Plan de auditoría (mantenimiento: copia de la solicitud de la auditoría anual a la casa certificadora o el plan de auditoría)",
+      "condiciona": "Segunda ministración (50 %) y graduación",
+      "numeral": "7.2; 8.1.7 incisos n) y o); 8.2",
+      "linea": 6885,
+      "lineas_adicionales": [
+        7830,
+        7832,
+        7949
+      ]
+    }
+  ],
+  "graduacion": {
+    "texto": "La graduación se da cuando la persona beneficiaria recibe el recurso económico y ha cumplido con el total de las actividades comprometidas en el Contrato de Adhesión, para lo cual presenta copia de la Bitácora para la autorización del Estudio Técnico Forestal de la vertiente aprobada o la autorización obtenida; en Certificación FSC, la solicitud de auditoría para la certificación o para el mantenimiento.",
+    "numeral": "8.2",
+    "linea": 7923
+  },
+  "ptrfi": {
+    "aplica": false,
+    "nota": "No aplica a MFS (es propio de RHF)."
+  },
+  "vale_de_planta": {
+    "aplica": false,
+    "nota": "No aplica a MFS."
+  },
+  "planta_por_hectarea": {
+    "aplica": false,
+    "nota": "No aplica a MFS."
+  },
+  "diagnostico_tecnico": {
+    "aplica": true,
+    "definicion": "Dictamen Técnico Forestal: opinión emitida por el área responsable del programa sobre el análisis de las condiciones del predio, a través de la información recabada por técnicos de las Delegaciones Regionales Forestales, donde se determina la factibilidad del terreno, utilizando el Sistema de Información Geográfica de PROBOSQUE. Las ROP de MFS no definen un «Diagnóstico Técnico» separado.",
+    "definicion_numeral": "3 (Glosario: Dictamen Técnico Forestal)",
+    "definicion_linea": 6559
+  },
+  "verificacion_en_campo": {
+    "descripcion": "La Convocatoria define la actividad VIII «Verificación de la ejecución de los trabajos del Programa» como el lapso «a partir de la emisión del primer pago, hasta la recepción de la bitácora o la solicitud de auditoría o el Plan de auditoría» (líneas 899-902). Las ROP no describen una visita de verificación de conclusión ni fijan un plazo en días; solo obligan a la persona beneficiaria a dar facilidades al personal de PROBOSQUE para las visitas de verificación en campo (8.1.7 k, línea 7823), prevén que el otorgamiento del apoyo se base también en la «verificación en campo» validada por los Comités (Convocatoria base cuarta, línea 768) y asignan el seguimiento y la supervisión a la Instancia Ejecutora, la Coordinación de Delegaciones Regionales y las Delegaciones (numeral 15, líneas 8155-8159).",
+    "que_mide": "El periodo de ejecución: desde que se emite el primer pago hasta que se recibe el entregable (bitácora, solicitud de auditoría o Plan de auditoría).",
+    "corre_desde": "Emisión del primer pago",
+    "termina": "Recepción de la bitácora, la solicitud de auditoría o el Plan de auditoría",
+    "numeral": "Convocatoria base quinta (MFS), actividad VIII",
+    "linea": 899,
+    "pago_segunda_ministracion": "El área responsable genera la solicitud del segundo pago cuando se obtiene la bitácora o la autorización (ETF) o se presenta la copia de la solicitud de auditoría o el Plan (FSC) y la remite a la Dirección de Administración, Finanzas y de Gestión Documental (10.1.1 inciso m, línea 8093). La solicitud de entrega del recurso se genera tras el oficio de solicitud de pago de la Delegación (10.1.1 inciso k, línea 8087)."
+  },
+  "valor_planta_no_establecida": {
+    "aplica": false,
+    "nota": "No aplica a MFS."
+  },
+  "lista_espera": {
+    "definicion": "Relación de personas solicitantes que, cumpliendo con los requisitos, no son sujetos de apoyo en ese momento por haberse cumplido la meta de personas beneficiarias programada para el ejercicio fiscal correspondiente, o por no existir suficiencia presupuestal.",
+    "definicion_numeral": "3 (Glosario: Lista de espera)",
+    "definicion_linea": 6611,
+    "uso": "El Comité aprueba la Lista de Personas Beneficiarias, la Lista de espera y la lista de solicitudes no procedentes (9.4.3 a, línea 8015) y autoriza que se den a conocer en las Delegaciones y en la página web (9.4.3 c, línea 8020). Los predios de dependencias públicas sin suficiencia presupuestal se incluyen en el listado de espera (8.1.1.1, línea 6914). Los desistimientos o ajustes de superficie liberan recurso que se reasigna con base en la Lista de espera, previa autorización del Comité (Convocatoria base sexta, línea 909). Con ampliación presupuestal se asigna recurso a solicitudes factibles sin cobertura (transitorio TERCERO, línea 8210). Se puede sustituir a la persona beneficiaria por personas no atendidas por insuficiencia presupuestal, previa aprobación del Comité (10.2 b, línea 8111).",
+    "numeral": "3; 8.1.1.1; 9.4.3; 10.2; Convocatoria base sexta"
+  },
+  "derechos": [
+    {
+      "texto": "Recibir la información necesaria en tiempo y forma respecto a la aplicación de la Convocatoria y las Reglas, a través de la instancia ejecutora y del personal de las Delegaciones Regionales Forestales.",
+      "numeral": "8.1.6, inciso a)",
+      "linea": 7768
+    },
+    {
+      "texto": "Recibir de conformidad el apoyo otorgado en caso de haber sido aprobado.",
+      "numeral": "8.1.6, inciso b)",
+      "linea": 7770
+    },
+    {
+      "texto": "Reserva y privacidad de su información personal conforme a la normatividad aplicable del INFOEM.",
+      "numeral": "8.1.6, inciso c)",
+      "linea": 7771
+    },
+    {
+      "texto": "Ser tratadas sin distinción de género, raza, etnia, credo religioso, condición socioeconómica, filiación política o cualquier otra.",
+      "numeral": "8.1.6, inciso d)",
+      "linea": 7772
+    },
+    {
+      "texto": "Asociarse libremente para que, en su caso, se soliciten los apoyos del Programa.",
+      "numeral": "8.1.6, inciso e)",
+      "linea": 7774
+    },
+    {
+      "texto": "Elegir libremente la contratación del Prestador de Servicios Técnicos acreditado por la SEMARNAT; el listado puede consultarse en el enlace que señalan las ROP o presentando copia de su registro y carta compromiso bajo protesta de decir verdad de que no se encuentra suspendido o revocado su RFN.",
+      "numeral": "8.1.6, inciso f)",
+      "linea": 7775
+    },
+    {
+      "texto": "Elegir libremente la contratación del Prestador de Servicios Técnicos para el acompañamiento de las certificaciones y de la declaración de servicios ecosistémicos, quien debe tener experiencia en la Certificación Internacional de la FSC.",
+      "numeral": "8.1.6, inciso g)",
+      "linea": 7779
+    },
+    {
+      "texto": "Consultar las entidades certificadoras acreditadas por el FSC y, si requiere más información, acudir al área responsable del programa.",
+      "numeral": "8.1.6, inciso h)",
+      "linea": 7782
+    },
+    {
+      "texto": "Los demás que se señalen en las Reglas y la Convocatoria.",
+      "numeral": "8.1.6, inciso i)",
+      "linea": 7785
+    }
+  ],
+  "obligaciones": [
+    {
+      "texto": "Proporcionar la información y/o documentación requerida de manera veraz en los términos establecidos.",
+      "numeral": "8.1.7, inciso a)",
+      "linea": 7787
+    },
+    {
+      "texto": "Acudir con el personal designado por las Delegaciones Regionales Forestales para integrar y validar la solicitud, así como el seguimiento de la misma.",
+      "numeral": "8.1.7, inciso b)",
+      "linea": 7788
+    },
+    {
+      "texto": "En su caso, determinar el polígono y cuantificar la superficie: la persona solicitante, con apoyo de un técnico externo a PROBOSQUE, deberá levantar el polígono para los Estudios Técnicos Forestales.",
+      "numeral": "8.1.7, inciso c)",
+      "linea": 7790
+    },
+    {
+      "texto": "Asistir al lugar designado por PROBOSQUE para recibir de manera gratuita la capacitación (formación en campo) sobre la actividad y sus derechos y obligaciones.",
+      "numeral": "8.1.7, incisos d) y g)",
+      "linea": 7792
+    },
+    {
+      "texto": "Cumplir con el clausulado comprometido en el Contrato de Adhesión y dar cumplimiento a las Reglas.",
+      "numeral": "8.1.7, inciso e)",
+      "linea": 7796
+    },
+    {
+      "texto": "Suscribir y presentar en tiempo y forma el Contrato de Adhesión correspondiente a la aprobación por el Comité, en apego a los tiempos establecidos en la Convocatoria.",
+      "numeral": "8.1.7, inciso f)",
+      "linea": 7798
+    },
+    {
+      "texto": "Cuidar el desarrollo del proyecto hasta su finalización y cumplir todas las condiciones que dieron origen a su elegibilidad.",
+      "numeral": "8.1.7, inciso h)",
+      "linea": 7810
+    },
+    {
+      "texto": "En contingencia sanitaria o fallecimiento de un integrante del comisariado, entrega del recurso a través de alguno de los titulares con acta de defunción y manifestación bajo protesta, y designación de la cartera acéfala por acta de asamblea con el acuse del RAN.",
+      "numeral": "8.1.7, inciso i)",
+      "linea": 7812
+    },
+    {
+      "texto": "Reintegrar los recursos económicos recibidos y no aplicados a la cuenta bancaria de PROBOSQUE que proporcione la Dirección de Administración, Finanzas y de Gestión Documental, una vez notificada la situación por cualquier medio; de lo contrario se sanciona conforme indique el Comité y se notifica al área jurídica.",
+      "numeral": "8.1.7, inciso j)",
+      "linea": 7819
+    },
+    {
+      "texto": "Aceptar y otorgar todas las facilidades al personal de PROBOSQUE para las visitas de verificación en campo.",
+      "numeral": "8.1.7, inciso k)",
+      "linea": 7823
+    },
+    {
+      "texto": "Manifestar por escrito las quejas, denuncias e inconformidades ante las instancias del numeral 18.",
+      "numeral": "8.1.7, inciso l)",
+      "linea": 7825
+    },
+    {
+      "texto": "ETF: presentar copia de la Bitácora para la autorización del Programa de Manejo Forestal del concepto aprobado o, en su caso, del resolutivo respectivo (autorización para el aprovechamiento de recursos forestales maderables o no maderables).",
+      "numeral": "8.1.7, inciso m)",
+      "linea": 7827
+    },
+    {
+      "texto": "Certificación de manejo forestal, cadena de custodia y/o declaración de servicios ecosistémicos: presentar la solicitud de auditoría o el plan de auditoría.",
+      "numeral": "8.1.7, inciso n)",
+      "linea": 7830
+    },
+    {
+      "texto": "Mantenimiento de la certificación de manejo forestal o de cadena de custodia: presentar copia de la solicitud de la auditoría anual a la casa certificadora o el plan de auditoría.",
+      "numeral": "8.1.7, inciso o)",
+      "linea": 7832
+    },
+    {
+      "texto": "En su caso, responder encuestas que aplique PROBOSQUE.",
+      "numeral": "8.1.7, inciso p)",
+      "linea": 7834
+    },
+    {
+      "texto": "Informar si es persona beneficiaria y las áreas que están siendo beneficiadas con el mismo propósito del Programa con apoyos de la CONAFOR.",
+      "numeral": "8.1.7, inciso q)",
+      "linea": 7835
+    },
+    {
+      "texto": "Utilizar el recurso económico para los fines que le fue otorgado.",
+      "numeral": "8.1.7, inciso r)",
+      "linea": 7837
+    },
+    {
+      "texto": "Considerar la aplicación de la NOM-015-SEMARNAT/SAGARPA-2007 para la prevención de incendios forestales.",
+      "numeral": "8.1.7, inciso s)",
+      "linea": 7838
+    },
+    {
+      "texto": "Reintegrar de manera obligatoria e inmediata los recursos depositados de más en su cuenta bancaria que no correspondan a lo asignado por el Comité y/o al Contrato de Adhesión, en el momento en que le sea notificada la situación por cualquier medio.",
+      "numeral": "8.1.7, inciso t)",
+      "linea": 7840
+    },
+    {
+      "texto": "Participar en los cursos y asesorías que PROBOSQUE determine (corresponsabilidad); las personas beneficiarias y los asesores técnicos son corresponsables de las condiciones que dieron origen a la elegibilidad y de su desarrollo.",
+      "numeral": "8.1.10",
+      "linea": 7919
+    }
+  ],
+  "causas_incumplimiento": [
+    {
+      "texto": "No realizar las actividades comprometidas con el Programa.",
+      "numeral": "8.1.8, inciso a)",
+      "linea": 7846
+    },
+    {
+      "texto": "Los interesados que no informen o hayan omitido informar de los conflictos o litigios de cualquier índole.",
+      "numeral": "8.1.8, inciso b)",
+      "linea": 7847
+    },
+    {
+      "texto": "Cuando se detecte que han proporcionado información falsa para su inscripción en el Programa.",
+      "numeral": "8.1.8, inciso c)",
+      "linea": 7848
+    },
+    {
+      "texto": "Utilizar los recursos económicos para fines distintos a los que le fueron otorgados.",
+      "numeral": "8.1.8, inciso d)",
+      "linea": 7849
+    },
+    {
+      "texto": "Cuando no se presenten los entregables (bitácora, autorización, solicitud de auditoría o plan de auditoría).",
+      "numeral": "8.1.8, inciso e)",
+      "linea": 7850
+    },
+    {
+      "texto": "Cuando no se cumpla con las obligaciones establecidas en el Contrato de Adhesión, la Convocatoria y las Reglas.",
+      "numeral": "8.1.8, inciso f)",
+      "linea": 7851
+    }
+  ],
+  "causas_cancelacion": [
+    {
+      "texto": "Incurrir en alguno de los supuestos de incumplimiento del numeral 8.1.9 (previo a la entrega del apoyo, el recurso se retiene hasta subsanar el incumplimiento; si no, se cancela el apoyo).",
+      "numeral": "8.1.9.2, inciso a); 8.1.9 (párrafo inicial)",
+      "linea": 7877,
+      "lineas_adicionales": [
+        7854
+      ]
+    },
+    {
+      "texto": "Cuando la persona beneficiaria y/o el Prestador de Servicios Técnicos contratado haya falseado la información presentada en los Estudios Técnicos Forestales y/o certificaciones relacionadas con su predio o con el centro de transformación.",
+      "numeral": "8.1.9.2, inciso b)",
+      "linea": 7878
+    },
+    {
+      "texto": "Cuando se determine la existencia de conflictos o litigios de cualquier índole (representación, posesión o propiedad), por parte de PROBOSQUE o de la autoridad competente.",
+      "numeral": "8.1.9.2, inciso c)",
+      "linea": 7881
+    },
+    {
+      "texto": "Utilizar los recursos económicos para fines distintos a los que fueron otorgados.",
+      "numeral": "8.1.9.2, inciso d)",
+      "linea": 7883
+    },
+    {
+      "texto": "No acudir a la firma del Contrato de Adhesión en un plazo de 10 días hábiles posterior a la notificación de ser persona beneficiaria con recurso disponible, no entregar la documentación requerida para recibir el recurso, o no acudir a recibirlo, sin causa justificada.",
+      "numeral": "8.1.9.2, inciso e)",
+      "linea": 7884
+    },
+    {
+      "texto": "No proporcionar información veraz para su incorporación al Programa.",
+      "numeral": "8.1.9.2, inciso f)",
+      "linea": 7887
+    },
+    {
+      "texto": "No cumplir con las obligaciones que le correspondan como persona beneficiaria, establecidas en las Reglas.",
+      "numeral": "8.1.9.2, inciso g)",
+      "linea": 7888
+    },
+    {
+      "texto": "Desistimiento por escrito dirigido a la Instancia Normativa, firmado por la persona beneficiaria (núcleos agrarios: sellado y firmado por presidente(a), secretario(a) y tesorero(a)), con los motivos.",
+      "numeral": "8.1.9.2, inciso h)",
+      "linea": 7889
+    },
+    {
+      "texto": "Por fallecimiento del titular, cuando no se notifique en 30 días hábiles el interés de la segunda persona beneficiaria de continuar con el programa.",
+      "numeral": "8.1.9.2, inciso i)",
+      "linea": 7892
+    },
+    {
+      "texto": "Antecedentes de venta de producto forestal maderable de forma ilegal, intercambio, donación u otro análogo con la ayuda funcional y/o apoyo especial obtenidos en esta u otra institución.",
+      "numeral": "8.1.9.2, inciso j)",
+      "linea": 7894
+    },
+    {
+      "texto": "Ser persona beneficiaria de programas federales, estatales o municipales con el mismo propósito en la misma área, a decisión de la Instancia Normativa.",
+      "numeral": "8.1.9.2, inciso k)",
+      "linea": 7896
+    },
+    {
+      "texto": "No presentar el acta de elección de órganos de representación dentro del término del artículo 39 de la Ley Agraria, inscrita o presentada para su trámite ante el RAN.",
+      "numeral": "8.1.9.2, inciso l)",
+      "linea": 7898
+    }
+  ],
+  "sanciones": [
+    {
+      "texto": "Suspensión temporal: los recursos pueden suspenderse durante el periodo que determine el Comité, a través de PROBOSQUE, por incumplimiento de las condiciones que dieron origen a la elegibilidad (incluida proporcionar información falsa para ingresar al programa), para subsanar las omisiones que se informen; de lo contrario procede la cancelación, la baja y la inclusión en el Listado de Personas Beneficiarias Incumplidas.",
+      "numeral": "8.1.9.1",
+      "linea": 7859,
+      "clave": "suspension_temporal"
+    },
+    {
+      "texto": "Baja del Programa por las causas del numeral 8.1.9.2 (ver causas_cancelacion).",
+      "numeral": "8.1.9.2",
+      "linea": 7876,
+      "clave": "baja_del_programa"
+    },
+    {
+      "texto": "Reintegro del recurso económico: la persona beneficiaria reintegra los montos de las ministraciones otorgadas a la cuenta de PROBOSQUE, una vez notificada por cualquier medio, por incumplimiento a la Convocatoria, Reglas y Contrato de Adhesión (previo acuerdo de la Instancia Normativa), por falseamiento de información o conflictos de propiedad, posesión, representación o litigio, por recibir recurso fuera de lo establecido en el contrato o por desistimiento; si no, se sanciona conforme indique el Comité y se notifica a la Unidad Jurídica.",
+      "numeral": "8.1.9.3",
+      "linea": 7901,
+      "clave": "reintegro"
+    },
+    {
+      "texto": "Listado de Personas Beneficiarias Incumplidas: pueden solicitar su exclusión si comprueban haber cumplido las obligaciones contraídas en su año de asignación, equivalente a los recursos económicos ministrados; en ningún caso pueden solicitar el pago de la ministración pendiente.",
+      "numeral": "8.1.9.1 y 8.1.9.3",
+      "linea": 7873,
+      "clave": "listado_incumplidas",
+      "lineas_adicionales": [
+        7906
+      ]
+    },
+    {
+      "texto": "El recurso cancelado o retenido puede reorientarse según las necesidades del programa, previa autorización de la Instancia Normativa; el monto no ejercido por cancelaciones y desistimientos puede reasignarse a predios factibles sin cobertura presupuestal, previo acuerdo del Comité.",
+      "numeral": "8.1.9 (párrafo final); 8.1.9.3 (párrafo final)",
+      "linea": 7857,
+      "clave": "reorientacion_y_reasignacion",
+      "lineas_adicionales": [
+        7916
+      ]
+    }
+  ],
+  "refrendo": {
+    "aplica": false,
+    "descripcion": "Las ROP de MFS no prevén refrendo ni trámite simplificado; el sistema debe tratar todas las solicitudes como nuevas. Sí inciden: la regla de que quien ya fue beneficiario del mismo concepto es inelegible (8.1.1.3 inciso c, línea 7517) y la nota de mantenimiento (línea 7266).",
+    "numeral": "8.1.1.2; 8.1.1.3",
+    "linea": 7517
+  },
+  "mecanica_operativa": [
+    {
+      "texto": "La Dirección de Administración, Finanzas y de Gestión Documental gestiona y administra los recursos económicos y emite los pagos (transferencia electrónica y/o cheques), una vez solicitados por la Dirección de Restauración y Fomento Forestal.",
+      "numeral": "10.1.1, inciso a)",
+      "linea": 8043,
+      "paso": "a"
+    },
+    {
+      "texto": "La Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia dictamina legalmente la documentación, revisa el listado de incumplidos y los predios con procedimientos o sanción administrativa y, previo acuerdo del Comité, gestiona la devolución del recurso no ejercido.",
+      "numeral": "10.1.1, inciso b)",
+      "linea": 8046,
+      "paso": "b"
+    },
+    {
+      "texto": "Publicada la Convocatoria y las ROP, la Instancia Ejecutora, a través de las Delegaciones, recibe solicitudes físicamente y es responsable de la correcta integración de los requisitos y de la apertura de expedientes, que entrega en oficinas centrales para la dictaminación jurídica; no se reciben solicitudes en oficinas centrales ni en una Delegación que no corresponda. Posteriormente se procede al levantamiento en campo de la poligonal y recopilación de datos técnicos.",
+      "numeral": "10.1.1, inciso c)",
+      "linea": 8051,
+      "paso": "c"
+    },
+    {
+      "texto": "La Instancia Ejecutora revisa, registra, integra, valida y digitaliza los expedientes y los remite a las unidades responsables para que emitan el dictamen.",
+      "numeral": "10.1.1, inciso d)",
+      "linea": 8066,
+      "paso": "d"
+    },
+    {
+      "texto": "Si con posterioridad se requiere nuevamente documentación o información complementaria, se notifica a la persona solicitante dentro del plazo de la evaluación, validación y calificación en campo y gabinete.",
+      "numeral": "10.1.1, inciso e)",
+      "linea": 8069,
+      "paso": "e"
+    },
+    {
+      "texto": "La Instancia Ejecutora, en coordinación con la Unidad Jurídica y el área responsable, emite los dictámenes jurídico y técnico y el listado preliminar de solicitudes factibles y no factibles; las Delegaciones realizan el levantamiento en campo de la o las poligonales y recopilan datos técnicos.",
+      "numeral": "10.1.1, inciso f)",
+      "linea": 8072,
+      "paso": "f"
+    },
+    {
+      "texto": "La Instancia Ejecutora convoca a la Instancia Normativa, que analiza, valida y, en su caso, autoriza las solicitudes factibles del recurso económico.",
+      "numeral": "10.1.1, inciso g)",
+      "linea": 8077,
+      "paso": "g"
+    },
+    {
+      "texto": "La Instancia Ejecutora tramita la publicación de resultados y la remite al área correspondiente de PROBOSQUE para su difusión.",
+      "numeral": "10.1.1, inciso h)",
+      "linea": 8080,
+      "paso": "h"
+    },
+    {
+      "texto": "La Instancia Ejecutora elabora y requisita los Contratos de Adhesión conforme a la Convocatoria.",
+      "numeral": "10.1.1, inciso i)",
+      "linea": 8082,
+      "paso": "i"
+    },
+    {
+      "texto": "La Instancia Ejecutora, con apoyo de la Unidad Jurídica, revisa la fundamentación legal y valida el proyecto de Contratos de Adhesión y adendum.",
+      "numeral": "10.1.1, inciso j)",
+      "linea": 8084,
+      "paso": "j"
+    },
+    {
+      "texto": "La Instancia Responsable, a través de la Dirección de Restauración y Fomento Forestal y el área responsable del programa, genera la solicitud de entrega del recurso económico posterior a la recepción del oficio de solicitud de pago de la Delegación Regional correspondiente.",
+      "numeral": "10.1.1, inciso k)",
+      "linea": 8087,
+      "paso": "k"
+    },
+    {
+      "texto": "La Instancia Ejecutora, en coordinación con la Dirección de Administración, Finanzas y de Gestión Documental, emite y entrega el recurso económico una vez que cuente con el Contrato de Adhesión y, en su caso, el contrato de Prestación de Servicios Técnicos debidamente firmado y sellado (en caso de núcleos agrarios).",
+      "numeral": "10.1.1, inciso l)",
+      "linea": 8090,
+      "paso": "l"
+    },
+    {
+      "texto": "Segunda ministración: el área responsable genera la solicitud del 30 % (ETF) al obtener la Bitácora o la autorización, o del 50 % (FSC) al presentar copia de la solicitud de auditoría o el Plan de auditoría, y la remite a la Dirección de Administración, Finanzas y de Gestión Documental.",
+      "numeral": "10.1.1, inciso m)",
+      "linea": 8093,
+      "paso": "m"
+    },
+    {
+      "texto": "Si al término del contrato de adhesión no se cumple con la meta por algún motivo externo al beneficiario, el plazo puede ampliarse a través del instrumento legal correspondiente.",
+      "numeral": "10.1.1, inciso n)",
+      "linea": 8100,
+      "paso": "n"
+    },
+    {
+      "texto": "Si se entregó recurso sin que se haya dado cumplimiento total al programa, se debe reintegrar el recurso económico a PROBOSQUE.",
+      "numeral": "10.1.1, inciso o)",
+      "linea": 8102,
+      "paso": "o"
+    },
+    {
+      "texto": "La Instancia Responsable, con apoyo de las nueve Delegaciones Regionales Forestales, es responsable de la operación y seguimiento del Programa, coordinadas por la Coordinación de Delegaciones Regionales.",
+      "numeral": "10.1.1, inciso p)",
+      "linea": 8104,
+      "paso": "p"
+    },
+    {
+      "texto": "Sustitución: si la persona beneficiaria titular no puede continuar, la segunda persona beneficiaria da seguimiento con carta poder notariada y asume derechos y obligaciones (conceptos A y B); en desistimiento, cancelación, disminución de superficie u otra causal puede sustituirse a la persona beneficiaria por personas no atendidas por insuficiencia presupuestal, previa aprobación del Comité; fuera de esos casos la sustitución no es factible fuera de la temporada de actividades.",
+      "numeral": "10.2",
+      "linea": 8107,
+      "paso": "sustitucion"
+    }
+  ],
+  "flujos_alternos": {
+    "A_expediente_incompleto": "Si la documentación está incompleta, la Delegación informa conforme al acuse; la persona tiene cinco días hábiles desde la recepción para completarla sin pasar de la fecha límite de recepción (27-mar-2026); si no, se desecha la solicitud (8.1.1.2, líneas 7224-7236 y 7241-7245). Después, si hace falta documentación nueva, se notifica dentro del plazo de evaluación (8.1.1.2, línea 7237; 10.1.1 e, línea 8069).",
+    "B_no_factible": "El dictamen técnico y jurídico produce el listado preliminar de factibles y no factibles (10.1.1 f, línea 8072); el Comité autoriza que las listas de beneficiarios, de aprobadas sin recursos y de no factibles se den a conocer en las Delegaciones y la página web (9.4.3 c, línea 8020). Las ROP no establecen recurso ni plazo de impugnación: el fallo es inapelable (glosario, línea 6530; Convocatoria base quinta III y sexta).",
+    "C_lista_espera": "Las solicitudes factibles sin recurso quedan en la lista de espera (glosario, línea 6611); con ampliación presupuestal se les asigna recurso (transitorio TERCERO, línea 8210); el recurso liberado por desistimientos o ajustes se reasigna con base en la lista, con autorización del Comité (Convocatoria base sexta, línea 909).",
+    "D_causa_externa": "Si al término del contrato no se cumple la meta por motivo externo a la persona beneficiaria, el plazo puede ampliarse por el instrumento legal correspondiente (adendum): 10.1.1 n, línea 8100. Las ROP de MFS no fijan plazo de aviso ni procedimiento.",
+    "E_conflicto_en_el_predio": "Si se determina conflicto o litigio, el Comité analiza el caso y decreta la suspensión o, en casos excepcionales, la cancelación, con garantía de audiencia (9.4.3 e, línea 8025); la baja procede por 8.1.9.2 c (línea 7881).",
+    "F_fallecimiento": "Por fallecimiento del titular, la segunda persona beneficiaria notifica su interés en 30 días hábiles; si no, baja (8.1.9.2 i, línea 7892); presenta carta poder notariada para dar seguimiento (10.2 a, línea 8108)."
+  },
+  "dias_inhabiles": "Las ROP de MFS no mencionan días inhábiles ni calendario; usan «días hábiles» sin definirlos.",
+  "dudas": [
+    "INICIO DEL PLAZO DE LA FIRMA DEL CONTRATO DE ADHESIÓN: la Convocatoria (base quinta MFS, actividad V, líneas 877-880) dice: «Se llevará a cabo posterior a la publicación de resultados, hasta el 15 de julio de 2026, después de la aprobación del Comité y antes del primer pago.» y, para reasignados, «hasta el último día del mes de septiembre de 2026» (líneas 881-882); no da un número de días. El numeral 8.1.9.2 inciso e) (línea 7884) da de baja a quien incurra en: «No acudir a la firma del Contrato de Adhesión en un plazo de 10 días hábiles posterior a la notificación de ser persona beneficiaria con recurso disponible, no entregar la documentación requerida para recibir el recurso económico, o no acudir a recibirlo, sin causa justificada». Es decir, la Convocatoria cuenta desde la publicación de resultados (con tope en fecha) y las ROP desde la notificación; en MFS no existe la frase «hasta los 10 días hábiles posteriores a la fecha en que sea notificada… que el Organismo ya cuenta con la disponibilidad del recurso» de la base quinta de RHF y PS. El inciso 8.1.7 f) (línea 7798) remite a «los tiempos establecidos en la Convocatoria». Por decidir con el cliente cuál evento arranca los 10 días hábiles.",
+    "INICIO DEL PLAZO DE LA DOCUMENTACIÓN FALTANTE: 8.1.1.2, último bloque (líneas 7224-7236): «…la delegación que corresponda informará a la persona solicitante lo conducente conforme al acuse y contará con un término de cinco días hábiles a partir de la recepción de la solicitud para la presentación de la documentación faltante, generando el folio de solicitud correspondiente, en caso de no complementar la documentación faltante dentro de los plazos establecidos se tendrá por desechada su solicitud, el horario de atención es de 9:00 a 17:00, de lunes a viernes.» y de nuevo (líneas 7241-7245): «…contará con un término de cinco días hábiles a partir de la recepción de la solicitud para la presentación de la documentación faltante, siempre y cuando este tiempo no exceda la fecha límite, establecida en la Convocatoria, para la recepción de solicitudes…» (igual en la Convocatoria base cuarta, líneas 761-765). El plazo corre desde la recepción de la solicitud, no desde que la Delegación informa lo faltante; el sujeto de «contará» es ambiguo (la Delegación o la persona solicitante). Si la solicitud se recibe poco antes del 27-mar-2026, el plazo se acorta a esa fecha.",
+    "QUÉ MIDE EL PLAZO DE VERIFICACIÓN: en MFS no hay plazo de verificación en días. La Convocatoria (base quinta MFS, actividad VIII, líneas 899-902) dice: «Verificación de la ejecución de los trabajos del Programa. A partir de la emisión del primer pago, hasta la recepción de la bitácora o la solicitud de auditoría o el Plan de auditoría.» Es un lapso de ejecución (del primer pago a la entrega del entregable), no el plazo de una visita ni un plazo para que las Delegaciones entreguen un formato (como los 10 días de RHF, los 30 de PS o los 15 de CC). No dice quién verifica, qué documento genera ni si hay visita de campo; las ROP solo exigen dar facilidades para las visitas (8.1.7 k, línea 7823).",
+    "POLÍGONO LEVANTADO: 8.1.7 inciso c) (línea 7790) dice que «La persona solicitante con apoyo de un técnico externo a PROBOSQUE deberá levantar el polígono para los Estudios Técnicos Forestales», pero 10.1.1 inciso c) (línea 8064) dice «Posteriormente se procederá al levantamiento en campo de la poligonal y recopilación de datos técnicos» y el inciso f) (línea 8076) atribuye a las Delegaciones «el levantamiento en campo de la o las poligonales». Además el polígono en shapefile es requisito al registrar (líneas 7050 y 7092). No se aclara quién lo levanta en cada etapa, ni si el del prestador reemplaza al de la Delegación.",
+    "PRESTADOR DE SERVICIOS FORESTALES: el recurso de ETF es «destinado al pago de un prestador de servicios forestales» (línea 6847); 8.1.6 f) (línea 7775) dice que la persona beneficiaria elige al «Prestador de Servicios Técnicos acreditado por la SEMARNAT» y que el listado puede consultarse en un enlace «o presentando copia de su registro y carta compromiso bajo protesta de decir verdad que no se encuentra suspendido o revocado su RFN»; no queda claro quién presenta la carta ni cuándo (en registro, al firmar, al pedir el pago), ni hay formato de la carta compromiso. El formato FO-PB-501-B pide el RFN del prestador propuesto (libro, tipo, volumen, número, año; línea 12156). Las ROP no dicen si se puede cambiar de prestador después de la asignación.",
+    "CONTRATO DE SERVICIOS TÉCNICOS: solo aparece en 10.1.1 inciso l) (línea 8090-8092), como condición para que se emita y entregue el recurso: «en su caso el contrato de Prestación de Servicios Técnicos debidamente firmado y sellado (en caso de núcleos agrarios) por cada una de las partes». No hay modelo, contenido mínimo, plazo ni se dice si PROBOSQUE lo revisa. En FSC se habla de prestador para el acompañamiento (8.1.6 g) pero el contrato no se menciona.",
+    "PRÓRROGA POR CAUSA EXTERNA: solo 10.1.1 inciso n) (línea 8100): «Si al término del contrato de adhesión no se cumple con la meta establecida por algún motivo externo al beneficiario, el plazo puede ampliarse a través del instrumento legal correspondiente.» No se dice quién la solicita, quién la autoriza (¿el Comité, la Instancia Ejecutora?), por cuánto tiempo, con qué documento justifica la causa externa ni si hay límite; el único instrumento nombrado es el adendum del Contrato de Adhesión (10.1.1 j, línea 8084). No hay en MFS aviso de caso fortuito o fuerza mayor con plazo (RHF y PS: 15 días hábiles), ni término «incidencia».",
+    "SIN PLAZO PARA LOS ENTREGABLES NI FECHA LÍMITE DE CONCLUSIÓN: las ROP y la Convocatoria no fijan fecha ni días para entregar la Bitácora, la autorización, la solicitud de auditoría o el Plan de auditoría; el único límite es la vigencia del Contrato de Adhesión (que tampoco se define). Tampoco hay plazo para publicar resultados (solo «posterior a la fecha de aprobación»), para pagar ni para reintegrar (inmediato).",
+    "DISCREPANCIA DE SUPERFICIES EN LAS MODALIDADES 5 Y 6 DE ETF: el cuadro de montos (7.2 y Convocatoria base tercera, líneas 6771-6779 y 570-578) dice «mayores a 7 hectáreas y menores o iguales a 95 hectáreas»; el cuadro de requisitos (líneas 7068 y 7100-7104) dice «mayores a 10 hectáreas y menores o iguales a 95 hectáreas»; los criterios de puntuación hablan de «10 A 90 HA.» y «>10 ha a 50 ha» (línea 7292-7294). Los predios de 7 a 10 ha no tienen requisitos claros. La modalidad 7 (no maderables), 8 (DTU), 9 (UMA) y 10 (informe preventivo) no traen rango de superficie para los requisitos.",
+    "PUNTAJE ETF, CRITERIO 1: la escala mezcla cortes distintos (10 a 90 ha, 91 a 250 y mayores de 251 en el título; 51 a 95, 151 a 250, >501 en la escala), deja huecos (250.x a 251; 500 a 501) y para DTU, no maderable, UMA e informe preventivo da escalas con topes diferentes. El puntaje SI/NO está en el cuadro como «SI NO» con dos números por criterio; se interpretó el primero como el puntaje si se cumple y el segundo como el puntaje si no (el cuadro suma 100 y 50).",
+    "TABLA DE UBICACIÓN POR TIPO DE BOSQUE (8.1.1.1, líneas 6919-6971): es una matriz (tipo de bosque contra tipo de estudio o certificación: DTU, UMA, informe preventivo, ETF, servicios ecosistémicos, certificación de manejo, cadena de custodia) cuyo texto extraído no conserva las celdas marcadas; no se pudo extraer qué estudios admite cada tipo de bosque. Hay que revisarla en el PDF (Gaceta, p. 112).",
+    "MONTOS DE LAS CERTIFICACIONES FSC: el cuadro (líneas 6788-6824) tiene columnas Acompañamiento, Certificación, Administrador de recursos, Persona beneficiaria y Número de predios por grupo. La fila 11 trae tres montos (210,000 / 350,000 / 40,000); la fila 12, dos (60,000 / 80,000); las filas 13 (130,000), 14 (95,600) y 15 (20,000) solo uno, sin que el texto extraído diga en qué columna caen. No se precisa si el monto es por grupo o por predio (la certificación grupal se «asignará proporcionalmente a los predios integrantes del grupo», línea 6854). Quedó marcado con columna_ambigua en los montos.",
+    "NUMERAL DE REMISIÓN ERRÓNEO: la dictaminación jurídica (línea 7497) remite al «numeral 8.2 Requisitos de las presentes Reglas»; los requisitos están en 8.1.1.2 (el 8.2 es Graduación). Los criterios de selección remiten a «criterios de selección y dictaminación» sin que 8.1.1.1 los enumere más que en la tabla de ubicación.",
+    "SUSPENSIÓN TEMPORAL (8.1.9.1, línea 7859-7862): el texto abre con el enunciado suelto «Proporcionar información falsa para ingresar al programa; y» y luego la regla general; y la baja 8.1.9.2 a) remite a «los supuestos del numeral 8.1.9» (circular). No hay causas de suspensión enumeradas ni plazo de la suspensión («el periodo que determine el Comité»).",
+    "NO HAY REFRENDO EN MFS: las ROP no hablan de refrendo ni de vigencia de documentación legal previa (no hay equivalente a vigencia_documentacion_legal_refrendo de RHF/PS); por eso aplica_en_refrendo queda en null. Tampoco hay en MFS plazo de aviso de caso fortuito (aviso_caso_fortuito_conflicto), acta del Comité (acta_sesion_comite), instalación ni lineamientos del Comité con días: el sistema debe tratar esos usos de plazo como «el programa no los tiene». Quien ya fue beneficiario del mismo concepto es inelegible (8.1.1.3 c, línea 7517) sin ventana de años; el mantenimiento exige que el pago de la certificación se haya hecho el mismo año de la firma (línea 7266).",
+    "PARA EL SISTEMA: (1) las ministraciones son por concepto (70/30 ETF, 50/50 FSC), no por modalidad: el archivo trae regimen «etf» y «fsc» y el mapa modalidad→régimen en regimen_pago_por_modalidad; el cálculo de montos de nucleo/montos.py asume monto por hectárea y régimen por modalidad o superficie, y MFS es monto fijo por apoyo. (2) La Solicitud Única de MFS es FO-PB-501-B (versión 6), no la 501-A. (3) Los criterios de selección con puntaje van como lista con puntaje {si, no} por concepto.",
+    "INTEGRACIÓN DEL COMITÉ: las ROP no dicen cuándo se instala ni dan plazo para el acta (solo que se firma previa aprobación); la lista de vocales de MFS (CONAFOR, SEMARNAT, Colegio de Profesionistas Forestales del Estado de México, Asociación Mexicana de Profesionales Forestales Sección XIV Toluca, Ejidos Comunes y Productores Forestales, Cámara Nacional de la Industria Maderera y UAEMex) difiere de la de RHF (que incluye la UACh). El numeral 12 (participación social, línea 8128) enumera solo cuatro organizaciones de la sociedad civil.",
+    "PLAZOS DE LA FIRMA PARA REASIGNADOS: «el último día del mes de septiembre de 2026» (línea 881-882) se derivó como 2026-09-30; la Convocatoria base quinta MFS fija «hasta el 15 de julio de 2026» (línea 879) y «hasta el 24 de junio de 2026, a partir de la conclusión de la dictaminación» (línea 871), por lo que la fecha de aprobación se entiende como tope."
+  ]
+}
