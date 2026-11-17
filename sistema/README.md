@@ -207,11 +207,11 @@ stateDiagram-v2
     notificada --> contrato_elaborado: Dirección elabora (HU-3.2)
     contrato_elaborado --> contrato_en_delegacion: Dirección envía (HU-3.2)
     contrato_en_delegacion --> contratada: Delegación registra la firma (HU-3.3)
-    publicada --> sin_firma_en_plazo: Dirección, plazo vencido (D)
+    publicada --> sin_firma_en_plazo: Dirección, plazo vencido (E)
     notificada --> sin_firma_en_plazo
     contrato_elaborado --> sin_firma_en_plazo
     contrato_en_delegacion --> sin_firma_en_plazo
-    sin_firma_en_plazo --> recurso_liberado: Secretaría Técnica, acuerdo del Comité (D)
+    sin_firma_en_plazo --> recurso_liberado: Secretaría Técnica, acuerdo del Comité (E)
     contratada --> vale_entregado: Delegación, PS y RHF (HU-3.4)
     contratada --> planta_entregada: Delegación, si el vivero ya surtió el vale (HU-3.4)
     vale_entregado --> planta_entregada: vivero (HU-3.4)
@@ -245,6 +245,68 @@ stateDiagram-v2
 | `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
 | `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
 | `recurso_liberado` | — (final) | Unidad Jurídica, Secretaría Técnica |
+
+### Estados de M4 y M6 (base S3-02b; las acciones las construyen HU-4.x y HU-6.x)
+
+Flujos alternos según la especificación: **D** caso fortuito, **E** incumplimiento y reintegro (también la baja por no firmar en
+plazo, que en la base de M3 se había marcado D), **F** sustitución o desistimiento, **G** prórroga por causa externa (solo MFS).
+Todos los estados nuevos van después de los de pago (`orden` mayor de 88), así que el monto aprobado sigue valiendo en ellos.
+
+```mermaid
+stateDiagram-v2
+    pagada --> en_ejecucion: Dirección (HU-4.1)
+    cheque_entregado --> en_ejecucion: Dirección, PSAHEM
+    contratada --> en_ejecucion: Dirección, PEG (reporta desde la firma)
+    en_ejecucion --> comprobacion_enviada: Delegación registra la entrega con acuse (HU-4.1)
+    comprobacion_enviada --> en_ejecucion: Dirección devuelve (motivo)
+    comprobacion_enviada --> verificada: Delegación o Dirección (HU-4.2; MFS revisa el entregable)
+    verificada --> ministracion_solicitada: Dirección, siguiente ministración
+    verificada --> concluida: Dirección
+    pagada --> concluida: última ministración pagada
+    en_ejecucion --> reporte_entregado: Delegación, PEG (HU-4.3)
+    reporte_entregado --> reportes_evaluados: Dirección de Protección Forestal
+    reportes_evaluados --> en_ejecucion: CASPEG valida el periodo
+    en_ejecucion --> ministracion_solicitada: Dirección, PEG
+    en_ejecucion --> caso_fortuito: Delegación, aviso con acuse (D; no MFS)
+    caso_fortuito --> en_ejecucion: Comité, meta ajustada
+    caso_fortuito --> suspendida: Comité
+    en_ejecucion --> omisiones_por_subsanar: Dirección, con plazo (E, HU-6.2)
+    omisiones_por_subsanar --> en_ejecucion: subsanadas
+    omisiones_por_subsanar --> cancelada: Comité
+    suspendida --> en_ejecucion: Comité levanta
+    suspendida --> cancelada: Comité
+    cancelada --> en_devolucion: Unidad Jurídica, requerimiento con monto y cuenta
+    en_devolucion --> reintegrada: Administración y Finanzas registra el depósito
+    en_ejecucion --> sustitucion: Delegación, solicitud con acuse (F, HU-6.1)
+    sustitucion --> en_ejecucion: Comité aprueba la sustitución
+    sustitucion --> recurso_liberado: Comité libera para la lista de espera
+    en_ejecucion --> prorroga_solicitada: Delegación, MFS (G)
+    prorroga_solicitada --> en_ejecucion: Dirección resuelve (adendum o negada)
+    concluida --> ejercicio_cerrado: Dirección (HU-6.3)
+    reintegrada --> ejercicio_cerrado
+    cancelada --> ejercicio_cerrado: sin recurso por devolver
+    ejercicio_cerrado --> [*]
+```
+
+El diagrama resume: el caso fortuito, las omisiones, la suspensión y la sustitución también salen de `contratada`, `pagada`,
+`comprobacion_enviada`, `verificada` y (PS y RHF) `planta_entregada`, según la tabla. Restricciones por programa: reportes y su
+evaluación solo PEG; comprobación con entrega solo los cinco con verificación o entregable (no PEG); verificación por la Delegación
+en CC, PS, RHF y PSAHEM; prórroga solo MFS; caso fortuito en todos menos MFS (R-17).
+
+| Estado | Bandeja (quién lo atiende) | También lo consultan |
+| --- | --- | --- |
+| `en_ejecucion` | Delegación (recibe la comprobación o el reporte) | Dirección, Jurídica |
+| `comprobacion_enviada` | Delegación y Dirección (verifican; R-04: el plazo es de entrega) | Jurídica |
+| `verificada`, `concluida`, `reintegrada` | Dirección (siguiente ministración, conclusión, cierre) | Jurídica, Administración y Finanzas |
+| `reporte_entregado` (PEG) | Dirección de Protección Forestal (evaluación interna) | Delegación, Secretaría Técnica |
+| `reportes_evaluados` (PEG) | Secretaría Técnica (validación del CASPEG) | Dirección |
+| `caso_fortuito`, `prorroga_solicitada` | Dirección | Delegación, Secretaría Técnica, Jurídica |
+| `suspendida` | Secretaría Técnica (levantar o cancelar) | Dirección, Jurídica, Administración y Finanzas |
+| `omisiones_por_subsanar` | Delegación (notifica) y Dirección | Jurídica, Secretaría Técnica |
+| `cancelada` | Unidad Jurídica (requerimiento de devolución) | Dirección, Secretaría Técnica, Administración y Finanzas |
+| `en_devolucion` | Administración y Finanzas (registra el reintegro) | Jurídica, Dirección |
+| `sustitucion` | Dirección y Secretaría Técnica | Delegación, Jurídica |
+| `ejercicio_cerrado` | — (final) | Dirección, Jurídica, Secretaría Técnica, Administración y Finanzas |
 
 Una Delegación solo ve sus expedientes; una Dirección, los de los programas de los que es Instancia
 Ejecutora; las demás unidades, los estados que atienden o consultan. Además, cada unidad ve en su bandeja
