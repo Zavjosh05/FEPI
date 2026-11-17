@@ -13,6 +13,12 @@ que cambie el programa) a:
   de espera), ``unidad`` (cuando las reglas no dicen si los días son hábiles), ``decision_propia`` y
   ``nota``.
 
+Opcionales de M4 y M6 (S3-02d): ``evento: "plazo:<clave>"`` toma como evento la fecha límite de otro plazo de las
+reglas (la entrega del informe corre desde la fecha límite de conclusión, R-04); ``vence_en_hito: true`` toma el
+vencimiento del ``Hito`` del evento (``datos["vence"]``: el plazo que fija el área al avisar una omisión, HU-6.2);
+``periodos: "<clave en Ejercicio.datos>"`` vence al fin del periodo en curso (reportes mensuales de PEG, decisión propia
+mientras HU-4.3 no registre los entregados).
+
 Los eventos se leen así: ``recepcion_solicitud`` del expediente; ``aviso_direccion`` y
 ``notificacion_persona`` de ``nucleo.Notificacion``; cualquier otro, del último ``Hito`` con esa clave
 (lo registra el módulo que lo produce con ``registrar_hito``) o de una función de
@@ -42,6 +48,11 @@ NOMBRES_EVENTO = {
     "entrega_cheque": "la entrega del cheque",
     "solicitud_pago_fiduciaria": "la solicitud de pago del área a la Secretaría Técnica",
     "conclusion_actividades": "la conclusión de las actividades",
+    "siniestro": "el caso fortuito o siniestro",
+    "fallecimiento_titular": "el fallecimiento de la persona titular",
+    "aviso_omision": "el aviso de la omisión",
+    "plazo:fecha_limite_conclusion_actividades": "la fecha límite de conclusión de las actividades",
+    "plazo:fecha_limite_conclusion_actividades_septiembre": "la fecha límite de conclusión de las actividades",
 }
 
 
@@ -159,6 +170,9 @@ def fecha_de_evento(expediente, evento, config=None):
         return extensiones.EVENTOS_PLAZO[evento](expediente, config)
     if evento == "recepcion_solicitud":
         return expediente.fecha_recepcion
+    if evento.startswith("plazo:"):
+        otro = expediente.ejercicio.plazo(evento.split(":", 1)[1])
+        return otro.fecha_fin if otro else None
     if evento == "aviso_direccion":
         n = _ultima_notificacion(expediente, "faltantes", notificada=False)
         return n.enviada_en if n else None
@@ -209,6 +223,14 @@ def vencimiento(expediente, uso, fecha_evento=None):
     res.tope = _fecha_tope(expediente, plazo, config.get("tope"))
     if res.fecha_evento is None:
         return res
+    if config.get("vence_en_hito"):
+        hito = expediente.hitos.filter(clave=evento).order_by("-fecha_hora", "-id").first()
+        vence = (hito.datos or {}).get("vence") if hito else None
+        res.vencimiento = date.fromisoformat(vence) if vence else None
+        return res
+    if config.get("periodos"):
+        res.vencimiento = _fin_del_periodo(expediente, config["periodos"], res.fecha_evento)
+        return res
     if plazo is not None and plazo.cantidad is not None:
         unidad = config.get("unidad") or plazo.unidad
         if unidad not in dias_habiles.UNIDADES_CALCULABLES:
@@ -227,6 +249,15 @@ def vencimiento(expediente, uso, fecha_evento=None):
         elif res.vencimiento > res.tope:
             res.vencimiento, res.topado = res.tope, True
     return res
+
+
+def _fin_del_periodo(expediente, clave, desde):
+    """Fin del periodo en curso (o del primero que empieza después del evento) de ``Ejercicio.datos[clave]``."""
+    hoy = max(timezone.localdate(), dias_habiles._como_fecha(desde))
+    for p in (expediente.ejercicio.datos or {}).get(clave, []):
+        if isinstance(p, dict) and p.get("fin") and date.fromisoformat(p["fin"]) >= hoy:
+            return date.fromisoformat(p["fin"])
+    return None
 
 
 def vencimientos(expediente, usos=None):

@@ -1,0 +1,10 @@
+<div class="tarjeta mb-3 border-warning" data-prueba="panel-por-vencer">
+  <div class="titulo-seccion">Por vencer <span class="badge text-bg-warning">{{ panel.total }}</span></div>
+  <div class="small text-secondary mb-2">Plazos de ejecución y seguimiento que vencen en 5 días hábiles o menos, o ya vencieron. Solo es aviso: el sistema no cambia nada por sí mismo.</div>
+  <table class="table table-sm small mb-0">
+    <tbody>{% for f in panel.filas %}<tr>
+      <td><a href="{{ f.url }}">{{ f.folio }}</a></td><td>{{ f.nombre }}</td>
+      <td class="text-nowrap"><span class="badge {% if f.situacion == 'vencido' %}text-bg-danger{% else %}text-bg-warning{% endif %}">{{ f.situacion }}</span> {{ f.vence|date:"d/m/Y" }}</td>
+    </tr>{% endfor %}</tbody>
+  </table>
+</div>

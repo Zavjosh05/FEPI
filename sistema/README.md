@@ -832,6 +832,26 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - **Aviso de faltantes sin plazo.** Si las reglas no dan plazo (PEG), el aviso de la Dirección sale sin fecha límite y lo dice («sin plazo en las reglas»).
 - **Textos.** Las pantallas ya no dicen «sprint»: nombran la historia que llenará cada cosa.
 
+### Plazos y avisos de M4 y M6 (S3-02d)
+
+- **Usos de plazo nuevos** (`datos/sistema.json` → `usos_de_plazo`, por programa; mismo servicio `nucleo.plazos.vencimiento`):
+
+  | Uso | Plazo de las reglas | Evento | Programas |
+  | --- | --- | --- | --- |
+  | `aviso_caso_fortuito` | `aviso_caso_fortuito_conflicto` (15 d. háb.) | hito `siniestro` (lo registra HU-6.2; las ROP no dicen desde cuándo) | CC, PS, RHF, PSAHEM (no MFS ni PEG) |
+  | `entrega_comprobacion` | CC 15 d. háb., PS 30, RHF 10 (`verificacion_en_campo_*`) | `plazo:fecha_limite_conclusion…` (la fecha límite de conclusión de las reglas) | **R-04: plazo de ENTREGA del informe o documento de verificación, no de visita**; PSAHEM y MFS «sin plazo en las reglas»; PEG no |
+  | `fecha_limite_conclusion` | `fecha_limite_conclusion_actividades` (CC 13-nov, PS 30-sep, RHF 30-sep/30-oct) | `firma_contrato` | CC, PS, RHF |
+  | `interes_segunda_beneficiaria` | `segunda_persona_beneficiaria_interes` (30 d. háb.) | hito `fallecimiento_titular` (HU-6.1) | todos menos PEG |
+  | `subsanar_omisiones` | ninguno (las ROP no fijan días) | hito `aviso_omision` con `datos.vence`: el plazo que fija el área (HU-6.2) | todos |
+  | `reporte_mensual` | `entrega_reporte_mensual` (mensual, sin día) | `firma_contrato`; vence al fin del mes en curso (`periodos_reportes`, decisión propia) | PEG |
+
+  Opciones nuevas del servicio: `evento: "plazo:<clave>"`, `vence_en_hito` y `periodos` (ver `nucleo/plazos.py`).
+- **Avisos** (`nucleo/avisos.py`, configurados en `avisos_de_plazo`: uso, estados del expediente y unidades a las que se avisa).
+  `manage.py revisar_plazos` (`avisos.revisar`, registrado por el núcleo en `REVISIONES_PLAZO`) deja en la bitácora, sin persona y
+  una sola vez por uso, situación y fecha, los plazos **por vencer** (5 días hábiles o menos) y los **vencidos**. La bandeja de
+  cada unidad muestra el panel **«Por vencer»** (`avisos.panel_por_vencer`) con los expedientes que esa unidad ve. **Solo avisa**:
+  no cambia estados ni ejecuta nada (P-08). Pruebas: `pruebas/test_nucleo_avisos_plazo.py`.
+
 ### Portal de personas beneficiarias (S3-02c; decisión S2-05)
 
 - **App `portal`** (`portal/models.py`, migración `0001_cuentas_portal`: `CuentaExterna`, `AccesoExpediente`, `CodigoConsulta`;

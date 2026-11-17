@@ -76,45 +76,74 @@
     "hasta_cuatro_ministraciones": "Hasta cuatro ministraciones (25 % cada una: supuesto, el reparto no está en las ROP)"
   },
   "usos_de_plazo": {
-    "nota": "Qué plazo de las reglas usa el sistema para cada cosa y qué evento lo arranca, por programa (nucleo/plazos.py). por_omision vale para todos; cada programa cambia solo lo suyo (false = el programa no tiene ese plazo). Eventos: recepcion_solicitud, aviso_direccion, notificacion_persona (con tipo_notificacion), y los hitos que registran los módulos (aprobacion_comite —acta del Comité que aprueba la solicitud—, publicacion_resultados, firma_contrato, entrega_vale, entrega_cheque, solicitud_pago_fiduciaria…). Si el evento no ha ocurrido, el vencimiento queda «sin fecha todavía».",
+    "nota": "Qué plazo de las reglas usa el sistema para cada cosa y qué evento lo arranca, por programa (nucleo/plazos.py). por_omision vale para todos; cada programa cambia solo lo suyo (false = el programa no tiene ese plazo). Eventos: recepcion_solicitud, aviso_direccion, notificacion_persona (con tipo_notificacion), y los hitos que registran los módulos (aprobacion_comite —acta del Comité que aprueba la solicitud—, publicacion_resultados, firma_contrato, entrega_vale, entrega_cheque, solicitud_pago_fiduciaria…). Si el evento no ha ocurrido, el vencimiento queda «sin fecha todavía». Usos de M4 y M6 (S3-02d): aviso_caso_fortuito, entrega_comprobacion (R-04: entrega, no visita), fecha_limite_conclusion, interes_segunda_beneficiaria, subsanar_omisiones y reporte_mensual (PEG); «avisos_de_plazo» dice en qué estados y a qué unidad se avisa.",
     "por_omision": {
       "faltantes_ventanilla": {"nombre": "Complemento de documentación faltante (ventanilla)", "plazo": "complemento_documentacion_faltante", "evento": "recepcion_solicitud", "tope": {"plazo": "recepcion_solicitudes"}, "nota": "ROP 8.1.1.2 (requisitos generales): 5 días hábiles a partir de la recepción, sin exceder la fecha límite de recepción de la Convocatoria; si no se complementa, la solicitud se tendrá por desechada (R-12)."},
       "faltantes_direccion": {"nombre": "Complemento de documentación faltante (aviso de la Dirección)", "plazo": "complemento_documentacion_faltante", "evento": "aviso_direccion", "decision_propia": true, "nota": "Las ROP (10.1) dicen que la Dirección notifica los faltantes dentro del plazo de evaluación, sin número de días. Decisión propia: se dan los mismos 5 días hábiles del complemento, contados desde el aviso (R-12; por decidir con el cliente)."},
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "plazo": "firma_contrato", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Fecha programada de firma: sirve para citar y alertar a la Delegación (R-03)."},
-      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "plazo": "firma_contrato", "evento": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Vencimiento para liberar el recurso: el contrato queda «sin firma en plazo» al vencer, contado desde la notificación con acuse (la baja es una sanción, R-03)."}
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "plazo": "firma_contrato", "evento": "notificacion_persona", "tipo_notificacion": "resultados", "tope": {"dato": "fecha_limite_reasignados", "solo_reasignadas": true}, "nota": "Vencimiento para liberar el recurso: el contrato queda «sin firma en plazo» al vencer, contado desde la notificación con acuse (la baja es una sanción, R-03)."},
+      "aviso_caso_fortuito": {"nombre": "Aviso de caso fortuito o fuerza mayor", "plazo": "aviso_caso_fortuito_conflicto", "evento": "siniestro", "decision_propia": true, "nota": "15 días hábiles para avisar el conflicto o siniestro; las ROP no dicen desde cuándo: se cuentan desde que ocurrió (hito «siniestro» que registra HU-6.2). CC 8.1.7 (línea 4642), PS (5954), RHF (3294), PSAHEM (2034)."},
+      "entrega_comprobacion": {"nombre": "Entrega del informe o del documento de verificación", "plazo": "verificacion_en_campo_informe_final", "evento": "plazo:fecha_limite_conclusion_actividades", "nota": "R-04: es plazo de ENTREGA del Informe Final o del documento de verificación, no de la visita. Corre desde la fecha límite de conclusión de las actividades."},
+      "fecha_limite_conclusion": {"nombre": "Fecha límite de conclusión de las actividades", "plazo": "fecha_limite_conclusion_actividades", "evento": "firma_contrato", "nota": "Fecha límite de la Convocatoria para concluir las actividades comprometidas."},
+      "interes_segunda_beneficiaria": {"nombre": "Interés de la segunda persona beneficiaria", "plazo": "segunda_persona_beneficiaria_interes", "evento": "fallecimiento_titular", "decision_propia": true, "nota": "30 días hábiles para que la segunda persona beneficiaria manifieste su interés; se cuentan desde el fallecimiento de la persona titular (hito que registra HU-6.1)."},
+      "subsanar_omisiones": {"nombre": "Subsanar las omisiones", "evento": "aviso_omision", "vence_en_hito": true, "decision_propia": true, "nota": "Las reglas no fijan días para corregir una omisión: el área los fija al emitir el aviso (HU-6.2) y quedan en el hito «aviso_omision» (datos.vence)."}
     },
     "CC": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "publicacion_resultados"},
-      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"}
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"},
+      "entrega_comprobacion": {"nombre": "Entrega del informe final de actividades", "nota": "CC: 15 días hábiles para entregar el Informe Final o la minuta desde el último día hábil de la conclusión (13-nov-2026; línea 4180). R-04: plazo de entrega, no de visita."}
     },
     "PS": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "nota": "En PS la Convocatoria cuenta la firma desde la notificación de que hay recurso (R-13)."},
       "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "En PS la causa de baja (8.1.9 b) inciso d) la cuenta desde la publicación de resultados (R-13); las reasignadas, desde su notificación."},
       "cita_firma": {"nombre": "Cita a firma por la Delegación", "plazo": "cita_firma_contrato", "evento": "publicacion_resultados", "nota": "La Delegación notifica y cita a firma dentro de 5 días hábiles desde la publicación (PS 10.1 h)."},
-      "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vivero", "evento": "entrega_vale", "unidad": "dias_naturales", "nota": "Las ROP dicen «30 días» sin precisar: se toman naturales (lectura literal, R-13; por decidir)."}
+      "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vivero", "evento": "entrega_vale", "unidad": "dias_naturales", "nota": "Las ROP dicen «30 días» sin precisar: se toman naturales (lectura literal, R-13; por decidir)."},
+      "entrega_comprobacion": {"nombre": "Entrega del documento de verificación", "nota": "PS: 30 días hábiles desde el último día hábil de septiembre (fecha límite de conclusión; línea 5443). R-13: plazo de entrega, no de visita."}
     },
     "RHF": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "nota": "En RHF la Convocatoria y 8.1.9 b) fr. 5 cuentan desde la notificación (R-15)."},
       "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"},
       "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vale", "evento": "entrega_vale"},
-      "ptrfi_actualizado": {"nombre": "Entrega del PTRFI actualizado", "plazo": "entrega_ptrfi_actualizado", "evento": "notificacion_persona", "tipo_notificacion": "resultados"}
+      "ptrfi_actualizado": {"nombre": "Entrega del PTRFI actualizado", "plazo": "entrega_ptrfi_actualizado", "evento": "notificacion_persona", "tipo_notificacion": "resultados"},
+      "entrega_comprobacion": {"nombre": "Entrega del formato de verificación de la Delegación", "plazo": "verificacion_en_campo_formato_delegacion", "evento": "plazo:fecha_limite_conclusion_actividades_septiembre", "nota": "RHF: 10 días hábiles desde la conclusión del concepto (septiembre u octubre según el concepto; línea 3592). Se toma septiembre; los conceptos que concluyen en octubre los ajustará HU-4.2. R-15: plazo de entrega, no de visita."},
+      "fecha_limite_conclusion": {"plazo": "fecha_limite_conclusion_actividades_septiembre", "nota": "RHF: 30-sep-2026 (y 30-oct-2026 para algunos conceptos, línea 3589)."}
     },
     "PSA": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "publicacion_resultados"},
       "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "Las ROP de PSAHEM no fijan otro evento: la Convocatoria cuenta desde la publicación (por confirmar con el cliente)."},
       "instruccion_pago_fiduciaria": {"nombre": "Instrucción de pago a la Fiduciaria", "plazo": "instruccion_pago_fiduciaria", "evento": "solicitud_pago_fiduciaria", "nota": "5 días hábiles para que la Secretaría Técnica solicite el pago a la Fiduciaria desde que recibe la solicitud del área (R-14)."},
-      "cobro_cheque": {"nombre": "Cobro del cheque", "plazo": "cobro_cheque", "evento": "entrega_cheque", "decision_propia": true, "nota": "Las ROP no dicen desde cuándo corren los 3 meses; se cuentan desde la entrega del cheque a la persona (R-14)."}
+      "cobro_cheque": {"nombre": "Cobro del cheque", "plazo": "cobro_cheque", "evento": "entrega_cheque", "decision_propia": true, "nota": "Las ROP no dicen desde cuándo corren los 3 meses; se cuentan desde la entrega del cheque a la persona (R-14)."},
+      "entrega_comprobacion": {"nombre": "Entrega del informe final de actividades", "plazo": "informe_final_actividades", "evento": "firma_contrato", "nota": "PSAHEM: el informe final se entrega dentro de la vigencia del contrato, sin días (línea 2072): «sin plazo en las reglas»."},
+      "fecha_limite_conclusion": false
     },
     "MFS": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "tope": {"dato": "fecha_limite_firma"}, "nota": "La Convocatoria de MFS pone la firma «hasta el 15 de julio de 2026» (líneas 877 a 880) y la baja corre 10 días hábiles desde la notificación (8.1.9.2 inciso e, línea 7884): la fecha programada es la notificación + 10 días hábiles sin pasar del 15 de julio (R-17)."},
-      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona", "nota": "Baja a los 10 días hábiles posteriores a la notificación de ser persona beneficiaria con recurso disponible (ROP MFS 8.1.9.2 inciso e, línea 7884); las reasignadas, sin pasar del 30 de septiembre."}
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona", "nota": "Baja a los 10 días hábiles posteriores a la notificación de ser persona beneficiaria con recurso disponible (ROP MFS 8.1.9.2 inciso e, línea 7884); las reasignadas, sin pasar del 30 de septiembre."},
+      "aviso_caso_fortuito": false,
+      "entrega_comprobacion": {"nombre": "Entrega de la Bitácora, la autorización o la solicitud o Plan de auditoría", "plazo": "verificacion_ejecucion_actividades", "evento": "pago_ministracion", "nota": "MFS: el lapso de verificación va de la emisión del primer pago a la recepción del entregable, sin días (Convocatoria, líneas 899 a 902): «sin plazo en las reglas» (R-17)."},
+      "fecha_limite_conclusion": false
     },
     "PEG": {
       "faltantes_ventanilla": {"nombre": "Complemento de documentación faltante (ventanilla)", "tope": null, "nota": "Las reglas de PEG no dan plazo para completar la documentación (8.1.1.2 b, fr. XII; Convocatoria base cuarta, línea 9362): el vencimiento queda «sin plazo en las reglas» (R-18)."},
       "faltantes_direccion": {"nombre": "Complemento de documentación faltante (aviso de la Dirección)", "decision_propia": false, "nota": "PEG no fija plazo para completar: el aviso de la Dirección queda «sin plazo en las reglas» (R-18)."},
       "notificacion_faltantes": {"nombre": "Notificación de documentos complementarios (Instancia Ejecutora)", "plazo": "aviso_faltantes_en_evaluacion", "evento": "recepcion_solicitud", "decision_propia": true, "nota": "10 días naturales para que la Instancia Ejecutora notifique documentos nuevos o complementarios (8.1.1.2 b, fr. XII, línea 8563); las reglas no dicen desde cuándo: se cuentan desde la recepción (R-18, por decidir)."},
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "aprobacion_comite", "evento_reasignada": "aprobacion_comite", "tope": null, "nota": "En PEG la firma se lleva a cabo 10 días hábiles posteriores a la aprobación de las solicitudes por el CASPEG (Convocatoria base quinta, actividad V, línea 9525), no desde la publicación ni la notificación (R-18)."},
-      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "aprobacion_comite", "evento_reasignada": "aprobacion_comite", "tope": null, "nota": "Mismo plazo: 10 días hábiles desde la aprobación del CASPEG (línea 9525)."}
+      "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "aprobacion_comite", "evento_reasignada": "aprobacion_comite", "tope": null, "nota": "Mismo plazo: 10 días hábiles desde la aprobación del CASPEG (línea 9525)."},
+      "aviso_caso_fortuito": false,
+      "entrega_comprobacion": false,
+      "fecha_limite_conclusion": false,
+      "interes_segunda_beneficiaria": false,
+      "reporte_mensual": {"nombre": "Reporte mensual del Guardabosque", "plazo": "entrega_reporte_mensual", "evento": "firma_contrato", "periodos": "periodos_reportes", "decision_propia": true, "nota": "PEG: reportes mensuales desde la firma (8.1.7 l, línea 8814); las reglas no dan el día de entrega: vence al fin del mes en curso (R-18, por decidir). HU-4.3 registrará los entregados."}
     }
+  },
+  "avisos_de_plazo": {
+    "nota": "Qué plazos revisa manage.py revisar_plazos para avisar antes de vencer (5 días hábiles o menos) y al vencer, en qué estados del expediente y a qué unidad (panel «Por vencer» de su bandeja). Solo avisa: no cambia estados ni ejecuta nada (P-08).",
+    "avisos": [
+      {"uso": "fecha_limite_conclusion", "estados": ["contratada", "planta_entregada", "vale_entregado", "pagada", "cheque_entregado", "en_ejecucion"], "unidades": ["direccion", "delegacion"]},
+      {"uso": "entrega_comprobacion", "estados": ["contratada", "planta_entregada", "pagada", "cheque_entregado", "en_ejecucion"], "unidades": ["delegacion", "direccion"]},
+      {"uso": "interes_segunda_beneficiaria", "estados": ["sustitucion"], "unidades": ["delegacion", "direccion"]},
+      {"uso": "subsanar_omisiones", "estados": ["omisiones_por_subsanar"], "unidades": ["delegacion", "direccion"]},
+      {"uso": "reporte_mensual", "estados": ["contratada", "en_ejecucion", "pagada"], "unidades": ["delegacion", "direccion"]}
+    ]
   }
 }
