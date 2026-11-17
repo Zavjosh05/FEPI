@@ -2,7 +2,8 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-56 tablas propias en cinco apps (`nucleo`, `recepcion`, `dictamen`, `contrato` y `pagos`) sobre PostgreSQL + PostGIS. El diagrama
+59 tablas propias en seis apps (`nucleo`, `recepcion`, `dictamen`, `contrato`, `pagos` y `portal`) sobre PostgreSQL + PostGIS; las
+apps `ejecucion` (M4) y `seguimiento` (M6) ya existen sin tablas: cada historia agrega las suyas. El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
 Para leerlo: `||--o{` es «uno a muchos» obligatorio, `|o--o{` «uno a muchos» opcional, `||--o|` «uno a uno»
@@ -11,8 +12,10 @@ principales. No se dibujan las relaciones hacia `Usuario` (casi todas las tablas
 ni las tablas de historial que crea django-simple-history (una `Historical…` por tabla del trámite).
 
 ```bash
-docker compose --profile pruebas run --rm --no-deps --entrypoint python pruebas     herramientas/diagrama_er.py > docs/modelo_datos.mmd
+docker compose --profile pruebas run --rm --no-deps --entrypoint python pruebas herramientas/regenerar_modelo_datos.py
 ```
+
+(`regenerar_modelo_datos.py` vuelve a dibujar cada diagrama de este archivo con sus mismas entidades y el `.mmd` completo.)
 
 ## 1. Reglas por programa y catálogos (núcleo)
 
@@ -82,6 +85,7 @@ erDiagram
     texto regimen
     texto condicion
     texto fundamento
+    bool supuesto
   }
   Modalidad {
     int id PK
@@ -202,6 +206,7 @@ erDiagram
   Expediente ||--o{ Validacion : expediente
   Municipio ||--o{ Predio : municipio
   Notificacion ||--o| Validacion : notificacion
+  Persona |o--o{ Expediente : persona_beneficiaria
   Persona |o--o{ Notificacion : destinatario
   Persona |o--o{ Poligono : prestador
   Persona ||--o{ Expediente : solicitante
@@ -278,6 +283,7 @@ erDiagram
     int ejercicio_id FK
     int predio_id FK
     int solicitante_id FK
+    int persona_beneficiaria_id FK
     bool es_refrendo
     bool con_representante_legal
     decimal superficie_solicitada_ha
@@ -408,6 +414,7 @@ erDiagram
   Expediente ||--o{ ResolucionSesion : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
+  Persona |o--o{ Expediente : persona_beneficiaria
   Persona |o--o{ PersonaIncumplida : persona
   Persona ||--o{ Expediente : solicitante
   Persona ||--o{ Predio : titular
@@ -510,6 +517,7 @@ erDiagram
     int ejercicio_id FK
     int predio_id FK
     int solicitante_id FK
+    int persona_beneficiaria_id FK
     bool es_refrendo
     bool con_representante_legal
     decimal superficie_solicitada_ha
@@ -587,6 +595,7 @@ erDiagram
     fecha plazo_original
     fecha plazo_nuevo
     archivo archivo
+    fecha_hora creado_en
   }
   Contrato {
     int id PK
@@ -597,6 +606,8 @@ erDiagram
     texto texto
     json datos
     archivo archivo
+    texto huella
+    fecha_hora elaborado_en
   }
   ElementoFormalizacion {
     int id PK
@@ -605,6 +616,7 @@ erDiagram
     texto nombre
     texto dato_etiqueta
     texto dato
+    archivo archivo
   }
   Especie {
     int id PK
@@ -620,6 +632,8 @@ erDiagram
     texto firmante
     texto firmante_nombre
     archivo archivo
+    texto huella
+    json verificacion
   }
   ModeloContrato {
     int id PK
@@ -634,6 +648,7 @@ erDiagram
     texto lugares
     fecha fecha_limite
     bool dentro_de_fecha
+    texto fundamento_fecha
   }
   RenglonVale {
     int id PK
@@ -649,6 +664,8 @@ erDiagram
     int orden
     texto folio
     texto predio
+    texto municipio
+    texto persona
   }
   SalidaPlanta {
     int id PK
@@ -666,6 +683,7 @@ erDiagram
     fecha_hora senalado_en
     texto motivo
     fecha_hora liberado_en
+    texto motivo_liberacion
   }
   ValePlanta {
     int id PK
@@ -676,6 +694,8 @@ erDiagram
     fecha vence_el
     texto vigencia_texto
     bool anticipado
+    archivo carta_compromiso
+    int propuesta_total
     int repone_id FK
   }
   VersionModelo {
@@ -685,6 +705,8 @@ erDiagram
     texto texto
     texto estado
     fecha_hora creada_en
+    fecha_hora revisada_en
+    texto observaciones
   }
   Vivero {
     int id PK
@@ -700,6 +722,8 @@ erDiagram
     bool con_representante_legal
     decimal superficie_solicitada_ha
     fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
   }
   Notificacion {
     int id PK
@@ -708,6 +732,8 @@ erDiagram
     texto asunto
     fecha_hora enviada_en
     fecha_hora notificada_en
+    texto medio
+    texto observaciones
   }
 ```
 
@@ -742,6 +768,8 @@ erDiagram
     bool con_representante_legal
     decimal superficie_solicitada_ha
     fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
   }
   Notificacion {
     int id PK
@@ -750,6 +778,8 @@ erDiagram
     texto asunto
     fecha_hora enviada_en
     fecha_hora notificada_en
+    texto medio
+    texto observaciones
   }
   Cheque {
     int id PK
@@ -761,7 +791,9 @@ erDiagram
     decimal importe
     fecha emitido_en
     fecha_hora registrado_en
+    fecha_hora enviado_en
     int aviso_id FK
+    fecha_hora entregado_en
   }
   ComprobanteCuenta {
     int id PK
@@ -787,6 +819,8 @@ erDiagram
     decimal importe
     texto tipo
     texto referencia
+    fecha fecha_pago
+    texto motivo_cheque
     int aviso_id FK
   }
   RemisionFiduciaria {
@@ -797,6 +831,8 @@ erDiagram
     fecha_hora remitida_en
     fecha_hora recibida_en
     fecha vence_el
+    bool en_plazo
+    texto oficio
   }
   RevisionSolicitud {
     int id PK
@@ -813,5 +849,83 @@ erDiagram
     decimal porcentaje
     decimal importe
     texto tipo_pago
+    texto estado
+    fecha_hora preparada_en
+  }
+```
+
+## 6. Portal de personas beneficiarias
+
+La cuenta externa (`CuentaExterna`: un `Usuario` sin unidad interna, con la CURP como usuario, ligado a la `Persona`), los
+expedientes que ve (`AccesoExpediente`, con el papel de persona beneficiaria o de prestador) y el código de consulta del
+expediente (`CodigoConsulta`, respaldo sin cuenta). Los códigos se guardan cifrados y se imprimen en un `Acuse`. Desde
+S3-02 el `Expediente` guarda además a la persona beneficiaria cuando no es quien solicita (`persona_beneficiaria`: el
+Guardabosque en PEG).
+
+```mermaid
+erDiagram
+  Acuse |o--o{ AccesoExpediente : acuse
+  Acuse |o--o{ CodigoConsulta : acuse
+  CuentaExterna ||--o{ AccesoExpediente : cuenta
+  Expediente |o--o{ Acuse : expediente
+  Expediente ||--o{ AccesoExpediente : expediente
+  Expediente ||--o| CodigoConsulta : expediente
+  Persona |o--o{ Expediente : persona_beneficiaria
+  Persona ||--o{ CuentaExterna : persona
+  Persona ||--o{ Expediente : solicitante
+  Acuse {
+    int id PK
+    texto folio UK
+    int expediente_id FK
+    texto referencia
+    texto tipo
+    texto titulo
+    fecha_hora fecha_hora
+    texto destinatario
+    json contenido
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    int solicitante_id FK
+    int persona_beneficiaria_id FK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
+  }
+  Persona {
+    int id PK
+    texto tipo
+    texto nombre
+    texto curp
+    texto rfc
+    texto rfn
+    texto representante
+  }
+  AccesoExpediente {
+    int id PK
+    int cuenta_id FK
+    int expediente_id FK
+    texto rol
+    fecha_hora otorgado_en
+    int acuse_id FK
+  }
+  CodigoConsulta {
+    int id PK
+    int expediente_id FK
+    texto codigo_hash
+    fecha_hora creado_en
+    int acuse_id FK
+  }
+  CuentaExterna {
+    int id PK
+    int persona_id FK
+    fecha_hora creada_en
+    texto codigo_hash
+    fecha_hora codigo_emitido_en
+    fecha_hora activada_en
   }
 ```

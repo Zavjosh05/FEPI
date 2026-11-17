@@ -1,0 +1,23 @@
+"""Modelos del módulo M6 (Seguimiento y cierre), **un módulo por historia** para que cada historia traiga su propia migración:
+
+- ``sustituciones.py``  HU-6.1 Lista de espera y sustituciones
+- ``incumplimientos.py``  HU-6.2 Incumplimientos y reintegros
+- ``cierre.py``  HU-6.3 Cierre del ejercicio
+
+Todavía no hay modelos: cada historia crea su archivo, lo importa aquí y genera su migración con
+``python manage.py makemigrations seguimiento -n hu_6_1_sustituciones``.
+
+Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo):
+
+- Acuerdos del Comité: ``dictamen.seguimiento.RECEPTORES`` (tipo de acuerdo -> funciones): reasignación y sustitución
+  (HU-6.1), caso fortuito, suspensión, cancelación, baja y reintegro (HU-6.2). ``extensiones.AL_LIBERAR_RECURSO`` corre al
+  liberar el recurso de un contrato sin firma (HU-6.1 propone la reasignación).
+- Estados: ``caso_fortuito`` (D), ``suspendida``, ``omisiones_por_subsanar``, ``cancelada``, ``en_devolucion``,
+  ``reintegrada`` (E), ``sustitucion`` (F), ``prorroga_solicitada`` (G, solo MFS; el modelo ``contrato.Adendum`` ya
+  existe) y ``ejercicio_cerrado``.
+- Plazos: ``aviso_caso_fortuito`` (hito ``siniestro``), ``interes_segunda_beneficiaria`` (hito ``fallecimiento_titular``)
+  y ``subsanar_omisiones`` (hito ``aviso_omision`` con ``datos["vence"]``, el plazo que fija el área); se registran con
+  ``nucleo.plazos.registrar_hito`` y los avisa ``nucleo.avisos``.
+- Notificaciones de omisión y devolución: ``nucleo.notificaciones`` (tipos ``omision`` y ``devolucion``).
+- Listado de Personas Beneficiarias Incumplidas: el catálogo de HU-2.2 (``dictamen``).
+"""

@@ -10,6 +10,8 @@ Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del e
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques.
+Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
+beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
 ## Cómo levantar
 
@@ -135,7 +137,13 @@ notificada y por elaborar. En HU-3.3 cada uno de PS y RHF tiene un segundo lote 
 sesión y publicación: en PS, dos contratos firmados en plazo (Mirador de los Pinos, Ladera Verde) y uno sin firma al
 vencer el plazo, señalado y por liberar (Cañada Seca); en RHF, tres firmados (Arroyo Claro, Cerro Gordo y Peña Blanca, esta
 de RFI Modalidad uno, que no recibe planta). Cañada Seca venció su plazo de firma por el calendario (publicada el 24-sep). Plantación Los Pinos queda por firmar en
-la Delegación. La página pública de resultados está en
+la Delegación. **MFS y Guardabosques** (`ejecucion/demo.py`): en MFS, Bosque Los Volcanes (ETF de 7 a 95 ha, polígono del prestador)
+y Aserradero La Cumbre (FSC de cadena de custodia) con la primera ministración pagada (70 % y 50 %), listos para entregar su Bitácora o
+solicitud de auditoría (HU-4.1), Predio El Mirador contratado y Predio Agua Fría recién recibido; en PEG, Ejido San Juan y Ejido San
+Bartolo con su Guardabosque, la evaluación de los reportes de junio validada por el CASPEG y el depósito del 25 %, Ejido Santa Ana
+contratado y Ejido San Lorenzo recién recibido. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
+acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
@@ -155,6 +163,9 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3) y M6 (HU-6.1 a 6.3), vacías pero listas: models/ (un módulo por historia,
+│                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
+│                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
 ├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 a 5.3): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
@@ -873,6 +884,21 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   la persona podrá enviar desde el portal son de HU-4.1 a 4.3 y HU-6.1 y 6.2 (`AccesoExpediente.rol` distingue a la persona del prestador).
 - **Pruebas.** `pruebas/test_portal.py`.
 
+### Apps `ejecucion` (M4) y `seguimiento` (M6) (S3-02e)
+
+- **Vacías pero listas**, como se dejaron `contrato` y `pagos`: `models/__init__.py` (sin modelos; el docstring dice qué archivo y qué
+  migración crea cada historia y qué ganchos ya existen), `vistas/`, `urls.py` (`/ejecucion/` y `/seguimiento/`, sin rutas todavía),
+  `registro.py` y las pestañas **«Ejecución»** y **«Seguimiento»** del expediente, que dicen qué historia las llenará y muestran el monto
+  aprobado y los plazos de la etapa (`entrega_comprobacion`, `fecha_limite_conclusion`, `reporte_mensual`; `aviso_caso_fortuito`,
+  `interes_segunda_beneficiaria`, `subsanar_omisiones`).
+- **Lo que las historias deben respetar** (está también en cada `models/__init__.py`): estados solo con `Expediente.cambiar_estado` y
+  los de `flujo_tramite.json` (S3-02b); soportes de pago por `pagos.solicitudes.FUENTES` (`entregable` HU-4.1, `verificacion_campo`
+  HU-4.2, `evaluacion_reportes` HU-4.3); eventos de plazo como hitos (`siniestro`, `fallecimiento_titular`, `aviso_omision` con
+  `datos.vence`); acuerdos del Comité por `dictamen.seguimiento.RECEPTORES` y `extensiones.AL_LIBERAR_RECURSO`; lo que llegue por el
+  portal, con el mismo servicio que en la Delegación (`portal.models.AccesoExpediente`).
+- **Demostración** (`ejecucion/demo.py`, registrada en `extensiones.DEMOS`; idempotente, con el reloj y el calendario de la
+  Convocatoria): ver «Usuarios de demostración». `herramientas/regenerar_modelo_datos.py` vuelve a dibujar `docs/modelo_datos.md` y `.mmd`.
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
@@ -933,7 +959,8 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen, contrato y pagos: 56 tablas, cinco áreas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
+  dictamen, contrato, pagos y portal: 59 tablas, seis áreas), generado desde los modelos con `herramientas/diagrama_er.py`
+  (`herramientas/regenerar_modelo_datos.py` rehace todos los diagramas); el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
 - `pruebas/test_sprint_1_recorrido_completo.py` y `test_sprint_2_recorrido_completo.py` (parametrizadas con los seis programas: CC,
   PS, RHF, PSAHEM, MFS y PEG; lo propio de MFS y PEG se prueba además en `test_nucleo_mfs_peg.py`): una sola solicitud recorre el registro, los requisitos, el

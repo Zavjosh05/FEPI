@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "dictamen",
     "contrato",
     "pagos",
+    "ejecucion",
+    "seguimiento",
     "portal",
 ]
 

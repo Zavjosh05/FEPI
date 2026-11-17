@@ -11,6 +11,8 @@ urlpatterns = [
     path("dictamen/", include("dictamen.urls")),
     path("contrato/", include("contrato.urls")),
     path("pagos/", include("pagos.urls")),
+    path("ejecucion/", include("ejecucion.urls")),
+    path("seguimiento/", include("seguimiento.urls")),
     path("portal/", include("portal.urls")),
     path("", include("nucleo.urls")),
 ]

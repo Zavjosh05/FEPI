@@ -1,8 +1,10 @@
 erDiagram
   Acuerdo }o--o{ Expediente : expedientes
+  Acuse |o--o{ AccesoExpediente : acuse
   Acuse |o--o{ Cheque : acuse_emision
   Acuse |o--o{ Cheque : acuse_entrega
   Acuse |o--o{ Cheque : acuse_envio
+  Acuse |o--o{ CodigoConsulta : acuse
   Acuse |o--o{ Contrato : acuse_envio
   Acuse |o--o{ DictamenJuridico : acuse
   Acuse |o--o{ DictamenTecnico : acuse
@@ -24,6 +26,7 @@ erDiagram
   Acuse |o--o{ Validacion : acuse
   Contrato ||--o{ Adendum : contrato
   Contrato ||--o| FirmaContrato : contrato
+  CuentaExterna ||--o{ AccesoExpediente : cuenta
   Documento |o--o{ RevisionRequisito : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Formato : ejercicio
@@ -43,6 +46,7 @@ erDiagram
   Estado ||--o{ Transicion : destino
   Estado ||--o{ Transicion : origen
   Expediente |o--o{ Acuse : expediente
+  Expediente ||--o{ AccesoExpediente : expediente
   Expediente ||--o{ Cheque : expediente
   Expediente ||--o{ ComprobanteCuenta : expediente
   Expediente ||--o{ Documento : expediente
@@ -58,6 +62,7 @@ erDiagram
   Expediente ||--o{ SolicitudPago : expediente
   Expediente ||--o{ ValePlanta : expediente
   Expediente ||--o{ Validacion : expediente
+  Expediente ||--o| CodigoConsulta : expediente
   Expediente ||--o| Contrato : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
@@ -73,10 +78,12 @@ erDiagram
   Notificacion |o--o{ Cheque : aviso
   Notificacion |o--o{ Pago : aviso
   Notificacion ||--o| Validacion : notificacion
+  Persona |o--o{ Expediente : persona_beneficiaria
   Persona |o--o{ Notificacion : destinatario
   Persona |o--o{ PersonaIncumplida : persona
   Persona |o--o{ Poligono : prestador
   Persona ||--o{ Cheque : persona
+  Persona ||--o{ CuentaExterna : persona
   Persona ||--o{ Expediente : solicitante
   Persona ||--o{ Predio : titular
   Poligono |o--o{ Poligono : anterior
@@ -466,6 +473,7 @@ erDiagram
     int ejercicio_id FK
     int predio_id FK
     int solicitante_id FK
+    int persona_beneficiaria_id FK
     int tipo_persona_id FK
     int modalidad_id FK
     bool es_refrendo
@@ -506,6 +514,7 @@ erDiagram
     texto regimen
     texto condicion
     texto fundamento
+    bool supuesto
   }
   Modalidad {
     int id PK
@@ -747,6 +756,32 @@ erDiagram
     int acuse_envio_id FK
     json soportes
     texto observaciones
+  }
+  AccesoExpediente {
+    int id PK
+    int cuenta_id FK
+    int expediente_id FK
+    texto rol
+    fecha_hora otorgado_en
+    int otorgado_por_id FK
+    int acuse_id FK
+  }
+  CodigoConsulta {
+    int id PK
+    int expediente_id FK
+    texto codigo_hash
+    fecha_hora creado_en
+    int acuse_id FK
+  }
+  CuentaExterna {
+    int id PK
+    int usuario_id FK
+    int persona_id FK
+    fecha_hora creada_en
+    int creada_por_id FK
+    texto codigo_hash
+    fecha_hora codigo_emitido_en
+    fecha_hora activada_en
   }
   Poligono {
     int id PK

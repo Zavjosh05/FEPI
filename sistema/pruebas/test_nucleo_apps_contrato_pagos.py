@@ -41,7 +41,8 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
 
     # Lote de pagos (HU-5.1): expedientes propios de M5, aparte de los de M3 que siguen como estaban.
     nuevos = [fila[2] for plan in LOTES.values() for fila in plan]
-    antes = Expediente.objects.exclude(predio__nombre__in=nuevos)
+    # (MFS y Guardabosques tienen su propio lote, ejecucion/demo.py, que se prueba en test_nucleo_apps_ejecucion_seguimiento.py.)
+    antes = Expediente.objects.exclude(predio__nombre__in=nuevos).exclude(ejercicio__programa__clave__in=["MFS", "PEG"])
     # Primer lote (HU-3.1 y HU-3.2): PS y RHF ya publicaron y tienen contratos en distintos puntos; PSAHEM sigue con sus
     # dos aprobadas por publicar. Segundo lote (HU-3.3): tres más en PS y en RHF, con contratos firmados y uno sin firma.
     estados = {"PS": {"contrato_en_delegacion", "publicada", "vale_entregado", "sin_firma_en_plazo"},
@@ -68,12 +69,13 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     # HU-5.1: contratos firmados de CC, PS, RHF y PSAHEM con su oficio y la solicitud de la primera ministración.
     lote = Expediente.objects.filter(predio__nombre__in=nuevos)
     assert lote.count() == 16 and FirmaContrato.objects.filter(expediente__in=lote).count() == 16
-    assert OficioPago.objects.count() == 15  # a Predio El Paraíso (CC) todavía no se le emite
+    assert OficioPago.objects.filter(expediente__in=lote).count() == 15  # a Predio El Paraíso (CC) todavía no se le emite
     assert not hasattr(Expediente.objects.get(predio__nombre="Predio El Paraíso"), "oficio_pago")
-    solicitudes_demo = {s.expediente.predio.nombre: s for s in SolicitudPago.objects.select_related("expediente__predio")}
+    solicitudes_demo = {s.expediente.predio.nombre: s for s in SolicitudPago.objects.filter(expediente__in=lote)
+                        .select_related("expediente__predio")}
     assert solicitudes_demo["Predio Santa Cruz"].estado == EstadoSolicitud.BORRADOR  # por enviar, con todos sus soportes
     assert solicitudes_demo["Cañada Verde"].estado == EstadoSolicitud.BORRADOR
-    enviadas = [s for s in SolicitudPago.objects.all() if s.estado != EstadoSolicitud.BORRADOR]
+    enviadas = [s for s in SolicitudPago.objects.filter(expediente__in=lote) if s.estado != EstadoSolicitud.BORRADOR]
     assert len(enviadas) == 13 and all(s.enviada_en and s.acuse_envio and s.soportes for s in enviadas)
     assert solicitudes_demo["Predio La Ciénega"].importe == 8000 and solicitudes_demo["Predio La Ciénega"].porcentaje == 100
     # HU-5.2: devuelta, pagadas (transferencia y un cheque excepcional), aceptada y remitidas a la Fiduciaria, en cada programa.
@@ -81,8 +83,9 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     assert estado["Predio Las Palomas"] == estado["Plantación El Cedro"] == estado["Rancho El Pedregal"] == "enviada"
     assert estado["Predio El Fresno"] == "devuelta" and Expediente.objects.get(predio__nombre="Predio El Fresno").estado.clave == "contratada"
     assert {estado[n] for n in ("Predio La Ciénega", "Plantación La Mesa", "Manantial Alto")} == {"pagada"}
-    assert Pago.objects.count() == 3 and Pago.objects.get(solicitud__expediente__predio__nombre="Manantial Alto").tipo == "cheque_excepcional"
-    assert all(p.solicitud == p.solicitud.expediente.solicitudes_pago.get() and p.fecha_pago and p.aviso for p in Pago.objects.all())
+    assert Pago.objects.filter(expediente__in=lote).count() == 3 and Pago.objects.get(solicitud__expediente__predio__nombre="Manantial Alto").tipo == "cheque_excepcional"
+    assert all(p.solicitud == p.solicitud.expediente.solicitudes_pago.get() and p.fecha_pago and p.aviso
+               for p in Pago.objects.filter(expediente__in=lote))
     assert estado["Ejido La Joya"] == "aceptada"
     assert RemisionFiduciaria.objects.count() == 5 and all(r.acuse and r.remitida_en and r.en_plazo for r in RemisionFiduciaria.objects.all())
     # HU-5.3: la Fiduciaria emite el cheque de las remitidas; en cada punto del camino hasta la entrega (y uno por vencer).
