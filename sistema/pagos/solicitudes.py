@@ -146,7 +146,7 @@ FUENTES = {
     "contrato_firmado": _contrato_firmado, "oficio_delegacion": _oficio_delegacion,
     "comprobante_cuenta": _comprobante_cuenta, "instruccion_comite": _instruccion_comite, "dictamen": _dictamen,
     "verificacion_campo": _verificacion_campo, "entregable": _entregable, "evaluacion_reportes": _evaluacion_reportes,
-}  # HU-4.1, HU-4.2 y HU-4.3 reemplazan «entregable», «verificacion_campo» y «evaluacion_reportes»
+}  # «entregable» lo reemplaza HU-4.1 (ejecucion/registro.py); HU-4.2 y HU-4.3 reemplazan «verificacion_campo» y «evaluacion_reportes»
 
 
 def fuente_de(clave):

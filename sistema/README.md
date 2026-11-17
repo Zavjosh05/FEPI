@@ -9,7 +9,8 @@ ejecución y seguimiento).
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques.
+notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
+módulo M4, HU-4.1 Envío de comprobaciones.
 Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
 beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
@@ -141,7 +142,11 @@ la Delegación. **MFS y Guardabosques** (`ejecucion/demo.py`): en MFS, Bosque Lo
 y Aserradero La Cumbre (FSC de cadena de custodia) con la primera ministración pagada (70 % y 50 %), listos para entregar su Bitácora o
 solicitud de auditoría (HU-4.1), Predio El Mirador contratado y Predio Agua Fría recién recibido; en PEG, Ejido San Juan y Ejido San
 Bartolo con su Guardabosque, la evaluación de los reportes de junio validada por el CASPEG y el depósito del 25 %, Ejido Santa Ana
-contratado y Ejido San Lorenzo recién recibido. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+contratado y Ejido San Lorenzo recién recibido. **Comprobaciones (HU-4.1):** Bosque Los Volcanes entregó su Bitácora en la Delegación
+(2-oct, por verificar); Margarito Sánchez Ruiz envió por el portal sus reportes de junio a octubre (el de octubre, por revisar en la
+Delegación de Amecameca) y Ejido San Bartolo entregó en ventanilla los de junio y julio (le falta agosto); Predio La Ciénega (CC),
+Plantación La Mesa (PS) y Manantial Alto (RHF, Modalidad uno: concluye en octubre) avisaron el término y La Ciénega entregó su
+Informe Final; los tres quedan por verificar. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -163,7 +168,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3) y M6 (HU-6.1 a 6.3), vacías pero listas: models/ (un módulo por historia,
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3; HU-4.1 hecha) y M6 (HU-6.1 a 6.3), listas: models/ (un módulo por historia,
 │                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
 │                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
@@ -175,7 +180,7 @@ sistema/
 │                      Leaflet-Geoman 2.20.6; sin CDN)
 ├── reglas/            CC.json, PS.json, RHF.json, PSA.json, catalogos.json, indice_rop.json (extraídos de las ROP;
 │                      no se editan a mano)
-├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json, contrato.json,
+├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json, contrato.json, ejecucion.json,
 │                      pagos.json, dias_inhabiles_2026.json
 ├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
 ├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación)
@@ -898,6 +903,55 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   portal, con el mismo servicio que en la Delegación (`portal.models.AccesoExpediente`).
 - **Demostración** (`ejecucion/demo.py`, registrada en `extensiones.DEMOS`; idempotente, con el reloj y el calendario de la
   Convocatoria): ver «Usuarios de demostración». `herramientas/regenerar_modelo_datos.py` vuelve a dibujar `docs/modelo_datos.md` y `.mmd`.
+
+### M4 · HU-4.1 Envío de comprobaciones
+
+- **Organización.** `ejecucion/models/comprobaciones.py` (migración `0001_hu_4_1_comprobaciones`: `Comprobacion`), servicio
+  `ejecucion/comprobaciones.py`, vistas `vistas/comprobaciones.py` (personal) y `vistas/portal.py` (portal, rutas en `/portal/envios/`,
+  `ejecucion/urls_portal.py`), formulario `formularios/comprobaciones.py`, plantillas `templates/ejecucion/comprobaciones/` y los tipos de
+  envío por programa en **`datos/ejecucion.json`** (con su fundamento: numeral y línea de las ROP).
+- **Qué se envía (datos por programa).** CC: aviso de término (8.1.1.1 fr. VII, líneas 4178 a 4180), Informe Final FO-PB-509-A (7.2,
+  líneas 4098 a 4100) y caso fortuito (8.1.7 fr. VI, línea 4642). PS: aviso de término (7.2 criterio 5, línea 5440), cambio del lugar del
+  polígono antes de plantar (8.1.7 j, línea 5951), justificación del ajuste (criterio 10, líneas 5455 y 5456) y caso fortuito (8.1.7 k,
+  línea 5954). RHF: aviso de término (10.1 t, líneas 3588 a 3591) y caso fortuito (8.1.7 i, línea 3294). PSAHEM: Informe Final con la
+  comprobación de gastos (8.1.7 fr. XVII, línea 2072) y caso fortuito (8.1.7 fr. VII, línea 2034). MFS, según su régimen: la Bitácora
+  (estudio técnico, 7.2 línea 6871 y 8.1.7 m) o la solicitud o el Plan de auditoría (FSC, línea 6885 y 8.1.7 n y o). PEG: reporte mensual
+  con su periodo (8.1.7 l, línea 8814; uno por periodo, no se reporta un mes que no empieza), acuse de recibo del depósito (10.1 fr. XV,
+  línea 9028) y evidencia del informe al núcleo agrario (8.1.7 k, línea 8812).
+- **Un solo servicio para los dos medios** (`registrar_envio`). Desde el portal, la persona con cuenta (solo a sus expedientes,
+  `AccesoExpediente`); en ventanilla, la Delegación del expediente, que anota quién lo entrega y queda como quien lo recibió. Ninguna
+  otra unidad registra. Cada envío deja: fecha y hora, el documento con su huella SHA-256 (obligatorio salvo en el aviso de término, que
+  las reglas admiten «por cualquier medio»), el **acuse** (tipo `comprobacion`, con los mismos renglones en los dos medios más
+  «Entrega» y «Recibe» en ventanilla), el renglón de la bitácora, el **hito** (`conclusion_actividades` y `siniestro` con la fecha que da
+  la persona, `informe_final`, `entrega_entregable`, `reporte_mensual` con su periodo, `acuse_deposito`, `aviso_cambio_poligono`) y la
+  calificación del plazo con `nucleo.plazos`: aviso de término contra la fecha límite de conclusión, Informe Final, Bitácora y solicitud
+  de auditoría contra `entrega_comprobacion` (MFS y PSAHEM: «sin plazo en las reglas»), caso fortuito contra los 15 días hábiles desde el
+  siniestro. **Fuera de plazo se registra igual** y queda señalado (acuse, pestaña y portal). Los reportes de PEG se registran sin
+  calificar el plazo: las reglas no dan el día de entrega (R-18).
+- **Estados.** El aviso de término, el Informe Final, la Bitácora y la solicitud de auditoría pasan el expediente a
+  `comprobacion_enviada` (el segundo envío ya no lo cambia); el caso fortuito, a `caso_fortuito` (flujo alterno D; lo resuelve el
+  Comité, HU-6.2). Si la primera comprobación llega con el expediente en `pagada`, `cheque_entregado` o `planta_entregada`, **el
+  sistema** registra antes el inicio de la ejecución (`en_ejecucion`, sin persona en la bitácora: la transición de la tabla es de la
+  Dirección y nadie tiene que hacer clic). Lo que llega por el portal cambia el estado como lo haría el sistema (`por_sistema`; la cuenta
+  externa no tiene unidad) y la bitácora dice quién lo envió. Los reportes y acuses de depósito de PEG no cambian el estado: su
+  evaluación es de HU-4.3. No se agregaron transiciones.
+- **Portal (P-35).** Primera pantalla real del portal: la sección «Mis envíos a la Delegación» del expediente
+  (`extensiones.SECCIONES_PORTAL`, nuevo punto de extensión que también usarán HU-4.3 y HU-6.x) con la lista de envíos, sus acuses y
+  documentos, y el formulario. La consulta sin cuenta (folio + código) ve los envíos y sus acuses pero **no envía**: el acuse lleva el
+  nombre y el usuario de quien envía, y quien no tiene cuenta (persona jurídico colectiva, núcleo agrario) entrega en la Delegación con
+  el mismo registro (S2-05). Un externo no ve, no envía ni descarga lo ajeno (404) y las pantallas del personal lo regresan al portal.
+- **Delegación.** Pestaña «Ejecución» (comprobaciones con medio, fecha y hora, plazo, acuse y documento; formulario de la entrega en
+  ventanilla con el fundamento de cada tipo), menú «Ejecución» (`/ejecucion/comprobaciones/`), panel de bandeja «Comprobaciones
+  recibidas por el portal, por revisar» y siguiente paso «Revisar lo recibido por el portal» (`marcar_revisada` deja quién y cuándo).
+- **Segunda ministración de MFS.** `ejecucion/registro.py` reemplaza la fuente `entregable` de `pagos.solicitudes.FUENTES`
+  (`comprobaciones.fuente_entregable`): la Bitácora (estudio técnico) o la solicitud o el Plan de auditoría (FSC) entregados son el
+  soporte, con el folio de su acuse y el enlace al documento.
+- **RHF en octubre (R-19).** `nucleo.plazos` admite `por_modalidad` en `usos_de_plazo`: en RHF la Restauración Forestal Integral
+  Modalidad uno toma la fecha límite de conclusión de octubre (30-oct-2026) y la entrega de la verificación corre desde ahí (17-nov-2026);
+  los demás conceptos siguen en septiembre (10.1 t, líneas 3588 a 3592).
+- **Pruebas.** `pruebas/test_hu_4_1.py` (criterios, tipos por programa, plazos, caso fortuito, MFS, PEG, permisos, bandeja, portal y
+  consulta sin cuenta) y el recorrido `pruebas/e2e/test_recorrido_hu_4_1.py` (capturas `hu_4_1_*` en `entregas/sprint_3/capturas/`);
+  fixtures `pruebas/fixtures_m4.py` (`pagada`, `cuenta_portal`).
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

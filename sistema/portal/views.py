@@ -5,9 +5,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
 from django.http import FileResponse, Http404
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 
-from nucleo import montos, plazos
+from nucleo import extensiones, montos, plazos
 from nucleo.models import Acuse
 
 from . import cuentas
@@ -79,11 +80,14 @@ def consulta(request):
 def expediente(request, folio):
     exp = _expediente_permitido(request, folio)
     venc = [v for v in plazos.vencimientos(exp).values() if v is not None and v.tiene_fecha]
+    con_cuenta = cuentas.es_externo(request.user)
+    secciones = [render_to_string(s["plantilla"], {**s["contexto"], "exp": exp}, request=request)
+                 for s in (f(request, exp, con_cuenta) for f in extensiones.SECCIONES_PORTAL) if s]
     return render(request, "portal/expediente.html", {
         "exp": exp, "monto": montos.monto_si_aprobado(exp), "vencimientos": venc,
         "acuses": exp.acuses.exclude(tipo="alta_portal").order_by("fecha_hora"),
         "notificaciones": exp.notificaciones.filter(notificada_en__isnull=False).order_by("notificada_en"),
-        "con_cuenta": cuentas.es_externo(request.user),
+        "con_cuenta": con_cuenta, "secciones": secciones,
     })
 
 

@@ -12,6 +12,14 @@ que la interfaz, en las fechas del calendario de 2026 (reloj simulado, ``nucleo/
   Santa Ana queda contratado. La cuenta del portal de Margarito Sánchez Ruiz (usuario ``SARM800101HMCNZR09``) queda activa con
   la contraseña de demostración.
 - Una solicitud recién recibida de cada programa (Predio Agua Fría en MFS y Ejido San Lorenzo en PEG).
+
+**HU-4.1 · Envío de comprobaciones** (``_comprobaciones``): en MFS, Bosque Los Volcanes entrega su Bitácora en la Delegación el
+2-oct (queda por verificar y su segunda ministración tiene soporte) y Aserradero La Cumbre sigue esperando su solicitud de
+auditoría; en PEG, Margarito Sánchez Ruiz envía por el portal sus reportes de junio a octubre (el de octubre, del 4-nov, está
+por revisar en la Delegación) y la Delegación recaba su acuse de depósito; Ejido San Bartolo entrega en ventanilla los de junio y
+julio (le falta agosto). Del lote de pagos (``pagos/demo.py``): Predio La Ciénega (CC) avisa el término el 10-nov y entrega su
+Informe Final el 17-nov, Plantación La Mesa (PS) avisa el término el 28-sep y Manantial Alto (RHF, Restauración Forestal
+Integral Modalidad uno, que concluye en octubre) el 28-oct; los tres quedan por verificar.
 """
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
@@ -178,4 +186,61 @@ def cargar_demo():
         if not Expediente.objects.filter(ejercicio=ejercicio, predio__nombre=RECIBIDAS[clave][2]).exists():
             hechas += _recibida(u, ejercicio, clave)
     _portal_demo()
+    _comprobaciones(u)
     return hechas
+
+
+# ----------------------------------------------------------------------------- HU-4.1
+def _envio(usuario, exp, tipo, fecha, hora=10, **kw):
+    from . import comprobaciones
+
+    archivo = kw.pop("archivo", None)
+    if archivo is None and comprobaciones.tipo_de_envio(exp, tipo).get("requiere_archivo"):
+        archivo = archivo_demo(f"{tipo}_{exp.folio}.pdf", f"{tipo} {exp.folio}")
+    with paso(fecha, hora):
+        return comprobaciones.registrar_envio(usuario, exp, tipo, archivo=archivo, **kw)
+
+
+def _revisar(u, c, fecha):
+    from . import comprobaciones
+
+    with paso(fecha, 16):
+        comprobaciones.marcar_revisada(_delegacion(u, c.expediente), c)
+
+
+def _comprobaciones(u):
+    """HU-4.1: envíos por el portal y entregas en ventanilla, cada uno en su fecha (idempotente por expediente)."""
+    from datetime import date
+
+    def exp_de(nombre):
+        return Expediente.objects.filter(predio__nombre=nombre, firma_contrato__isnull=False).first()
+
+    volcanes = exp_de("Bosque Los Volcanes")
+    if volcanes is not None and not volcanes.comprobaciones.exists():
+        _envio(_delegacion(u, volcanes), volcanes, "bitacora_etf", "2026-10-02", persona_entrega="Prestador de servicios forestales (RFN)",
+               descripcion="Copia de la Bitácora ingresada para la autorización del Programa de Manejo.")
+    san_juan = exp_de("Ejido San Juan")
+    margarito = Usuario.objects.filter(username="SARM800101HMCNZR09", cuenta_externa__activada_en__isnull=False).first()
+    if san_juan is not None and margarito is not None and not san_juan.comprobaciones.exists():
+        for periodo, fecha in (("2026-06", "2026-07-03"), ("2026-07", "2026-08-04"), ("2026-08", "2026-09-03"),
+                               ("2026-09", "2026-10-05"), ("2026-10", "2026-11-04")):
+            c = _envio(margarito, san_juan, "reporte_mensual", fecha, 9, periodo=periodo,
+                       descripcion="Recorridos de vigilancia y brechas cortafuego.")
+            if periodo != "2026-10":
+                _revisar(u, c, fecha)
+        _envio(_delegacion(u, san_juan), san_juan, "acuse_deposito", "2026-07-16", fecha_hecho=date(2026, 7, 14))
+    san_bartolo = exp_de("Ejido San Bartolo")
+    if san_bartolo is not None and not san_bartolo.comprobaciones.exists():
+        for periodo, fecha in (("2026-06", "2026-07-06"), ("2026-07", "2026-08-05")):
+            _envio(_delegacion(u, san_bartolo), san_bartolo, "reporte_mensual", fecha, periodo=periodo)
+    for nombre, fecha, termino in (("Plantación La Mesa", "2026-09-28", date(2026, 9, 25)),
+                                   ("Manantial Alto", "2026-10-28", date(2026, 10, 27)),
+                                   ("Predio La Ciénega", "2026-11-10", date(2026, 11, 9))):
+        exp = exp_de(nombre)
+        if exp is None or exp.comprobaciones.exists() or exp.estado.clave != "pagada":
+            continue
+        _envio(_delegacion(u, exp), exp, "aviso_termino", fecha, fecha_hecho=termino,
+               descripcion="La persona beneficiaria informa en la Delegación que concluyó las actividades.")
+        if exp.programa.clave == "CC":
+            _envio(_delegacion(u, exp), exp, "informe_final", "2026-11-17", 12,
+                   descripcion="Informe Final de Actividades FO-PB-509-A firmado por la persona beneficiaria y el técnico.")

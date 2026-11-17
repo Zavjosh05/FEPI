@@ -13,6 +13,7 @@ urlpatterns = [
     path("pagos/", include("pagos.urls")),
     path("ejecucion/", include("ejecucion.urls")),
     path("seguimiento/", include("seguimiento.urls")),
+    path("portal/envios/", include("ejecucion.urls_portal")),  # HU-4.1: envíos desde el portal
     path("portal/", include("portal.urls")),
     path("", include("nucleo.urls")),
 ]

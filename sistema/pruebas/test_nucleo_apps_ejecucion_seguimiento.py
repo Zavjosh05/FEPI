@@ -22,7 +22,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
     assert apps.is_installed("ejecucion") and apps.is_installed("seguimiento")
     claves = [p["clave"] for p in extensiones.PESTANAS_EXPEDIENTE]
     assert {"ejecucion", "seguimiento"} <= set(claves) and claves.index("pagos") < claves.index("ejecucion")
-    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == ["HU-4.1", "HU-4.2", "HU-4.3"]
+    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == ["HU-4.2", "HU-4.3"]   # HU-4.1 ya construida
     assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.1", "HU-6.2", "HU-6.3"]
     assert apps.get_app_config("ejecucion").get_models() is not None
 
@@ -46,8 +46,12 @@ def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
         assert demo.cargar_demo() == 8
         assert demo.cargar_demo() == 0
     pagadas = Expediente.objects.filter(estado__clave="pagada")
-    assert {e.predio.nombre for e in pagadas} == {"Bosque Los Volcanes", "Aserradero La Cumbre", "Ejido San Juan", "Ejido San Bartolo"}
-    volcanes = pagadas.get(predio__nombre="Bosque Los Volcanes")
+    assert {e.predio.nombre for e in pagadas} == {"Aserradero La Cumbre", "Ejido San Juan", "Ejido San Bartolo"}
+    volcanes = Expediente.objects.get(predio__nombre="Bosque Los Volcanes")
+    # HU-4.1: la Bitácora entregada en la Delegación deja a Los Volcanes por verificar y con el soporte de su segunda ministración.
+    assert volcanes.estado.clave == "comprobacion_enviada" and volcanes.comprobaciones.get().tipo == "bitacora_etf"
+    from pagos import solicitudes
+    assert next(s for s in solicitudes.soportes(volcanes, 2) if s["clave"] == "entregable_etf")["cumple"]
     assert volcanes.pagos.get().importe == Decimal("21000.00")                          # 70 % de $30,000 (ETF)
     assert volcanes.poligonos.get(vigente=True).levantado_por == "prestador"
     assert pagadas.get(predio__nombre="Aserradero La Cumbre").pagos.get().importe == Decimal("70000.00")  # 50 % FSC
@@ -56,5 +60,13 @@ def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
     assert pago.tipo == "deposito" and pago.importe == Decimal("6387.50")
     assert san_juan.beneficiaria.nombre == "Margarito Sánchez Ruiz"
     assert CuentaExterna.objects.get(usuario__username="SARM800101HMCNZR09").activada_en
+    # HU-4.1: reportes de junio a octubre por el portal (el último por revisar) y en ventanilla los de San Bartolo.
+    reportes = san_juan.comprobaciones.filter(tipo="reporte_mensual")
+    assert [c.periodo for c in reportes.order_by("periodo")] == ["2026-06", "2026-07", "2026-08", "2026-09", "2026-10"]
+    assert {c.medio for c in reportes} == {"portal"} and reportes.filter(revisada_en__isnull=True).count() == 1
+    assert san_juan.comprobaciones.filter(tipo="acuse_deposito", medio="ventanilla").count() == 1
+    bartolo = pagadas.get(predio__nombre="Ejido San Bartolo")
+    assert sorted(bartolo.comprobaciones.values_list("periodo", flat=True)) == ["2026-06", "2026-07"]
+    assert all(c.acuse and c.enviada_en.year == 2026 for c in san_juan.comprobaciones.all())
     assert Expediente.objects.filter(predio__nombre__in=["Predio Agua Fría", "Ejido San Lorenzo"], estado__clave="recibida").count() == 2
     assert not Expediente.objects.filter(fecha_recepcion__year__gt=2026).exists()

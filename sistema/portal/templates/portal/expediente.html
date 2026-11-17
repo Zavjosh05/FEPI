@@ -34,5 +34,5 @@
     </div>
   </div>
 </div>
-<p class="small text-secondary mt-2">Las comprobaciones, reportes y avisos que pueda enviar desde aquí se agregarán con las historias de ejecución (HU-4.1 a HU-4.3) y de seguimiento (HU-6.1 y HU-6.2); mientras tanto se entregan en la Delegación.</p>
+{% for s in secciones %}{{ s }}{% endfor %}
 {% endblock %}

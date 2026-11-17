@@ -1,0 +1,97 @@
+{
+  "nota": "Datos del módulo M4 (Ejecución y verificación). «tipos_envio»: lo que la persona beneficiaria (o el Guardabosque) envía desde el portal o entrega en la Delegación (HU-4.1). Cada programa lista los suyos en «programas.<CLAVE>.envios», con el fundamento de las ROP (numeral y línea del texto en especificacion/). Campos de un tipo: requiere_archivo (sin el documento no se registra), fecha_hecho (la persona dice cuándo ocurrió: término de las actividades o siniestro), pide_periodo (PEG: el mes que reporta), plazo (uso de nucleo.plazos con el que se dice si llegó en plazo; null = sin plazo), hito (evento fechado que registra; hito_en_fecha_hecho = con la fecha que dio la persona), estado_destino (cambio de estado que pide el flujo; null = solo se registra), entregable_de (MFS: regímenes cuya segunda ministración condiciona) y regimenes (solo se ofrece en esos regímenes de pago). «estados_previos_a_la_ejecucion»: si la primera comprobación que cambia el estado llega con el expediente en uno de ellos, el sistema registra antes el inicio de la ejecución (en_ejecucion).",
+  "estados_previos_a_la_ejecucion": ["pagada", "cheque_entregado", "planta_entregada"],
+  "estados_sin_envios": ["sin_firma_en_plazo", "recurso_liberado", "cancelada", "en_devolucion", "reintegrada", "ejercicio_cerrado"],
+  "extensiones_archivo": [".pdf", ".jpg", ".jpeg", ".png"],
+  "tipos_envio": {
+    "aviso_termino": {
+      "nombre": "Aviso de término de actividades", "grupo": "aviso",
+      "descripcion": "La persona informa a la Delegación que concluyó las actividades comprometidas (las reglas lo admiten por cualquier medio).",
+      "requiere_archivo": false, "fecha_hecho": "Fecha en que concluyeron las actividades",
+      "plazo": "fecha_limite_conclusion", "hito": "conclusion_actividades", "hito_en_fecha_hecho": true,
+      "estado_destino": "comprobacion_enviada"
+    },
+    "informe_final": {
+      "nombre": "Informe Final de Actividades", "grupo": "informe",
+      "descripcion": "Informe de los trabajos ejecutados y concluidos (CC: formato FO-PB-509-A firmado por la persona beneficiaria y el personal comisionado; PSAHEM: con la comprobación de gastos).",
+      "requiere_archivo": true, "fecha_hecho": null,
+      "plazo": "entrega_comprobacion", "hito": "informe_final", "estado_destino": "comprobacion_enviada"
+    },
+    "caso_fortuito": {
+      "nombre": "Aviso de caso fortuito, siniestro o conflicto", "grupo": "aviso",
+      "descripcion": "Aviso por escrito de un conflicto (límites, representación, posesión, litigio) o de un siniestro o afectación al predio que impide las actividades, con la documentación que lo sustente.",
+      "requiere_archivo": true, "fecha_hecho": "Fecha en que ocurrió el siniestro o se presentó el conflicto",
+      "plazo": "aviso_caso_fortuito", "hito": "siniestro", "hito_en_fecha_hecho": true,
+      "estado_destino": "caso_fortuito"
+    },
+    "cambio_poligono": {
+      "nombre": "Aviso de cambio del lugar del polígono (antes de plantar)", "grupo": "aviso",
+      "descripcion": "Escrito libre con el cambio del lugar del polígono aprobado, antes de establecer la plantación, para su revisión técnica y jurídica.",
+      "requiere_archivo": true, "fecha_hecho": null, "plazo": null, "hito": "aviso_cambio_poligono", "estado_destino": null
+    },
+    "justificacion_ajuste": {
+      "nombre": "Justificación de actividades no concluidas (ajuste)", "grupo": "aviso",
+      "descripcion": "La persona justifica por qué no concluyó las actividades; el ajuste no puede ser menor al 70 %.",
+      "requiere_archivo": true, "fecha_hecho": null, "plazo": null, "hito": null, "estado_destino": null
+    },
+    "bitacora_etf": {
+      "nombre": "Copia de la Bitácora para la autorización del Programa de Manejo (o de la autorización respectiva)", "grupo": "bitacora",
+      "descripcion": "Estudios Técnicos Forestales: copia de la Bitácora para la autorización del Programa de Manejo Forestal o del resolutivo (autorización para el aprovechamiento).",
+      "requiere_archivo": true, "fecha_hecho": null, "plazo": "entrega_comprobacion", "hito": "entrega_entregable",
+      "estado_destino": "comprobacion_enviada", "entregable_de": ["etf"], "regimenes": ["etf"]
+    },
+    "solicitud_auditoria_fsc": {
+      "nombre": "Copia de la solicitud de auditoría ante la certificadora o del Plan de auditoría", "grupo": "auditoria",
+      "descripcion": "Certificación FSC (y su mantenimiento): copia de la solicitud de auditoría (anual, en mantenimiento) ante la entidad certificadora o del Plan de auditoría.",
+      "requiere_archivo": true, "fecha_hecho": null, "plazo": "entrega_comprobacion", "hito": "entrega_entregable",
+      "estado_destino": "comprobacion_enviada", "entregable_de": ["fsc"], "regimenes": ["fsc"]
+    },
+    "reporte_mensual": {
+      "nombre": "Reporte mensual de actividades del Guardabosque", "grupo": "reporte",
+      "descripcion": "Reporte de las actividades del mes, en el formato preestablecido. Las reglas no dan el día de entrega de cada mes (R-18): se registra sin calificar el plazo.",
+      "requiere_archivo": true, "fecha_hecho": null, "pide_periodo": true, "un_envio_por_periodo": true,
+      "plazo": null, "hito": "reporte_mensual", "estado_destino": null
+    },
+    "acuse_deposito": {
+      "nombre": "Acuse de recibo del depósito", "grupo": "acuse_deposito",
+      "descripcion": "Acuse de recibo firmado por el Guardabosque del depósito de su ministración, que la Delegación recaba.",
+      "requiere_archivo": true, "fecha_hecho": "Fecha del depósito que acusa", "plazo": null, "hito": "acuse_deposito",
+      "estado_destino": null
+    },
+    "evidencia_informe_nucleo": {
+      "nombre": "Evidencia de que informó a su núcleo agrario", "grupo": "informe",
+      "descripcion": "Evidencia documental de que el Guardabosque informó a su núcleo agrario de las actividades que realizó, al final del ejercicio o al término de sus funciones.",
+      "requiere_archivo": true, "fecha_hecho": null, "plazo": null, "hito": null, "estado_destino": null
+    }
+  },
+  "programas": {
+    "CC": {"envios": [
+      {"tipo": "aviso_termino", "fundamento": "ROP CC 8.1.1.1, lineamientos generales, fr. VII (líneas 4178 a 4180): concluir a más tardar el 13 de noviembre e informar el término por correo, teléfono o en persona; 8.1.7 fr. XIII."},
+      {"tipo": "informe_final", "fundamento": "ROP CC 7.2 (líneas 4098 a 4100): la segunda ministración se otorga con base en el Informe Final de Actividades FO-PB-509-A firmado por la persona beneficiaria y el personal comisionado; 8.1.1.1 fr. VII (línea 4180)."},
+      {"tipo": "caso_fortuito", "fundamento": "ROP CC 8.1.7 fr. VI (línea 4642): aviso por escrito en un plazo que no exceda 15 días hábiles, por conducto de la Delegación o a la Dirección de Restauración y Fomento Forestal."}
+    ]},
+    "PS": {"envios": [
+      {"tipo": "aviso_termino", "fundamento": "ROP PS 7.2, criterio general 5 (línea 5440): concluir a más tardar el último día hábil de septiembre e informar el término a la Delegación por cualquier medio."},
+      {"tipo": "cambio_poligono", "fundamento": "ROP PS 8.1.7 j) (líneas 5951 a 5953): escrito libre antes de establecer la plantación; si no, se toma como incumplimiento."},
+      {"tipo": "justificacion_ajuste", "fundamento": "ROP PS 7.2, criterio general 10 (líneas 5455 y 5456): solo se aceptan ajustes debidamente justificados y no menores al 70 %."},
+      {"tipo": "caso_fortuito", "fundamento": "ROP PS 8.1.7 k) (línea 5954): aviso por escrito en un plazo que no exceda 15 días hábiles."}
+    ]},
+    "RHF": {"envios": [
+      {"tipo": "aviso_termino", "fundamento": "ROP RHF 10.1 inciso t) (líneas 3588 a 3591): concluir a más tardar el último día hábil de septiembre (octubre en Restauración Forestal Integral Modalidad uno) e informar el término a la Delegación por cualquier medio."},
+      {"tipo": "caso_fortuito", "fundamento": "ROP RHF 8.1.7 inciso i) (línea 3294): aviso por escrito del conflicto o siniestro, con la documentación que lo sustente y, en caso fortuito o fuerza mayor, la denuncia ante la autoridad."}
+    ]},
+    "PSA": {"envios": [
+      {"tipo": "informe_final", "fundamento": "ROP PSAHEM 8.1.7 fr. XVII (línea 2072): informe final de actividades con la comprobación de gastos, a más tardar el último día de vigencia del contrato; 7.2 (líneas 1376 y 1377)."},
+      {"tipo": "caso_fortuito", "fundamento": "ROP PSAHEM 8.1.7 fr. VII (línea 2034): aviso por escrito al Comité Técnico en un plazo que no exceda 15 días hábiles, por conducto de la Delegación o de la Dirección de Restauración y Fomento Forestal."}
+    ]},
+    "MFS": {"envios": [
+      {"tipo": "bitacora_etf", "fundamento": "ROP MFS 7.2 (línea 6871) y 8.1.7 m) (líneas 7827 a 7829): condiciona la segunda ministración (30 %) de los Estudios Técnicos Forestales."},
+      {"tipo": "solicitud_auditoria_fsc", "fundamento": "ROP MFS 7.2 (línea 6885) y 8.1.7 n) y o) (líneas 7830 a 7833): condiciona la segunda ministración (50 %) de la certificación FSC y de su mantenimiento."}
+    ]},
+    "PEG": {"envios": [
+      {"tipo": "reporte_mensual", "fundamento": "ROP PEG 8.1.7 l) (línea 8814) y 7.2.1 (líneas 8499 a 8501): reportes mensuales en las oficinas de la Delegación, en formato preestablecido; sin reportes no hay ministración."},
+      {"tipo": "acuse_deposito", "fundamento": "ROP PEG 10.1 fr. XV (línea 9028): la Delegación recaba el acuse de recibo del depósito y la Instancia Ejecutora lo entrega a Administración y Finanzas."},
+      {"tipo": "evidencia_informe_nucleo", "fundamento": "ROP PEG 8.1.7 k) (línea 8812): evidencia documental de que informó a su núcleo agrario, al final del ejercicio o al término de sus funciones."}
+    ]}
+  }
+}

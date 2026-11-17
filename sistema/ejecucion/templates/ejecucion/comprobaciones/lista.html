@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Comprobaciones{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Comprobaciones</h1>
+  <div class="small text-secondary">Avisos, informes, bitácoras, solicitudes de auditoría, reportes y acuses de depósito de las personas beneficiarias, enviados por el portal o entregados en la Delegación.</div>
+</div>
+{% if es_delegacion %}
+<div class="tarjeta mb-3" data-prueba="recibidas-por-revisar">
+  <div class="titulo-seccion">Recibidas por el portal, por revisar ({{ por_revisar|length }})</div>
+  {% include "ejecucion/comprobaciones/_tabla.html" with filas=por_revisar revisar=True %}
+</div>
+{% endif %}
+<div class="tarjeta mb-3" data-prueba="todas-las-comprobaciones">
+  <div class="titulo-seccion">Todas ({{ todas|length }})</div>
+  {% include "ejecucion/comprobaciones/_tabla.html" with filas=todas %}
+</div>
+{% endblock %}

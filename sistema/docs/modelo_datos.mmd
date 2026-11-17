@@ -5,6 +5,7 @@ erDiagram
   Acuse |o--o{ Cheque : acuse_entrega
   Acuse |o--o{ Cheque : acuse_envio
   Acuse |o--o{ CodigoConsulta : acuse
+  Acuse |o--o{ Comprobacion : acuse
   Acuse |o--o{ Contrato : acuse_envio
   Acuse |o--o{ DictamenJuridico : acuse
   Acuse |o--o{ DictamenTecnico : acuse
@@ -48,6 +49,7 @@ erDiagram
   Expediente |o--o{ Acuse : expediente
   Expediente ||--o{ AccesoExpediente : expediente
   Expediente ||--o{ Cheque : expediente
+  Expediente ||--o{ Comprobacion : expediente
   Expediente ||--o{ ComprobanteCuenta : expediente
   Expediente ||--o{ Documento : expediente
   Expediente ||--o{ Evento : expediente
@@ -393,6 +395,33 @@ erDiagram
     texto observaciones_acta
     int acuse_acta_id FK
     int creada_por_id FK
+  }
+  Comprobacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    texto fundamento
+    texto medio
+    fecha_hora enviada_en
+    int enviada_por_id FK
+    texto persona_entrega
+    int recibida_por_id FK
+    texto descripcion
+    fecha fecha_hecho
+    texto periodo
+    archivo archivo
+    texto huella
+    int acuse_id FK
+    texto plazo_uso
+    fecha vence
+    bool en_plazo
+    texto plazo_texto
+    texto estado_al_enviar
+    texto cambio_estado
+    int revisada_por_id FK
+    fecha_hora revisada_en
+    json datos
   }
   Acuse {
     int id PK

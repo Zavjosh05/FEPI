@@ -28,13 +28,15 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   espera por acuerdo del Comité (sprint 3, flujo alterno D).
 - EXTRAS_BANDEJA: funciones ``(usuario) -> Q | None`` que suman a «por atender» expedientes que la unidad debe atender
   aunque su estado esté asignado a otra unidad (PSAHEM: la solicitud aceptada que la Secretaría Técnica debe remitir, P-26).
+- SECCIONES_PORTAL: funciones ``(request, expediente, con_cuenta) -> {"plantilla", "contexto"} | None`` con una sección más
+  de la pantalla del expediente en el portal de personas beneficiarias (HU-4.1: los envíos a la Delegación).
 """
 
 FILTROS_BANDEJA = []
 EXTRAS_BANDEJA = []
 PANELES_BANDEJA = []
 PESTANAS_EXPEDIENTE = []
-GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos"]
+GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos", "Ejecución y verificación"]
 MENU = [{"nombre": "Registrar solicitud", "url": "recepcion:registrar", "grupo": "Recepción", "tipos": ["delegacion"],
          "estricto": True}]
 REVISIONES_PLAZO = []
@@ -45,3 +47,4 @@ SUPERFICIE_APROBADA = []
 SIGUIENTES_PASOS = []
 AL_FIRMAR = []
 AL_LIBERAR_RECURSO = []
+SECCIONES_PORTAL = []

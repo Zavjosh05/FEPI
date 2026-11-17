@@ -105,8 +105,8 @@
       "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "notificacion_persona"},
       "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vale", "evento": "entrega_vale"},
       "ptrfi_actualizado": {"nombre": "Entrega del PTRFI actualizado", "plazo": "entrega_ptrfi_actualizado", "evento": "notificacion_persona", "tipo_notificacion": "resultados"},
-      "entrega_comprobacion": {"nombre": "Entrega del formato de verificación de la Delegación", "plazo": "verificacion_en_campo_formato_delegacion", "evento": "plazo:fecha_limite_conclusion_actividades_septiembre", "nota": "RHF: 10 días hábiles desde la conclusión del concepto (septiembre u octubre según el concepto; línea 3592). Se toma septiembre; los conceptos que concluyen en octubre los ajustará HU-4.2. R-15: plazo de entrega, no de visita."},
-      "fecha_limite_conclusion": {"plazo": "fecha_limite_conclusion_actividades_septiembre", "nota": "RHF: 30-sep-2026 (y 30-oct-2026 para algunos conceptos, línea 3589)."}
+      "entrega_comprobacion": {"nombre": "Entrega del formato de verificación de la Delegación", "plazo": "verificacion_en_campo_formato_delegacion", "evento": "plazo:fecha_limite_conclusion_actividades_septiembre", "por_modalidad": {"rfi_modalidad_uno": {"evento": "plazo:fecha_limite_conclusion_actividades_octubre"}}, "nota": "RHF: 10 días hábiles desde la conclusión del concepto (línea 3592): septiembre en Bosques de agua, Preservación y RFI Modalidad dos; octubre en RFI Modalidad uno (10.1 t, líneas 3588 y 3589; R-19). R-15: plazo de entrega, no de visita."},
+      "fecha_limite_conclusion": {"plazo": "fecha_limite_conclusion_actividades_septiembre", "por_modalidad": {"rfi_modalidad_uno": {"plazo": "fecha_limite_conclusion_actividades_octubre"}}, "nota": "RHF: 30-sep-2026; 30-oct-2026 en Restauración Forestal Integral Modalidad uno (10.1 t, líneas 3588 y 3589)."}
     },
     "PSA": {
       "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "publicacion_resultados"},

@@ -1,0 +1,27 @@
+<div class="tarjeta mt-3" data-prueba="mis-envios">
+  <div class="titulo-seccion">Mis envíos a la Delegación</div>
+  {% if comprobaciones %}
+  <ul class="small" data-prueba="lista-envios">{% for c in comprobaciones %}
+    <li data-comprobacion="{{ c.tipo }}"><strong>{{ c.nombre }}</strong>{% if c.periodo %} ({{ c.periodo }}){% endif %} · {{ c.get_medio_display|lower }} · {{ c.enviada_en|date:"d/m/Y H:i" }} h
+      {% if c.en_plazo is True %}<span class="badge text-bg-success">en plazo</span>{% elif c.en_plazo is False %}<span class="badge text-bg-danger">fuera de plazo</span>{% endif %}
+      {% if c.acuse %} · acuse <a href="{% url 'portal:acuse' exp.folio c.acuse.folio %}">{{ c.acuse.folio }}</a>{% endif %}
+      {% if c.archivo %} · <a href="{% url 'ejecucion_portal:archivo' exp.folio c.pk %}">documento</a>{% endif %}</li>
+  {% endfor %}</ul>
+  {% else %}<div class="small text-secondary mb-2">Todavía no hay envíos.</div>{% endif %}
+
+  {% if puede_enviar %}
+  <form method="post" action="{% url 'ejecucion_portal:enviar' exp.folio %}" enctype="multipart/form-data" class="row g-2" id="form-envio-portal">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_envio.tipo.label_tag }}{{ form_envio.tipo }}</div>
+    {% if form_envio.fecha_hecho %}<div class="col-12 col-md-3">{{ form_envio.fecha_hecho.label_tag }}{{ form_envio.fecha_hecho }}<div class="form-text">{{ form_envio.fecha_hecho.help_text }}</div></div>{% endif %}
+    {% if form_envio.periodo %}<div class="col-12 col-md-3">{{ form_envio.periodo.label_tag }}{{ form_envio.periodo }}</div>{% endif %}
+    <div class="col-12 col-md-6">{{ form_envio.archivo.label_tag }}{{ form_envio.archivo }}</div>
+    <div class="col-12">{{ form_envio.descripcion.label_tag }}{{ form_envio.descripcion }}</div>
+    <div class="col-12"><button class="btn btn-primary" type="submit">Enviar a la Delegación</button></div>
+  </form>
+  <ul class="small text-secondary mt-2 mb-0">{% for t in tipos_envio %}<li><strong>{{ t.nombre }}</strong>: {{ t.descripcion }}</li>{% endfor %}</ul>
+  {% elif not con_cuenta %}
+  <div class="small text-secondary" data-prueba="consulta-sin-envio">En la consulta sin cuenta solo se ven los envíos y sus acuses. Para enviar, entre con su cuenta (CURP y contraseña) o entréguelo en la Delegación: queda el mismo registro.</div>
+  {% elif motivo_sin_envio %}
+  <div class="small text-secondary">{{ motivo_sin_envio }}</div>
+  {% endif %}
+</div>

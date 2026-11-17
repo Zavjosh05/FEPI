@@ -1,0 +1,12 @@
+{% if filas %}
+<div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+  <thead class="table-light"><tr><th>Solicitud</th><th>Comprobación</th><th>Medio</th><th>Fecha y hora</th><th>Plazo</th><th>Acuse</th>{% if revisar %}<th></th>{% endif %}</tr></thead>
+  <tbody>{% for c in filas %}{% with e=c.expediente %}
+  <tr data-folio="{{ e.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' e.folio %}?pestana=ejecucion">{{ e.folio }}</a><div class="text-secondary fw-normal">{{ e.beneficiaria.nombre }}</div></td>
+    <td>{{ c.nombre }}{% if c.periodo %} · {{ c.periodo }}{% endif %}</td><td>{{ c.get_medio_display }}</td>
+    <td class="text-nowrap">{{ c.enviada_en|date:"d/m/Y H:i" }} h</td>
+    <td>{% if c.en_plazo is True %}<span class="badge text-bg-success">En plazo</span>{% elif c.en_plazo is False %}<span class="badge text-bg-danger">Fuera de plazo</span>{% else %}—{% endif %}</td>
+    <td>{% if c.acuse %}<a href="{% url 'nucleo:acuse' c.acuse.folio %}" target="_blank">{{ c.acuse.folio }}</a>{% endif %}</td>
+    {% if revisar %}<td><form method="post" action="{% url 'ejecucion:revisada' c.pk %}">{% csrf_token %}<input type="hidden" name="siguiente" value="{% url 'ejecucion:comprobaciones' %}"><button class="btn btn-sm btn-outline-primary text-nowrap" type="submit">Marcar como revisado</button></form></td>{% endif %}</tr>
+  {% endwith %}{% endfor %}</tbody></table></div>
+{% else %}<div class="small text-secondary">Ninguna.</div>{% endif %}

@@ -19,6 +19,10 @@ vencimiento del ``Hito`` del evento (``datos["vence"]``: el plazo que fija el á
 ``periodos: "<clave en Ejercicio.datos>"`` vence al fin del periodo en curso (reportes mensuales de PEG, decisión propia
 mientras HU-4.3 no registre los entregados).
 
+``por_modalidad: {"<modalidad>": {...}}`` (HU-4.1) cambia la configuración para las modalidades nombradas: en RHF, la
+Restauración Forestal Integral Modalidad uno concluye en octubre y su entrega de la verificación corre desde ahí (10.1 t,
+líneas 3588 a 3592), no desde septiembre (R-19).
+
 Los eventos se leen así: ``recepcion_solicitud`` del expediente; ``aviso_direccion`` y
 ``notificacion_persona`` de ``nucleo.Notificacion``; cualquier otro, del último ``Hito`` con esa clave
 (lo registra el módulo que lo produce con ``registrar_hito``) o de una función de
@@ -53,6 +57,8 @@ NOMBRES_EVENTO = {
     "aviso_omision": "el aviso de la omisión",
     "plazo:fecha_limite_conclusion_actividades": "la fecha límite de conclusión de las actividades",
     "plazo:fecha_limite_conclusion_actividades_septiembre": "la fecha límite de conclusión de las actividades",
+    "plazo:fecha_limite_conclusion_actividades_octubre": "la fecha límite de conclusión de las actividades (octubre)",
+    "conclusion_actividades": "el término de las actividades",
 }
 
 
@@ -213,6 +219,10 @@ def vencimiento(expediente, uso, fecha_evento=None):
     config = config_uso(expediente.programa.clave, uso)
     if config is None:
         return None
+    if config.get("por_modalidad") and expediente.modalidad_id:  # solo entonces se consulta la modalidad
+        propio = config["por_modalidad"].get(expediente.modalidad.clave)
+        if propio:
+            config = {**config, **propio}
     plazo = expediente.ejercicio.plazo(config["plazo"]) if config.get("plazo") else None
     evento = config.get("evento", "")
     if config.get("evento_reasignada") and es_reasignada(expediente):

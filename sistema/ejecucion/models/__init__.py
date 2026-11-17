@@ -4,8 +4,8 @@
 - ``verificacion.py``  HU-4.2 Verificación en campo
 - ``reportes.py``  HU-4.3 Evaluación de reportes
 
-Todavía no hay modelos: cada historia crea su archivo, lo importa aquí y genera su migración con
-``python manage.py makemigrations ejecucion -n hu_4_1_comprobaciones``.
+Cada historia crea su archivo, lo importa aquí y genera su migración con
+``python manage.py makemigrations ejecucion -n hu_4_1_comprobaciones``. Hechos: HU-4.1 (``Comprobacion``).
 
 Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo):
 
@@ -22,3 +22,4 @@ Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo
 - Superficie verificada: ``extensiones.SUPERFICIE_APROBADA`` admite una función que dé la superficie verificada para que
   ``nucleo.montos`` ajuste la segunda ministración.
 """
+from .comprobaciones import Comprobacion, MedioEnvio  # noqa: E402,F401
