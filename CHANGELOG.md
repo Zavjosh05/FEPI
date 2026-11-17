@@ -4,6 +4,28 @@ Los cambios importantes del proyecto se anotan aquí. El formato sigue
 [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones siguen
 [Versionado Semántico](https://semver.org/lang/es/). Mientras sea prototipo, se queda en 0.x.
 
+## [0.11.0] - 2026-11-17
+
+Sprint 3 de la Calculadora: especies por municipio (HU-7.5, necesidad CF-DEV-05 de las Tablas v12,
+M7.5). Solo cambia la página; los resultados de `resultados/` son los mismos.
+
+### Agregado
+
+- **Especies registradas en el inventario** (HU-7.5): en el detalle de cada municipio, la lista de
+  especies del INFyS 2015–2020 de CONAFOR (científico, común, familia, árboles; por número de
+  árboles), lo identificado solo a género aparte y rotulado, el encabezado con la fuente, el periodo
+  y el aviso de la malla de 5 km, la atribución y la nota de licencia por confirmar. Los municipios
+  sin registros dicen «Sin registros en el inventario» y su tipo (conglomerado sin arbolado, 20; sin
+  conglomerado, 50; con registros, 55 de 125).
+- Vista «Inventario forestal» del mapa (en los dos modos) con leyenda y conteo; fuente añadida a
+  «Alcances».
+- `src/especies_infys.py`: agrega los CSV de `datos/edomex/infys/` por municipio (empata nombres sin
+  acentos si hace falta y falla con mensaje claro). `mapa_interactivo.py` lo incorpora con `--infys`
+  y publica `datos/especies.json` (~50 kB, se pide solo al consultarlo; también embebido en el
+  archivo único) y `inventario` en el índice. Nunca salen registros por árbol ni coordenadas.
+- Pruebas `pruebas/calculadora/test_hu_7_5_especies_por_municipio.py` (18) y capturas
+  `entregas/sprint_3/capturas/hu_7_5_*.png`.
+
 ## [0.10.0] - 2026-11-17
 
 Sprint 3 de la Calculadora: cambio de uso del suelo (HU-7.4, necesidad CF-DEV-04 de las Tablas v12,

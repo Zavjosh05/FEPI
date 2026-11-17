@@ -321,6 +321,16 @@ En los dos:
   imágenes (el final del periodo) y la fuente (Sentinel-2 entrenado con la Serie VII, 2021). Un año
   o periodo sin clasificación dice «sin dato», no cero; la pérdida por incendio va aparte. Sus
   datos están en `datos/destino/<periodo>.json` y `datos/cuadriculas/destino_<periodo>.png`.
+- **Especies registradas en el inventario** (HU-7.5, CF-DEV-05; en los dos modos): al elegir un
+  municipio, su detalle trae la lista de especies del INFyS 2015–2020 de CONAFOR (nombre
+  científico, nombre común, familia y árboles, de más a menos), lo identificado solo a género aparte
+  y rotulado así, el encabezado con la fuente y el periodo («muestreo en una malla de 5 km: es la
+  lista de lo registrado, no un inventario completo»; poco más de la mitad de los registros llega a
+  especie) y la atribución a CONAFOR con la nota de que la licencia está por confirmar. Un municipio
+  sin registros dice «Sin registros en el inventario» y distingue «conglomerado sin arbolado» de «sin
+  conglomerado» (55, 20 y 50 de 125). La vista «Inventario forestal» del mapa pinta esas tres
+  situaciones. Solo se publica el agregado por municipio (`datos/especies.json`, ~50 kB, se pide al
+  consultarlo), nunca los registros por árbol ni coordenadas.
 - **Año de pérdida** (CF-DEV-12): capa con el último año en que cada celda perdió bosque, un tono
   por año (violeta, de claro a oscuro), con cada año como capa que se prende y apaga. En "Comparar
   años" muestra los años de la comparación elegida.
@@ -348,7 +358,17 @@ python src/mapa_interactivo.py resultados/edomex_serie_2023_2025 resultados/edom
   --salida docs/mapa_edomex.html --sitio docs/calculadora
 ```
 
-Se puede pedir solo una de las dos (`--salida` o `--sitio`). Cada carpeta puede ser de `correr`
+Se puede pedir solo una de las dos (`--salida` o `--sitio`).
+
+**Especies del inventario (HU-7.5).** `src/especies_infys.py` arma el agregado que usa la página a
+partir de los CSV de `datos/edomex/infys/` (git los ignora; `mapa_interactivo.py` los lee con
+`--infys`, por defecto esa carpeta; `python src/especies_infys.py --nombres
+datos/edomex/municipios_edomex.gpkg` solo imprime el resumen). Empata los municipios con los de la
+página por nombre exacto y, si no, sin acentos ni mayúsculas, y se detiene con un mensaje si alguno
+no empata. Si faltan los CSV, se vuelven a sacar del archivo `INFyS_2015_2020_Mexico.xlsx`
+(https://idefor.cnf.gob.mx/documents/1078/download, 14 MB, sin cuenta): hoja Arbolado unida a la hoja
+Conglomerado por `IDConglomerado` (el municipio sale de ahí); ver `datos/edomex/infys/LEEME.md` y
+`entregas/sprint_2/investigacion_infys.md`. La licencia de estos datos no está confirmada. Cada carpeta puede ser de `correr`
 (una comparación) o de `serie` (varias, más el modo "Un año" y la evolución). Si dos carpetas traen
 el mismo par de años y temporada, gana la de la serie. Todas deben ser de la misma zona (mismo
 `--aoi`). `--validacion` agrega a "Alcances" la precisión contra Hansen. `--sitio` borra y vuelve a

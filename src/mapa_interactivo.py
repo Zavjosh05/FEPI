@@ -443,7 +443,7 @@ def _validacion(carpeta):
              "exhaustividad": _num(r.get("exhaustividad"), 3)} for _, r in v.iterrows()]
 
 
-def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, conafor=None):
+def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, conafor=None, infys=None):
     """Todos los archivos de datos de la página: {ruta relativa a datos/: dict (JSON) o bytes (PNG)}.
     Los dos modos de salida usan exactamente estos archivos."""
     periodos, carpeta_serie = {}, None
@@ -482,6 +482,15 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, 
     ultimo = max(anios_pub) if anios_pub else ULTIMO_ANIO_CONAFOR
 
     archivos = {"municipios.topojson": topo}
+    # Especies registradas en el INFyS (HU-7.5): agregado por municipio, archivo propio que se pide al consultarlo
+    inventario = None
+    if infys and Path(infys).exists():
+        import especies_infys
+        esp = especies_infys.construir(infys, nombres)
+        archivos["especies.json"] = esp
+        inventario = {k: esp[k] for k in ("fuente", "periodo", "anios_campo", "malla_km", "nota", "licencia", "resumen", "textos_situacion")}
+    else:
+        print(f"Aviso: no se encontró {infys}; la página no tendrá las especies del inventario.")
     for pp in periodos:
         # Años de la ventana del periodo sin capa de CONAFOR: sus incendios no se conocen (no son cero)
         pp["anios_sin_capa"] = [a for a in range(pp["base"], pp["actual"] + 1) if a > ultimo]
@@ -528,7 +537,7 @@ def armar_datos(carpetas, unidades, campo_unidad, titulo, ancho_px, validacion, 
         "anios": anios, "evolucion_estatal": evolucion,
         "conafor": {"anios": anios_pub or list(range(2019, ultimo + 1)), "ultimo": ultimo},
         "comparaciones": [{k: pp[k] for k in LIGEROS} for pp in periodos],
-        "serie": serie, "validacion": _validacion(validacion),
+        "serie": serie, "validacion": _validacion(validacion), "inventario": inventario,
         "pasos": {"clases": PASO_CLASES, "perdida": PASO_PERDIDA, "destino": PASO_DESTINO},
         "destinos": DESTINOS,
         "archivos": sorted(k for k in archivos if k != "indice.json")}
@@ -595,13 +604,15 @@ def main():
     p.add_argument("--fragmento", action="store_true",
                    help="con --salida: sin <html>/<head>/<body> (para publicarla como Artifact)")
     p.add_argument("--sitio", help="carpeta del sitio estático (index.html + datos/), p. ej. docs/calculadora")
+    p.add_argument("--infys", default="datos/edomex/infys",
+                   help="carpeta con los CSV del INFyS 2015-2020 (ver su LEEME.md), para las especies por municipio")
     p.add_argument("--incendios", default="datos/edomex/incendios_conafor_edomex.gpkg",
                    help="polígonos de incendios de CONAFOR (src/descargar_capas.py), para ubicar cada incendio")
     a = p.parse_args()
     if not a.salida and not a.sitio:
         p.error("falta --salida, --sitio o los dos")
 
-    archivos = armar_datos(a.carpetas, a.unidades, a.campo_unidad, a.titulo, a.ancho_px, a.validacion, a.incendios)
+    archivos = armar_datos(a.carpetas, a.unidades, a.campo_unidad, a.titulo, a.ancho_px, a.validacion, a.incendios, a.infys)
     idx = archivos["indice.json"]
     plantilla = (Path(__file__).resolve().parent / "plantilla_mapa.html").read_text(encoding="utf-8")
     resumen = (f"{len(idx['comparaciones'])} comparación(es)"

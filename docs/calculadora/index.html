@@ -126,6 +126,7 @@ button:focus-visible, input:focus-visible, tr:focus-visible { outline: 2px solid
 .vista-coropleta .u.k0 { fill: var(--div-0); } .vista-coropleta .u.k1 { fill: var(--div-1); } .vista-coropleta .u.k2 { fill: var(--div-2); }
 .vista-coropleta .u.k3 { fill: var(--div-3); } .vista-coropleta .u.k4 { fill: var(--div-4); } .vista-coropleta .u.k5 { fill: var(--div-5); }
 .vista-coropleta .u.poco { fill: url(#rayas); }
+.vista-coropleta .u.i-con { fill: var(--den-2); } .vista-coropleta .u.i-cgl { fill: var(--d-agricola); } .vista-coropleta .u.i-sin { fill: url(#rayas); }
 .u.encima { stroke: var(--sel); stroke-width: 1.6; }
 .contorno { fill: none; stroke: var(--contorno); stroke-width: 1.4; vector-effect: non-scaling-stroke; pointer-events: none; }
 .seleccion { fill: none; stroke: var(--sel); stroke-width: 2.6; vector-effect: non-scaling-stroke; pointer-events: none; }
@@ -156,6 +157,20 @@ button:focus-visible, input:focus-visible, tr:focus-visible { outline: 2px solid
 .detalle .tipos td + td, .detalle .tipos th + th { padding-left: 10px; white-space: nowrap; }
 .detalle .tipos tfoot td { font-weight: 600; border-bottom: 0; }
 .detalle .tipos tfoot td:first-child { color: var(--ink); }
+.detalle .especies, .lado .detalle section.especies { display: grid; gap: 8px; margin-top: 10px; border-top: 1px solid var(--line); padding: 10px 0 0; }
+.detalle .especies h4, .detalle .especies p { margin: 0; }
+.detalle .especies .aviso { font-size: .86rem; padding: 8px 10px; }
+.detalle .especies .aviso p + p { margin-top: 4px; }
+.detalle .especies .sin-registros { background: var(--aviso-bg); color: var(--aviso-ink); border-radius: 8px; padding: 8px 10px; font-size: .92rem; }
+.detalle .especies .sin-registros p + p { margin-top: 4px; }
+.detalle .especies .desplazable { max-height: 20rem; overflow: auto; border: 1px solid var(--line); border-radius: 6px; padding: 0 8px; }
+.detalle .especies .desplazable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.detalle .especies table { font-size: .86rem; }
+.detalle .especies thead th { position: sticky; top: 0; background: var(--surface); }
+.detalle .especies th, .detalle .especies td { text-align: left; padding: 4px 6px 4px 0; vertical-align: top; }
+.detalle .especies th:last-child, .detalle .especies td:last-child { text-align: right; white-space: nowrap; }
+.detalle .especies td:first-child { color: var(--ink); } .detalle .especies td:nth-child(2), .detalle .especies td:nth-child(3) { color: var(--ink-2); }
+.detalle .especies .atribucion { color: var(--ink-3); font-size: .82rem; }
 .serie-graf { position: relative; }
 .serie-graf svg { display: block; width: 100%; height: 150px; overflow: visible; }
 .serie-graf .eje text { fill: var(--ink-3); font: .75rem var(--f-texto); font-variant-numeric: tabular-nums; }
@@ -553,6 +568,12 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     if (p.destino) return;
     p.destino = await leer(`destino/${p.id}.json`);
   }
+  // Especies del inventario (HU-7.5): agregado por municipio, solo al elegir un municipio o la vista del inventario
+  let ESP = null;
+  async function cargarEspecies() {
+    if (!D.inventario || ESP) return;
+    ESP = await leer("especies.json");
+  }
   const aniosCargados = new Set();
   async function cargarAnio(t) {
     if (aniosCargados.has(t)) return;
@@ -576,6 +597,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   // todas las comparaciones de su detalle. Las cuadrículas las pide pintarRaster.
   function necesidades(e) {
     const tareas = [];
+    if (D.inventario && (e.sel || e.vista === "inventario")) tareas.push(cargarEspecies());
     const todosLosAnios = () => { if (S) { S.anios.forEach((a, t) => tareas.push(cargarAnio(t))); tareas.push(cargarTendencias()); } };
     if (e.modo === "anio") {
       tareas.push(cargarAnio(e.t), cargarAnio(0), cargarTendencias());
@@ -774,13 +796,15 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     anio: [["bosque", "Bosque"], ["tendencia", "Tendencia por municipio"]],
   };
   if (S) { VISTAS.comparar.push(["perdida", "Año de pérdida"]); VISTAS.anio.push(["perdida", "Año de pérdida"]); }
-  const coropleta = () => st.vista === "neto" || st.vista === "tendencia";
+  if (D.inventario) { VISTAS.comparar.push(["inventario", "Inventario forestal"]); VISTAS.anio.push(["inventario", "Inventario forestal"]); }
+  const coropleta = () => st.vista === "neto" || st.vista === "tendencia" || st.vista === "inventario";
+  const claseInv = nombre => { const r = ESP && ESP.municipios[nombre]; return r ? { con_registros: "i-con", conglomerado_sin_arbolado: "i-cgl", sin_conglomerado: "i-sin" }[r.situacion] : "poco"; };
   function pintarVistas() {
     const el = document.getElementById("vistas");
     el.innerHTML = VISTAS[st.modo].map(([v, t]) => `<button type="button" role="radio" data-vista="${v}" aria-checked="${v === st.vista}">${t}</button>`).join("");
     el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
       // La capa de incendios necesita su archivo: el cambio pasa por actualizar, que lo pide y luego pinta
-      if (b.dataset.vista === "incendios") { actualizar(e => { e.vista = "incendios"; }); return; }
+      if (b.dataset.vista === "incendios" || b.dataset.vista === "inventario") { actualizar(e => { e.vista = b.dataset.vista; }); return; }
       st.vista = b.dataset.vista; pintarVistas(); pintarCoropletas(); pintarLeyenda(); pintarRaster(); pintarPuntos();
     }));
   }
@@ -853,7 +877,7 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   }
 
   function pintarCoropletas() {
-    unidades.attr("class", u => "u " + (st.vista === "tendencia" ? claseTend(u.nombre) : clase(fila(u.nombre))));
+    unidades.attr("class", u => "u " + (st.vista === "tendencia" ? claseTend(u.nombre) : st.vista === "inventario" ? claseInv(u.nombre) : clase(fila(u.nombre))));
     d3.select("#mapa").classed("vista-coropleta", coropleta());
   }
 
@@ -861,7 +885,10 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
   const globo = document.getElementById("globo"), lienzo = document.getElementById("lienzo");
   function mostrarGlobo(e, u) {
     let cuerpo;
-    if (enAnio()) {
+    if (st.vista === "inventario") {
+      const r = ESP && ESP.municipios[u.nombre];
+      cuerpo = r ? `<dl><dt>Inventario ${esc(D.inventario.periodo)}</dt><dd>${TEXTO_SIT[r.situacion]}</dd>${r.situacion === "con_registros" ? `<dt>Árboles registrados</dt><dd>${nf.format(r.arboles)}</dd><dt>Especies</dt><dd>${nf.format(r.especies.length)}</dd>` : ""}</dl>` : "<div>Sin datos</div>";
+    } else if (enAnio()) {
       const s = serieDe(u.nombre), r = s && s[st.t], tn = tendDe(u.nombre), a = S.anios[st.t];
       cuerpo = r ? `<dl>
         <dt>Bosque ${a}</dt><dd>${ha(r[IS.bosque])}</dd>
@@ -971,8 +998,52 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       + `. Es un clasificador${ex && ex.global != null ? ` con ${nf.format(ex.global * 100)} % de acuerdo con la Serie VII (kappa ${nf2.format(ex.kappa)})` : ""}, no una verificación.`;
   }
 
+  // ---------- Especies registradas en el inventario (HU-7.5 / CF-DEV-05) ----------
+  const TEXTO_SIT = D.inventario ? D.inventario.textos_situacion : {};
+  const plural = (n, uno, varios) => `${nf.format(n)} ${n === 1 ? uno : varios}`;
+  function tablaEspecies(filas, primera, id) {
+    return `<div class="desplazable" tabindex="0" role="region" aria-label="${esc(primera)}"><table id="${id}"><thead><tr><th scope="col">${primera}</th><th scope="col">Nombre común</th><th scope="col">Familia</th><th scope="col">Árboles</th></tr></thead>
+      <tbody>${filas.map(f => `<tr><td><i>${esc(f[0])}</i></td><td>${esc(f[1] || "—")}</td><td>${esc(f[2])}</td><td>${nf.format(f[4])}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  function seccionEspecies(nombre) {
+    const inv = D.inventario;
+    if (!inv) return "";
+    const r = inv.resumen, sit = r.situacion, pe = r.pct_a_especie;
+    const mitad = pe >= 0.5 && pe < 0.6 ? "Poco más de la mitad" : `El ${nf1.format(pe * 100)} %`;
+    const aviso = `<div class="aviso" id="especies-fuente" role="note"><p><strong>${esc(inv.fuente)}; muestreo en una malla de ${inv.malla_km} km: es la lista de lo registrado, no un inventario completo.</strong></p>
+      <p>${mitad} de los registros del Estado (${nf1.format(pe * 100)} %) llega a especie; el resto se identificó solo a género o no se identificó. Años de campo: ${listaAnios(inv.anios_campo)}.</p></div>`;
+    const pie = `<p class="atribucion">Fuente: CONAFOR, Inventario Nacional Forestal y de Suelos, ciclo ${esc(inv.periodo)}, vía IDEFOR. ${esc(inv.licencia)}</p>`;
+    const titulo = `<h4 id="especies-titulo">Especies registradas en el inventario${nombre ? " · " + esc(nombre) : ""}</h4>`;
+    if (!nombre) {
+      return `<section class="especies" id="especies" aria-labelledby="especies-titulo">${titulo}${aviso}
+        <p class="vacio" id="especies-estado">Municipios del Estado: ${nf.format(sit.con_registros)} con registros, ${nf.format(sit.conglomerado_sin_arbolado)} con conglomerado sin arbolado y ${nf.format(sit.sin_conglomerado)} sin conglomerado, de ${nf.format(r.municipios)}. Elige un municipio para ver su lista; el mapa tiene la vista «Inventario forestal».</p>${pie}</section>`;
+    }
+    const m = ESP && ESP.municipios[nombre];
+    if (!m) return `<section class="especies" id="especies" aria-labelledby="especies-titulo">${titulo}${aviso}<p class="vacio">Sin datos del inventario para este municipio.</p>${pie}</section>`;
+    const [total, muestreados, conArb] = m.cgl;
+    let cuerpo;
+    if (m.situacion === "con_registros") {
+      const anios = listaAnios(m.anios);
+      cuerpo = `<p id="especies-resumen"><strong>${plural(m.arboles, "árbol registrado", "árboles registrados")}</strong> en ${plural(conArb, "conglomerado con arbolado", "conglomerados con arbolado")} (años de campo ${anios}). ${nf.format(m.a_especie)} llegan a especie, ${nf.format(m.solo_genero)} solo a género y ${nf.format(m.sin_identificar)} no se identificaron.</p>`
+        + (m.especies.length ? `<h4>Especies (${nf.format(m.especies.length)}), por número de árboles</h4>` + tablaEspecies(m.especies, "Nombre científico", "tabla-especies")
+          : `<p class="vacio" id="especies-ninguna">Ningún registro de este municipio llega a especie.</p>`)
+        + (m.generos.length ? `<h4 id="generos-titulo">Identificado solo a género (${nf.format(m.generos.length)})</h4><p class="vacio">No se pudo precisar la especie; no se cuentan como especies.</p>` + tablaEspecies(m.generos, "Género", "tabla-generos") : "");
+    } else if (m.situacion === "conglomerado_sin_arbolado") {
+      cuerpo = `<div class="sin-registros" id="especies-sin-registros" data-situacion="${m.situacion}"><p><strong>Sin registros en el inventario.</strong></p>
+        <p>Conglomerado sin arbolado: el municipio tiene ${plural(total, "conglomerado del inventario", "conglomerados del inventario")} (${plural(muestreados, "muestreado", "muestreados")}), pero ninguno con árboles registrados. No significa que no tenga bosque.</p></div>`;
+    } else {
+      cuerpo = `<div class="sin-registros" id="especies-sin-registros" data-situacion="${m.situacion}"><p><strong>Sin registros en el inventario.</strong></p>
+        <p>Sin conglomerado: no cayó ningún conglomerado del inventario en este municipio (la malla es de ${inv.malla_km} km). No significa que no tenga bosque.</p></div>`;
+    }
+    return `<section class="especies" id="especies" aria-labelledby="especies-titulo" data-situacion="${m.situacion}">${titulo}${aviso}${cuerpo}${pie}</section>`;
+  }
+
   function pintarDetalle() {
     const el = document.getElementById("detalle");
+    pintarDetalleBase(el);
+    el.insertAdjacentHTML("beforeend", seccionEspecies(st.sel));
+  }
+  function pintarDetalleBase(el) {
     if (enAnio()) {
       el.innerHTML = (st.sel ? `<h3>${esc(st.sel)}</h3>` + graficaSerie(st.sel) : `<h3>Detalle</h3><p class="vacio">Toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver su serie y su bosque por tipo. Abajo, toda la zona.</p>`)
         + tiposAnio(st.sel);
@@ -1322,6 +1393,13 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
       nota.textContent = d.total && d.tiene_cuadricula
         ? `Estimación por clasificación de imágenes Sentinel-2 (exactitud: ${exactitudTxt(d)}). ${celdas} toma el uso más frecuente entre sus píxeles de otra pérdida, así que se ven más grandes de lo que son; las hectáreas son las del periodo. La pérdida por incendio no se clasifica.`
         : "Sin dato: este periodo no tiene clasificación del uso al que pasó el terreno perdido.";
+    } else if (st.vista === "inventario") {
+      const sit = D.inventario.resumen.situacion, tot = D.inventario.resumen.municipios;
+      titulo.textContent = `Inventario forestal ${D.inventario.periodo}`;
+      ul.innerHTML = `<li><span class="muestra" style="background:var(--den-2)"></span>Con registros<span class="cifra-ha">${nf.format(sit.con_registros)}</span></li>
+        <li><span class="muestra" style="background:var(--d-agricola)"></span>Conglomerado sin arbolado<span class="cifra-ha">${nf.format(sit.conglomerado_sin_arbolado)}</span></li>
+        <li><svg class="muestra" viewBox="0 0 16 12" aria-hidden="true"><rect width="16" height="12" fill="url(#rayas)"></rect></svg>Sin conglomerado<span class="cifra-ha">${nf.format(sit.sin_conglomerado)}</span></li>`;
+      nota.textContent = `Situación de cada municipio en el ${D.inventario.fuente}: ${nf.format(sit.con_registros)} de ${nf.format(tot)} tienen árboles registrados (el muestreo es una malla de ${D.inventario.malla_km} km). «Conglomerado sin arbolado»: cayó un conglomerado pero no se registró ningún árbol. «Sin conglomerado»: no cayó ninguno. Sin registros no significa sin bosque. ${D.inventario.licencia}`;
     } else if (st.vista === "incendios") {
       const p = P();
       titulo.textContent = "Incendios";
@@ -1456,10 +1534,10 @@ table.municipios { width: 100%; border-collapse: collapse; font-variant-numeric:
     const exact = S ? Object.entries(S.exactitud).filter(([, v]) => v && v.global != null) : [];
     const val = D.validacion || [];
     const bloques = [
-      ["Qué mide", `<p>La superficie con cobertura arbórea (hectáreas) dentro de la zona forestal: un píxel de 10 m cuenta como bosque si su NDVI es de ${nf2.format(umbral)} o más. De un año a otro separa la pérdida por incendio (dentro de un polígono de CONAFOR con dNBR ≥ 0.27), las otras pérdidas y la ganancia. No mide biomasa, carbono, densidad del arbolado ni especies.</p>`],
+      ["Qué mide", `<p>La superficie con cobertura arbórea (hectáreas) dentro de la zona forestal: un píxel de 10 m cuenta como bosque si su NDVI es de ${nf2.format(umbral)} o más. De un año a otro separa la pérdida por incendio (dentro de un polígono de CONAFOR con dNBR ≥ 0.27), las otras pérdidas y la ganancia. No mide biomasa, carbono, densidad del arbolado ni especies (la lista de especies registradas viene del inventario de CONAFOR y es aparte).</p>`],
       ["Dónde", `<p>${esc(D.titulo)}, por municipio, dentro de la zona forestal de INEGI Serie VII${zona}: bosques, selva baja caducifolia, matorrales y vegetación secundaria arbórea${S && S.clases ? ` (claves ${esc(S.clases)})` : ""}. Fuera de esa zona no se cuenta bosque.</p>`],
       ["Cuándo", `<p>Un compuesto de noviembre-diciembre por año (${anios.join(", ")}): sin lluvias, con las parcelas secas y antes de la temporada de incendios. Los incendios de cada periodo van del 1 de noviembre al 31 de octubre.${pre.length ? ` Además, un preliminar ${pre.map(p => `${p.meses} ${p.base} → ${p.actual}`).join("; ")}, de otra temporada, que no se compara con los anteriores.` : ""}</p>`],
-      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta ${D.conafor.ultimo}.</li><li>Uso de suelo y vegetación Serie VII de INEGI (2021) y límites municipales (IDEFOR). INEGI no ha publicado uso del suelo oficial posterior; el uso al que pasó el terreno perdido es una estimación con Sentinel-2 entrenada con esa serie.</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
+      ["Con qué fuentes", `<ul><li>Sentinel-2 L2A (ESA Copernicus), del catálogo libre Earth Search en AWS.</li><li>Polígonos de incendios de CONAFOR (IDEFOR), hasta ${D.conafor.ultimo}.</li>${D.inventario ? `<li>${esc(D.inventario.fuente)}, vía IDEFOR: solo para la lista de especies registradas por municipio (muestreo en una malla de ${D.inventario.malla_km} km; no entra en las cifras del bosque).</li>` : ""}<li>Uso de suelo y vegetación Serie VII de INEGI (2021) y límites municipales (IDEFOR). INEGI no ha publicado uso del suelo oficial posterior; el uso al que pasó el terreno perdido es una estimación con Sentinel-2 entrenada con esa serie.</li>${val.length ? "<li>Hansen Global Forest Change v1.13 (UMD), solo para validar.</li>" : ""}</ul>`],
     ];
     if (S) {
       const sin = S.sin_encadenar;
