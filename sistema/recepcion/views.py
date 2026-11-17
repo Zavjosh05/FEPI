@@ -52,6 +52,8 @@ def registrar(request):
                 rfc=d["rfc"], telefono=d["telefono"], correo=d["correo"], representante=d["representante"],
                 con_representante_legal=d["con_representante_legal"], es_refrendo=d["es_refrendo"],
                 predio_existente=d["predio_existente"], observaciones=d["observaciones"],
+                beneficiaria_nombre=d.get("beneficiaria_nombre", ""), beneficiaria_curp=d.get("beneficiaria_curp", ""),
+                beneficiaria_telefono=d.get("beneficiaria_telefono", ""),
             )
             try:
                 exp = servicios.registrar_solicitud(request.user, datos)
@@ -287,8 +289,9 @@ def validar(request, folio):
                 if val.resultado == ResultadoValidacion.VALIDADO:
                     messages.success(request, f"Expediente validado. Constancia {val.acuse.folio}.")
                 else:
+                    limite = f"{val.fecha_limite:%d/%m/%Y}" if val.fecha_limite else "sin plazo en las reglas"
                     messages.success(request, f"Aviso de faltantes {val.acuse.folio} emitido con fecha límite "
-                                              f"{val.fecha_limite:%d/%m/%Y}; se notifica por conducto de "
+                                              f"{limite}; se notifica por conducto de "
                                               f"{exp.delegacion.nombre}.")
                 return redirect(reverse("recepcion:expediente", args=[folio]) + "?pestana=validacion")
     contexto["evaluacion"] = servicios.evaluar_para_validacion(exp)

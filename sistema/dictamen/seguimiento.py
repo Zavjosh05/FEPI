@@ -28,9 +28,16 @@ def tipo_acuerdo(clave):
     return next((t for t in datos_dictamen()["tipos_acuerdo"] if t["clave"] == clave), None)
 
 
-def unidad_sugerida(clave_tipo):
+def unidad_sugerida(clave_tipo, ejercicio=None):
+    """Área que cumple el acuerdo por omisión (``datos/dictamen.json``). Si es una Dirección que no es Instancia
+    Ejecutora del programa (la DRFF en PEG), se sugiere la Dirección del programa (Protección Forestal)."""
     t = tipo_acuerdo(clave_tipo)
-    return Unidad.objects.filter(clave=t.get("unidad")).first() if t else None
+    unidad = Unidad.objects.filter(clave=t.get("unidad")).first() if t else None
+    if unidad is not None and ejercicio is not None and unidad.tipo == TipoUnidad.DIRECCION \
+            and not unidad.programas.filter(pk=ejercicio.programa_id).exists():
+        propia = Unidad.objects.filter(tipo=TipoUnidad.DIRECCION, programas=ejercicio.programa_id).first()
+        return propia or unidad
+    return unidad
 
 
 def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_responsable=None, ministracion=None,
@@ -53,7 +60,7 @@ def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_re
         raise ValidationError("Indique a qué expedientes aplica el acuerdo.")
     if any(e.ejercicio_id != sesion.ejercicio_id for e in expedientes):
         raise ValidationError("Todos los expedientes deben ser del programa y ejercicio de la sesión.")
-    unidad_responsable = unidad_responsable or unidad_sugerida(tipo)
+    unidad_responsable = unidad_responsable or unidad_sugerida(tipo, sesion.ejercicio)
     if unidad_responsable is None:
         raise ValidationError("Indique el área que debe cumplir el acuerdo.")
     if definicion.get("pide") == "ministracion":

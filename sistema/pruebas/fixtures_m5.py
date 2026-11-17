@@ -11,7 +11,8 @@ from pagos import pagos, solicitudes
 from .fixtures_m2 import documento_sesion, fecha_sesion
 from .fixtures_m3 import PEG_SOLICITUD, SOLICITUDES_M3, delegado_de
 
-__all__ = ["con_soportes", "instruir_pago", "solicitada", "aceptada", "peg_contratado", "remitida", "entregado"]
+__all__ = ["con_soportes", "instruir_pago", "validar_reportes", "solicitada", "aceptada", "peg_contratado", "remitida",
+           "entregado"]
 
 
 def instruir_pago(usuarios, expediente, ministracion=1):
@@ -24,6 +25,16 @@ def instruir_pago(usuarios, expediente, ministracion=1):
     return seguimiento.registrar_acuerdo(
         usuarios["comite"], s, "instruccion_pago", f"Instruir el pago de la ministración {ministracion}", [expediente],
         Unidad.objects.get(clave="FIDUCIARIA"), ministracion=ministracion)
+
+
+def validar_reportes(usuarios, expediente, periodos=("2026-01",)):
+    """PEG: sesión de seguimiento del CASPEG que valida la evaluación de los reportes de los periodos dados (HU-2.4)."""
+    s = sesiones.crear_sesion(usuarios["comite"], expediente.ejercicio, TipoSesion.SEGUIMIENTO, fecha_sesion(8), "Sala",
+                              "Quórum\nValidación de reportes")
+    sesiones.agregar_documento(usuarios["comite"], s, documento_sesion(), "Reportes")
+    sesiones.enviar_convocatoria(usuarios["comite"], s)
+    return [seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes", f"Se validan los reportes de {p}",
+                                          [expediente], periodo=p) for p in periodos]
 
 
 @pytest.fixture
@@ -44,6 +55,8 @@ def con_soportes(contratadas, usuarios, pdf, monkeypatch):
                 solicitudes.adjuntar_comprobante(deleg, exp, pdf("cuenta.pdf"))
             if instruccion and programa == "PSA":
                 instruir_pago(usuarios, exp)
+            if instruccion and programa == "PEG":
+                validar_reportes(usuarios, exp)
             exp.refresh_from_db()
         return exps[0] if cuantas == 1 else exps
     return _crear
@@ -81,10 +94,13 @@ def peg_contratado(peg, contrato_manual, usuarios, pdf):
 
     def _crear():
         exp = contrato_manual(peg, direccion="dir_dpf", **PEG_SOLICITUD)
+        deleg = delegado_de(usuarios, exp)
         firma.registrar_firma(
-            delegado_de(usuarios, exp), exp, None, "persona", "Guardabosque", pdf("firmado.pdf"),
+            deleg, exp, None, "persona", "Guardabosque", pdf("firmado.pdf"),
             [p["clave"] for p in firma.puntos_de_verificacion(exp)],
             {"credencial_guardabosque": {"archivo": pdf("credencial.pdf"), "dato": "CRED-0001"}})
+        solicitudes.adjuntar_comprobante(deleg, exp, pdf("cuenta.pdf"))
+        validar_reportes(usuarios, exp)
         exp.refresh_from_db()
         return exp
     return _crear

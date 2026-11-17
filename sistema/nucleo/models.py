@@ -332,7 +332,7 @@ class MontoApoyo(models.Model):
 
 
 class Ministracion(models.Model):
-    """Porcentaje de cada ministración por régimen (sprint 2)."""
+    """Porcentaje de cada ministración por régimen."""
 
     ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, related_name="ministraciones")
     numero = models.PositiveIntegerField()
@@ -409,6 +409,7 @@ class TipoPersonaGeneral(models.TextChoices):
     JURIDICA_COLECTIVA = "juridica_colectiva", "Persona jurídico colectiva"
     NUCLEO_AGRARIO = "nucleo_agrario", "Núcleo agrario"
     PRESTADOR = "prestador", "Prestador de servicios forestales"
+    GUARDABOSQUE = "guardabosque", "Guardabosque"
 
 
 class Persona(models.Model):
@@ -479,6 +480,9 @@ class Expediente(models.Model):
     ejercicio = models.ForeignKey(Ejercicio, on_delete=models.PROTECT, related_name="expedientes")
     predio = models.ForeignKey(Predio, on_delete=models.PROTECT, related_name="expedientes")
     solicitante = models.ForeignKey(Persona, on_delete=models.PROTECT, related_name="solicitudes")
+    persona_beneficiaria = models.ForeignKey(
+        Persona, null=True, blank=True, on_delete=models.PROTECT, related_name="apoyos",
+        help_text="Persona beneficiaria cuando no es quien solicita (PEG: el Guardabosque que designa el núcleo agrario).")
     tipo_persona = models.ForeignKey(TipoPersona, on_delete=models.PROTECT)
     modalidad = models.ForeignKey(Modalidad, null=True, blank=True, on_delete=models.PROTECT)
     es_refrendo = models.BooleanField(default=False)
@@ -503,6 +507,11 @@ class Expediente(models.Model):
     @property
     def programa(self):
         return self.ejercicio.programa
+
+    @property
+    def beneficiaria(self):
+        """La persona que recibe el apoyo: la beneficiaria propia (Guardabosque en PEG) o quien solicita."""
+        return self.persona_beneficiaria or self.solicitante
 
     def save(self, *args, **kwargs):
         if not self.folio:

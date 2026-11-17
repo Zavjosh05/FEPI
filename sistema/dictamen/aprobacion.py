@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from nucleo import montos
+from nucleo import montos, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
 from nucleo.templatetags.moneda import formato_moneda
@@ -188,4 +188,8 @@ def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones="", mome
                 + (f", lugar {r.orden}" if r.orden else ""),
                 datos={"sesion": sesion.pk, "orden": r.orden},
             )
+            if r.resultado == ResultadoListado.BENEFICIARIA:
+                # Evento de arranque de plazos: en PEG la firma corre desde la aprobación del CASPEG (R-18).
+                plazos.registrar_hito(r.expediente, "aprobacion_comite", usuario, ahora, referencia=sesion.numero,
+                                      datos={"sesion": sesion.pk})
     return acuse

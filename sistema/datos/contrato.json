@@ -17,7 +17,17 @@
         {"clave": "firma_tesoreria", "texto": "Firma de la Tesorería del Comisariado"},
         {"clave": "sello_nucleo", "texto": "Sello del núcleo agrario"},
         {"clave": "firma_probosque", "texto": "Firma por PROBOSQUE"}
+      ],
+      "guardabosque_y_nucleo": [
+        {"clave": "firma_guardabosque", "texto": "Firma de la persona Guardabosque (persona beneficiaria)"},
+        {"clave": "firma_comisariado", "texto": "Firma de las personas que integran el Comisariado del núcleo agrario"},
+        {"clave": "sello_nucleo", "texto": "Sello del núcleo agrario"},
+        {"clave": "firma_probosque", "texto": "Firma por PROBOSQUE"}
       ]
+    },
+    "por_programa": {
+      "nota": "Listas propias de un programa (ganan sobre el tipo de persona). PEG: el contrato lo requisita la persona beneficiaria (el Guardabosque) para su firma y sello del núcleo agrario por cada una de las partes (ROP PEG 10.1 fr. XII, líneas 9021 a 9023).",
+      "PEG": "guardabosque_y_nucleo"
     },
     "equivalencias": {
       "institucion_educativa_o_osc": "juridica_colectiva",
@@ -26,7 +36,7 @@
     "por_omision": "fisica"
   },
   "formalizacion_propia": {
-    "nota": "Lo que cada programa pide además del contrato firmado. Sin estos elementos la firma no se da por completa. MFS y PEG todavía no tienen archivo de reglas: se definen aquí (sprint 3 los mueve a sus reglas).",
+    "nota": "Lo que cada programa pide además del contrato firmado. Sin estos elementos la firma no se da por completa. Las reglas de MFS y PEG no traen estos elementos como lista (solo en el texto que se cita): se definen aquí.",
     "MFS": {
       "fundamento": "MFS: el apoyo se otorga al contar con el Contrato de Adhesión y, en su caso, el contrato de Prestación de Servicios Técnicos (línea 8091); la persona elige libremente al prestador, con su RFN, y presenta carta compromiso bajo protesta de decir verdad de que no está suspendido o revocado (derechos, inciso f, líneas 7775 a 7778).",
       "elementos": [

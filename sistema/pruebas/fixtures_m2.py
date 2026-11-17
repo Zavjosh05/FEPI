@@ -17,7 +17,8 @@ __all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "regis
 
 def registrar_validada(usuarios, ejercicio, municipio="Amecameca", nombre="Predio M2", ha=6, desplazamiento=(0, 0),
                        usuario="del_amecameca", direccion="dir_drff", tipo="fisica", modalidad="reforestacion",
-                       refrendo=False, curp="", solicitante="Persona Solicitante M2", solicitante_tipo=None):
+                       refrendo=False, curp="", solicitante="Persona Solicitante M2", solicitante_tipo=None,
+                       beneficiaria="", beneficiaria_curp=""):
     """Solicitud registrada, completa, con polígono, enviada y validada (con los servicios del sistema)."""
     deleg = usuarios[usuario]
     datos = recepcion.DatosSolicitud(
@@ -26,6 +27,7 @@ def registrar_validada(usuarios, ejercicio, municipio="Amecameca", nombre="Predi
         modalidad=ejercicio.modalidades.filter(clave=modalidad).first() if modalidad else None,
         solicitante_nombre=solicitante, solicitante_tipo=solicitante_tipo or (tipo if tipo in TipoPersonaGeneral.values else "fisica"), es_refrendo=refrendo, curp=curp,
         superficie_solicitada_ha=Decimal(ha) if ha is not None else None,
+        beneficiaria_nombre=beneficiaria, beneficiaria_curp=beneficiaria_curp,
     )
     exp = recepcion.registrar_solicitud(deleg, datos)
     completar_requisitos(deleg, exp, fecha_archivo=timezone.localdate() - timedelta(days=300) if refrendo else None)
@@ -88,6 +90,8 @@ def registrar_peg(usuarios, ejercicio, nombre="Ejido San Juan", solicitante="Eji
     kw.setdefault("tipo", "nucleo_agrario")
     kw.setdefault("modalidad", "apoyo_monetario_guardabosque")
     kw.setdefault("ha", None)
+    kw.setdefault("beneficiaria", "Margarito Sánchez Ruiz")
+    kw.setdefault("beneficiaria_curp", "SARM800101HMCNZR09")
     return registrar_validada(usuarios, ejercicio, nombre=nombre, solicitante=solicitante, **kw)
 
 

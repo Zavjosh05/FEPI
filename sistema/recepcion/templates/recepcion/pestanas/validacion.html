@@ -3,7 +3,7 @@
   <div class="d-flex flex-wrap justify-content-between gap-2">
     <div>
       <div class="titulo-seccion mb-1">Aviso de faltantes vigente</div>
-      <div>Fecha límite para entregar: <strong data-prueba="fecha-limite">{{ aviso.fecha_limite|date:"d/m/Y" }}</strong></div>
+      <div>Fecha límite para entregar: <strong data-prueba="fecha-limite">{{ aviso.fecha_limite|date:"d/m/Y"|default:"sin plazo en las reglas" }}</strong></div>
       <div class="small text-secondary">Plazo aplicado: {{ aviso.plazo_aplicado }} · emitido el {{ aviso.fecha_hora|date:"d/m/Y H:i:s" }} h por {{ aviso.usuario }}</div>
       {% if aviso.notificado_en %}
       <div class="small text-success mt-1">Notificado a la persona solicitante por conducto de la Delegación el {{ aviso.notificado_en|date:"d/m/Y H:i:s" }} h ({{ aviso.notificado_por }}).</div>

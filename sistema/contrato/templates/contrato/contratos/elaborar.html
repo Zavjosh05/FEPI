@@ -18,8 +18,8 @@
         <tr><th>Persona</th><td>{{ exp.solicitante.nombre }} ({{ exp.tipo_persona.nombre }})</td></tr>
         <tr><th>Predio</th><td>{{ exp.predio.nombre }}, {{ exp.predio.municipio.nombre }}</td></tr>
         <tr><th>Modalidad</th><td>{{ exp.modalidad.nombre|default:"—" }}</td></tr>
-        <tr><th>Superficie aprobada</th><td>{{ monto.superficie_ha|floatformat:"-4" }} ha</td></tr>
-        <tr><th>Monto</th><td>{{ monto.total|moneda }} ({{ monto.monto_ha|moneda }} por hectárea)</td></tr>
+        {% if monto.por_hectarea %}<tr><th>Superficie aprobada</th><td>{{ monto.superficie_ha|floatformat:"-4" }} ha</td></tr>{% endif %}
+        <tr><th>Monto</th><td>{{ monto.total|moneda }} ({{ monto.texto_base }}){% if monto.nota %}<div class="small text-secondary">{{ monto.nota }}</div>{% endif %}</td></tr>
         <tr><th>Ministraciones</th><td>{% for m in monto.ministraciones %}{{ m.numero }}.ª: {{ m.porcentaje|floatformat:"-2" }} % ({{ m.importe|moneda }}){% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td></tr>
       </table>
     </div>

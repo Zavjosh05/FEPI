@@ -1,9 +1,13 @@
-"""Recorrido completo del prototipo del sprint 2 con una solicitud por programa (CC, PS, RHF y PSAHEM).
+"""Recorrido completo del prototipo del sprint 2 con una solicitud por programa (CC, PS, RHF, PSAHEM, MFS y PEG).
 
 «La solicitud de prueba se publica, su contrato se firma y se paga su primera ministración.» Parte de una solicitud
 aprobada por la sesión del Comité (recorrido del sprint 1) y cada paso lo hace la unidad que le toca. En cada relevo
 se comprueba el estado del expediente, en la bandeja de quién queda, el acuse, el renglón de la bitácora (usuario y
 unidad) y las fechas que piden los criterios (publicación, envío, notificación, firma, pago o remisión, entrega).
+MFS firma con su contrato de servicios técnicos (RFN) y carta compromiso, cobra un monto fijo por concepto (70/30 en
+estudio técnico) y su segunda ministración espera la Bitácora (HU-4.1). PEG lo atiende la Dirección de Protección
+Forestal: firma con la credencial del Guardabosque, la firma corre desde la aprobación del CASPEG, se paga por depósito
+el 25 % (supuesto de las reglas) con la evaluación de reportes validada por el Comité.
 """
 from decimal import Decimal
 
@@ -21,14 +25,16 @@ from pagos.models import EstadoSolicitud
 
 from .fixtures_m2 import *  # noqa: F401,F403
 from .fixtures_m3 import *  # noqa: F401,F403
-from .fixtures_m3 import delegado_de
-from .fixtures_m5 import instruir_pago
+from .fixtures_m3 import delegado_de, direccion_de, elementos_propios
+from .fixtures_m5 import instruir_pago, validar_reportes
 
 pytestmark = pytest.mark.django_db
 
-UNIDADES = ("del_amecameca", "del_toluca", "del_valle", "dir_drff", "juridica", "comite", "finanzas", "vivero",
-            "fiduciaria")
-PROGRAMAS = ("CC", "PS", "RHF", "PSA")
+UNIDADES = ("del_amecameca", "del_toluca", "del_valle", "dir_drff", "dir_dpf", "juridica", "comite", "finanzas",
+            "vivero", "fiduciaria")
+PROGRAMAS = ("CC", "PS", "RHF", "PSA", "MFS", "PEG")
+# Lo que impide pedir la segunda ministración mientras no exista su historia de M4.
+SEGUNDA_BLOQUEADA = {"MFS": "Copia de la Bitácora", "PEG": "Evaluación de los reportes"}
 
 
 def atiende(exp, usuarios):
@@ -74,13 +80,14 @@ def hito(exp, clave):
 def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_ministracion(
         programa, aprobadas, modelo_validado, catalogo_planta, usuarios, pdf):
     u = usuarios
-    dir_, jur, finanzas = u["dir_drff"], u["juridica"], u["finanzas"]
     sesion, (exp,) = aprobadas(programa, cuantas=1)
     ejercicio = exp.ejercicio
+    dir_, jur, finanzas = direccion_de(u, ejercicio), u["juridica"], u["finanzas"]
+    area = {dir_.username}
     deleg = delegado_de(u, exp)
     otra_deleg = u["del_valle"]
     assert otra_deleg.unidad_id != deleg.unidad_id
-    assert exp.estado.clave == "aprobada" and atiende(exp, u) == {"dir_drff"}      # el área responsable publica
+    assert exp.estado.clave == "aprobada" and atiende(exp, u) == area              # el área responsable publica
     r = Rastro(exp)
 
     # --- M3.1 Publicación de los listados autorizados y aviso de resultado ---------------------------------------
@@ -108,7 +115,7 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
     publicacion.registrar_entrega(deleg, aviso, "personal")
     aviso.refresh_from_db()
     assert aviso.notificada_en and aviso.notificada_en >= pub.publicada_en and aviso.acuse_notificacion
-    acuses = r.relevo("notificada", deleg, None, {"dir_drff"}, u, tipo_acuse=aviso.acuse_notificacion.tipo)
+    acuses = r.relevo("notificada", deleg, None, area, u, tipo_acuse=aviso.acuse_notificacion.tipo)
     # (la fecha de notificación arranca los plazos desde la Notificación misma, no desde un Hito: ver README)
 
     # --- M3.2 Modelo de contrato validado por la Unidad Jurídica; elaboración y envío a la Delegación -----------------
@@ -128,7 +135,7 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
             contratos.elaborar_contrato(u[quien], exp, mod)
     contrato = contratos.elaborar_contrato(dir_, exp, mod)
     assert contrato.folio.startswith(f"CTO-{programa}-2026-") and contrato.archivo and not contrato.enviado
-    r.relevo("contrato_elaborado", dir_, None, {"dir_drff"}, u, nuevos_acuses=0)
+    r.relevo("contrato_elaborado", dir_, None, area, u, nuevos_acuses=0)
     with pytest.raises(PermissionDenied):
         contratos.enviar_a_delegacion(deleg, contrato)
     antes = timezone.now()
@@ -139,22 +146,32 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
 
     # --- M3.3 Firma en la Delegación: solo la del expediente, con la verificación de firmas y sello completa ------
     with pytest.raises(PermissionDenied):
-        firma.registrar_firma(otra_deleg, exp, None, "persona", exp.solicitante.nombre, archivo_demo("f.pdf"),
+        firma.registrar_firma(otra_deleg, exp, None, "persona", exp.beneficiaria.nombre, archivo_demo("f.pdf"),
                               [p["clave"] for p in firma.puntos_de_verificacion(exp)])
     puntos = [p["clave"] for p in firma.puntos_de_verificacion(exp)]
     with pytest.raises(ValidationError):
-        firma.registrar_firma(deleg, exp, None, "persona", exp.solicitante.nombre, archivo_demo("f.pdf"), puntos[:-1])
+        firma.registrar_firma(deleg, exp, None, "persona", exp.beneficiaria.nombre, archivo_demo("f.pdf"), puntos[:-1],
+                              elementos_propios(exp))
+    propios = elementos_propios(exp)
+    if programa in ("MFS", "PEG"):                                   # formalización propia del programa
+        assert propios
+        with pytest.raises(ValidationError):
+            firma.registrar_firma(deleg, exp, None, "persona", exp.beneficiaria.nombre, archivo_demo("f.pdf"), puntos)
     exp.refresh_from_db()
     assert exp.estado.clave == "contrato_en_delegacion"
     programada, liberacion = firma.fechas_de_firma(exp)
     assert programada.vencimiento and liberacion.vencimiento                                # R-03: dos fechas
+    if programa == "PEG":                                           # R-18: desde la aprobación del CASPEG
+        assert programada.evento == liberacion.evento == "aprobacion_comite"
+        assert programada.fecha_evento == hito(exp, "aprobacion_comite").fecha_hora
     antes = timezone.now()
-    f = firma.registrar_firma(deleg, exp, None, "persona", exp.solicitante.nombre, archivo_demo("firmado.pdf"), puntos)
+    f = firma.registrar_firma(deleg, exp, None, "persona", exp.beneficiaria.nombre, archivo_demo("firmado.pdf"), puntos,
+                              propios)
     assert antes <= f.firmado_en <= timezone.now() and f.dentro_de_plazo is not False
     hf = hito(exp, "firma_contrato")
     assert hf.fecha_hora == f.firmado_en and hf.fecha_hora >= contrato.enviado_en
     # PS y RHF: la firma deja el expediente en `contratada` (el vale se emite después, con la planta aún sin entregar)
-    r.relevo("contratada", deleg, None, {"dir_drff"}, u, tipo_acuse="firma_contrato")
+    r.relevo("contratada", deleg, None, area, u, tipo_acuse="firma_contrato")
 
     # --- M3.4 PS y RHF: Vale de Planta, salida parcial y salida final del vivero --------------------------------------
     vivero, esp = catalogo_planta
@@ -194,8 +211,9 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
         solicitudes.emitir_oficio(otra_deleg, exp)
     with pytest.raises(PermissionDenied):
         solicitudes.emitir_oficio(dir_, exp)
-    # Sin soportes el servicio impide el envío y dice cuál falta (queda «por enviar»).
-    with pytest.raises(ValidationError, match="Oficio de solicitud de pago"):
+    # Sin soportes el servicio impide el envío y dice cuál falta (queda «por enviar»). PEG no pide oficio de la
+    # Delegación: la solicitud la genera la Instancia Ejecutora (ROP PEG 10.1 fr. XIII).
+    with pytest.raises(ValidationError, match="Comprobante" if programa == "PEG" else "Oficio de solicitud de pago"):
         solicitudes.enviar_solicitud(dir_, exp, 1)
     oficio = solicitudes.emitir_oficio(deleg, exp)
     assert oficio.folio.startswith(f"OFP-{programa}-2026-") and oficio.acuse.tipo == "oficio_solicitud_pago"
@@ -210,6 +228,10 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
         with pytest.raises(PermissionDenied):
             solicitudes.adjuntar_comprobante(otra_deleg, exp, pdf("cuenta.pdf"))
         solicitudes.adjuntar_comprobante(deleg, exp, pdf("cuenta.pdf"))
+        if programa == "PEG":
+            with pytest.raises(ValidationError, match="Evaluación de los reportes"):
+                solicitudes.enviar_solicitud(dir_, exp, 1)
+            validar_reportes(u, exp, ["2026-01"])                   # el CASPEG valida el primer periodo (HU-2.4)
     else:
         with pytest.raises(ValidationError, match="instruye el pago de la ministración 1"):
             solicitudes.enviar_solicitud(dir_, exp, 1)
@@ -223,9 +245,10 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
         solicitudes.enviar_solicitud(dir_, exp, 2)                  # no existe la segunda sin la primera
     sol = solicitudes.enviar_solicitud(dir_, exp, 1)
     esperado = montos.monto_aprobado(exp).ministraciones[0]
-    assert sol.importe == esperado.importe and sol.porcentaje == esperado.porcentaje == 70 and sol.ministracion == 1
+    primera = {"PEG": 25}.get(programa, 70)                          # PEG: 25 % (supuesto marcado en las reglas)
+    assert sol.importe == esperado.importe and sol.porcentaje == esperado.porcentaje == primera and sol.ministracion == 1
     assert sol.enviada_en and sol.acuse_envio.tipo == "solicitud_pago" and all(s["cumple"] for s in sol.soportes)
-    assert sol.tipo_pago == ("cheque_fiduciaria" if programa == "PSA" else "transferencia")
+    assert sol.tipo_pago == {"PSA": "cheque_fiduciaria", "PEG": "deposito"}.get(programa, "transferencia")
     # Mientras no se pague, la segunda ministración no se puede pedir.
     with pytest.raises(ValidationError):
         solicitudes.enviar_solicitud(dir_, exp, 2)
@@ -252,11 +275,11 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
             pagos.registrar_pago(finanzas, sol, "SPEI-1", timezone.localdate(), importe=sol.importe - 1)
         pago = pagos.registrar_pago(finanzas, sol, "SPEI-0001", timezone.localdate())
         assert pago.importe == sol.importe == esperado.importe and pago.fecha_pago == timezone.localdate()
-        assert pago.tipo == "transferencia" and pago.acuse.tipo == "pago_ministracion"
+        assert pago.tipo == sol.tipo_pago and pago.acuse.tipo == "pago_ministracion"
         assert hito(exp, "pago_ministracion").fecha_hora is not None
         with pytest.raises(ValidationError, match="no se paga dos veces"):
             pagos.registrar_pago(finanzas, sol, "SPEI-OTRA", timezone.localdate())
-        r.relevo("pagada", finanzas, None, {"dir_drff"}, u, tipo_acuse="pago_ministracion")
+        r.relevo("pagada", finanzas, None, area, u, tipo_acuse="pago_ministracion")
         # El aviso de pago llega a la persona por conducto de la Delegación.
         assert pago.aviso.tipo == "pago" and pago.aviso in notificaciones.pendientes_de_notificar(exp.delegacion)
         pagado = pago.importe
@@ -307,13 +330,18 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
     # --- La primera ministración quedó pagada por el importe de las reglas; la segunda sigue bloqueada --------------
     sol.refresh_from_db()
     assert sol.estado == EstadoSolicitud.PAGADA and pagado == sol.importe == esperado.importe
-    assert esperado.porcentaje == 70 and Decimal(pagado) == (montos.monto_aprobado(exp).total * Decimal("0.7")).quantize(Decimal("0.01"))
+    pct = esperado.porcentaje / 100
+    assert Decimal(pagado) == (montos.monto_aprobado(exp).total * pct).quantize(Decimal("0.01"))
     if programa == "PSA":
         assert pagado == Decimal("73500.00")                                  # 30 ha de cuenca alta (3,500 por ha) × 70 %
+    if programa == "MFS":
+        assert pagado == Decimal("21000.00")                                  # monto fijo de $30,000 (ETF de 7 a 95 ha) × 70 %
+    if programa == "PEG":
+        assert pagado == Decimal("6387.50")                                   # $25,550 por Guardabosque × 25 %
     assert fecha_pago_o_entrega
-    with pytest.raises(ValidationError, match="Verificación en campo o evaluación de reportes"):
-        solicitudes.enviar_solicitud(dir_, exp, 2)                   # sin verificación en campo (sprint 3)
-    assert atiende(exp, u) == {"dir_drff"}
+    with pytest.raises(ValidationError, match=SEGUNDA_BLOQUEADA.get(programa, "Verificación en campo o evaluación de reportes")):
+        solicitudes.enviar_solicitud(dir_, exp, 2)                   # espera su comprobación o verificación (M4)
+    assert atiende(exp, u) == area
 
     # --- La bitácora cuenta toda la historia en orden, con usuario y unidad en cada renglón --------------------------
     estados = [e.estado_destino.clave for e in exp.eventos.order_by("fecha_hora", "pk") if e.estado_destino_id]

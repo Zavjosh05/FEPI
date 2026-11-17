@@ -33,12 +33,12 @@
   {% for p in parrafos %}<p>{% if forloop.first and "BORRADOR" in p %}<span class="borrador" style="display:block">{{ p }}</span>{% else %}{{ p|linebreaksbr }}{% endif %}</p>{% endfor %}
   <table class="datos">
     <tr><th>Solicitud</th><td>{{ expediente.folio }} · {{ expediente.ejercicio.programa.nombre }} {{ expediente.ejercicio.anio }}</td></tr>
-    <tr><th>Persona beneficiaria</th><td>{{ expediente.solicitante.nombre }}{% if expediente.solicitante.representante %} · representante: {{ expediente.solicitante.representante }}{% endif %}</td></tr>
+    <tr><th>Persona beneficiaria</th><td>{{ datos.persona }}{% if expediente.persona_beneficiaria_id %} · solicita: {{ expediente.solicitante.nombre }}{% endif %}{% if expediente.solicitante.representante %} · representante: {{ expediente.solicitante.representante }}{% endif %}</td></tr>
     <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
     <tr><th>Delegación</th><td>{{ expediente.delegacion.nombre }}</td></tr>
     <tr><th>Modalidad</th><td>{{ datos.modalidad }}</td></tr>
-    <tr><th>Superficie aprobada</th><td>{{ datos.superficie_ha }} ha</td></tr>
-    <tr><th>Monto total del apoyo</th><td>{{ datos.monto_total }} ({{ datos.monto_por_hectarea }} por hectárea){% if regimen %} · régimen {{ regimen }}{% endif %}</td></tr>
+    {% if datos.superficie_texto %}<tr><th>Superficie aprobada</th><td>{{ datos.superficie_ha }} ha</td></tr>{% endif %}
+    <tr><th>Monto total del apoyo</th><td>{{ datos.monto_total }} ({{ datos.base_del_monto }}){% if regimen %} · régimen {{ regimen }}{% endif %}</td></tr>
     <tr><th>Plazo de firma</th><td>{{ datos.plazo_firma }}</td></tr>
   </table>
   {% if ministraciones %}

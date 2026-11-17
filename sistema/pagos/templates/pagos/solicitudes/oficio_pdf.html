@@ -39,7 +39,7 @@
     <tr><th>Persona beneficiaria</th><td>{{ expediente.solicitante.nombre }}</td></tr>
     <tr><th>Predio</th><td>{{ expediente.predio.folio }} · {{ expediente.predio.nombre }}, {{ expediente.predio.municipio.nombre }}</td></tr>
     <tr><th>Contrato firmado</th><td>{{ firma.contrato.folio }} · firmado el {{ firma.firmado_en|date:"d/m/Y H:i" }} h</td></tr>
-    {% if monto %}<tr><th>Monto aprobado</th><td>${{ monto.total|floatformat:2 }} ({{ monto.superficie_ha|floatformat:"-4" }} ha)</td></tr>{% endif %}
+    {% if monto %}<tr><th>Monto aprobado</th><td>{{ monto.texto_calculo }}</td></tr>{% endif %}
     <tr><th>Forma de pago</th><td>{{ tipo_pago }}</td></tr>
   </table>
   {% if monto and monto.ministraciones %}

@@ -8,8 +8,11 @@
   impide enviarla si falta un soporte y dice cuál. El importe es el de ``nucleo.montos.monto_aprobado``. El envío deja fecha,
   hora, acuse y el estado ``ministracion_solicitada``; en PSAHEM, además, el hito ``solicitud_pago_fiduciaria`` con el que
   corren los 5 días hábiles de la Secretaría Técnica (ROP PSAHEM 10.1 fr. X, líneas 2290 a 2292).
-- Los soportes se comprueban con ``FUENTES``: el sprint 3 sustituye ``verificacion_campo`` (verificación en campo o evaluación
-  de reportes) y la segunda ministración dejará de estar bloqueada.
+- Los soportes se comprueban con ``FUENTES``. Ganchos que llenan las historias de M4: ``verificacion_campo`` (HU-4.2,
+  verificación en campo), ``entregable`` (HU-4.1, envío de comprobaciones: la Bitácora o la autorización en MFS-ETF, la
+  solicitud o el Plan de auditoría en MFS-FSC) y ``evaluacion_reportes`` (HU-4.3; hoy cuenta los periodos que el CASPEG
+  validó para el expediente). Al reemplazar la función, la ministración deja de estar bloqueada.
+- Los soportes de las ministraciones siguientes pueden depender del régimen de pago (``siguientes_por_regimen``: MFS).
 """
 import hashlib
 from functools import lru_cache
@@ -64,7 +67,11 @@ def nombre_tipo_pago(clave):
 def soportes_requeridos(expediente, numero):
     """Soportes que pide el programa para esa ministración: ``[{"clave", "nombre", "fundamento"}]``."""
     cfg = config(expediente)["soportes"]
-    pedidos = cfg.get(str(numero)) or cfg["siguientes"]
+    pedidos = cfg.get(str(numero))
+    if pedidos is None and cfg.get("siguientes_por_regimen"):
+        regimen = montos.regimen_de_pago(expediente, montos.superficie_aprobada(expediente))
+        pedidos = cfg["siguientes_por_regimen"].get(regimen)
+    pedidos = pedidos or cfg["siguientes"]
     catalogo = datos_pagos()["soportes"]
     return [{"clave": s["clave"], "nombre": catalogo[s["clave"]]["nombre"], "fundamento": s.get("fundamento", "")}
             for s in pedidos]
@@ -112,22 +119,48 @@ def _dictamen(exp, numero):
 
 
 def _verificacion_campo(exp, numero):
-    return (False, "Todavía no existe: la verificación en campo o la evaluación de reportes es del sprint 3 (M6); "
-                   "hasta entonces la ministración no se puede solicitar.", "", "")
+    return (False, "Todavía no se registra la verificación en campo (HU-4.2); hasta entonces la ministración no se puede "
+                   "solicitar.", "", "")
+
+
+def _entregable(exp, numero):
+    """MFS: Bitácora o autorización (ETF), solicitud o Plan de auditoría (FSC). Gancho de HU-4.1."""
+    return (False, "Todavía no se registra la entrega del documento que condiciona esta ministración (HU-4.1, envío de "
+                   "comprobaciones); hasta entonces no se puede solicitar.", "", "")
+
+
+def _evaluacion_reportes(exp, numero):
+    """PEG: periodos de reportes que el CASPEG validó para el expediente (acuerdos de HU-2.4); la ministración N pide N.
+    HU-4.3 la reemplaza por la evaluación por Guardabosque y por periodo."""
+    from dictamen.models import Acuerdo
+
+    periodos = sorted(set(Acuerdo.objects.filter(tipo="validacion_reportes", expedientes=exp).exclude(periodo="")
+                          .values_list("periodo", flat=True)))
+    if len(periodos) < numero:
+        return (False, f"El CASPEG ha validado {len(periodos)} periodo(s) de reportes de este Guardabosque y la ministración "
+                       f"{numero} pide {numero} (la evaluación por periodo es HU-4.3).", "", "")
+    return True, f"Periodos validados por el CASPEG: {', '.join(periodos)}.", ", ".join(periodos[:numero]), ""
 
 
 FUENTES = {
     "contrato_firmado": _contrato_firmado, "oficio_delegacion": _oficio_delegacion,
     "comprobante_cuenta": _comprobante_cuenta, "instruccion_comite": _instruccion_comite, "dictamen": _dictamen,
-    "verificacion_campo": _verificacion_campo,
-}  # el sprint 3 reemplaza FUENTES["verificacion_campo"] por la verificación real
+    "verificacion_campo": _verificacion_campo, "entregable": _entregable, "evaluacion_reportes": _evaluacion_reportes,
+}  # HU-4.1, HU-4.2 y HU-4.3 reemplazan «entregable», «verificacion_campo» y «evaluacion_reportes»
+
+
+def fuente_de(clave):
+    """Fuente que comprueba un soporte (``soportes.<clave>.fuente`` de ``datos/pagos.json``; por omisión, la clave)."""
+    return datos_pagos()["soportes"].get(clave, {}).get("fuente", clave)
 
 
 # P-30: la unidad que debe resolver cada soporte que falta
 RESPONSABLE = {
     "contrato_firmado": "la Delegación (registra la firma)", "oficio_delegacion": "la Delegación (emite el oficio)",
     "comprobante_cuenta": "la Delegación (recaba el comprobante)", "instruccion_comite": "la Secretaría Técnica del Comité",
-    "dictamen": "la Dirección y la Unidad Jurídica", "verificacion_campo": "la Dirección (sprint 3)",
+    "dictamen": "la Dirección y la Unidad Jurídica", "verificacion_campo": "la Delegación y la Dirección (HU-4.2)",
+    "entregable": "la Delegación, que recibe la comprobación (HU-4.1)",
+    "evaluacion_reportes": "la Dirección de Protección Forestal y el CASPEG (HU-4.3)",
 }
 
 
@@ -136,9 +169,9 @@ def soportes(expediente, numero):
     "referencia", "url"}]``."""
     resultado = []
     for s in soportes_requeridos(expediente, numero):
-        cumple, detalle, referencia, url = FUENTES[s["clave"]](expediente, numero)
+        cumple, detalle, referencia, url = FUENTES[fuente_de(s["clave"])](expediente, numero)
         resultado.append({**s, "cumple": bool(cumple), "detalle": detalle, "referencia": referencia, "url": url,
-                          "responsable": RESPONSABLE.get(s["clave"], "el área responsable")})
+                          "responsable": RESPONSABLE.get(s["clave"]) or RESPONSABLE.get(fuente_de(s["clave"]), "el área responsable")})
     return resultado
 
 

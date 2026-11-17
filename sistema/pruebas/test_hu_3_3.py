@@ -105,13 +105,16 @@ def test_hu_3_3_se_verifican_las_firmas_y_el_sello_y_sin_todos_los_puntos_no_se_
 
 def test_hu_3_3_los_puntos_de_verificacion_salen_de_los_datos_por_tipo_de_persona():
     def tipo(clave):
-        return SimpleNamespace(tipo_persona=SimpleNamespace(clave=clave))
+        return SimpleNamespace(tipo_persona=SimpleNamespace(clave=clave), programa=SimpleNamespace(clave="CC"))
 
     assert [p["clave"] for p in firma.puntos_de_verificacion(tipo("nucleo_agrario"))] == [
         "firma_presidencia", "firma_secretaria", "firma_tesoreria", "sello_nucleo", "firma_probosque"]
     assert [p["clave"] for p in firma.puntos_de_verificacion(tipo("juridica_colectiva"))][0] == "firma_representante"
     assert firma.puntos_de_verificacion(tipo("dependencia_publica")) == firma.puntos_de_verificacion(tipo("juridica_colectiva"))
     assert firma.puntos_de_verificacion(tipo("algo_nuevo")) == firma.puntos_de_verificacion(tipo("fisica"))
+    # PEG tiene su propia lista (firma del Guardabosque y sello del núcleo agrario, 10.1 fr. XII).
+    peg = SimpleNamespace(tipo_persona=SimpleNamespace(clave="nucleo_agrario"), programa=SimpleNamespace(clave="PEG"))
+    assert [p["clave"] for p in firma.puntos_de_verificacion(peg)][0] == "firma_guardabosque"
 
 
 def test_hu_3_3_solo_la_delegacion_del_expediente_registra_la_firma(en_delegacion, usuarios, pdf):
@@ -181,7 +184,7 @@ def test_hu_3_3_los_dias_que_faltan_cuentan_dias_habiles(en_delegacion):
 
 # ----------------------------------------------------------------------------- criterio 2: MFS y PEG
 def test_hu_3_3_mfs_exige_contrato_de_servicios_tecnicos_con_rfn_y_carta_compromiso(mfs, contrato_manual, usuarios, pdf):
-    exp = contrato_manual(mfs, tipo="fisica", modalidad=None)
+    exp = contrato_manual(mfs, tipo="fisica", modalidad="etf_pmf_maderable_7_95", ha=40)
     clavep = [e["clave"] for e in firma.formalizacion_propia(exp)["elementos"]]
     assert clavep == ["contrato_servicios_tecnicos", "carta_compromiso_psf"]
     deleg = delegado_de(usuarios, exp)
@@ -364,7 +367,7 @@ def test_hu_3_3_registro_de_la_firma_por_pantalla_y_pestana_contrato(en_delegaci
 
 
 def test_hu_3_3_pantalla_de_mfs_pide_los_elementos_de_formalizacion(mfs, contrato_manual, usuarios, client, contrasena, pdf):
-    exp = contrato_manual(mfs, modalidad=None)
+    exp = contrato_manual(mfs, modalidad="etf_pmf_maderable_7_95", ha=40)
     client.login(username=delegado_de(usuarios, exp).username, password=contrasena)
     html = client.get(f"/contrato/contratos/{exp.folio}/firmar/").content.decode()
     assert "Contrato de servicios técnicos con el prestador" in html and "RFN del prestador" in html and "Carta compromiso" in html

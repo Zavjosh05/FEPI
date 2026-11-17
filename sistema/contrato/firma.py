@@ -46,6 +46,7 @@ def puntos_de_verificacion(expediente):
     cfg = datos_contrato()["verificacion_firmas"]
     clave = expediente.tipo_persona.clave
     clave = cfg.get("equivalencias", {}).get(clave, clave)
+    clave = cfg.get("por_programa", {}).get(expediente.programa.clave, clave)
     return list(cfg["por_tipo_persona"].get(clave) or cfg["por_tipo_persona"][cfg["por_omision"]])
 
 
@@ -265,7 +266,7 @@ def liberar_recurso(usuario, expediente, motivo, momento=None):
              ("Vencimiento que pasó", f"{senal.vencio_el:%d/%m/%Y}" if senal.vencio_el else "—"),
              ("Motivo de la liberación", motivo.strip()),
              ("Fecha y hora", f"{timezone.localtime(ahora):%d/%m/%Y %H:%M:%S} h"), ("Confirma", usuario.unidad.nombre),
-             ("Reasignación", "Pendiente: la reasignación a la lista de espera es por acuerdo del Comité (sprint 3).")],
+             ("Reasignación", "Pendiente: la reasignación a la lista de espera es por acuerdo del Comité (HU-6.1, lista de espera y sustituciones).")],
             destinatario=expediente.solicitante.nombre)
         senal.liberado_por, senal.liberado_en, senal.motivo_liberacion, senal.acuse_liberacion = (
             usuario, ahora, motivo.strip(), acuse)

@@ -1,18 +1,18 @@
 {% load moneda %}
 {% if historias %}<div class="alert alert-info small" data-prueba="por-construir">
-  <strong>{{ titulo }}.</strong> Esta pestaña la llenarán las historias del sprint 2:
+  <strong>{{ titulo }}.</strong> Esta pestaña la llenarán estas historias:
   <ul class="mb-0 mt-1">{% for clave, nombre, que in historias %}<li><strong>{{ clave }} {{ nombre }}</strong>: {{ que }}.</li>{% endfor %}</ul>
 </div>{% endif %}
 <div class="row g-3">
   <div class="col-12 col-lg-6">
     <div class="titulo-seccion">Monto aprobado</div>
     {% if monto %}
-    <div data-prueba="monto-aprobado">{{ monto.superficie_ha|floatformat:"-4" }} ha × {{ monto.monto_ha|moneda }} = <strong>{{ monto.total|moneda }}</strong>
+    <div data-prueba="monto-aprobado">{{ monto.texto_calculo }}
       {% if monto.regimen %}<span class="small text-secondary">· régimen: {{ monto.regimen_nombre|default:monto.regimen }}</span>{% endif %}</div>
     {% if monto.nota %}<div class="small text-secondary">{{ monto.nota }}</div>{% endif %}
     <table class="table table-sm small mt-2">
       <thead class="table-light"><tr><th>Ministración</th><th>%</th><th>Importe</th><th>Condición</th></tr></thead>
-      <tbody>{% for m in monto.ministraciones %}<tr><td>{{ m.numero }}</td><td>{{ m.porcentaje|floatformat:"-2" }}</td><td class="text-nowrap">{{ m.importe|moneda }}</td><td>{{ m.condicion|truncatechars:160 }}</td></tr>
+      <tbody>{% for m in monto.ministraciones %}<tr><td>{{ m.numero }}</td><td>{{ m.porcentaje|floatformat:"-2" }}{% if m.supuesto %} <span class="badge text-bg-warning" title="El reparto no está en las Reglas de Operación">supuesto</span>{% endif %}</td><td class="text-nowrap">{{ m.importe|moneda }}</td><td>{{ m.condicion|truncatechars:160 }}</td></tr>
       {% empty %}<tr><td colspan="4" class="text-secondary">Sin ministraciones (concepto sin recurso económico).</td></tr>{% endfor %}</tbody>
     </table>
     {% else %}<div class="small text-secondary">El monto se calcula cuando el Comité aprueba la solicitud.</div>{% endif %}

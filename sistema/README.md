@@ -401,6 +401,14 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   | `recoger_planta` (PS, RHF) | `recoger_planta_vivero` / `recoger_planta_vale` | `entrega_vale` | PS: «30 días» como naturales (R-13) |
   | `ptrfi_actualizado` (RHF) | `entrega_ptrfi_actualizado` | `notificacion_persona` | |
   | `instruccion_pago_fiduciaria`, `cobro_cheque` (PSA) | los de las reglas | `solicitud_pago_fiduciaria`, `entrega_cheque` | cheque: desde la entrega (R-14) |
+  | `firma_programada` (MFS) | `firma_contrato` (10 d. háb.) | `notificacion_persona` | sin pasar del 15-jul-2026 (`fecha_limite_firma`, Convocatoria líneas 877 a 880); la baja (`firma_liberacion`) sin tope, 8.1.9.2 e (línea 7884) |
+  | `firma_programada`, `firma_liberacion` (PEG) | `firma_contrato` (10 d. háb.) | `aprobacion_comite` (hito del acta del CASPEG) | Convocatoria base quinta, actividad V (línea 9525), R-18 |
+  | `faltantes_ventanilla`, `faltantes_direccion` (PEG) | `complemento_documentacion_faltante` (sin cantidad) | — | «sin plazo en las reglas»: el aviso de faltantes sale sin fecha límite y lo dice |
+  | `notificacion_faltantes` (PEG) | `aviso_faltantes_en_evaluacion` (10 d. nat.) | `recepcion_solicitud` | las reglas no dicen desde cuándo (8.1.1.2 b, fr. XII, línea 8563): decisión propia |
+
+  `Vencimiento.sin_plazo_en_reglas` y `plazos.SIN_PLAZO` («sin plazo en las reglas») distinguen un plazo que las reglas no
+  traen de uno cuyo evento aún no ocurre («sin fecha todavía»). El acta de la sesión de aprobación registra el hito
+  `aprobacion_comite` de cada persona beneficiaria (todos los programas).
 
   Si el evento ocurrió después del tope (por ejemplo, una solicitud de demostración recibida después del
   27-mar-2026), no se topa: se marca `evento_despues_del_tope` y el acuse lo avisa. M1 ya usa el servicio
@@ -527,10 +535,12 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   el servicio aplica la de liberación como tope. Los casos «fuera de la fecha programada» solo se dan en CC (programada desde
   la publicación, liberación desde la notificación) y se cubren en las pruebas; en la demostración no hay uno porque la
   publicación de CC queda pendiente a propósito.
-- **Formalización propia (criterio 2).** MFS y PEG no tienen archivo de reglas: sus elementos están en
+- **Formalización propia (criterio 2).** Las reglas de MFS y PEG nombran estos elementos solo en el texto: están en
   `datos/contrato.json` → `formalizacion_propia`. MFS: contrato de servicios técnicos con el prestador (con su RFN) y carta
   compromiso (ROP MFS, línea 8091 y derechos, líneas 7775 a 7778); PEG: credencial del Guardabosque entregada, con su folio
-  (derechos, línea 8770). Sin ellos la firma no se da por completa. Se prueban con programas de fixtures (`mfs`, `peg`).
+  (derechos, línea 8770). Sin ellos la firma no se da por completa. Se prueban con las reglas reales (fixtures `mfs`, `peg`).
+  En PEG la verificación de firmas tiene su propia lista (`verificacion_firmas.por_programa`): firma del Guardabosque, del
+  Comisariado, sello del núcleo agrario y PROBOSQUE (10.1 fr. XII, líneas 9021 a 9023).
 - **Sin firma al vencer (criterio 3, P-08).** `manage.py revisar_plazos` (`firma.revisar_firmas`) señala los contratos de
   solicitudes publicadas, notificadas, con contrato elaborado o en la Delegación cuyo vencimiento para liberar el recurso ya
   pasó: estado `sin_firma_en_plazo`, renglón en la bitácora sin persona (el sistema), registro `SinFirma` y aviso en la
@@ -593,8 +603,10 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   contrato», por eso el comprobante se sube en M5 y no se revisa en M1); PSAHEM, contrato o convenio firmado, oficio, dictámenes y la
   **instrucción de pago del Comité Técnico** de esa ministración (acuerdo de HU-2.4 tipo `instruccion_pago`; no pide comprobante: paga
   con cheque, 10.1 fr. X, línea 2288). Las ministraciones siguientes agregan la «verificación en campo o evaluación de reportes».
-  Cada soporte se comprueba con una función de `solicitudes.FUENTES`; la de `verificacion_campo` todavía no existe (sprint 3): dice que la
-  segunda ministración no se puede solicitar y por qué, y el sprint 3 solo la reemplaza (hay una prueba que lo demuestra).
+  Cada soporte se comprueba con una función de `solicitudes.FUENTES` (el soporte nombra su fuente en `soportes.<clave>.fuente`). Ganchos de
+  M4: `verificacion_campo` (HU-4.2), `entregable` (HU-4.1: Bitácora o autorización en MFS-ETF, solicitud o Plan de auditoría en MFS-FSC) y
+  `evaluacion_reportes` (HU-4.3; hoy cuenta los periodos que el CASPEG validó para el expediente: la ministración N pide N). Mientras no se
+  reemplacen, dicen por qué la ministración no se puede solicitar (hay una prueba que demuestra el reemplazo).
 - **Comprobante de la cuenta.** `solicitudes.adjuntar_comprobante` (Delegación, que lo recibe al firmar, o el área responsable): PDF, JPG
   o PNG; el más reciente es el vigente (un cambio de cuenta es un comprobante nuevo). Se rechaza en los programas que no lo piden.
 - **Solicitud de la ministración.** `preparar_solicitud` (la deja «por enviar», con su lista de soportes) y `enviar_solicitud`: solo el
@@ -609,7 +621,10 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pantallas.** Pestaña «Pagos» del expediente (oficio, comprobante y cada ministración con su lista de soportes, con enlace al
   documento de cada uno), «Pagos» en el menú (solicitudes por emitir oficio, por solicitar, por enviar, en trámite y pagadas), paneles en
   las bandejas de la Delegación y del área responsable y siguiente paso en el expediente.
-- **PEG.** Sin reglas: `datos/pagos.json` solo fija que su pago es un «depósito» (HU-5.2).
+- **MFS y PEG (S3-02).** MFS pide contrato, oficio y comprobante (MFS-REQ-10) para la primera y, para las siguientes, el entregable de su
+  régimen (`siguientes_por_regimen`: `etf` la Bitácora, `fsc` la solicitud o el Plan de auditoría; ROP MFS 7.2, líneas 6871 y 6885). PEG paga
+  por depósito y pide contrato, comprobante (PEG-REQ-09) y la evaluación de reportes validada por el CASPEG; no pide oficio de la Delegación
+  (la solicitud la genera la Instancia Ejecutora, 10.1 fr. XIII, línea 9024).
 
 ### M5 · HU-5.2 Pago de la ministración
 
@@ -739,6 +754,21 @@ lista). Se limitaron las tablas que crecían sin tope: el listado preliminar mue
 pública, 250 por listado (con aviso y búsqueda por folio); la bandeja ya tenía su tope de 300. Las pantallas de contratos, firmas,
 vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la publicación).
 
+### Base de ejecución y seguimiento (S3-02): MFS y Guardabosques de punta a punta
+
+- **Quién solicita y quién recibe.** `Expediente.persona_beneficiaria` (nucleo `0009`) y la propiedad `Expediente.beneficiaria` (la
+  propia o quien solicita). En PEG (`ajustes_reglas.PEG.persona_beneficiaria`) solicita el núcleo agrario y la persona beneficiaria es el
+  Guardabosque: el registro la pide (nombre, CURP y teléfono; sin ella no se recibe), el Guardabosque no es tipo de persona que registre
+  (`tipos_persona_no_seleccionables`) y los requisitos de los dos tipos se revisan en el mismo expediente (`recepcion.servicios.requisitos_aplicables`).
+  El contrato de PEG es de la persona Guardabosque y menciona al núcleo agrario.
+- **Superficie.** PEG no la usa (la lista de verificación no trae el renglón ni el contrato la frase); MFS tiene rango solo en los Programas de
+  Manejo maderable (`ajustes_reglas.MFS.rango_superficie`: lista `rangos_etf`, desde exclusivo y hasta inclusivo).
+- **Comité.** Integrantes del CASPEG (invitados permanentes en lista y especiales en texto); convocatoria de 5 días hábiles o de 1 día si es
+  extraordinaria (`cantidad_extraordinaria_dias`). La unidad sugerida de un acuerdo que toca a «la Dirección» es la Instancia Ejecutora del programa
+  (Protección Forestal en PEG).
+- **Aviso de faltantes sin plazo.** Si las reglas no dan plazo (PEG), el aviso de la Dirección sale sin fecha límite y lo dice («sin plazo en las reglas»).
+- **Textos.** Las pantallas ya no dicen «sprint»: nombran la historia que llenará cada cosa.
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
@@ -786,20 +816,23 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   se capturan: índice de presión, ANP, grupos prioritarios…).
 - Recurso disponible por sesión y monto por hectárea cuando la superficie factible difiere de la
   solicitada.
-- Plazo de convocatoria de los Comités de PSAHEM y PEG (5 días hábiles en el CASPEG, línea 8939) y
-  sus integrantes: cuando existan sus archivos de reglas.
+- Plazo de convocatoria del Comité Técnico de PSAHEM (su Reglamento Interno no está en el texto). El CASPEG ya valida
+  5 días hábiles (1 si es extraordinaria, 9.4.2, línea 8938).
 - Si el acta debe esperar a la fecha de la sesión: hoy se puede registrar en cuanto se envía la
   convocatoria.
 - Clave INEGI de los municipios (la capa de IDEFOR no la trae).
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
-- Reglas de MFS y PEG (archivos `reglas/<CLAVE>.json`).
+- MFS (R-17): superficie de los conceptos ETF 5 y 6 (7 contra 10 ha), columnas del cuadro de montos FSC (hoy se suman los
+  componentes de la certificación grupal) y quién autoriza la prórroga. PEG (R-18): reparto de las 4 ministraciones (25 % es
+  supuesto), calendario de reportes (se usan los 12 meses), desde cuándo corren los 10 días naturales para notificar faltantes.
 
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
   dictamen, contrato y pagos: 56 tablas, cinco áreas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
-- `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
+- `pruebas/test_sprint_1_recorrido_completo.py` y `test_sprint_2_recorrido_completo.py` (parametrizadas con los seis programas: CC,
+  PS, RHF, PSAHEM, MFS y PEG; lo propio de MFS y PEG se prueba además en `test_nucleo_mfs_peg.py`): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
   aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
   queda, el acuse y el renglón de la bitácora.

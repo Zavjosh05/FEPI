@@ -10,7 +10,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from nucleo import dias_habiles, notificaciones, plazos
+from nucleo import dias_habiles, notificaciones, plazos, reglas
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import datos_sistema
 from nucleo.models import (
@@ -48,9 +48,14 @@ def fmt_fecha_hora(valor):
 
 # ----------------------------------------------------------------------------- requisitos aplicables
 def requisitos_aplicables(ejercicio, tipo_persona, modalidad=None):
-    """Requisitos del programa-ejercicio para el tipo de persona y la modalidad (vacío = todos)."""
+    """Requisitos del programa-ejercicio para el tipo de persona y la modalidad (vacío = todos). Si la persona
+    beneficiaria no es quien solicita (PEG: el Guardabosque), se suman los requisitos de su tipo (8.1.1.2 b)."""
     qs = ejercicio.requisitos.all()
-    qs = qs.filter(Q(tipos_persona=tipo_persona) | Q(tipos_persona__isnull=True))
+    filtro = Q(tipos_persona=tipo_persona) | Q(tipos_persona__isnull=True)
+    beneficiaria = reglas.persona_beneficiaria_distinta(ejercicio)
+    if beneficiaria:
+        filtro |= Q(tipos_persona__clave=beneficiaria["tipo_persona"])
+    qs = qs.filter(filtro)
     if modalidad is not None:
         qs = qs.filter(Q(modalidades=modalidad) | Q(modalidades__isnull=True))
     else:
@@ -83,6 +88,9 @@ class DatosSolicitud:
     es_refrendo: bool = False
     predio_existente: object = None
     observaciones: str = ""
+    beneficiaria_nombre: str = ""  # PEG: el Guardabosque que designa la Asamblea del núcleo agrario
+    beneficiaria_curp: str = ""
+    beneficiaria_telefono: str = ""
     extra: dict = field(default_factory=dict)
 
 
@@ -105,6 +113,11 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
     if datos.modalidad is not None and not datos.modalidad.seleccionable:
         raise ValidationError(f"«{datos.modalidad.nombre}» no se elige al registrar la solicitud "
                               "(es un régimen de pago, el refrendo u otro caso que el sistema maneja aparte).")
+    if not reglas.tipos_persona_seleccionables(datos.ejercicio).filter(pk=datos.tipo_persona.pk).exists():
+        raise ValidationError(f"«{datos.tipo_persona.nombre}» no presenta la solicitud en este programa.")
+    conf_beneficiaria = reglas.persona_beneficiaria_distinta(datos.ejercicio)
+    if conf_beneficiaria and conf_beneficiaria.get("obligatoria") and not datos.beneficiaria_nombre.strip():
+        raise ValidationError(f"Falta la persona beneficiaria: {conf_beneficiaria['etiqueta']}.")
     with transaction.atomic():
         if datos.predio_existente:
             predio = datos.predio_existente
@@ -120,8 +133,14 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
                 nombre=datos.nombre_predio, municipio=datos.municipio, localidad=datos.localidad,
                 titular=solicitante, superficie_declarada_ha=datos.superficie_solicitada_ha,
             )
+        beneficiaria = None
+        if conf_beneficiaria and datos.beneficiaria_nombre.strip():
+            beneficiaria = Persona.objects.create(
+                tipo=conf_beneficiaria.get("tipo_general", "fisica"), nombre=datos.beneficiaria_nombre.strip(),
+                curp=datos.beneficiaria_curp.strip().upper(), telefono=datos.beneficiaria_telefono)
         expediente = Expediente.objects.create(
             ejercicio=datos.ejercicio, predio=predio, solicitante=solicitante, tipo_persona=datos.tipo_persona,
+            persona_beneficiaria=beneficiaria,
             modalidad=datos.modalidad, es_refrendo=datos.es_refrendo,
             con_representante_legal=datos.con_representante_legal,
             superficie_solicitada_ha=datos.superficie_solicitada_ha, delegacion=delegacion,
@@ -136,6 +155,9 @@ def registrar_solicitud(usuario, datos: DatosSolicitud):
             ("Delegación que recibe", delegacion.nombre),
             ("Fecha y hora de recepción", fmt_fecha_hora(expediente.fecha_recepcion)),
             ("Tipo de persona", datos.tipo_persona.nombre),
+            *([(conf_beneficiaria["etiqueta"],
+                beneficiaria.nombre + (f" (CURP {beneficiaria.curp})" if beneficiaria.curp else ""))]
+              if beneficiaria else []),
             ("Modalidad", datos.modalidad.nombre if datos.modalidad else "—"),
             ("Refrendo", "Sí" if datos.es_refrendo else "No"),
             ("Superficie solicitada", f"{datos.superficie_solicitada_ha} ha" if datos.superficie_solicitada_ha else "—"),
@@ -415,10 +437,13 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
                                       descripcion="Expediente validado por la Dirección.")
             return val
         venc = plazos.vencimiento(expediente, "faltantes_direccion", fecha_evento=ahora)
-        if venc is None or not venc.tiene_fecha:
+        if venc is None or (not venc.tiene_fecha and not venc.sin_plazo_en_reglas):
             raise ValidationError("Las reglas del programa no tienen un plazo calculable para los faltantes.")
+        # PEG: las reglas no dan plazo para completar (R-18); el aviso sale sin fecha límite y lo dice.
         limite = venc.vencimiento
-        texto_plazo = f"{venc.texto_plazo} ({venc.fundamento})"
+        texto_limite = f"{limite:%d/%m/%Y}" if limite else plazos.SIN_PLAZO
+        texto_plazo = (f"{venc.texto_plazo} ({venc.fundamento})" if limite else
+                       f"{plazos.SIN_PLAZO} ({venc.fundamento or venc.nota})")
         val = Validacion.objects.create(
             expediente=expediente, resultado=ResultadoValidacion.FALTANTES, usuario=usuario, fecha_hora=ahora,
             observaciones=observaciones, detalle=detalle, fecha_limite=limite, plazo_aplicado=texto_plazo[:300],
@@ -428,7 +453,7 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
         acuse = emitir_acuse(
             expediente, "aviso_faltantes", "Aviso de faltantes", usuario,
             [("Fecha y hora del aviso", fmt_fecha_hora(ahora)),
-             ("Fecha límite para entregar", f"{limite:%d/%m/%Y}"),
+             ("Fecha límite para entregar", texto_limite),
              ("Plazo aplicado", texto_plazo),
              ("Conducto", f"Por conducto de {expediente.delegacion.nombre}"),
              ("Observaciones", observaciones or "—")],
@@ -438,12 +463,12 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
         val.acuse = acuse
         val.notificacion = notificaciones.emitir_notificacion(
             expediente, TipoNotificacion.FALTANTES, "Aviso de faltantes", usuario, acuse_envio=acuse, fecha_hora=ahora,
-            datos={"validacion": val.pk, "fecha_limite": limite.isoformat()},
+            datos={"validacion": val.pk, "fecha_limite": limite.isoformat() if limite else None},
         )
         val.save(update_fields=["acuse", "notificacion"])
         expediente.cambiar_estado("faltantes", usuario, tipo_evento="aviso_faltantes", acuse=acuse,
-                                  descripcion=f"Aviso de faltantes ({len(faltantes)}) con fecha límite {limite:%d/%m/%Y}.",
-                                  datos={"fecha_limite": limite.isoformat()})
+                                  descripcion=f"Aviso de faltantes ({len(faltantes)}) con fecha límite {texto_limite}.",
+                                  datos={"fecha_limite": limite.isoformat() if limite else None})
     return val
 
 
@@ -464,7 +489,8 @@ def registrar_notificacion(usuario, validacion, medio=MedioNotificacion.PERSONAL
     return notificaciones.registrar_notificacion(
         usuario, validacion.notificacion, medio=medio, fecha_hora=fecha_hora,
         titulo_acuse="Acuse de notificación del aviso de faltantes",
-        renglones=[("Fecha límite para entregar", f"{validacion.fecha_limite:%d/%m/%Y}")],
+        renglones=[("Fecha límite para entregar", f"{validacion.fecha_limite:%d/%m/%Y}" if validacion.fecha_limite
+                    else plazos.SIN_PLAZO)],
         detalle=[{"clave": r.requisito.clave, "texto": r.requisito.titulo, "estado": "Faltante"}
                  for r in validacion.faltantes.select_related("requisito")],
         descripcion="Aviso de faltantes notificado a la persona solicitante.",

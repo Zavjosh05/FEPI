@@ -29,9 +29,11 @@ from .catalogos import datos_sistema
 from .models import Hito
 
 SIN_FECHA = "sin fecha todavía"
+SIN_PLAZO = "sin plazo en las reglas"
 
 NOMBRES_EVENTO = {
     "recepcion_solicitud": "la recepción de la solicitud",
+    "aprobacion_comite": "la aprobación del Comité",
     "aviso_direccion": "el aviso de faltantes de la Dirección",
     "notificacion_persona": "la notificación a la persona",
     "publicacion_resultados": "la publicación de resultados",
@@ -84,8 +86,15 @@ class Vencimiento:
         return self.plazo.fundamento if self.plazo else ""
 
     @property
+    def sin_plazo_en_reglas(self):
+        """Las reglas no dan cantidad ni fecha para este plazo (PEG: completar faltantes, R-18)."""
+        return self.plazo is None or (self.plazo.cantidad is None and not self.plazo.fecha_fin)
+
+    @property
     def texto(self):
         """Frase para pantallas y acuses."""
+        if not self.tiene_fecha and self.sin_plazo_en_reglas:
+            return f"{SIN_PLAZO}" + (f" ({self.fundamento})" if self.fundamento else "")
         if not self.tiene_fecha:
             return f"{SIN_FECHA} (corre desde {self.nombre_evento})"
         texto = f"{self.vencimiento:%d/%m/%Y} ({self.texto_plazo} desde {self.nombre_evento}"
@@ -94,9 +103,10 @@ class Vencimiento:
         return texto + ")"
 
     def estado(self, hoy=None, inhabiles=None):
-        """«sin fecha todavía», «en plazo», «por vencer» (5 días hábiles o menos) o «vencido»."""
+        """«sin fecha todavía», «sin plazo en las reglas», «en plazo», «por vencer» (5 días hábiles o menos) o
+        «vencido»."""
         if not self.tiene_fecha:
-            return SIN_FECHA
+            return SIN_PLAZO if self.sin_plazo_en_reglas else SIN_FECHA
         hoy = hoy or timezone.localdate()
         if hoy > self.vencimiento:
             return "vencido"

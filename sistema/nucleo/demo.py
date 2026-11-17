@@ -118,7 +118,8 @@ def _solicitud(usuario, ejercicio, municipio, predio, persona, tipo, modalidad, 
         ejercicio=ejercicio, municipio=Municipio.objects.get(nombre=municipio), nombre_predio=predio,
         tipo_persona=tp, modalidad=mod, solicitante_nombre=persona,
         solicitante_tipo=tipo if tipo in {"fisica", "juridica_colectiva", "nucleo_agrario"} else "juridica_colectiva",
-        superficie_solicitada_ha=Decimal(superficie), observaciones="Solicitud de demostración.", **extra,
+        superficie_solicitada_ha=Decimal(superficie) if superficie is not None else None,
+        observaciones="Solicitud de demostración.", **extra,
     )
     return servicios.registrar_solicitud(usuario, datos)
 

@@ -1,5 +1,5 @@
 {
-  "nota": "Datos del módulo M5 (Pagos) por programa. Los soportes de cada solicitud de pago se piden por número de ministración: la clave «1» es la primera y «siguientes» las demás. Cada soporte (catálogo «soportes») tiene una fuente que el servicio pagos/solicitudes.py sabe comprobar. El tipo de pago dice cómo se paga: transferencia (CC, MFS, PS, RHF), cheque de la Fiduciaria (PSAHEM) o depósito al Guardabosque (PEG, aún sin reglas). Los fundamentos citan numeral y línea del texto de las ROP 2026 (especificacion/ROP_PROBOSQUE_2026_texto.txt).",
+  "nota": "Datos del módulo M5 (Pagos) por programa. Los soportes de cada solicitud de pago se piden por número de ministración: la clave «1» es la primera y «siguientes» las demás. Cada soporte (catálogo «soportes») tiene una fuente que el servicio pagos/solicitudes.py sabe comprobar. El tipo de pago dice cómo se paga: transferencia (CC, MFS, PS, RHF), cheque de la Fiduciaria (PSAHEM) o depósito al Guardabosque (PEG). Los fundamentos citan numeral y línea del texto de las ROP 2026 (especificacion/ROP_PROBOSQUE_2026_texto.txt). Si el programa tiene varios regímenes de pago con soportes distintos (MFS: estudio técnico forestal y certificación FSC), «siguientes_por_regimen» da los soportes de las ministraciones siguientes por régimen (nucleo.montos).",
   "tipos_pago": {
     "transferencia": "Transferencia electrónica",
     "cheque_excepcional": "Cheque (caso excepcional)",
@@ -7,24 +7,69 @@
     "deposito": "Depósito al Guardabosque"
   },
   "soportes": {
-    "contrato_firmado": {"nombre": "Contrato o convenio firmado", "fuente": "contrato_firmado"},
-    "oficio_delegacion": {"nombre": "Oficio de solicitud de pago de la Delegación", "fuente": "oficio_delegacion"},
-    "comprobante_cuenta": {"nombre": "Comprobante de la cuenta bancaria de la persona beneficiaria", "fuente": "comprobante_cuenta"},
-    "instruccion_comite": {"nombre": "Instrucción de pago del Comité Técnico a la Fiduciaria", "fuente": "instruccion_comite"},
-    "dictamen": {"nombre": "Dictámenes técnico y jurídico", "fuente": "dictamen"},
-    "verificacion_campo": {"nombre": "Verificación en campo o evaluación de reportes", "fuente": "verificacion_campo"}
+    "contrato_firmado": {
+      "nombre": "Contrato o convenio firmado",
+      "fuente": "contrato_firmado"
+    },
+    "oficio_delegacion": {
+      "nombre": "Oficio de solicitud de pago de la Delegación",
+      "fuente": "oficio_delegacion"
+    },
+    "comprobante_cuenta": {
+      "nombre": "Comprobante de la cuenta bancaria de la persona beneficiaria",
+      "fuente": "comprobante_cuenta"
+    },
+    "instruccion_comite": {
+      "nombre": "Instrucción de pago del Comité Técnico a la Fiduciaria",
+      "fuente": "instruccion_comite"
+    },
+    "dictamen": {
+      "nombre": "Dictámenes técnico y jurídico",
+      "fuente": "dictamen"
+    },
+    "verificacion_campo": {
+      "nombre": "Verificación en campo o evaluación de reportes",
+      "fuente": "verificacion_campo"
+    },
+    "entregable_etf": {
+      "nombre": "Copia de la Bitácora para la autorización del estudio técnico forestal (o de la autorización respectiva)",
+      "fuente": "entregable"
+    },
+    "entregable_fsc": {
+      "nombre": "Copia de la solicitud de auditoría ante la entidad certificadora o del Plan de auditoría",
+      "fuente": "entregable"
+    },
+    "evaluacion_reportes": {
+      "nombre": "Evaluación de los reportes mensuales del Guardabosque validada por el CASPEG",
+      "fuente": "evaluacion_reportes"
+    }
   },
   "por_omision": {
     "tipo_pago": "transferencia",
     "soportes": {
       "1": [
-        {"clave": "contrato_firmado", "fundamento": "Sin contrato firmado no se solicita el pago (necesidades CC-ARP-05, MFS-ARP-05, PS-ARP-05, RHF-ARP-05)."},
-        {"clave": "oficio_delegacion", "fundamento": "Oficio de la Delegación en cuanto el contrato está firmado (HU-5.1; el formato no viene en las ROP, R-07)."}
+        {
+          "clave": "contrato_firmado",
+          "fundamento": "Sin contrato firmado no se solicita el pago (necesidades CC-ARP-05, MFS-ARP-05, PS-ARP-05, RHF-ARP-05)."
+        },
+        {
+          "clave": "oficio_delegacion",
+          "fundamento": "Oficio de la Delegación en cuanto el contrato está firmado (HU-5.1; el formato no viene en las ROP, R-07)."
+        }
       ],
       "siguientes": [
-        {"clave": "contrato_firmado", "fundamento": "Contrato firmado."},
-        {"clave": "oficio_delegacion", "fundamento": "Oficio de la Delegación."},
-        {"clave": "verificacion_campo", "fundamento": "La segunda ministración se paga con la verificación del cumplimiento (HU-5.1)."}
+        {
+          "clave": "contrato_firmado",
+          "fundamento": "Contrato firmado."
+        },
+        {
+          "clave": "oficio_delegacion",
+          "fundamento": "Oficio de la Delegación."
+        },
+        {
+          "clave": "verificacion_campo",
+          "fundamento": "La segunda ministración se paga con la verificación del cumplimiento (HU-5.1)."
+        }
       ]
     }
   },
@@ -33,14 +78,32 @@
       "tipo_pago": "transferencia",
       "soportes": {
         "1": [
-          {"clave": "contrato_firmado", "fundamento": "ROP CC 7.2 (línea 4091 y 4096): el pago es posterior a la firma del Contrato de Adhesión."},
-          {"clave": "oficio_delegacion", "fundamento": "CC-ARP-05: oficio de la Delegación (ROP CC 10.1 fr. XI y XIII)."},
-          {"clave": "comprobante_cuenta", "fundamento": "CC-REQ-23, ROP CC 8.1.1.2 fr. XII (línea 4370) y 7.2 (línea 4096): para la primera ministración."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "ROP CC 7.2 (línea 4091 y 4096): el pago es posterior a la firma del Contrato de Adhesión."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "CC-ARP-05: oficio de la Delegación (ROP CC 10.1 fr. XI y XIII)."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "CC-REQ-23, ROP CC 8.1.1.2 fr. XII (línea 4370) y 7.2 (línea 4096): para la primera ministración."
+          }
         ],
         "siguientes": [
-          {"clave": "contrato_firmado", "fundamento": "Contrato de Adhesión firmado."},
-          {"clave": "oficio_delegacion", "fundamento": "Oficio de la Delegación."},
-          {"clave": "verificacion_campo", "fundamento": "ROP CC 7.2 (línea 4098): el 30 % se paga con el Informe Final de Actividades y la verificación de los trabajos."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "Oficio de la Delegación."
+          },
+          {
+            "clave": "verificacion_campo",
+            "fundamento": "ROP CC 7.2 (línea 4098): el 30 % se paga con el Informe Final de Actividades y la verificación de los trabajos."
+          }
         ]
       }
     },
@@ -48,14 +111,32 @@
       "tipo_pago": "transferencia",
       "soportes": {
         "1": [
-          {"clave": "contrato_firmado", "fundamento": "ROP PS 7.2 (líneas 5370 y 5378): 70 % posterior a la firma del Contrato de Adhesión."},
-          {"clave": "oficio_delegacion", "fundamento": "PS-ARP-05: oficio de la Delegación (ROP PS 10.1 k) y n))."},
-          {"clave": "comprobante_cuenta", "fundamento": "PS-REQ-20, ROP PS 8.1.1.2 fr. XX (línea 5650) y 7.2 (línea 5370)."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "ROP PS 7.2 (líneas 5370 y 5378): 70 % posterior a la firma del Contrato de Adhesión."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "PS-ARP-05: oficio de la Delegación (ROP PS 10.1 k) y n))."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "PS-REQ-20, ROP PS 8.1.1.2 fr. XX (línea 5650) y 7.2 (línea 5370)."
+          }
         ],
         "siguientes": [
-          {"clave": "contrato_firmado", "fundamento": "Contrato de Adhesión firmado."},
-          {"clave": "oficio_delegacion", "fundamento": "Oficio de la Delegación."},
-          {"clave": "verificacion_campo", "fundamento": "ROP PS 7.2 (línea 5371) y 10.1 n): 30 % con el formato de verificación de la Delegación."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "Oficio de la Delegación."
+          },
+          {
+            "clave": "verificacion_campo",
+            "fundamento": "ROP PS 7.2 (línea 5371) y 10.1 n): 30 % con el formato de verificación de la Delegación."
+          }
         ]
       }
     },
@@ -63,14 +144,32 @@
       "tipo_pago": "transferencia",
       "soportes": {
         "1": [
-          {"clave": "contrato_firmado", "fundamento": "ROP RHF 7.2.1.1 a) (línea 2743): 70 % posterior a la firma del Contrato de Adhesión."},
-          {"clave": "oficio_delegacion", "fundamento": "RHF-ARP-05: oficio de la Delegación (ROP RHF 10.1 l) y o))."},
-          {"clave": "comprobante_cuenta", "fundamento": "RHF-REQ-29, ROP RHF 8.1.1.2 inciso i) (línea 3034): para la entrega por transferencia."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "ROP RHF 7.2.1.1 a) (línea 2743): 70 % posterior a la firma del Contrato de Adhesión."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "RHF-ARP-05: oficio de la Delegación (ROP RHF 10.1 l) y o))."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "RHF-REQ-29, ROP RHF 8.1.1.2 inciso i) (línea 3034): para la entrega por transferencia."
+          }
         ],
         "siguientes": [
-          {"clave": "contrato_firmado", "fundamento": "Contrato de Adhesión firmado."},
-          {"clave": "oficio_delegacion", "fundamento": "Oficio de la Delegación."},
-          {"clave": "verificacion_campo", "fundamento": "ROP RHF 7.2.1.1 a) (línea 2744): 30 % una vez verificado el cumplimiento."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "Oficio de la Delegación."
+          },
+          {
+            "clave": "verificacion_campo",
+            "fundamento": "ROP RHF 7.2.1.1 a) (línea 2744): 30 % una vez verificado el cumplimiento."
+          }
         ]
       }
     },
@@ -79,26 +178,143 @@
       "nota": "PSAHEM no pide comprobante bancario: paga con cheque que entregan las Delegaciones (ROP PSAHEM 10.1 fr. X, línea 2288).",
       "soportes": {
         "1": [
-          {"clave": "contrato_firmado", "fundamento": "ROP PSAHEM 10.1 fr. IX (líneas 2286 y 2287): no se solicita el pago sin la firma del Contrato de Adhesión o Convenio de Concertación."},
-          {"clave": "oficio_delegacion", "fundamento": "PSA-ARP-05 y ROP PSAHEM 10.1 fr. VIII (líneas 2284 y 2285): oficio de solicitud."},
-          {"clave": "dictamen", "fundamento": "ROP PSAHEM 10.1 fr. VIII (línea 2285): dictamen que avala la solicitud de cheque."},
-          {"clave": "instruccion_comite", "fundamento": "ROP PSAHEM 10.1 fr. VIII (líneas 2281 a 2283): el Comité Técnico instruye a la Fiduciaria; HU-2.4."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "ROP PSAHEM 10.1 fr. IX (líneas 2286 y 2287): no se solicita el pago sin la firma del Contrato de Adhesión o Convenio de Concertación."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "PSA-ARP-05 y ROP PSAHEM 10.1 fr. VIII (líneas 2284 y 2285): oficio de solicitud."
+          },
+          {
+            "clave": "dictamen",
+            "fundamento": "ROP PSAHEM 10.1 fr. VIII (línea 2285): dictamen que avala la solicitud de cheque."
+          },
+          {
+            "clave": "instruccion_comite",
+            "fundamento": "ROP PSAHEM 10.1 fr. VIII (líneas 2281 a 2283): el Comité Técnico instruye a la Fiduciaria; HU-2.4."
+          }
         ],
         "siguientes": [
-          {"clave": "contrato_firmado", "fundamento": "Contrato o convenio firmado."},
-          {"clave": "oficio_delegacion", "fundamento": "Oficio de solicitud."},
-          {"clave": "dictamen", "fundamento": "Dictámenes técnico y jurídico."},
-          {"clave": "instruccion_comite", "fundamento": "Instrucción del Comité Técnico para esta ministración (HU-2.4)."},
-          {"clave": "verificacion_campo", "fundamento": "ROP PSAHEM 7.2 (línea 1376) y 10.1 fr. XI y XII (líneas 2309 a 2317): visita de campo y minuta de verificación."}
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato o convenio firmado."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "Oficio de solicitud."
+          },
+          {
+            "clave": "dictamen",
+            "fundamento": "Dictámenes técnico y jurídico."
+          },
+          {
+            "clave": "instruccion_comite",
+            "fundamento": "Instrucción del Comité Técnico para esta ministración (HU-2.4)."
+          },
+          {
+            "clave": "verificacion_campo",
+            "fundamento": "ROP PSAHEM 7.2 (línea 1376) y 10.1 fr. XI y XII (líneas 2309 a 2317): visita de campo y minuta de verificación."
+          }
         ]
       }
     },
     "PEG": {
       "tipo_pago": "deposito",
-      "nota": "Guardabosques aún no tiene archivo de reglas: solo se define que su pago es un depósito (PEG-AF-01). Los soportes propios (validación de reportes por el CASPEG) llegan con M6.",
+      "nota": "PEG: transferencia interbancaria (depósito) a la persona Guardabosque, previa entrega de los reportes mensuales (7.2.1, líneas 8497 a 8504); la Instancia Ejecutora genera la solicitud del recurso tras la evaluación interna de los reportes (10.1 fr. XIII, líneas 9024 y 9025) y el Comité la valida (Convocatoria, líneas 9505 y 9506). La ROP no prevé oficio de la Delegación para el pago. Mientras no exista la evaluación por Guardabosque (HU-4.3), la fuente «evaluacion_reportes» cuenta los periodos que el CASPEG ya validó para el expediente (acuerdos de HU-2.4): la ministración N pide N periodos validados (decisión propia; el reparto de periodos por ministración no está en las ROP, R-18).",
       "soportes": {
-        "1": [{"clave": "contrato_firmado", "fundamento": "Formalización del programa (HU-3.3)."}],
-        "siguientes": [{"clave": "contrato_firmado", "fundamento": "Formalización del programa (HU-3.3)."}]
+        "1": [
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado y credencial entregada (HU-3.3; ROP PEG 10.1 fr. XII, líneas 9021 a 9023)."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "PEG-REQ-09, ROP PEG 8.1.1.2 b) fr. III (línea 8551): contrato de apertura o estado de cuenta vigente a nombre del Guardabosque, de ser asignado."
+          },
+          {
+            "clave": "evaluacion_reportes",
+            "fundamento": "ROP PEG 7.2.1 (línea 8499) y 10.1 fr. XIII (línea 9024); Convocatoria base cuarta (líneas 9505 y 9506): el apoyo se otorga con base en la revisión de los reportes mensuales, validada por el Comité."
+          }
+        ],
+        "siguientes": [
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "Cuenta bancaria vigente del Guardabosque."
+          },
+          {
+            "clave": "evaluacion_reportes",
+            "fundamento": "Reportes mensuales del periodo evaluados y validados por el CASPEG (7.2.1; 10.1 fr. XIII)."
+          }
+        ]
+      }
+    },
+    "MFS": {
+      "tipo_pago": "transferencia",
+      "nota": "MFS: el 70 % (ETF) o 50 % (FSC) se paga tras la firma del Contrato de Adhesión y, en su caso, del contrato de Prestación de Servicios Técnicos (10.1.1 inciso l, línea 8090); la segunda ministración, contra la entrega de la Bitácora o la autorización (ETF) o de la solicitud o Plan de auditoría (FSC), no contra una verificación en campo (7.2, líneas 6871 y 6885; 10.1.1 inciso m). La entrega la registra HU-4.1 (envío de comprobaciones).",
+      "soportes": {
+        "1": [
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "ROP MFS 10.1.1 inciso l) (línea 8090): el recurso se entrega con el Contrato de Adhesión y, en su caso, el de Prestación de Servicios Técnicos firmados (HU-3.3)."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "MFS-ARP-05: oficio de la Delegación (HU-5.1; el formato no viene en las ROP, R-07)."
+          },
+          {
+            "clave": "comprobante_cuenta",
+            "fundamento": "MFS-REQ-10, ROP MFS 8.1.1.2 fr. VIII (línea 7015): documento bancario vigente al firmar el contrato (núcleos agrarios: cuenta mancomunada, MFS-REQ-11)."
+          }
+        ],
+        "siguientes": [
+          {
+            "clave": "contrato_firmado",
+            "fundamento": "Contrato de Adhesión firmado."
+          },
+          {
+            "clave": "oficio_delegacion",
+            "fundamento": "Oficio de la Delegación."
+          },
+          {
+            "clave": "verificacion_campo",
+            "fundamento": "Respaldo si el régimen no se conoce (no debería ocurrir: cada modalidad tiene régimen en las reglas)."
+          }
+        ],
+        "siguientes_por_regimen": {
+          "etf": [
+            {
+              "clave": "contrato_firmado",
+              "fundamento": "Contrato de Adhesión firmado."
+            },
+            {
+              "clave": "oficio_delegacion",
+              "fundamento": "Oficio de la Delegación."
+            },
+            {
+              "clave": "entregable_etf",
+              "fundamento": "ROP MFS 7.2 (cuadro de entregables, línea 6871) y 10.1.1 inciso m): el 30 % se paga al presentar copia de la Bitácora para la autorización del estudio técnico aprobado o de la autorización respectiva."
+            }
+          ],
+          "fsc": [
+            {
+              "clave": "contrato_firmado",
+              "fundamento": "Contrato de Adhesión firmado."
+            },
+            {
+              "clave": "oficio_delegacion",
+              "fundamento": "Oficio de la Delegación."
+            },
+            {
+              "clave": "entregable_fsc",
+              "fundamento": "ROP MFS 7.2 (cuadro de entregables, línea 6885), 8.1.7 incisos n) y o) y 10.1.1 inciso m): el 50 % restante se paga al presentar copia de la solicitud de auditoría o del Plan de auditoría."
+            }
+          ]
+        }
       }
     }
   },

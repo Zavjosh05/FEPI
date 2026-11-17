@@ -11,7 +11,7 @@ from nucleo.models import Ejercicio
 
 from .fixtures_m2 import documento_sesion
 
-__all__ = ["PEG_SOLICITUD", "aprobadas", "notificadas", "en_delegacion", "contratadas", "catalogo_planta", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
+__all__ = ["PEG_SOLICITUD", "direccion_de", "elementos_propios", "aprobadas", "notificadas", "en_delegacion", "contratadas", "catalogo_planta", "mfs", "contrato_manual", "modelo_validado", "delegado_de",
            "SOLICITUDES_M3"]
 
 # programa: (usuario Delegación, municipio, predio, persona, modalidad, hectáreas)
@@ -25,12 +25,31 @@ SOLICITUDES_M3 = {
             ("del_valle", "Amanalco", "Ojo de Agua", "Guadalupe Reyes Albarrán", "bosques_de_agua", 2)],
     "PSA": [("del_toluca", "Ocoyoacac", "Bosque El Zarco", "Felipe Hernández Ramos", "cuenca_alta", 30),
             ("del_valle", "Villa Victoria", "Monte La Loma", "Josefina Colín Becerril", "cuenca_media_baja", 25)],
+    # MFS: monto fijo por concepto; el primero es un Programa de Manejo maderable de 7 a 95 ha (régimen ETF, 70/30), el
+    # segundo una certificación FSC de cadena de custodia (50/50). El polígono lo levanta el prestador con RFN (8.1.7 c).
+    "MFS": [("del_amecameca", "Amecameca", "Bosque Los Volcanes", "Ejido San Pedro Nexapa", "etf_pmf_maderable_7_95", 40),
+            ("del_toluca", "Zinacantepec", "Aserradero La Cumbre", "Maderas La Cumbre", "fsc_certificacion_cadena_custodia", 12)],
+    # PEG: solicita el núcleo agrario; la persona beneficiaria es el Guardabosque (sin superficie ni polígono).
+    "PEG": [("del_amecameca", "Amecameca", "Ejido San Juan", "Ejido San Juan", "apoyo_monetario_guardabosque", None),
+            ("del_valle", "Amanalco", "Ejido San Bartolo", "Ejido San Bartolo", "apoyo_monetario_guardabosque", None)],
 }
+GUARDABOSQUES = [("Margarito Sánchez Ruiz", "SARM800101HMCNZR09"), ("Juana Colín Esquivel", "COEJ850315MMCLSN02")]
+EXTRA_M3 = {
+    "MFS": lambda i: {"levantado_por": "prestador"},
+    "PEG": lambda i: {"tipo": "nucleo_agrario", "beneficiaria_nombre": GUARDABOSQUES[i][0],
+                      "beneficiaria_curp": GUARDABOSQUES[i][1]},
+}
+
+
+def direccion_de(usuarios, ejercicio):
+    """Usuario de la Dirección que es Instancia Ejecutora del programa (Protección Forestal en PEG)."""
+    return usuarios["dir_dpf"] if ejercicio.programa.clave == "PEG" else usuarios["dir_drff"]
 
 
 # Guardabosques: la registra el núcleo agrario, en la modalidad única del programa y sin superficie (reglas/PEG.json).
 PEG_SOLICITUD = {"tipo": "nucleo_agrario", "modalidad": "apoyo_monetario_guardabosque", "ha": None,
-                 "solicitante": "Ejido San Juan"}
+                 "solicitante": "Ejido San Juan", "beneficiaria": "Margarito Sánchez Ruiz",
+                 "beneficiaria_curp": "SARM800101HMCNZR09"}
 
 
 @pytest.fixture
@@ -43,11 +62,13 @@ def aprobadas(catalogos, usuarios):
     def _crear(programa="PS", autoriza=True, presupuesto=None, no_factible=False, cuantas=None):
         ejercicio = Ejercicio.objects.get(programa__clave=programa, anio=2026)
         datos = SOLICITUDES_M3[programa][:cuantas]
+        direccion = direccion_de(u, ejercicio)
         exps = []
         for i, (deleg, municipio, predio, persona, modalidad, ha) in enumerate(datos):
-            exp = _validada(u[deleg], u["dir_drff"], ejercicio, municipio, predio, persona, modalidad, ha)
+            extra = EXTRA_M3.get(programa, lambda i: {})(i)
+            exp = _validada(u[deleg], direccion, ejercicio, municipio, predio, persona, modalidad, ha, **extra)
             malo = no_factible and i == len(datos) - 1
-            tecnico.dictaminar(u["dir_drff"], exp, "no_factible" if malo else "factible", "Dictamen técnico de prueba.")
+            tecnico.dictaminar(direccion, exp, "no_factible" if malo else "factible", "Dictamen técnico de prueba.")
             juridico.dictaminar(u["juridica"], exp, "procedente", "Documentación completa.")
             exps.append(exp)
         fecha = timezone.localtime(timezone.now()) - timedelta(hours=2)
@@ -77,7 +98,7 @@ def notificadas(aprobadas, usuarios):
 
     def _crear(programa="PS", cuantas=1, **kw):
         sesion, exps = aprobadas(programa, cuantas=cuantas, **kw)
-        publicacion.publicar(usuarios["dir_drff"], sesion)
+        publicacion.publicar(direccion_de(usuarios, sesion.ejercicio), sesion)
         for e in exps:
             publicacion.registrar_entrega(delegado_de(usuarios, e), e.notificaciones.get(tipo="resultados"), "personal")
             e.refresh_from_db()
@@ -93,7 +114,7 @@ def modelo_validado(usuarios):
 
     def _crear(ejercicio, tipo=TipoModelo.CONTRATO_ADHESION, nombre="Modelo de prueba"):
         texto = contratos.PLANTILLAS_BASE[tipo].replace(contratos.MARCA_BORRADOR, "").strip()
-        m = contratos.registrar_modelo(usuarios["dir_drff"], ejercicio, tipo, nombre, texto)
+        m = contratos.registrar_modelo(direccion_de(usuarios, ejercicio), ejercicio, tipo, nombre, texto)
         contratos.validar_version(usuarios["juridica"], m.vigente, "Conforme.")
         return m
     return _crear
@@ -108,8 +129,9 @@ def en_delegacion(notificadas, modelo_validado, usuarios):
     def _crear(programa="PS", cuantas=1, **kw):
         sesion, exps = notificadas(programa, cuantas=cuantas, **kw)
         modelo = modelo_validado(exps[0].ejercicio)
+        direccion = direccion_de(usuarios, exps[0].ejercicio)
         for e in exps:
-            contratos.enviar_a_delegacion(usuarios["dir_drff"], contratos.elaborar_contrato(usuarios["dir_drff"], e, modelo))
+            contratos.enviar_a_delegacion(direccion, contratos.elaborar_contrato(direccion, e, modelo))
             e.refresh_from_db()
         return sesion, exps
     return _crear
@@ -117,14 +139,9 @@ def en_delegacion(notificadas, modelo_validado, usuarios):
 
 @pytest.fixture
 def mfs(catalogos):
-    """MFS 2026 sin archivo de reglas: tipo de persona, un requisito y el plazo de firma de 10 días hábiles."""
-    from nucleo.models import Plazo
-
-    from .fixtures_m2 import _reglas_minimas
-
-    ej = _reglas_minimas("MFS", catalogos)
-    Plazo.objects.get_or_create(ejercicio=ej, clave="firma_contrato", defaults={
-        "descripcion": "Firma del contrato", "cantidad": 10, "unidad": "dias_habiles", "fundamento": "prueba"})
+    """MFS 2026 con sus reglas reales (``reglas/MFS.json``; firma en 10 días hábiles desde la notificación)."""
+    ej = Ejercicio.objects.get(programa__clave="MFS", anio=2026)
+    assert ej.tiene_reglas and ej.plazo("firma_contrato").cantidad == 10
     return ej
 
 
@@ -176,11 +193,22 @@ def contratadas(en_delegacion, usuarios):
     def _crear(programa="PS", cuantas=1, **kw):
         sesion, exps = en_delegacion(programa, cuantas=cuantas, **kw)
         for e in exps:
-            firma.registrar_firma(delegado_de(usuarios, e), e, None, "persona", e.solicitante.nombre,
-                                  archivo_demo("firmado.pdf"), [p["clave"] for p in firma.puntos_de_verificacion(e)])
+            firma.registrar_firma(delegado_de(usuarios, e), e, None, "persona", e.beneficiaria.nombre,
+                                  archivo_demo("firmado.pdf"), [p["clave"] for p in firma.puntos_de_verificacion(e)],
+                                  elementos_propios(e))
             e.refresh_from_db()
         return sesion, exps
     return _crear
+
+
+def elementos_propios(expediente, dato="RFN-PRUEBA-01"):
+    """Los elementos de formalización propia del programa (MFS: contrato de servicios técnicos y carta compromiso; PEG:
+    credencial), con un archivo y su dato, para registrar la firma completa."""
+    from contrato import firma
+    from nucleo.demo import archivo_demo
+
+    return {e["clave"]: {"archivo": archivo_demo(f"{e['clave']}.pdf"), "dato": dato if e.get("dato") else ""}
+            for e in firma.formalizacion_propia(expediente)["elementos"]}
 
 
 @pytest.fixture

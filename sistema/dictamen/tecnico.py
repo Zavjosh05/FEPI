@@ -24,7 +24,7 @@ def lista_verificacion(ejercicio, modalidad=None):
     datos = ejercicio.datos or {}
     items = []
     sup = datos.get("superficie")
-    if sup:
+    if sup and sup.get("aplica") is not False:  # PEG no usa superficie (paga por persona)
         rango = reglas.rango_superficie(ejercicio, modalidad)
         items.append({"clave": "superficie", "grupo": "Superficie",
                       "texto": rango["texto"]

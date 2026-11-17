@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 
+from nucleo import reglas
 from nucleo.models import Ejercicio, Modalidad, Municipio, Predio, TipoPersona, TipoPersonaGeneral
 
 from .models import EstadoRevision, LevantadoPor
@@ -43,6 +44,9 @@ class RegistroSolicitudForm(Bs, forms.Form):
     curp = forms.CharField(label="CURP", max_length=18, required=False)
     rfc = forms.CharField(label="RFC", max_length=13, required=False)
     representante = forms.CharField(label="Representante legal o comisariado", max_length=250, required=False)
+    beneficiaria_nombre = forms.CharField(label="Nombre de la persona beneficiaria", max_length=250, required=False)
+    beneficiaria_curp = forms.CharField(label="CURP", max_length=18, required=False)
+    beneficiaria_telefono = forms.CharField(label="Teléfono", max_length=40, required=False)
     telefono = forms.CharField(label="Teléfono", max_length=40, required=False)
     correo = forms.EmailField(label="Correo electrónico", required=False)
     observaciones = forms.CharField(label="Observaciones de la ventanilla", required=False,
@@ -50,6 +54,7 @@ class RegistroSolicitudForm(Bs, forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.beneficiaria = None
         ejercicios = Ejercicio.objects.filter(vigente=True, reglas_cargadas__isnull=False).select_related("programa")
         self.fields["ejercicio"].queryset = ejercicios
         self.fields["ejercicio"].label_from_instance = lambda e: f"{e.programa.nombre} {e.anio}"
@@ -60,7 +65,10 @@ class RegistroSolicitudForm(Bs, forms.Form):
         ejercicio = ejercicio or ejercicios.first()
         if ejercicio:
             self.fields["ejercicio"].initial = ejercicio.pk
-            self.fields["tipo_persona"].queryset = ejercicio.tipos_persona.all()
+            self.fields["tipo_persona"].queryset = reglas.tipos_persona_seleccionables(ejercicio)
+            self.beneficiaria = reglas.persona_beneficiaria_distinta(ejercicio)
+            if self.beneficiaria:
+                self.fields["beneficiaria_nombre"].label = f"Nombre: {self.beneficiaria['etiqueta']}"
             self.fields["modalidad"].queryset = ejercicio.modalidades.filter(seleccionable=True)
         self.fields["municipio"].label_from_instance = lambda m: (
             f"{m.nombre} — {m.delegacion.nombre.replace('Delegación Regional Forestal', 'DRF')}" if m.delegacion
@@ -88,6 +96,8 @@ class RegistroSolicitudForm(Bs, forms.Form):
             self.add_error("tipo_persona", "El tipo de persona no corresponde al programa.")
         if ej and ej.modalidades.filter(seleccionable=True).exists() and not datos.get("modalidad"):
             self.add_error("modalidad", "Elija la modalidad.")
+        if self.beneficiaria and self.beneficiaria.get("obligatoria") and not datos.get("beneficiaria_nombre"):
+            self.add_error("beneficiaria_nombre", f"Escriba el nombre: {self.beneficiaria['etiqueta']}.")
         return datos
 
     @staticmethod

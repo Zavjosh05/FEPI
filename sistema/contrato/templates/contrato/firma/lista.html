@@ -10,7 +10,7 @@
 <div class="tarjeta mb-3 {% if sin_firma %}border-danger{% endif %}" data-prueba="sin-firma">
   <div class="titulo-seccion">Sin firma en plazo · recurso por liberar ({{ sin_firma|length }})</div>
   {% if sin_firma %}
-  <div class="small mb-2">Venció el plazo para firmar. Liberar el recurso no es automático: lo confirma el área responsable con un motivo. La reasignación a la lista de espera es por acuerdo del Comité (sprint 3).</div>
+  <div class="small mb-2">Venció el plazo para firmar. Liberar el recurso no es automático: lo confirma el área responsable con un motivo. La reasignación a la lista de espera es por acuerdo del Comité (HU-6.1, lista de espera y sustituciones).</div>
   <div class="table-responsive"><table class="table table-sm small align-middle">
     <thead class="table-light"><tr><th>Solicitud</th><th>Persona · predio</th><th>Venció</th><th>Señalado</th>{% if es_area %}<th>Liberar el recurso</th>{% endif %}</tr></thead>
     <tbody>{% for f in sin_firma %}{% with e=f.s.expediente %}

@@ -27,7 +27,7 @@
     <input type="hidden" name="prefijo" value="pestana"><input type="hidden" name="volver" value="{% url 'recepcion:expediente' exp.folio %}?pestana=contrato">
     <input class="form-control form-control-sm w-auto flex-grow-1" name="pestana-motivo" placeholder="Motivo de la liberación del recurso" required aria-label="Motivo">
     <button class="btn btn-sm btn-danger" type="submit">Liberar el recurso</button></form>
-  <div class="small text-secondary mt-1">Liberar el recurso lo confirma una persona del área responsable; la reasignación a la lista de espera es por acuerdo del Comité (sprint 3).</div>
+  <div class="small text-secondary mt-1">Liberar el recurso lo confirma una persona del área responsable; la reasignación a la lista de espera es por acuerdo del Comité (HU-6.1, lista de espera y sustituciones).</div>
   {% else %}<div class="small text-secondary mt-1">El área responsable confirma la liberación del recurso; no es automática.</div>{% endif %}
 </div>
 {% elif contrato and contrato.enviado %}

@@ -28,26 +28,32 @@ def paso(fecha, hora=10, minuto=0):
     return reloj.en(cuando(fecha, hora, minuto), tic=2)
 
 
-def _validada(u_del, u_dir, ejercicio, municipio, predio, persona, modalidad, ha, desplazamiento=(0, 0), registro=None, **extra):
+def _validada(u_del, u_dir, ejercicio, municipio, predio, persona, modalidad, ha, desplazamiento=(0, 0), registro=None,
+              tipo="fisica", levantado_por="delegacion", **extra):
     """Solicitud registrada, con requisitos, polígono, enviada a la Dirección y validada. Con ``registro`` (fecha del registro)
     cada paso ocurre en su día del calendario: polígono al día hábil siguiente, envío a los 2 y validación a los 5 días hábiles;
     sin ella, todo ocurre «ahora» (fixtures de pruebas)."""
+    superficie = str(ha) if ha is not None else None
+    usa_poligono = ejercicio.programa.usa_poligono
+    quien = "Brigada de la Delegación" if levantado_por == "delegacion" else "Prestador de servicios forestales (RFN)"
     if registro is None:
-        exp = _solicitud(u_del, ejercicio, municipio, predio, persona, "fisica", modalidad, str(ha), **extra)
+        exp = _solicitud(u_del, ejercicio, municipio, predio, persona, tipo, modalidad, superficie, **extra)
         completar_requisitos(u_del, exp)
-        recepcion.registrar_poligono(u_del, exp, cuadro_en_municipio(exp.predio.municipio, ha, desplazamiento), "dibujo",
-                                     "delegacion", "Brigada de la Delegación", timezone.localdate() - timedelta(days=5))
+        if usa_poligono:
+            recepcion.registrar_poligono(u_del, exp, cuadro_en_municipio(exp.predio.municipio, ha, desplazamiento), "dibujo",
+                                         levantado_por, quien, timezone.localdate() - timedelta(days=5))
         recepcion.enviar_a_direccion(u_del, exp)
         recepcion.validar_expediente(u_dir, exp)
         exp.refresh_from_db()
         return exp
     registro = habil(registro)
     with paso(registro, 9):
-        exp = _solicitud(u_del, ejercicio, municipio, predio, persona, "fisica", modalidad, str(ha), **extra)
+        exp = _solicitud(u_del, ejercicio, municipio, predio, persona, tipo, modalidad, superficie, **extra)
         completar_requisitos(u_del, exp)
-    with paso(habil(registro, 1), 12):
-        recepcion.registrar_poligono(u_del, exp, cuadro_en_municipio(exp.predio.municipio, ha, desplazamiento), "dibujo",
-                                     "delegacion", "Brigada de la Delegación", timezone.localdate() - timedelta(days=1))
+    if usa_poligono:
+        with paso(habil(registro, 1), 12):
+            recepcion.registrar_poligono(u_del, exp, cuadro_en_municipio(exp.predio.municipio, ha, desplazamiento), "dibujo",
+                                         levantado_por, quien, timezone.localdate() - timedelta(days=1))
     with paso(habil(registro, 2), 10):
         recepcion.enviar_a_direccion(u_del, exp)
     with paso(habil(registro, 5), 11):

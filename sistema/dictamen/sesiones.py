@@ -18,6 +18,18 @@ from .comun import datos_dictamen, exigir_unidad
 from .models import CaracterSesion, DocumentoSesion, EstadoSesion, SesionComite
 
 
+def _invitados(comite):
+    """Invitados del Comité: listas o textos de las reglas (PEG trae permanentes en lista y especiales en un texto)."""
+    invitados = []
+    for clave in ("invitados_permanentes_solo_voz", "invitados_especiales_solo_voz"):
+        valor = comite.get(clave)
+        if isinstance(valor, list):
+            invitados += valor
+        elif valor:
+            invitados.append(valor)
+    return invitados
+
+
 def integrantes_comite(ejercicio):
     """Integrantes del Comité del programa: de las reglas (``instancias.comite``; en PSAHEM
     ``instancias.comite_tecnico``, el Comité Técnico del FIPASAHEM) o de reglas/catalogos.json."""
@@ -29,7 +41,7 @@ def integrantes_comite(ejercicio):
         return {
             "nombre": comite.get("nombre", ""), "fundamento": f"{comite.get('numeral', '')} (línea {comite.get('linea', '')})",
             "presidencia": comite.get("presidencia", ""), "secretaria_tecnica": comite.get("secretaria_tecnica", ""),
-            "vocales": comite.get("vocales_con_voz_y_voto", []), "invitados": comite.get("invitados_especiales_solo_voz", []),
+            "vocales": comite.get("vocales_con_voz_y_voto", []), "invitados": _invitados(comite),
             "composicion": comite.get("integracion", ""),
         }
     catalogo = leer_json(settings.REGLAS_DIR / "catalogos.json")
@@ -68,21 +80,25 @@ def anticipacion_requerida(sesion):
     plazo = sesion.ejercicio.plazo(clave)
     if plazo is None:
         return None, None
+    cantidad, texto_plazo = plazo.cantidad, plazo.texto_plazo
     if sesion.caracter == CaracterSesion.EXTRAORDINARIA:
         horas = (plazo.datos or {}).get("cantidad_extraordinaria_horas")
-        if horas is None:
+        dias = (plazo.datos or {}).get("cantidad_extraordinaria_dias")  # PEG: un día (9.4.2, línea 8942)
+        if horas is None and dias is None:
             return None, None
-        return f"{horas} horas ({plazo.fundamento})", sesion.fecha_hora - timedelta(hours=horas)
+        if horas is not None:
+            return f"{horas} horas ({plazo.fundamento})", sesion.fecha_hora - timedelta(hours=horas)
+        cantidad, texto_plazo = dias, f"{dias} día{'s' if dias != 1 else ''} hábil{'es' if dias != 1 else ''}"
     # N días hábiles de anticipación: entre el día del envío y el de la sesión debe haber N días hábiles.
     fecha_sesion = timezone.localtime(sesion.fecha_hora).date()
     limite = fecha_sesion
     contados = 0
-    while contados < plazo.cantidad:
+    while contados < cantidad:
         limite -= timedelta(days=1)
         if dias_habiles.es_habil(limite):
             contados += 1
     fin_del_dia = timezone.make_aware(datetime.combine(limite, time(23, 59, 59)))
-    return f"{plazo.texto_plazo} de anticipación ({plazo.fundamento})", fin_del_dia
+    return f"{texto_plazo} de anticipación ({plazo.fundamento})", fin_del_dia
 
 
 def enviar_convocatoria(usuario, sesion, momento=None):

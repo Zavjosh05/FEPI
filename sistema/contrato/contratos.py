@@ -20,7 +20,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from dictamen.comun import exigir_programa, exigir_unidad
-from nucleo import montos, plazos
+from nucleo import montos, plazos, reglas
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.models import Consecutivo, Evento, TipoUnidad, expedientes_visibles
 from nucleo.templatetags.moneda import formato_moneda
@@ -39,8 +39,11 @@ CAMPOS = {
     "municipio": "Municipio",
     "delegacion": "Delegación Regional Forestal",
     "modalidad": "Modalidad o concepto de apoyo",
+    "solicitante": "Persona solicitante (en PEG, el núcleo agrario)",
     "superficie_ha": "Superficie aprobada (ha)",
-    "monto_por_hectarea": "Monto por hectárea",
+    "superficie_texto": "Superficie aprobada, como frase («, en una superficie aprobada de N hectáreas»; vacía si el programa no paga por hectárea)",
+    "monto_por_hectarea": "Monto unitario (por hectárea, por apoyo o por persona)",
+    "base_del_monto": "Base del monto («$2,000.00 por hectárea», «$30,000.00 por apoyo», «$25,550.00 por persona beneficiaria al año»)",
     "monto_total": "Monto total del apoyo",
     "ministraciones": "Ministraciones (número, porcentaje e importe)",
     "plazo_firma": "Plazo para la firma",
@@ -58,9 +61,9 @@ CONTRATO DE ADHESIÓN {{folio_contrato}}
 
 Que celebran, por una parte, la Protectora de Bosques del Estado de México (PROBOSQUE), por conducto de la {{delegacion}}, y por la otra {{persona}} ({{tipo_persona}}), en lo sucesivo «la persona beneficiaria», en el marco del programa {{programa}} {{ejercicio}} y de sus Reglas de Operación.
 
-PRIMERA. Objeto. La persona beneficiaria se obliga a realizar las actividades comprometidas en su solicitud {{folio_solicitud}} en el predio «{{predio}}» (folio {{folio_predio}}), municipio de {{municipio}}, modalidad {{modalidad}}, en una superficie aprobada de {{superficie_ha}} hectáreas.
+PRIMERA. Objeto. La persona beneficiaria se obliga a realizar las actividades comprometidas en su solicitud {{folio_solicitud}} en el predio «{{predio}}» (folio {{folio_predio}}), municipio de {{municipio}}, modalidad {{modalidad}}{{superficie_texto}}.
 
-SEGUNDA. Apoyo. PROBOSQUE otorgará un apoyo de {{monto_total}} ({{monto_por_hectarea}} por hectárea), en las siguientes ministraciones: {{ministraciones}}.
+SEGUNDA. Apoyo. PROBOSQUE otorgará un apoyo de {{monto_total}} ({{base_del_monto}}), en las siguientes ministraciones: {{ministraciones}}.
 
 TERCERA. Firma y vigencia. El presente contrato se firma dentro del plazo siguiente: {{plazo_firma}}. Su vigencia corre hasta el cumplimiento de las actividades comprometidas.
 
@@ -76,7 +79,7 @@ Que celebran PROBOSQUE y la Comisión Nacional Forestal, por una parte, y por la
 
 PRIMERA. Objeto. Incorporar el predio «{{predio}}» (folio {{folio_predio}}), municipio de {{municipio}}, con {{superficie_ha}} hectáreas, a la modalidad {{modalidad}}.
 
-SEGUNDA. Apoyo. El apoyo es de {{monto_total}} ({{monto_por_hectarea}} por hectárea), en las ministraciones: {{ministraciones}}.
+SEGUNDA. Apoyo. El apoyo es de {{monto_total}} ({{base_del_monto}}), en las ministraciones: {{ministraciones}}.
 
 TERCERA. Firma. {{plazo_firma}}.
 
@@ -211,15 +214,22 @@ def datos_del_contrato(expediente, folio, ahora):
     ministraciones = [f"{x.numero}.ª ministración, {x.porcentaje.normalize():f} % ({formato_moneda(x.importe)})"
                       for x in m.ministraciones] or ["sin ministraciones (concepto sin recurso económico)"]
     sol = expediente.solicitante
+    persona, tipo_persona = sol.nombre, expediente.tipo_persona.nombre
+    conf = reglas.persona_beneficiaria_distinta(expediente.ejercicio)
+    if conf and expediente.persona_beneficiaria_id:
+        # PEG: el contrato es de la persona Guardabosque; el núcleo agrario que la designó firma y sella (10.1 fr. XII).
+        persona, tipo_persona = expediente.persona_beneficiaria.nombre, f"{conf['etiqueta']}, {sol.nombre}"
+    superficie = f"{m.superficie_ha.normalize():f}"
     return {
         "folio_contrato": folio, "folio_solicitud": expediente.folio,
         "programa": expediente.programa.nombre, "ejercicio": str(expediente.ejercicio.anio),
-        "persona": sol.nombre, "tipo_persona": expediente.tipo_persona.nombre,
+        "persona": persona, "tipo_persona": tipo_persona, "solicitante": sol.nombre,
         "representante": sol.representante or "", "predio": expediente.predio.nombre,
         "folio_predio": expediente.predio.folio, "municipio": expediente.predio.municipio.nombre,
         "delegacion": expediente.delegacion.nombre,
         "modalidad": expediente.modalidad.nombre if expediente.modalidad else "—",
-        "superficie_ha": f"{m.superficie_ha.normalize():f}", "monto_por_hectarea": formato_moneda(m.monto_ha),
+        "superficie_ha": superficie, "monto_por_hectarea": formato_moneda(m.monto_ha), "base_del_monto": m.texto_base,
+        "superficie_texto": f", en una superficie aprobada de {superficie} hectáreas" if m.por_hectarea else "",
         "monto_total": formato_moneda(m.total), "ministraciones": "; ".join(ministraciones),
         "plazo_firma": firma.texto if firma else "las Reglas de Operación no fijan plazo para este programa",
         "fecha_elaboracion": f"{timezone.localtime(ahora):%d/%m/%Y}",
@@ -227,6 +237,7 @@ def datos_del_contrato(expediente, folio, ahora):
         "_detalle": [{"numero": x.numero, "porcentaje": f"{x.porcentaje.normalize():f}", "importe": formato_moneda(x.importe),
                       "condicion": x.condicion} for x in m.ministraciones],
         "_regimen": m.regimen_nombre or m.regimen,
+        "_por_hectarea": m.por_hectarea, "_nota_monto": m.nota,
     }
 
 

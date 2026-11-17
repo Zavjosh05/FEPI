@@ -1,10 +1,12 @@
-"""Recorrido completo del prototipo del sprint 1 con una sola solicitud, en cada programa con reglas (CC, PS,
-RHF y PSAHEM).
+"""Recorrido completo del prototipo del sprint 1 con una sola solicitud, en los seis programas (CC, PS, RHF, PSAHEM,
+MFS y Guardabosques).
 
 «Una solicitud de prueba recorre la recepción, la validación, los dictámenes y la sesión de aprobación.»
 Cada paso lo hace la unidad que le toca y se comprueba el relevo: el expediente sale de una bandeja y
 entra en la siguiente, con su estado, su acuse y su renglón en la bitácora. Incluye el flujo alterno A
-(aviso de faltantes y reenvío) y un acuerdo de una sesión de seguimiento.
+(aviso de faltantes y reenvío) y un acuerdo de una sesión de seguimiento. En MFS el polígono lo levanta el prestador
+de servicios forestales con RFN (8.1.7 c); en PEG solicita el núcleo agrario, la persona beneficiaria es el
+Guardabosque, no hay polígono y atiende la Dirección de Protección Forestal.
 """
 from decimal import Decimal
 
@@ -24,7 +26,7 @@ from .fixtures_m2 import despues_de, documento_sesion, fecha_sesion
 
 pytestmark = pytest.mark.django_db
 
-UNIDADES = ("del_amecameca", "del_toluca", "dir_drff", "juridica", "comite")
+UNIDADES = ("del_amecameca", "del_toluca", "dir_drff", "dir_dpf", "juridica", "comite")
 
 
 def en_bandeja_de(exp, usuarios):
@@ -38,6 +40,8 @@ PROGRAMAS = {
     "PS": ("plantacion_forestal_comercial", "fisica", "3", "caso_fortuito"),
     "RHF": ("rfi_modalidad_dos", "fisica", "2", "caso_fortuito"),
     "PSA": ("cuenca_alta", "fisica", "25", "caso_fortuito"),
+    "MFS": ("etf_pmf_maderable_7_95", "fisica", "40", "suspension"),          # MFS no trae caso fortuito (R-17)
+    "PEG": ("apoyo_monetario_guardabosque", "nucleo_agrario", None, "suspension"),  # 9.4.3 c): el CASPEG suspende
 }
 
 
@@ -49,19 +53,26 @@ def requisito_para_faltar(exp):
 
 @pytest.mark.parametrize("programa", list(PROGRAMAS))
 def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aprobacion(programa, usuarios, pdf):
-    deleg, direccion = usuarios["del_amecameca"], usuarios["dir_drff"]
+    deleg, direccion = usuarios["del_amecameca"], usuarios["dir_dpf" if programa == "PEG" else "dir_drff"]
     jur, comite = usuarios["juridica"], usuarios["comite"]
     cc = Ejercicio.objects.get(programa__clave=programa, anio=2026)
     modalidad, tipo, superficie, tipo_acuerdo = PROGRAMAS[programa]
+    dir_ = direccion.username
+    beneficiaria = {"beneficiaria_nombre": "Margarito Sánchez Ruiz", "beneficiaria_curp": "SARM800101HMCNZR09"} \
+        if programa == "PEG" else {}
 
     # --- M1.1 Registro en la Delegación (HU-1.1) ------------------------------------------------
     datos = recepcion.DatosSolicitud(
         ejercicio=cc, municipio=Municipio.objects.get(nombre="Amecameca"), nombre_predio="Predio del recorrido",
         tipo_persona=cc.tipos_persona.get(clave=tipo), modalidad=cc.modalidades.get(clave=modalidad, seleccionable=True),
-        solicitante_nombre="Persona del Recorrido", solicitante_tipo="fisica", es_refrendo=False,
-        superficie_solicitada_ha=Decimal(superficie),
+        solicitante_nombre="Persona del Recorrido", solicitante_tipo=tipo, es_refrendo=False,
+        superficie_solicitada_ha=Decimal(superficie) if superficie else None, **beneficiaria,
     )
     exp = recepcion.registrar_solicitud(deleg, datos)
+    if programa == "PEG":
+        # Los requisitos del Guardabosque (8.1.1.2 b) se revisan en el mismo expediente que los del núcleo agrario.
+        tipos = set(exp.revisiones.values_list("requisito__tipos_persona__clave", flat=True))
+        assert {"nucleo_agrario", "guardabosque"} <= tipos and exp.beneficiaria.nombre == "Margarito Sánchez Ruiz"
     assert exp.estado.clave == "recibida" and exp.fecha_recepcion
     assert exp.acuses.count() == 1                                   # acuse de recepción
     assert en_bandeja_de(exp, usuarios) == {"del_amecameca"}        # otra Delegación no lo ve
@@ -77,9 +88,15 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     assert not recepcion.problemas_para_enviar(exp)
 
     # --- M1.3 Polígono levantado en campo (HU-1.3) ----------------------------------------------
-    pol = recepcion.registrar_poligono(deleg, exp, cuadro_en_municipio(exp.predio.municipio, float(superficie)), "dibujo",
-                                       "delegacion", "Brigada de la Delegación", timezone.localdate())
-    assert pol.vigente and abs(float(pol.superficie_ha) - float(superficie)) < 0.1
+    if cc.programa.usa_poligono:
+        quien = "prestador" if programa == "MFS" else "delegacion"   # MFS: el prestador con RFN (8.1.7 c)
+        pol = recepcion.registrar_poligono(deleg, exp, cuadro_en_municipio(exp.predio.municipio, float(superficie)),
+                                           "dibujo", quien, "Levantamiento en campo", timezone.localdate())
+        assert pol.vigente and abs(float(pol.superficie_ha) - float(superficie)) < 0.1 and pol.levantado_por == quien
+    else:
+        with pytest.raises(Exception):
+            recepcion.registrar_poligono(deleg, exp, cuadro_en_municipio(exp.predio.municipio, 1.0), "dibujo",
+                                         "delegacion", "Brigada", timezone.localdate())
 
     # --- Envío a la Dirección: relevo Delegación -> Dirección -------------------------------------
     with pytest.raises((PermissionDenied, TransicionNoPermitida)):
@@ -87,13 +104,17 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     recepcion.enviar_a_direccion(deleg, exp)
     exp.refresh_from_db()
     assert exp.estado.clave == "enviada_direccion"
-    assert en_bandeja_de(exp, usuarios) == {"dir_drff"}
+    assert en_bandeja_de(exp, usuarios) == {dir_}
 
     # --- M1.4 Flujo alterno A: aviso de faltantes, notificación y reenvío (HU-1.4) ----------------
     plano.refresh_from_db()
     aviso = recepcion.validar_expediente(direccion, exp, [plano.pk], "El plano no trae coordenadas")
     exp.refresh_from_db()
-    assert exp.estado.clave == "faltantes" and aviso.fecha_limite
+    assert exp.estado.clave == "faltantes"
+    if programa == "PEG":   # PEG no da plazo para completar (R-18): el aviso lo dice en lugar de una fecha
+        assert aviso.fecha_limite is None and "sin plazo en las reglas" in str(aviso.acuse.contenido)
+    else:
+        assert aviso.fecha_limite
     assert en_bandeja_de(exp, usuarios) == {"del_amecameca"}        # regresa a la Delegación
     recepcion.registrar_notificacion(deleg, aviso)                  # por conducto de la Delegación
     plano.refresh_from_db()
@@ -104,13 +125,14 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     assert exp.estado.clave == "validada"
 
     # --- M2.1 y M2.2 Dictámenes en paralelo: Dirección y Unidad Jurídica --------------------------
-    assert en_bandeja_de(exp, usuarios) == {"dir_drff", "juridica"}
+    assert en_bandeja_de(exp, usuarios) == {dir_, "juridica"}
     with pytest.raises((PermissionDenied, TransicionNoPermitida)):
         exp.cambiar_estado("no_factible", direccion, "Sin pasar por el Comité")
     tecnico.dictaminar(direccion, exp, "factible", "Reforestación con densidad suficiente")
     exp.refresh_from_db()
     assert exp.estado.clave == "validada"                           # falta el jurídico
-    assert exp.dictamen_tecnico.analisis["superficie_en_rango"] is True    # rango de su modalidad o cuenca
+    if cc.programa.usa_poligono:
+        assert exp.dictamen_tecnico.analisis["superficie_en_rango"] is True    # rango de su modalidad o cuenca
     assert exp.dictamen_tecnico.fecha_limite                        # plazo de dictaminación de sus reglas
     assert en_bandeja_de(exp, usuarios) == {"juridica"}            # la Dirección ya dictaminó
     juridico.dictaminar(jur, exp, "procedente", "Documentación legal vigente")
@@ -133,7 +155,8 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     exp.refresh_from_db()
     sesion.refresh_from_db()
     assert exp.estado.clave == "aprobada" and sesion.autoriza_publicacion and acta.archivo
-    assert en_bandeja_de(exp, usuarios) == {"dir_drff"}            # el área responsable publica (M3)
+    assert en_bandeja_de(exp, usuarios) == {dir_}                  # el área responsable publica (M3)
+    assert exp.hitos.filter(clave="aprobacion_comite").exists()    # arranca la firma en PEG (R-18)
 
     # --- M2.4 Sesión de seguimiento: el acuerdo llega al área que debe cumplirlo -------------------
     seg = sesiones.crear_sesion(comite, cc, TipoSesion.SEGUIMIENTO, fecha_sesion(8), "Sala de juntas",
@@ -142,6 +165,8 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     sesiones.enviar_convocatoria(comite, seg)
     acuerdo = seguimiento.registrar_acuerdo(comite, seg, tipo_acuerdo, "Atender el aviso de siniestro", [exp])
     assert acuerdo in seguimiento.acuerdos_pendientes(acuerdo.unidad_responsable)
+    if tipo_acuerdo != "cancelacion":
+        assert acuerdo.unidad_responsable == direccion.unidad     # la Instancia Ejecutora del programa
     responsable = next(u for u in usuarios.values() if u.unidad_id == acuerdo.unidad_responsable_id)
     seguimiento.cumplir(responsable, acuerdo, "Atendido")
     assert acuerdo not in seguimiento.acuerdos_pendientes(acuerdo.unidad_responsable)
