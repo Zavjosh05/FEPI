@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Padrón de personas beneficiarias{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-1">Padrón de personas beneficiarias de los programas de PROBOSQUE</h1>
+  <div class="text-secondary small">Relación de las personas beneficiarias de cada programa y ejercicio, con la información que las Reglas de Operación permiten publicar. No necesita iniciar sesión. Se actualiza solo con las bajas, cancelaciones y sustituciones.</div>
+</div>
+<div class="tarjeta" data-prueba="indice-padron">
+  {% for p in publicaciones %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom">
+    <div><a class="fw-semibold" href="{% url 'padron:programa' p.ejercicio.programa.clave p.ejercicio.anio %}">{{ p.ejercicio.programa.nombre }} {{ p.ejercicio.anio }}</a>
+      <div class="small text-secondary">Publicado el {{ p.publicada_en|date:"d/m/Y" }}</div></div>
+    <div class="d-flex gap-2"><a class="btn btn-sm btn-outline-primary" href="{% url 'padron:programa' p.ejercicio.programa.clave p.ejercicio.anio %}">Ver el padrón</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'padron:csv' p.ejercicio.programa.clave p.ejercicio.anio %}">CSV</a></div>
+  </div>
+  {% empty %}<div class="text-secondary">Todavía no se publica ningún padrón.</div>{% endfor %}
+</div>
+{% endblock %}

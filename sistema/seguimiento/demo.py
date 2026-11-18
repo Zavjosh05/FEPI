@@ -26,6 +26,10 @@ Unidad Jurídica emite el requerimiento por el valor de la planta no establecida
 demostración) a la cuenta de RHF; la Delegación lo notifica el 16-nov y Administración y Finanzas comprueba el depósito el 18-nov
 (reintegrada). En la fecha de corte la revisión de plazos señala lo demás (faltantes vencidos de la recepción; los reportes no
 entregados de los Guardabosques ya los señaló la evaluación de HU-4.3) para que una persona lo confirme.
+
+**HU-6.3 · Cierre del ejercicio** (``_cierre``): el 19-nov (fecha de corte) el área responsable de RHF cierra el expediente de Loma del
+Aire (reintegro depositado), publica el padrón de RHF y envía el informe anual al Comité (la Secretaría Técnica aún no registra su
+recepción); la Dirección de Protección Forestal publica el padrón del PEG con sus altas, bajas y sustituciones.
 """
 from decimal import Decimal
 
@@ -43,7 +47,7 @@ from nucleo.demo import _pdf_demo, archivo_demo
 from nucleo.demo_calendario import cuando, habil, habil_antes
 from nucleo.models import Ejercicio, Expediente, Usuario
 
-from . import incumplimientos, reasignacion
+from . import cierre, incumplimientos, reasignacion
 
 # (usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas)
 LOTE = [("del_valle", "Amanalco", "Arroyo Seco", "Inés Bernal Castro", "bosques_de_agua", 2),
@@ -203,6 +207,31 @@ def _incumplimientos(u):
         incumplimientos.revisar(fecha_corte())
 
 
+def _cierre(u):
+    """HU-6.3: el día de corte el área responsable de RHF cierra Loma del Aire (reintegro depositado), publica el padrón de RHF
+    (con la baja de Arroyo Seco y la cancelación de Loma del Aire) y envía el informe anual al Comité, que la Secretaría Técnica aún no
+    recibe; la Dirección de Protección Forestal publica el padrón del PEG (con sus altas, bajas y sustituciones)."""
+    from nucleo.demo_calendario import fecha_corte
+
+    corte = fecha_corte()
+    rhf = _ejercicio("RHF")
+    if rhf is not None:
+        loma = Expediente.objects.filter(ejercicio=rhf, predio__nombre="Loma del Aire", estado__clave="reintegrada").first()
+        if loma is not None:
+            with paso(corte, 10):
+                cierre.cerrar_expediente(u["dir_drff"], loma)
+        if cierre.padron_publicado(rhf) is None and cierre.expedientes_de(rhf).exists():
+            with paso(corte, 10, 30):
+                cierre.publicar_padron(u["dir_drff"], rhf)
+        if cierre.informe_de(rhf) is None and cierre.expedientes_de(rhf).exists():
+            with paso(corte, 11):
+                cierre.enviar_informe(u["dir_drff"], rhf)
+    peg = _ejercicio("PEG")
+    if peg is not None and cierre.padron_publicado(peg) is None and cierre.expedientes_de(peg).exists():
+        with paso(corte, 11, 30):
+            cierre.publicar_padron(u["dir_dpf"], peg)
+
+
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -212,4 +241,5 @@ def cargar_demo():
         hechas += _lote_reasignacion(u, rhf)
     _prorroga_mfs(u)
     _incumplimientos(u)
+    _cierre(u)
     return hechas

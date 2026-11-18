@@ -1,9 +1,9 @@
 """Un usuario externo (cuenta del portal) solo puede usar el portal: cualquier otra pantalla del sistema lo regresa a
-«Mis expedientes» (o responde 403 si no es una consulta GET). La página pública de resultados sigue abierta."""
+«Mis expedientes» (o responde 403 si no es una consulta GET). Las páginas públicas de resultados y del padrón siguen abiertas."""
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 
-PERMITIDAS = ("/portal/", "/static/", "/contrato/resultados/", "/salud/")
+PERMITIDAS = ("/portal/", "/static/", "/contrato/resultados/", "/padron/", "/salud/")
 
 
 class SoloPortalMiddleware:

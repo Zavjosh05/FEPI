@@ -13,6 +13,7 @@ urlpatterns = [
     path("pagos/", include("pagos.urls")),
     path("ejecucion/", include("ejecucion.urls")),
     path("seguimiento/", include("seguimiento.urls")),
+    path("padron/", include("seguimiento.urls_publicas")),  # HU-6.3: padron publico de personas beneficiarias
     path("portal/envios/", include("ejecucion.urls_portal")),  # HU-4.1: envíos desde el portal
     path("portal/seguimiento/", include("seguimiento.urls_portal")),  # HU-6.1: desistimiento y sustitución
     path("portal/", include("portal.urls")),

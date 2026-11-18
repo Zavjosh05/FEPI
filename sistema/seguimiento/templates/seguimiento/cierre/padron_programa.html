@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Padrón {{ ejercicio.programa.clave }} {{ ejercicio.anio }}{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <div class="small"><a href="{% url 'padron:indice' %}">Todos los programas</a></div>
+  <h1 class="h4 mb-1">Padrón de personas beneficiarias · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
+  <div class="text-secondary small" data-prueba="actualizacion">Publicado el {{ publicacion.publicada_en|date:"d/m/Y" }} a las {{ publicacion.publicada_en|date:"H:i" }} h. Consulta del {{ ahora|date:"d/m/Y" }} a las {{ ahora|date:"H:i" }} h{% if padron.ultimo_movimiento %}; último movimiento registrado el {{ padron.ultimo_movimiento|date:"d/m/Y" }}{% endif %}.
+    {{ padron.vigentes }} persona(s) vigente(s) de {{ padron.filas|length }}. Fundamento: {{ ejercicio.programa.clave }} {{ padron.config.numeral }}, línea {{ padron.config.linea }}.</div>
+  {% if padron.config.reserva %}<div class="small text-secondary mt-1" data-prueba="reserva">{{ padron.config.reserva }}</div>{% endif %}
+</div>
+<form method="get" class="tarjeta mb-3 d-flex flex-wrap gap-2 align-items-end" role="search">
+  <div class="flex-grow-1" style="max-width: 24rem"><label class="form-label mb-1" for="folio">Buscar por folio</label>
+    <input class="form-control" id="folio" name="folio" value="{{ folio }}" placeholder="{{ ejercicio.programa.clave }}-{{ ejercicio.anio }}-XXX-0000"></div>
+  <button class="btn btn-primary" type="submit">Buscar</button>
+  <a class="btn btn-outline-secondary" href="{% url 'padron:csv' ejercicio.programa.clave ejercicio.anio %}" data-prueba="exportar-padron">Exportar a CSV</a>
+</form>
+<div class="tarjeta mb-3" data-prueba="padron-filas">
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr>{% for c, nombre in padron.columnas %}<th>{{ nombre }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for f in filas %}<tr data-folio="{{ f.folio }}" data-situacion="{{ f.situacion_clave }}">{% for celda in f.celdas %}<td>{{ celda }}</td>{% endfor %}</tr>
+    {% empty %}<tr><td colspan="{{ padron.columnas|length }}" class="text-secondary">Sin personas beneficiarias con ese folio.</td></tr>{% endfor %}
+    {% if recortadas %}<tr><td colspan="{{ padron.columnas|length }}" class="text-secondary">Se muestran las primeras {{ filas|length }}; hay {{ recortadas }} más (búsquela por folio o descargue el CSV).</td></tr>{% endif %}</tbody>
+  </table></div>
+</div>
+{% if padron.movimientos %}
+<div class="tarjeta mb-3" data-prueba="movimientos">
+  <div class="titulo-seccion">Altas, bajas y sustituciones</div>
+  <div class="small text-secondary mb-2">{{ padron.config.movimientos_fundamento }}</div>
+  <div class="table-responsive"><table class="table table-sm small mb-0"><thead class="table-light"><tr><th>Fecha</th><th>Movimiento</th><th>Folio</th><th>Detalle</th></tr></thead>
+    <tbody>{% for m in padron.movimientos %}<tr data-tipo="{{ m.tipo }}"><td class="text-nowrap">{{ m.fecha|date:"d/m/Y" }}</td><td>{{ m.tipo }}</td><td>{{ m.folio }}</td><td>{{ m.detalle }}</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endif %}
+<div class="small text-secondary">{{ padron.config.fundamento_general.texto }} No se publican: {{ padron.config.no_se_publica|join:", " }}.</div>
+{% endblock %}

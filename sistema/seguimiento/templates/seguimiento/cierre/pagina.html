@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Cierre del ejercicio{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Cierre del ejercicio</h1>
+  <div class="small text-secondary">Resultados finales de cada programa y ejercicio: lo aprobado, verificado, pagado y reintegrado de cada persona beneficiaria, con las diferencias que haya. Desde aquí el área responsable cierra los expedientes, publica el padrón y envía el informe anual al Comité.</div>
+</div>
+{% if por_recibir %}
+<div class="tarjeta border-warning mb-3" data-prueba="informes-por-recibir">
+  <div class="titulo-seccion">Informes anuales por recibir ({{ por_recibir|length }})</div>
+  <table class="table table-sm small mb-0"><tbody>{% for i in por_recibir %}<tr><td>{{ i.ejercicio.programa.nombre }} {{ i.ejercicio.anio }}</td><td>Enviado el {{ i.enviado_en|date:"d/m/Y H:i" }} h</td><td><a href="{% url 'seguimiento:cierre_detalle' i.ejercicio.pk %}">Registrar la recepción</a></td></tr>{% endfor %}</tbody></table>
+</div>
+{% endif %}
+<div class="tarjeta" data-prueba="ejercicios-cierre">
+  {% for t in tarjetas %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom" data-programa="{{ t.ejercicio.programa.clave }}">
+    <div><a class="fw-semibold" href="{% url 'seguimiento:cierre_detalle' t.ejercicio.pk %}">{{ t.ejercicio.programa.nombre }} {{ t.ejercicio.anio }}</a>
+      <div class="small text-secondary">{{ t.cerrados }} de {{ t.expedientes }} expediente(s) cerrados ·
+        padrón {% if t.padron %}publicado el {{ t.padron.publicada_en|date:"d/m/Y" }}{% else %}sin publicar{% endif %} ·
+        informe {% if t.informe %}enviado el {{ t.informe.enviado_en|date:"d/m/Y H:i" }} h{% else %}sin enviar{% endif %}</div></div>
+    <a class="btn btn-sm btn-outline-primary" href="{% url 'seguimiento:cierre_detalle' t.ejercicio.pk %}">Ver resultados finales</a>
+  </div>
+  {% empty %}<div class="text-secondary">Todavía no hay personas beneficiarias con contrato firmado.</div>{% endfor %}
+</div>
+{% endblock %}

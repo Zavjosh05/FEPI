@@ -17,7 +17,7 @@ HISTORIAS = [
     ("HU-6.2", "Incumplimientos y reintegros", "registra cada omisión con su plazo, el caso fortuito, la cancelación, el requerimiento de devolución con monto y cuenta, el reintegro y el Listado de Incumplidas"),
     ("HU-6.3", "Cierre del ejercicio", "cuadra los resultados finales con las verificaciones y los pagos, publica el padrón y registra el envío del informe al Comité"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-6.1", "HU-6.2"}
+HISTORIAS_CONSTRUIDAS = {"HU-6.1", "HU-6.2", "HU-6.3"}
 USOS_DE_PLAZO = ['aviso_caso_fortuito', 'interes_segunda_beneficiaria', 'subsanar_omisiones']
 TIPOS_ACUERDO_M6 = ("reasignacion", "sustitucion", "liberacion_recurso", "caso_fortuito", "caso_especial", "cancelacion",
                     "suspension", "baja")
@@ -37,6 +37,9 @@ def contexto_pestana(request, exp):
     from .vistas.incumplimientos import contexto_incumplimientos_exp
 
     contexto.update(contexto_incumplimientos_exp(request, exp))
+    from .vistas.cierre import contexto_cierre_exp
+
+    contexto.update(contexto_cierre_exp(request, exp))
     return contexto
 
 
@@ -46,7 +49,7 @@ def _pestana(exp):
 
 def siguiente_paso(usuario, exp):
     """Siguiente paso de M6 en el expediente."""
-    from . import incumplimientos, reasignacion
+    from . import cierre, incumplimientos, reasignacion
 
     estado = exp.estado.clave
     abierto = incumplimientos.senalamientos_de(usuario).filter(expediente=exp).first() if usuario.tipo_unidad in (
@@ -54,6 +57,11 @@ def siguiente_paso(usuario, exp):
     if abierto is not None:
         return {"texto": abierto.config.get("accion", "Atender el señalamiento"), "url": _pestana(exp),
                 "ayuda": f"{abierto.descripcion} Lo preparó el sistema; lo confirma usted."}
+    if (usuario.tipo_unidad == TipoUnidad.DIRECCION and estado in ("concluida", "reintegrada", "cancelada")
+            and usuario.unidad.programas.filter(pk=exp.programa.pk).exists() and not hasattr(exp, "cierre")
+            and cierre.puede_cerrar(exp)[0]):
+        return {"texto": "Cerrar el expediente", "url": _pestana(exp),
+                "ayuda": "Lo aprobado, verificado, pagado y reintegrado coinciden: queda cerrado con sus resultados finales."}
     if usuario.tipo_unidad == TipoUnidad.JURIDICA and estado == "cancelada" and incumplimientos.por_emitir().filter(expediente=exp).exists():
         return {"texto": "Emitir el requerimiento de devolución", "url": _pestana(exp),
                 "ayuda": "Con el monto y la cuenta para el depósito que registró Administración y Finanzas."}
@@ -159,6 +167,23 @@ def panel_requerimientos(request):
                   reverse("seguimiento:incumplimientos"), ayuda, "Abrir incumplimientos y reintegros")
 
 
+def panel_informes(request):
+    """Secretaría Técnica: informes anuales de los programas por recibir en el Comité."""
+    from . import cierre
+
+    if request.user.tipo_unidad != TipoUnidad.SECRETARIA_COMITE:
+        return None
+    pendientes = list(cierre.informes_por_recibir()[:50])
+    if not pendientes:
+        return None
+    return _panel("panel-informes-por-recibir", "Informes anuales por recibir en el Comité", len(pendientes),
+                  [{"url": reverse("seguimiento:cierre_detalle", args=[i.ejercicio.pk]),
+                    "texto": f"{i.ejercicio.programa.nombre} {i.ejercicio.anio}",
+                    "detalle": f"Enviado el {i.enviado_en:%d/%m/%Y %H:%M} h · {i.acuse.folio if i.acuse_id else ''}"} for i in pendientes[:6]],
+                  reverse("seguimiento:cierre"), "Registre su recepción y la sesión del Comité en que se presenta.",
+                  "Ver los informes")
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -183,6 +208,9 @@ def registrar():
 
     extensiones.MENU.append({"nombre": "Incumplimientos y reintegros", "url": "seguimiento:incumplimientos",
                              "grupo": "Seguimiento y cierre", "tipos": [T.JURIDICA, T.ADMIN_FINANZAS], "estricto": True})
+    extensiones.MENU.append({"nombre": "Cierre del ejercicio", "url": "seguimiento:cierre", "grupo": "Seguimiento y cierre",
+                             "tipos": [T.DIRECCION, T.SECRETARIA_COMITE, T.JURIDICA, T.ADMIN_FINANZAS], "estricto": True})
+    extensiones.PANELES_BANDEJA.append(panel_informes)
     extensiones.AL_INCIDENCIA.append(incumplimientos.al_incidencia)
     extensiones.AL_REPORTE_INCUMPLIDO.append(incumplimientos.al_reporte_incumplido)
     extensiones.REVISIONES_PLAZO.append(incumplimientos.revisar)

@@ -4,10 +4,10 @@
   ``Prorroga``)
 - ``incumplimientos.py``  HU-6.2 Incumplimientos y reintegros (``AvisoOmision``, ``Senalamiento``, ``CuentaReintegro``,
   ``Requerimiento``)
-- ``cierre.py``  HU-6.3 Cierre del ejercicio
+- ``cierre.py``  HU-6.3 Cierre del ejercicio (``CierreExpediente``, ``PadronPublicacion``, ``InformeAnual``)
 
 Cada historia crea su archivo, lo importa aquí y genera su migración con
-``python manage.py makemigrations seguimiento -n hu_6_1_reasignacion``. Hechos: HU-6.1 y HU-6.2. ``Propuesta`` (propuesta del área
+``python manage.py makemigrations seguimiento -n hu_6_1_reasignacion``. Hechos: HU-6.1, HU-6.2 y HU-6.3. ``Propuesta`` (propuesta del área
 responsable al Comité, ligada al acuerdo que la resuelve) es común: HU-6.2 suma sus tipos.
 
 Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo):
@@ -28,3 +28,4 @@ from .reasignacion import (EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga,
                            SolicitudPersona)
 from .incumplimientos import (AvisoOmision, CuentaReintegro, EstadoRequerimiento, Requerimiento,  # noqa: E402,F401
                               Senalamiento)
+from .cierre import CierreExpediente, InformeAnual, PadronPublicacion  # noqa: E402,F401

@@ -112,5 +112,208 @@
     "solicita": "delegacion",
     "autoriza": "direccion",
     "supuesto": "Las reglas no dicen quién pide la prórroga, quién la autoriza ni por cuánto tiempo (R-17): se supone que la Delegación registra la solicitud de la persona con su acuse y que el área responsable la resuelve con el adendum. Se cambia aquí («solicita» y «autoriza»)."
+  },
+  "cierre": {
+    "nota": "HU-6.3 · Cierre del ejercicio. Las reglas no traen plazo en días para cerrar, publicar el padrón ni presentar el informe: el cierre lo hace el área responsable cuando los resultados finales cuadran, y las diferencias se señalan en pantalla (decisión propia). Cada cita es numeral y línea del texto de las ROP 2026.",
+    "diferencias": {
+      "pagado_mayor_aprobado": {
+        "nombre": "Pagado mayor que lo aprobado",
+        "gravedad": "error",
+        "texto": "Lo pagado (menos lo reintegrado) rebasa el monto aprobado, ajustado a lo verificado donde las reglas lo piden."
+      },
+      "verificado_sin_pago": {
+        "nombre": "Verificado sin pago",
+        "gravedad": "error",
+        "texto": "La verificación cumple y queda una ministración con importe por pagar sin pagarse."
+      },
+      "pagado_sin_verificacion": {
+        "nombre": "Pagado sin la verificación que la regla exige",
+        "gravedad": "error",
+        "texto": "Una ministración se pagó y las reglas piden como soporte la verificación en campo o la evaluación de reportes, y no hay."
+      },
+      "cancelado_sin_requerimiento": {
+        "nombre": "Cancelado sin requerimiento resuelto",
+        "gravedad": "error",
+        "texto": "El apoyo se canceló, se ministró recurso y el requerimiento de devolución no está depositado ni resuelto sin monto."
+      },
+      "reintegrado_mayor_pagado": {
+        "nombre": "Reintegrado mayor que lo ministrado",
+        "gravedad": "error",
+        "texto": "El depósito comprobado es mayor que lo ministrado más, donde las reglas lo piden, el valor de la planta no establecida."
+      },
+      "pago_distinto_solicitud": {
+        "nombre": "Pago distinto de la solicitud",
+        "gravedad": "error",
+        "texto": "El importe del pago registrado no coincide con el de su solicitud de pago."
+      }
+    },
+    "cierre_expediente": {
+      "desde": {
+        "concluida": "con_resultados",
+        "reintegrada": "reintegrada",
+        "cancelada": "sin_recurso"
+      },
+      "concluir_desde": [
+        "verificada",
+        "pagada",
+        "cheque_entregado",
+        "en_ejecucion"
+      ],
+      "tipos": {
+        "con_resultados": "Cerrado con resultados finales",
+        "reintegrada": "Cerrado con el reintegro depositado",
+        "sin_recurso": "Cerrado sin recurso por devolver"
+      },
+      "fundamento": "El área responsable emite los listados de resultados finales y los presenta a la Instancia Normativa (PSAHEM 10.1 fr. XIII, línea 2318; RHF 10.1 p, línea 3574; CC 10.1 fr. XIV, línea 4902; PS 10.1 o, línea 6220; PEG 10.1 fr. XVI, línea 9031). MFS no trae esa fracción: se aplica el mismo cierre (decisión propia)."
+    },
+    "informe": {
+      "destinatario": "Instancia Normativa (Comité del programa)",
+      "programas": {
+        "CC": {
+          "numeral": "15",
+          "linea": 4948,
+          "texto": "La Instancia Ejecutora o Responsable presenta un informe anual a la Instancia Normativa sobre la ejecución del programa, al final del ejercicio fiscal."
+        },
+        "PS": {
+          "numeral": "15 y 16.1",
+          "linea": 6258,
+          "texto": "La Instancia Ejecutora presenta un informe anual a la Instancia Normativa sobre la ejecución del Programa (informe de resultados, línea 6264)."
+        },
+        "RHF": {
+          "numeral": "15",
+          "linea": 3659,
+          "texto": "La Instancia Ejecutora presenta un informe anual a la Instancia Normativa sobre la ejecución del Programa."
+        },
+        "PSA": {
+          "numeral": "16.1",
+          "linea": 2367,
+          "texto": "La Instancia Responsable presenta un informe anual a la Instancia Normativa sobre la ejecución del programa al final del ejercicio fiscal."
+        },
+        "MFS": {
+          "numeral": "15",
+          "linea": 8160,
+          "texto": "La Instancia Ejecutora presenta un informe anual a la Instancia Normativa sobre la ejecución del Programa."
+        },
+        "PEG": {
+          "numeral": "15 y 10.1 fr. XVI",
+          "linea": 9096,
+          "texto": "En la primera sesión ordinaria del ejercicio fiscal siguiente, la Instancia Ejecutora presenta un informe anual al CASPEG sobre la ejecución del programa del ejercicio inmediato anterior; los resultados finales se informan al CASPEG para su conocimiento (línea 9031).",
+          "sesion_siguiente_ejercicio": true
+        }
+      },
+      "plazo": "Ninguna regla da un plazo en días para enviar el informe: queda registrada la fecha y la hora del envío y de su recepción en la sesión del Comité (decisión propia)."
+    },
+    "padron": {
+      "fundamento_general": {
+        "numeral": "8.1.5",
+        "texto": "La Instancia Ejecutora tiene permanentemente integrados, actualizados y disponibles los padrones de las personas beneficiarias de los programas no sociales a su cargo, conforme al artículo 92 fr. XIV inciso p) de la Ley de Transparencia y Acceso a la Información Pública del Estado de México y Municipios y los Lineamientos para la integración y actualización de los padrones (Gaceta, 28-nov-2025)."
+      },
+      "columnas": {
+        "folio": "Folio",
+        "persona": "Persona beneficiaria",
+        "nucleo": "Núcleo agrario",
+        "predio": "Predio",
+        "municipio": "Municipio",
+        "modalidad": "Modalidad",
+        "monto": "Monto del apoyo",
+        "situacion": "Situación",
+        "alta": "Alta"
+      },
+      "no_se_publica": [
+        "CURP",
+        "RFC",
+        "domicilio",
+        "teléfono",
+        "correo",
+        "cuenta bancaria",
+        "representante"
+      ],
+      "programas": {
+        "CC": {
+          "numeral": "8.1.5",
+          "linea": 4600,
+          "columnas": [
+            "folio",
+            "persona",
+            "municipio",
+            "predio",
+            "modalidad",
+            "monto",
+            "situacion",
+            "alta"
+          ]
+        },
+        "PS": {
+          "numeral": "8.1.5",
+          "linea": 5892,
+          "columnas": [
+            "folio",
+            "persona",
+            "municipio",
+            "predio",
+            "modalidad",
+            "monto",
+            "situacion",
+            "alta"
+          ]
+        },
+        "RHF": {
+          "numeral": "8.1.5",
+          "linea": 3231,
+          "columnas": [
+            "folio",
+            "persona",
+            "municipio",
+            "predio",
+            "modalidad",
+            "monto",
+            "situacion",
+            "alta"
+          ]
+        },
+        "PSA": {
+          "numeral": "8.1.5",
+          "linea": 1989,
+          "columnas": [
+            "folio",
+            "persona",
+            "municipio",
+            "predio",
+            "modalidad",
+            "monto",
+            "situacion",
+            "alta"
+          ]
+        },
+        "MFS": {
+          "numeral": "8.1.5",
+          "linea": 7760,
+          "columnas": [
+            "folio",
+            "persona",
+            "municipio",
+            "predio",
+            "modalidad",
+            "monto",
+            "situacion",
+            "alta"
+          ]
+        },
+        "PEG": {
+          "numeral": "8.1.5; 14; 9.4.3 a, b y d; 10.2",
+          "linea": 8750,
+          "columnas": [
+            "folio",
+            "nucleo",
+            "municipio",
+            "situacion",
+            "alta"
+          ],
+          "movimientos": true,
+          "reserva": "Las personas beneficiarias vulnerables ante un ilícito por el apoyo monetario son información clasificada (numeral 14, línea 9091): el padrón público del PEG muestra el núcleo agrario y no el nombre del Guardabosque (decisión propia por confirmar con el cliente).",
+          "movimientos_fundamento": "Altas por aprobación del CASPEG (9.4.3 a y b, líneas 8950-8951), bajas con acuerdo del CASPEG (9.4.3 d, línea 8954) y sustituciones (10.2, líneas 9057-9064)."
+        }
+      }
+    }
   }
 }

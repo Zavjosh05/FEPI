@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Cierre {{ ejercicio.programa.clave }} {{ ejercicio.anio }}{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <div class="small"><a href="{% url 'seguimiento:cierre' %}">Cierre del ejercicio</a></div>
+  <h1 class="h4 mb-1">Resultados finales · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
+  <div class="small text-secondary">{{ cfg_cierre.cierre_expediente.fundamento }}</div>
+</div>
+
+<div class="tarjeta mb-3" data-prueba="estado-cierre">
+  <div class="titulo-seccion">Para cerrar el ejercicio {% if estado.cerrado %}<span class="badge text-bg-success">Ejercicio cerrado</span>{% endif %}</div>
+  <ul class="list-unstyled small mb-0">{% for clave, texto, listo in estado.pasos %}<li data-paso="{{ clave }}" data-listo="{% if listo %}si{% else %}no{% endif %}"><span class="badge text-bg-{% if listo %}success{% else %}secondary{% endif %}">{% if listo %}Hecho{% else %}Falta{% endif %}</span> {{ texto }}</li>{% endfor %}</ul>
+</div>
+
+<div class="tarjeta mb-3" data-prueba="totales">
+  <div class="titulo-seccion">Totales del programa</div>
+  <div class="row g-2 small">
+    <div class="col-6 col-md-3"><div class="text-secondary">Aprobado</div><strong data-total="aprobado">{{ total.aprobado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Aprobado ajustado a lo verificado</div><strong data-total="ajustado">{{ total.ajustado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Pagado</div><strong data-total="pagado">{{ total.pagado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Reintegrado</div><strong data-total="reintegrado">{{ total.reintegrado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Recurso liberado</div><strong data-total="liberado">{{ total.liberado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Reasignado a la lista de espera</div><strong data-total="reasignado">{{ total.reasignado|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Liberado por reasignar</div><strong data-total="por_reasignar">{{ total.por_reasignar|moneda }}</strong></div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Expedientes</div><strong>{{ total.cerrados }} cerrados de {{ total.expedientes }}</strong> · {{ total.con_diferencias }} con diferencias</div>
+  </div>
+</div>
+
+<div class="tarjeta mb-3" data-prueba="resultados-finales">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div class="titulo-seccion mb-0">Resultados por persona beneficiaria</div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'seguimiento:resultados_csv' ejercicio.pk %}" data-prueba="exportar-resultados">Exportar a CSV</a>
+      {% if es_area and total.listos %}<form method="post" action="{% url 'seguimiento:cerrar_listos' ejercicio.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit" data-prueba="cerrar-listos">Cerrar los {{ total.listos }} que ya cuadran</button></form>{% endif %}
+    </div>
+  </div>
+  <div class="table-responsive">
+  <table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Expediente</th><th>Persona</th><th class="text-end">Aprobado</th><th>Verificado</th><th class="text-end">Pagado</th><th class="text-end">Reintegrado</th><th class="text-end">Liberado</th><th>Situación</th></tr></thead>
+    <tbody>
+    {% for f in filas %}
+    <tr data-folio="{{ f.folio }}" data-diferencias="{{ f.diferencias|length }}" data-cerrado="{% if f.cierre %}si{% else %}no{% endif %}">
+      <td class="text-nowrap"><a href="{% url 'recepcion:expediente' f.folio %}?pestana=seguimiento">{{ f.folio }}</a></td>
+      <td>{{ f.persona }}<div class="text-secondary">{{ f.municipio }}</div></td>
+      <td class="text-end text-nowrap">{{ f.aprobado|moneda }}{% if f.ajustado != f.aprobado %}<div class="text-secondary">ajustado {{ f.ajustado|moneda }}</div>{% endif %}</td>
+      <td>{{ f.verificado.texto }}</td>
+      <td class="text-end text-nowrap">{{ f.pagado|moneda }}</td>
+      <td class="text-end text-nowrap">{{ f.reintegrado|moneda }}</td>
+      <td class="text-end text-nowrap">{{ f.liberado|moneda }}</td>
+      <td>{{ f.estado.nombre }}
+        {% if f.cierre %}<div><span class="badge text-bg-dark">{{ f.cierre.motivo }}</span> <a href="{% url 'nucleo:acuse' f.cierre.acuse.folio %}" target="_blank">{{ f.cierre.acuse.folio }}</a></div>
+        {% elif f.puede_cerrar %}<div><span class="badge text-bg-success">Lista para cerrar</span></div>{% endif %}
+        {% for d in f.diferencias %}<div class="text-danger" data-diferencia="{{ d.clave }}"><strong>{{ d.nombre }}.</strong> {{ d.detalle }}</div>{% endfor %}</td>
+    </tr>
+    {% empty %}<tr><td colspan="8" class="text-secondary">Todavía no hay personas beneficiarias con contrato firmado.</td></tr>{% endfor %}
+    </tbody>
+    {% if filas %}<tfoot class="table-light"><tr><th colspan="2">Total</th><th class="text-end">{{ total.aprobado|moneda }}</th><th></th><th class="text-end">{{ total.pagado|moneda }}</th><th class="text-end">{{ total.reintegrado|moneda }}</th><th class="text-end">{{ total.liberado|moneda }}</th><th></th></tr></tfoot>{% endif %}
+  </table>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta h-100" data-prueba="padron">
+      <div class="titulo-seccion">Padrón de personas beneficiarias</div>
+      <div class="small text-secondary mb-2">{{ cfg_padron.fundamento_general.texto }} Fundamento: {{ ejercicio.programa.clave }} {{ cfg_padron.numeral }}, línea {{ cfg_padron.linea }}. No se publica: {{ cfg_padron.no_se_publica|join:", " }}.{% if cfg_padron.reserva %} {{ cfg_padron.reserva }}{% endif %}</div>
+      {% if padron %}
+        <div class="small mb-2" data-prueba="padron-publicado">Publicado el {{ padron.publicada_en|date:"d/m/Y" }} a las {{ padron.publicada_en|date:"H:i" }} h (acuse <a href="{% url 'nucleo:acuse' padron.acuse.folio %}" target="_blank">{{ padron.acuse.folio }}</a>). Se actualiza solo con las bajas, cancelaciones y sustituciones.</div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'padron:programa' ejercicio.programa.clave ejercicio.anio %}">Ver la página pública</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'padron:csv' ejercicio.programa.clave ejercicio.anio %}">Exportar a CSV</a>
+      {% elif es_area %}
+        <form method="post" action="{% url 'seguimiento:publicar_padron' ejercicio.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit" data-prueba="publicar-padron">Publicar el padrón</button></form>
+      {% else %}<div class="small text-secondary">El área responsable aún no lo publica.</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="tarjeta h-100" data-prueba="informe">
+      <div class="titulo-seccion">Informe anual al Comité</div>
+      <div class="small text-secondary mb-2">{{ cfg_informe.texto }} Fundamento: {{ ejercicio.programa.clave }} {{ cfg_informe.numeral }}, línea {{ cfg_informe.linea }}. {{ cfg_informe.plazo }}</div>
+      {% if informe %}
+        <div class="small mb-1" data-prueba="informe-enviado">Enviado a {{ comite }} el <strong>{{ informe.enviado_en|date:"d/m/Y" }} a las {{ informe.enviado_en|date:"H:i" }} h</strong> (acuse <a href="{% url 'nucleo:acuse' informe.acuse.folio %}" target="_blank">{{ informe.acuse.folio }}</a>).</div>
+        <div class="small mb-2" data-prueba="informe-recepcion">{% if informe.recibido_en %}Recibido por la Secretaría Técnica el {{ informe.recibido_en|date:"d/m/Y" }} a las {{ informe.recibido_en|date:"H:i" }} h{% if informe.sesion %} en la sesión {{ informe.sesion.numero }} ({{ informe.sesion.fecha_hora|date:"d/m/Y" }}){% endif %} (acuse <a href="{% url 'nucleo:acuse' informe.acuse_recepcion.folio %}" target="_blank">{{ informe.acuse_recepcion.folio }}</a>).{% else %}Todavía no se registra su recepción en el Comité.{% endif %}</div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'seguimiento:informe_archivo' ejercicio.pk %}" target="_blank">Abrir el informe (PDF)</a>
+        {% if puede_recibir %}
+        <form method="post" action="{% url 'seguimiento:recepcion_informe' ejercicio.pk %}" class="row g-2 mt-1" data-prueba="form-recepcion">{% csrf_token %}
+          <div class="col-12">{{ form_recepcion.sesion.label_tag }}{{ form_recepcion.sesion }}</div>
+          <div class="col-12">{{ form_recepcion.observaciones.label_tag }}{{ form_recepcion.observaciones }}</div>
+          <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar la recepción</button></div>
+        </form>{% endif %}
+      {% elif es_area %}
+        <form method="post" action="{% url 'seguimiento:enviar_informe' ejercicio.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit" data-prueba="enviar-informe">Enviar el informe anual al Comité</button></form>
+        <div class="small text-secondary mt-1">El PDF lleva los resultados finales y las diferencias que haya; el envío queda con su fecha y su hora.</div>
+      {% else %}<div class="small text-secondary">El área responsable aún no lo envía.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 """Rutas del módulo M6 (Seguimiento y cierre); cada historia agrega las suyas con su vista en vistas/<historia>.py."""
 from django.urls import path
 
-from .vistas import incumplimientos, reasignacion
+from .vistas import cierre, incumplimientos, reasignacion
 
 app_name = "seguimiento"
 
@@ -24,4 +24,14 @@ urlpatterns = [
     path("requerimiento/<int:pk>/deposito/", incumplimientos.comprobar, name="comprobar_deposito"),
     path("requerimiento/<int:pk>/comprobante/", incumplimientos.archivo_deposito, name="archivo_deposito"),
     path("cuentas/", incumplimientos.registrar_cuenta, name="registrar_cuenta"),
+    # HU-6.3: cierre del ejercicio, padrón e informe anual
+    path("cierre/", cierre.pagina, name="cierre"),
+    path("cierre/<int:pk>/", cierre.detalle, name="cierre_detalle"),
+    path("cierre/<int:pk>/resultados.csv", cierre.resultados_csv, name="resultados_csv"),
+    path("cierre/<int:pk>/cerrar/", cierre.cerrar_listos, name="cerrar_listos"),
+    path("cierre/<int:pk>/padron/", cierre.publicar_padron, name="publicar_padron"),
+    path("cierre/<int:pk>/informe/", cierre.enviar_informe, name="enviar_informe"),
+    path("cierre/<int:pk>/informe/archivo/", cierre.informe_archivo, name="informe_archivo"),
+    path("cierre/<int:pk>/informe/recepcion/", cierre.recepcion_informe, name="recepcion_informe"),
+    path("expediente/<str:folio>/cerrar/", cierre.cerrar_expediente, name="cerrar_expediente"),
 ]

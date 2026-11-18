@@ -1,0 +1,21 @@
+{% load moneda %}
+{% if cierre_exp %}
+<div class="titulo-seccion mt-3">Resultados finales y cierre</div>
+<div class="small mb-2" data-prueba="resultados-expediente">
+  <div class="row g-2">
+    <div class="col-6 col-md-3"><div class="text-secondary">Aprobado</div><strong>{{ cierre_exp.aprobado|moneda }}</strong>{% if cierre_exp.ajustado != cierre_exp.aprobado %}<div class="text-secondary">ajustado {{ cierre_exp.ajustado|moneda }}</div>{% endif %}</div>
+    <div class="col-6 col-md-3"><div class="text-secondary">Verificado</div><strong>{{ cierre_exp.verificado.texto }}</strong></div>
+    <div class="col-6 col-md-2"><div class="text-secondary">Pagado</div><strong>{{ cierre_exp.pagado|moneda }}</strong></div>
+    <div class="col-6 col-md-2"><div class="text-secondary">Reintegrado</div><strong>{{ cierre_exp.reintegrado|moneda }}</strong></div>
+    <div class="col-6 col-md-2"><div class="text-secondary">Liberado</div><strong>{{ cierre_exp.liberado|moneda }}</strong></div>
+  </div>
+</div>
+{% for d in cierre_exp.diferencias %}<div class="alert alert-danger small py-2" data-diferencia="{{ d.clave }}"><strong>{{ d.nombre }}.</strong> {{ d.detalle }}</div>{% endfor %}
+{% if cierre_exp.cierre %}
+<div class="alert alert-dark small py-2" data-prueba="expediente-cerrado">{{ cierre_exp.cierre.motivo }} el {{ cierre_exp.cierre.cerrado_en|date:"d/m/Y" }} a las {{ cierre_exp.cierre.cerrado_en|date:"H:i" }} h (acuse <a href="{% url 'nucleo:acuse' cierre_exp.cierre.acuse.folio %}" target="_blank">{{ cierre_exp.cierre.acuse.folio }}</a>).</div>
+{% elif puede_cerrar_exp %}
+<form method="post" action="{% url 'seguimiento:cerrar_expediente' exp.folio %}" class="mb-3">{% csrf_token %}
+  <button class="btn btn-sm btn-primary" type="submit" data-prueba="cerrar-expediente">Cerrar el expediente</button>
+  <span class="small text-secondary">Los resultados cuadran: lo aprobado, verificado, pagado y reintegrado coinciden.</span></form>
+{% elif cierre_exp.motivo_no_cierra and not cierre_exp.diferencias %}<div class="small text-secondary mb-2">{{ cierre_exp.motivo_no_cierra }}</div>{% endif %}
+{% endif %}

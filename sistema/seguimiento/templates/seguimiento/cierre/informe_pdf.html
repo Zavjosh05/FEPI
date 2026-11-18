@@ -1,0 +1,32 @@
+{% load moneda %}<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Informe anual {{ ejercicio.programa.clave }} {{ ejercicio.anio }}</title>
+<style>
+  @page { size: letter landscape; margin: 1.6cm; @bottom-center { content: "Informe anual {{ ejercicio.programa.clave }} {{ ejercicio.anio }} · página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 9pt; color: #1d1d1d; }
+  h1 { font-size: 15pt; margin: 4px 0; } h2 { font-size: 11pt; margin: 14px 0 4px; color: #1f5130; }
+  .org { font-size: 9pt; color: #1f5130; font-weight: bold; letter-spacing: .5px; }
+  table { width: 100%; border-collapse: collapse; } th, td { text-align: left; vertical-align: top; padding: 3px 5px; border-bottom: 1px solid #ddd; font-size: 8pt; }
+  th { background: #eef3ef; } .n { text-align: right; white-space: nowrap; } .dif { color: #8a1c1c; }
+  .nota { background: #f6f6f6; padding: 6px; font-size: 8.5pt; margin-top: 6px; }
+</style></head><body>
+<div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+<h1>Informe anual de la ejecución del programa · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
+<div>Dirigido a: {{ comite }} ({{ cfg.destinatario }}). Elaborado el {{ fecha|date:"d/m/Y" }} a las {{ fecha|date:"H:i" }} h por {{ usuario.unidad.nombre }}.</div>
+<div class="nota">{{ cfg.texto }} Fundamento: {{ ejercicio.programa.clave }} {{ cfg.numeral }}, línea {{ cfg.linea }}. {{ cfg.plazo }}</div>
+<h2>Resumen de resultados finales</h2>
+<table><tbody>
+<tr><th>Personas beneficiarias (contrato firmado)</th><td class="n">{{ total.expedientes }}</td><th>Expedientes cerrados</th><td class="n">{{ total.cerrados }}</td></tr>
+<tr><th>Aprobado</th><td class="n">{{ total.aprobado|moneda }}</td><th>Aprobado ajustado a lo verificado</th><td class="n">{{ total.ajustado|moneda }}</td></tr>
+<tr><th>Pagado</th><td class="n">{{ total.pagado|moneda }}</td><th>Reintegrado</th><td class="n">{{ total.reintegrado|moneda }}</td></tr>
+<tr><th>Recurso liberado</th><td class="n">{{ total.liberado|moneda }}</td><th>Reasignado a la lista de espera</th><td class="n">{{ total.reasignado|moneda }}</td></tr>
+<tr><th>Liberado por reasignar</th><td class="n">{{ total.por_reasignar|moneda }}</td><th>Padrón</th><td>{% if padron %}publicado el {{ padron.publicada_en|date:"d/m/Y H:i" }} h{% else %}sin publicar{% endif %}</td></tr>
+</tbody></table>
+<h2>Diferencias entre lo aprobado, verificado, pagado y reintegrado ({{ diferencias|length }})</h2>
+{% if diferencias %}<table><thead><tr><th>Expediente</th><th>Diferencia</th><th>Detalle</th></tr></thead><tbody>
+{% for f, d in diferencias %}<tr><td>{{ f.folio }}</td><td class="dif">{{ d.nombre }}</td><td>{{ d.detalle }}</td></tr>{% endfor %}</tbody></table>
+{% else %}<div>Sin diferencias: los resultados finales coinciden con las verificaciones y los pagos.</div>{% endif %}
+<h2>Resultados por persona beneficiaria</h2>
+<table><thead><tr><th>Expediente</th><th>Persona</th><th>Municipio</th><th class="n">Aprobado</th><th>Verificado</th><th class="n">Pagado</th><th class="n">Reintegrado</th><th class="n">Liberado</th><th>Situación</th></tr></thead><tbody>
+{% for f in filas %}<tr><td>{{ f.folio }}</td><td>{{ f.persona }}</td><td>{{ f.municipio }}</td><td class="n">{{ f.aprobado|moneda }}</td><td>{{ f.verificado.texto }}</td><td class="n">{{ f.pagado|moneda }}</td><td class="n">{{ f.reintegrado|moneda }}</td><td class="n">{{ f.liberado|moneda }}</td><td>{{ f.estado.nombre }}{% if f.cierre %} · {{ f.cierre.motivo }}{% endif %}</td></tr>{% endfor %}
+</tbody></table>
+</body></html>

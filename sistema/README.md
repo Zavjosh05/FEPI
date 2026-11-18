@@ -11,7 +11,7 @@ HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
 módulo M4, HU-4.1 Envío de comprobaciones, HU-4.2 Verificación en campo y HU-4.3 Evaluación de reportes; del módulo M6, HU-6.1 Lista de
-espera y sustituciones y HU-6.2 Incumplimientos y reintegros.
+espera y sustituciones, HU-6.2 Incumplimientos y reintegros y HU-6.3 Cierre del ejercicio.
 Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
 beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
@@ -185,7 +185,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3, hechas) y M6 (HU-6.1 a 6.3; HU-6.1 y 6.2 hechas): models/ (un módulo por historia,
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3, hechas) y M6 (HU-6.1 a 6.3, hechas): models/ (un módulo por historia,
 │                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
 │                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
@@ -1165,10 +1165,45 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   planta no establecida, excedente de la verificación con la incidencia, cuenta de PSAHEM, cheque vencido, Guardabosque, suspensión y su
   levantamiento, desecho por faltantes, desistimiento con ministraciones, pantallas) y el recorrido
   `pruebas/e2e/test_recorrido_hu_6_2.py` (capturas `hu_6_2_*`).
-- **Para HU-6.3 (cierre y padrón).** Los estados finales de M6 quedan listos: `reintegrada` (con `Requerimiento` depositado),
-  `cancelada` con requerimiento `sin_monto` (cerrar «sin recurso por devolver»), `recurso_liberado` y los reasignados; `RecursoLiberado`
-  dice cuánto se liberó y cuánto se reasignó por ejercicio; `PersonaIncumplida` trae las inscripciones del ejercicio
-  (`programa` y `acuerdo`).
+### M6 · HU-6.3 Cierre del ejercicio
+
+- **Resultados finales** (`seguimiento/cierre.py`, pantalla «Cierre del ejercicio» en el grupo «Seguimiento y cierre» del menú para el
+  área responsable, la Secretaría Técnica, la Unidad Jurídica y Administración y Finanzas): por programa y ejercicio, una fila por
+  persona beneficiaria (expediente con contrato firmado) con lo **aprobado** (`reasignacion.total_aprobado` y el ajustado a lo
+  verificado de `nucleo.montos`), lo **verificado** (HU-4.2 o la evaluación de reportes en PEG), lo **pagado** (ministraciones pagadas), lo
+  **reintegrado** (requerimientos depositados) y lo **liberado** y **reasignado** (`RecursoLiberado`). Exporta a CSV.
+- **Comprobación** (`comprobar_expediente`): señala pagado mayor que lo aprobado, verificado sin pago, pagado sin la verificación que la
+  regla exige (soportes `verificacion_campo` o `evaluacion_reportes` de `datos/pagos.json`), cancelado sin requerimiento resuelto,
+  reintegrado mayor que lo ministrado (más el valor de la planta no establecida) y pago distinto de su solicitud. Las diferencias, su
+  texto y su gravedad son datos: `datos/seguimiento.json`, sección `cierre.diferencias`. Una diferencia de gravedad «error» impide el cierre.
+- **Cierre del expediente** (`cerrar_expediente`; solo la Dirección del programa): desde `concluida` (pasa antes por ella desde
+  `verificada`, `pagada`, `cheque_entregado` o PEG `en_ejecucion` si ya no queda ministración por pagar), `reintegrada` o `cancelada` con
+  el requerimiento «sin recurso por devolver»; queda `ejercicio_cerrado` con su acuse y la copia de los resultados (`CierreExpediente`).
+  **No se agregó ninguna transición**: las siete que usa ya estaban en `datos/flujo_tramite.json` (marcadas HU-6.3). «Cerrar los que ya
+  cuadran» lo hace por ejercicio.
+- **Padrón público** (`/padron/`, sin cuenta; `seguimiento/vistas/padron.py`, `PadronPublicacion`): el área responsable lo publica con su
+  acuse y después **se calcula en cada consulta**, así que refleja solo las bajas, cancelaciones, desistimientos, suspensiones y
+  sustituciones de HU-6.1 y 6.2. Columnas por programa en `cierre.padron.programas` (CC, PS, RHF, PSAHEM, MFS: folio, persona, municipio, predio,
+  modalidad, monto del apoyo, situación y alta; 8.1.5 de cada programa, líneas 4600, 5892, 3231, 1989 y 7760). **Nunca** se publican CURP, RFC,
+  domicilio, teléfono, correo, cuenta ni representante. **PEG** (8.1.5, línea 8750; 14, línea 9091): muestra el núcleo agrario y **no el nombre
+  del Guardabosque** (información clasificada para quien sea vulnerable; decisión propia por confirmar) y agrega la tabla de **altas, bajas y
+  sustituciones** (9.4.3 a, b y d; 10.2). Exporta a CSV. El enlace está en la pantalla de entrada.
+- **Informe anual al Comité** (`enviar_informe`, `InformeAnual`): PDF con el resumen de resultados finales y las diferencias, con el acuse del
+  envío (**fecha y hora**, `nucleo.acuses`); la Secretaría Técnica **registra su recepción** (acuse con fecha y hora) y la sesión del Comité
+  en que se presenta, y el informe queda entre los documentos de la sesión. Panel «Informes anuales por recibir» en su bandeja. Fundamento:
+  informe anual a la Instancia Normativa (PSAHEM 16.1, línea 2367; RHF 15, línea 3659; CC 15, línea 4948; PS 15, línea 6258; MFS 15, línea 8160;
+  PEG 15, línea 9096, en la primera sesión ordinaria del ejercicio siguiente, y 10.1 fr. XVI, línea 9031) y listados de resultados finales (PSAHEM 10.1
+  fr. XIII, línea 2318; RHF 10.1 p, línea 3574; CC 10.1 fr. XIV, línea 4902; PS 10.1 o, línea 6220).
+- **Cierre del ejercicio**: la pantalla lista lo que falta (expedientes cerrados, padrón, informe enviado y recibido).
+- **Demostración** (`seguimiento/demo.py`, `_cierre`, fecha de corte): el área de RHF cierra Loma del Aire (reintegro depositado), publica el
+  padrón de RHF (con la baja de Arroyo Seco y la cancelación de Loma del Aire) y envía el informe al Comité (sin recepción); la Dirección de
+  Protección Forestal publica el padrón del PEG.
+- **Pruebas.** `pruebas/test_hu_6_3.py` (13) y el recorrido `pruebas/e2e/test_recorrido_hu_6_3.py` (capturas `hu_6_3_*`). El menú de la
+  Dirección, la Secretaría Técnica, Jurídica y Finanzas ahora muestra el grupo «Seguimiento y cierre» (dos enlaces o más).
+- **Duda para el cliente (no traen plazo en días ni lista de columnas).** Ninguna ROP da un plazo para publicar el padrón, cerrar el ejercicio
+  ni enviar el informe; tampoco enumeran las columnas del padrón (remiten al artículo 92 fr. XIV p) de la Ley de Transparencia y a los
+  Lineamientos de 28-nov-2025, que no están en el texto): las columnas son decisión propia. MFS no trae la fracción de «listados de
+  resultados finales»: se aplica el mismo cierre.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
