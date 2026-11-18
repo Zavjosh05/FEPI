@@ -52,7 +52,7 @@ consecutivos, los acuses y los archivos no se mezclan entre procesos. El comando
 ejecuta `docker/pruebas.sh`, en dos pasos: (1) las rápidas con `-n 4` y (2) los recorridos de navegador con `-n 3` (cada
 proceso abre su Chromium; WSL dispone de unos 7 GB). Se separan porque las pruebas de navegador (`live_server`) vacían la base
 al terminar cada una y, mezcladas con las rápidas en el mismo proceso, obligarían a recargar los catálogos en cada prueba. Para
-cambiar los procesos: `-e PRUEBAS_N=2 -e PRUEBAS_N_NAVEGADOR=0` (0 = en serie). **Un solo comando de Docker a la vez**: dos
+cambiar los procesos: `-e PRUEBAS_N=2 -e PRUEBAS_N_NAVEGADOR=0` (0 = en serie). **Límite de tiempo por prueba:** `pytest-timeout` (`timeout = 300`, `timeout_method = thread` en `pytest.ini`): una prueba colgada falla con su traza en lugar de bloquear la corrida. **Un solo comando de Docker a la vez**: dos
 invocaciones simultáneas chocarían en los nombres de las bases de prueba.
 
 | Qué | Comando | Antes (serie) | Ahora |
@@ -142,14 +142,17 @@ la Delegación. **MFS y Guardabosques** (`ejecucion/demo.py`): en MFS, Bosque Lo
 y Aserradero La Cumbre (FSC de cadena de custodia) con la primera ministración pagada (70 % y 50 %), listos para entregar su Bitácora o
 solicitud de auditoría (HU-4.1), Predio El Mirador contratado y Predio Agua Fría recién recibido; en PEG, Ejido San Juan y Ejido San
 Bartolo con su Guardabosque, la evaluación de los reportes de junio validada por el CASPEG y el depósito del 25 %, Ejido Santa Ana
-contratado y Ejido San Lorenzo recién recibido. **Comprobaciones (HU-4.1):** Bosque Los Volcanes entregó su Bitácora en la Delegación
+contratado (no entrega reportes) y Ejido San Lorenzo recién recibido. **Comprobaciones (HU-4.1):** Bosque Los Volcanes entregó su Bitácora en la Delegación
 (2-oct, por verificar); Margarito Sánchez Ruiz envió por el portal sus reportes de junio a octubre (el de octubre, por revisar en la
-Delegación de Amecameca) y Ejido San Bartolo entregó en ventanilla los de junio y julio (le falta agosto); Predio La Ciénega (CC),
+Delegación de Amecameca) y Ejido San Bartolo entregó en ventanilla los de junio y julio (le falta agosto: «no entregó»); Predio La Ciénega (CC),
 Plantación La Mesa (PS) y Manantial Alto (RHF, Modalidad uno: concluye en octubre) avisaron el término y La Ciénega entregó su
 Informe Final. **Verificación (HU-4.2):** el área responsable revisó la Bitácora de Los Volcanes (6-oct) y su segunda ministración
 ($9,000) está pagada; Plantación La Mesa se verificó con 1.8 de 2 ha (90 %), una helada como caso fortuito y su segunda ministración
 por solicitar en $2,000 (proporcional); Manantial Alto, completo y en plazo (concluye en octubre); Predio La Ciénega (pago único),
-verificado y con sus actividades concluidas. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+verificado y con sus actividades concluidas. **Evaluación de reportes (HU-4.3):** el CASPEG validó la evaluación de junio (7-jul) y las de
+julio y agosto (15-sep); Margarito Sánchez Ruiz cobró su segunda ministración (22-sep); Ejido San Bartolo no entregó agosto y Ejido Santa
+Ana ningún mes, así que quedan señalados y sin ministración; septiembre (con observaciones) queda por evaluar y el reporte de octubre por
+revisar en la Delegación. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -687,7 +690,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   con cheque, 10.1 fr. X, línea 2288). Las ministraciones siguientes agregan la «verificación en campo o evaluación de reportes».
   Cada soporte se comprueba con una función de `solicitudes.FUENTES` (el soporte nombra su fuente en `soportes.<clave>.fuente`). Ganchos de
   M4: `verificacion_campo` (HU-4.2), `entregable` (HU-4.1: Bitácora o autorización en MFS-ETF, solicitud o Plan de auditoría en MFS-FSC) y
-  `evaluacion_reportes` (HU-4.3; hoy cuenta los periodos que el CASPEG validó para el expediente: la ministración N pide N). Mientras no se
+  `evaluacion_reportes` (HU-4.3: la evaluación de cada periodo que cubre la ministración, validada por el CASPEG). Mientras no se
   reemplacen, dicen por qué la ministración no se puede solicitar (hay una prueba que demuestra el reemplazo).
 - **Comprobante de la cuenta.** `solicitudes.adjuntar_comprobante` (Delegación, que lo recibe al firmar, o el área responsable): PDF, JPG
   o PNG; el más reciente es el vigente (un cambio de cuenta es un comprobante nuevo). Se rechaza en los programas que no lo piden.
@@ -1002,6 +1005,48 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - **Pruebas.** `pruebas/test_hu_4_2.py`, el recorrido `pruebas/e2e/test_recorrido_hu_4_2.py` (capturas `hu_4_2_*`) y
   `pruebas/test_sprint_3_recorrido_ejecucion.py`: CC (comprobación por el portal), PS, RHF, PSAHEM (cheque del 30 %) y MFS (con la
   Bitácora) recorren de la primera ministración pagada a la segunda pagada, con estado, bandeja, acuse y bitácora en cada relevo.
+
+### M4 · HU-4.3 Evaluación de reportes (Guardabosques)
+
+- **Organización.** `ejecucion/models/reportes.py` (migración `0003_hu_4_3_reportes`: `RevisionReporte`, `EvaluacionPeriodo`,
+  `EnvioEvaluacion`), servicio `ejecucion/reportes.py`, vistas `vistas/reportes.py`, formularios `formularios/reportes.py`, plantillas
+  `templates/ejecucion/reportes/` y lo del programa en `datos/ejecucion.json` → `reportes` (con su fundamento). Solo aplica a
+  **Guardabosques (PEG)**: en los demás programas `reportes.config` es None.
+- **Quién hace qué (ROP PEG).** La **Delegación** revisa cada reporte mensual y cada acuse de depósito que recibe de los Guardabosques de su
+  zona (8.1.7 l, líneas 8814 y 8815; Convocatoria base quinta VII, líneas 9534 a 9538; 10.1 fr. XV, línea 9028): «revisado», «revisado con
+  observaciones» o «devuelto para corregir» (se notifica a la persona; el Guardabosque lo vuelve a enviar y el envío más reciente es el que
+  cuenta). La **Dirección de Protección Forestal** evalúa **por Guardabosque y por periodo** (glosario «Evaluación interna», líneas 8433 y
+  8434; 10.1 fr. XIII, líneas 9024 y 9025): «cumple» o «no cumple» con su motivo, a partir de lo que revisó la Delegación. Un periodo ya
+  terminado sin reporte (o con el reporte devuelto sin corregir) queda **«no entregó» en automático**, visible en la tabla por periodo
+  (criterio 2). La Dirección **envía la evaluación del periodo al CASPEG** con fecha, hora y acuse (no antes de que termine el periodo ni
+  mientras haya reportes por revisar o evaluar). El **CASPEG la valida** (Convocatoria base cuarta, líneas 9505 y 9506) con un acuerdo de su
+  sesión de seguimiento: el tipo `validacion_reportes` de HU-2.4, con el periodo y los expedientes; cuenta si es posterior al envío.
+- **Pago.** `ejecucion/registro.py` reemplaza la fuente `evaluacion_reportes` de `pagos.solicitudes.FUENTES` (`reportes.fuente_evaluacion`):
+  la ministración N pide que **cada periodo que cubre** esté evaluado «cumple», enviado al CASPEG y validado por él. Quien **no cumplió o no
+  entregó** queda señalado y su ministración no se solicita: lo atiende el seguimiento de incumplimientos (suspensión por ministración,
+  8.1.8 a y 8.1.9.1 a, líneas 8827 y 8852; baja por tres reportes no presentados, 8.1.8 i y 8.1.9.2 f, líneas 8838 y 8864).
+- **Supuestos (se dicen en pantalla).** Los 12 periodos son los meses del ejercicio, derivados, y las 4 ministraciones del 25 % son un supuesto
+  del archivo de reglas (R-18). Qué periodo cubre cada ministración **no lo dicen las ROP**: `datos/ejecucion.json` → `reportes` → `programas`
+  → `PEG` → `meses_por_ministracion` (1, 2, 2 y el resto) toma «cada ministración cubre los meses que van desde la previa», contados desde
+  el mes de la firma (se reporta desde ese mes, Convocatoria base quinta VII, línea 9534): con firma en junio, la 1 cubre junio, la 2 julio y
+  agosto, la 3 septiembre y octubre y la 4 noviembre y diciembre. Duda para el cliente.
+- **Estados.** No cambia el estado del expediente y **no se agregaron transiciones**: el flujo trae `reporte_entregado` y `reportes_evaluados`
+  (desde `en_ejecucion`), pero la evaluación es por Guardabosque y por periodo, y un Guardabosque tiene periodos en distintas etapas mientras
+  sigue en el ciclo «pagada» ↔ «ministración solicitada» (no existe `pagada` → `reporte_entregado`); un estado por expediente la contradiría.
+  Las bandejas se arman con consultas: paneles «Reportes de Guardabosques por revisar» (Delegación), «Evaluación de reportes por periodo»
+  (Dirección) y «Evaluaciones de reportes por validar» (Secretaría Técnica, que no ve los expedientes de PEG en `pagada`: su pantalla lee
+  los envíos, `EnvioEvaluacion`).
+- **Pantallas.** Menú «Evaluación de reportes» (`/ejecucion/reportes/`): la Delegación revisa; la Dirección ve la tabla por periodo
+  (Guardabosques × estado), evalúa y envía; el CASPEG ve lo enviado y lo que falta validar; hay también una matriz de todos los periodos. La
+  pestaña «Ejecución» del expediente trae el historial por periodo (reporte, revisión, evaluación, validación y ministración que lo cubre) y
+  el portal muestra la revisión de la Delegación junto a cada envío. Los reportes y acuses de PEG ya no se «marcan como revisados» (HU-4.1):
+  se revisan con su resultado.
+- **Ganchos para HU-6.2.** `extensiones.AL_REPORTE_INCUMPLIDO` (nuevo) corre por cada evaluación distinta de «cumple» al enviarse el
+  periodo; `reportes.periodos_senalados(expediente)` lista los periodos señalados.
+- **Pruebas.** `pruebas/test_hu_4_3.py`, el recorrido `pruebas/e2e/test_recorrido_hu_4_3.py` (capturas `hu_4_3_*`) y
+  `pruebas/test_sprint_3_recorrido_ejecucion.py` (PEG hasta la segunda ministración: uno cumple, otro no entrega agosto). La fixture
+  `validar_reportes` arma toda la cadena para los periodos de una ministración, con el reloj simulado el día siguiente al fin del último
+  periodo; `Rastro` cuenta los renglones nuevos de la bitácora por orden de alta, no por fecha.
 
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 

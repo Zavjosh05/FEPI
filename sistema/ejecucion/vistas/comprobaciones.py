@@ -11,7 +11,7 @@ from django.views.decorators.http import require_POST
 
 from nucleo.models import TipoUnidad, expedientes_visibles
 
-from .. import comprobaciones
+from .. import comprobaciones, reportes
 from ..formularios.comprobaciones import EnvioForm
 from ..models import Comprobacion, Verificacion
 from .comun import expediente_visible, mensajes_error, responder_archivo
@@ -35,7 +35,7 @@ def lista(request):
         raise PermissionDenied("Las comprobaciones las ven la Delegación, el área responsable y la Unidad Jurídica.")
     todas = list(comprobaciones.comprobaciones_visibles(request.user).order_by("-enviada_en", "-id")[:300])
     return render(request, "ejecucion/comprobaciones/lista.html", {
-        "por_revisar": [c for c in todas if c.por_portal and c.revisada_en is None] if tipo == TipoUnidad.DELEGACION else [],
+        "por_revisar": [c for c in todas if c.por_portal and c.revisada_en is None and not reportes.es_revisable(c)] if tipo == TipoUnidad.DELEGACION else [],
         "todas": todas, "es_delegacion": tipo == TipoUnidad.DELEGACION,
         "por_verificar": list(expedientes_visibles(request.user).filter(estado__clave="comprobacion_enviada").select_related("persona_beneficiaria")
                               .order_by("fecha_recepcion")[:300]),
@@ -97,8 +97,11 @@ def contexto_comprobaciones_exp(request, exp):
     es_delegacion = request.user.tipo_unidad == TipoUnidad.DELEGACION and request.user.unidad_id == exp.delegacion_id
     puede, motivo = comprobaciones.puede_enviar(exp)
     tipos = comprobaciones.tipos_de_envio(exp)
+    lista = list(exp.comprobaciones.select_related("acuse", "enviada_por", "recibida_por", "revisada_por"))
+    for c in lista:
+        c.se_revisa_con_resultado = reportes.es_revisable(c)  # HU-4.3: reportes y acuses de PEG
     return {
-        "comprobaciones": list(exp.comprobaciones.select_related("acuse", "enviada_por", "recibida_por", "revisada_por")),
+        "comprobaciones": lista,
         "tipos_envio": tipos, "puede_registrar": es_delegacion and puede and bool(tipos), "motivo_sin_envio": motivo,
         "es_delegacion_exp": es_delegacion,
         "form_envio": EnvioForm(tipos=tipos, periodos=comprobaciones.periodos(exp), ventanilla=True),

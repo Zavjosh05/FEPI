@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block titulo %}Evaluación de reportes{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Evaluación de reportes de los Guardabosques</h1>
+  <div class="small text-secondary">La Delegación revisa cada reporte mensual y acuse de depósito que recibe; la Dirección de Protección Forestal evalúa por Guardabosque y por periodo y envía la evaluación al CASPEG, que la valida con un acuerdo de su sesión de seguimiento. Con la evaluación validada se solicita la ministración.</div>
+</div>
+{% if not ejercicio %}
+<div class="tarjeta" data-prueba="sin-ejercicio"><div class="small text-secondary">No hay un programa con reglas cargadas que evalúe reportes.</div></div>
+{% else %}
+<div class="alert alert-secondary small" data-prueba="supuestos" role="note">
+  <strong>Supuestos (las reglas no los dicen):</strong> {{ cfg.supuesto_periodos }} {{ cfg.supuesto_correspondencia }}
+</div>
+<form method="get" class="row g-2 align-items-end mb-3" id="form-periodo">
+  {% if ejercicios|length > 1 %}<div class="col-auto"><label class="form-label small mb-0" for="ejercicio">Ejercicio</label>
+    <select name="ejercicio" id="ejercicio" class="form-select form-select-sm">{% for e in ejercicios %}<option value="{{ e.pk }}"{% if e.pk == ejercicio.pk %} selected{% endif %}>{{ e.programa.nombre }} {{ e.anio }}</option>{% endfor %}</select></div>
+  {% else %}<input type="hidden" name="ejercicio" value="{{ ejercicio.pk }}">{% endif %}
+  <div class="col-auto"><label class="form-label small mb-0" for="periodo">Periodo</label>
+    <select name="periodo" id="periodo" class="form-select form-select-sm">{% for p in periodos %}<option value="{{ p.clave }}"{% if periodo and p.clave == periodo.clave %} selected{% endif %}>{{ p.nombre }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button class="btn btn-sm btn-outline-secondary" type="submit">Ver el periodo</button></div>
+</form>
+
+{% if es_delegacion %}
+<div class="tarjeta mb-3" data-prueba="por-revisar">
+  <div class="titulo-seccion">Reportes y acuses de depósito por revisar ({{ por_revisar|length }})</div>
+  {% if por_revisar %}
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Guardabosque</th><th>Envío</th><th>Recibido</th><th>Revisión</th></tr></thead>
+    <tbody>{% for c in por_revisar %}
+      <tr data-folio="{{ c.expediente.folio }}" data-comprobacion="{{ c.tipo }}"><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' c.expediente.folio %}?pestana=ejecucion">{{ c.expediente.folio }}</a><div class="text-secondary fw-normal">{{ c.expediente.beneficiaria.nombre }}</div></td>
+        <td>{{ c.nombre }}{% if c.periodo %} · {{ c.periodo }}{% endif %}{% if c.archivo %}<div><a href="{% url 'ejecucion:archivo' c.pk %}" target="_blank">documento</a></div>{% endif %}</td>
+        <td class="text-nowrap">{{ c.get_medio_display }}<div class="text-secondary">{{ c.enviada_en|date:"d/m/Y H:i" }} h{% if c.acuse %} · <a href="{% url 'nucleo:acuse' c.acuse.folio %}" target="_blank">{{ c.acuse.folio }}</a>{% endif %}</div></td>
+        <td>{% include "ejecucion/reportes/_forma_revision.html" with siguiente=request.get_full_path %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">No hay reportes por revisar.</div>{% endif %}
+  <div class="small text-secondary mt-2">{{ cfg.fundamento_revision }}</div>
+</div>
+{% endif %}
+
+{% if periodo and not es_comite %}
+<div class="tarjeta mb-3" data-prueba="tabla-periodo" data-periodo="{{ periodo.clave }}">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div class="titulo-seccion mb-0">{{ periodo.nombre }}: Guardabosques y su estado ({{ filas|length }})</div>
+    <div class="small">{% for r in resumen %}<span class="badge text-bg-{{ r.clase }}" data-resumen="{{ r.estado }}">{{ r.n }} · {{ r.etiqueta }}</span> {% endfor %}</div>
+  </div>
+  {% if not periodo_terminado %}<div class="small text-secondary mb-2">{{ periodo.nombre }} todavía no termina: quien no tiene reporte pasa a «No entregó» en cuanto termina, y la evaluación se envía al CASPEG después.</div>{% endif %}
+  {% if filas %}
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Guardabosque</th><th>Reporte</th><th>Revisión de la Delegación</th><th>Estado</th>{% if es_direccion %}<th>Evaluación</th>{% endif %}<th>CASPEG</th></tr></thead>
+    <tbody>{% for f in filas %}
+      <tr data-prueba="fila-guardabosque" data-folio="{{ f.expediente.folio }}" data-estado="{{ f.estado }}">
+        <td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' f.expediente.folio %}?pestana=ejecucion">{{ f.expediente.folio }}</a><div class="text-secondary fw-normal">{{ f.expediente.beneficiaria.nombre }} · {{ f.expediente.delegacion.nombre }}</div></td>
+        <td>{% if f.reporte %}{{ f.reporte.enviada_en|date:"d/m/Y H:i" }} h · {{ f.reporte.get_medio_display|lower }}{% if f.reporte.acuse %} · <a href="{% url 'nucleo:acuse' f.reporte.acuse.folio %}" target="_blank">{{ f.reporte.acuse.folio }}</a>{% endif %}{% else %}<span class="text-secondary">Sin reporte</span>{% endif %}</td>
+        <td>{% if f.revision %}{{ f.revision.get_resultado_display }}{% if f.revision.observaciones %}<div class="text-secondary">{{ f.revision.observaciones }}</div>{% endif %}{% elif f.reporte %}<span class="text-secondary">Sin revisar</span>{% else %}—{% endif %}</td>
+        <td><span class="badge text-bg-{{ f.clase }}" data-prueba="estado-periodo">{{ f.etiqueta }}</span>
+          {% if f.estado == 'no_entrego' %}<div class="small text-danger">Señalado para el seguimiento{% if f.automatico %} (automático){% endif %}</div>{% endif %}
+          {% if f.evaluacion and f.evaluacion.motivo and f.estado != 'no_entrego' %}<div class="text-secondary">{{ f.evaluacion.motivo }}</div>{% endif %}</td>
+        {% if es_direccion %}<td>{% if f.envio is None and f.reporte and f.revision and f.estado != 'devuelto' %}{% include "ejecucion/reportes/_forma_evaluacion.html" with e=f.expediente p=periodo siguiente=request.get_full_path actual=f.evaluacion.resultado motivo=f.evaluacion.motivo %}{% elif f.estado == 'por_revisar' %}<span class="text-secondary">Espera la revisión de la Delegación</span>{% elif f.estado == 'devuelto' %}<span class="text-secondary">Espera el nuevo envío</span>{% else %}—{% endif %}</td>{% endif %}
+        <td>{% if f.envio %}Enviada el {{ f.envio.enviado_en|date:"d/m/Y H:i" }} h{% if f.envio.acuse %} · <a href="{% url 'nucleo:acuse' f.envio.acuse.folio %}" target="_blank">{{ f.envio.acuse.folio }}</a>{% endif %}
+            <div>{% if f.validacion %}<span class="badge text-bg-success" data-prueba="validada">Validada · acuerdo {{ f.validacion.numero }}</span>{% else %}<span class="badge text-bg-secondary" data-prueba="por-validar">Por validar</span>{% endif %}</div>{% else %}<span class="text-secondary">No enviada</span>{% endif %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary" data-prueba="sin-guardabosques">No hay Guardabosques con contrato firmado que deban reportar este periodo.</div>{% endif %}
+  {% if es_direccion %}
+  <div class="d-flex flex-wrap align-items-center gap-2 mt-3" data-prueba="enviar-al-caspeg">
+    <form method="post" action="{% url 'ejecucion:enviar_evaluacion' ejercicio.pk periodo.clave %}">{% csrf_token %}
+      <button class="btn btn-primary" type="submit"{% if not puede_enviar %} disabled{% endif %}>Enviar la evaluación de {{ periodo.nombre }} al CASPEG</button></form>
+    <span class="small text-secondary">{% if not periodo_terminado %}Se envía cuando el periodo termina.{% elif pendientes %}Faltan {{ pendientes|length }} Guardabosque(s) por revisar o evaluar.{% elif por_enviar %}Queda con fecha, hora y acuse; quien no entregó pasa a «No entregó» y quien no cumplió queda señalado.{% else %}No hay evaluaciones por enviar.{% endif %}</span>
+  </div>
+  <div class="small text-secondary mt-2">{{ cfg.fundamento_evaluacion }}</div>
+  {% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="matriz-periodos">
+  <div class="titulo-seccion">Todos los periodos</div>
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Guardabosque</th>{% for p in columnas %}<th class="text-center">{{ p.nombre }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for fila in matriz %}<tr data-folio="{{ fila.expediente.folio }}"><td class="fw-semibold text-nowrap"><a href="{% url 'recepcion:expediente' fila.expediente.folio %}?pestana=ejecucion">{{ fila.expediente.folio }}</a><div class="text-secondary fw-normal">{{ fila.expediente.beneficiaria.nombre }}</div></td>
+      {% for c in fila.celdas %}<td class="text-center">{% if c %}<span class="badge text-bg-{{ c.clase }}" data-periodo="{{ c.periodo.clave }}" data-estado="{{ c.estado }}">{{ c.etiqueta }}</span>{% else %}<span class="text-secondary">—</span>{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+  <div class="small text-secondary mt-2">Cada Guardabosque reporta desde el mes de la firma de su contrato.</div>
+</div>
+{% endif %}
+
+{% if es_direccion or es_comite %}
+<div class="tarjeta mb-3" data-prueba="enviados-al-caspeg">
+  <div class="titulo-seccion">Evaluaciones enviadas al CASPEG ({{ envios|length }})</div>
+  {% for item in envios %}{% with e=item.envio %}
+  <div class="mb-2" data-envio="{{ e.periodo }}">
+    <strong>{{ e.nombre_periodo }}</strong> · enviada el {{ e.enviado_en|date:"d/m/Y H:i" }} h por {{ e.unidad.nombre }}{% if e.acuse %} · <a href="{% url 'nucleo:acuse' e.acuse.folio %}" target="_blank">{{ e.acuse.folio }}</a>{% endif %}
+    · {{ e.cumplen }} cumplen, {{ e.no_cumplen }} no cumplen, {{ e.no_entregaron }} no entregaron
+    {% if item.por_validar %}<span class="badge text-bg-warning">Por validar: {{ item.por_validar|length }}</span>{% else %}<span class="badge text-bg-success">Validada</span>{% endif %}
+    <ul class="small mb-0">{% for ev in item.evaluaciones %}<li data-folio="{{ ev.expediente.folio }}">{{ ev.expediente.folio }} · {{ ev.expediente.beneficiaria.nombre }}: {{ ev.get_resultado_display }}{% if ev.motivo %} ({{ ev.motivo }}){% endif %}</li>{% endfor %}</ul>
+  </div>{% endwith %}{% empty %}<div class="small text-secondary">Todavía no se envía ninguna evaluación.</div>{% endfor %}
+  {% if es_comite %}<div class="small text-secondary mt-2">{{ cfg.fundamento_validacion }} Se valida con un acuerdo de la sesión de seguimiento (tipo «Validación de la evaluación de reportes mensuales»), que incluye los expedientes y el periodo.
+    <a href="{% url 'dictamen:sesiones' %}">Ir a las sesiones</a></div>{% endif %}
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

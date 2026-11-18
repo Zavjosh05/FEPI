@@ -15,7 +15,7 @@
           <div class="text-secondary">{{ c.plazo_texto }}</div></td>
         <td class="text-nowrap">{% if c.acuse %}<a href="{% url 'nucleo:acuse' c.acuse.folio %}" target="_blank">{{ c.acuse.folio }}</a>{% endif %}
           {% if c.archivo %} · <a href="{% url 'ejecucion:archivo' c.pk %}" target="_blank">documento</a>{% endif %}
-          {% if es_delegacion_exp and c.por_portal and not c.revisada_en %}<form method="post" action="{% url 'ejecucion:revisada' c.pk %}" class="mt-1">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">Marcar como revisado</button></form>{% endif %}</td>
+          {% if es_delegacion_exp and c.por_portal and not c.revisada_en and not c.se_revisa_con_resultado %}<form method="post" action="{% url 'ejecucion:revisada' c.pk %}" class="mt-1">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">Marcar como revisado</button></form>{% endif %}</td>
       </tr>
     {% endfor %}</tbody></table></div>
   {% else %}<div class="small text-secondary" data-prueba="sin-comprobaciones">Todavía no hay comprobaciones de esta persona.</div>{% endif %}

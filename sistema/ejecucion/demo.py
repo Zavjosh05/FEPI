@@ -27,6 +27,14 @@ su segunda ministración (30 %, $9,000) se paga el 14-oct; la Delegación de Tol
 solicitar en $2,000 (la parte proporcional: 1.8 ha × $5,000 menos los $7,000 ya ministrados); Manantial Alto se verifica completo
 el 9-nov, en plazo por concluir en octubre; Predio La Ciénega (pago único) se verifica el 18-nov con el Informe Final firmado y
 el área da por concluidas sus actividades el 19-nov.
+
+**HU-4.3 · Evaluación de reportes** (PEG; ``_reportes_junio`` y ``_evaluaciones``): los reportes de junio (San Juan por el portal el
+3-jul, San Bartolo en ventanilla el 6-jul) se revisan, se evalúan «cumple» y la Dirección de Protección Forestal envía la evaluación
+del periodo al CASPEG el 6-jul, que la valida el 7-jul con su acuerdo de seguimiento: de ahí sale el depósito del 14-jul. Santa Ana
+no entrega ningún reporte y queda «no entregó» (señalado) en todos los periodos. Julio y agosto se evalúan el 6-ago y el 4-sep y el
+CASPEG los valida el 15-sep: San Juan cobra su segunda ministración (22-sep); San Bartolo entregó julio pero no agosto, así que
+queda «no entregó» en agosto y su segunda ministración no se puede solicitar. Septiembre (San Juan, con observaciones) queda por
+evaluar y el reporte de octubre de San Juan por revisar en la Delegación.
 """
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
@@ -93,20 +101,23 @@ def _modelo(u, ejercicio, direccion):
     return m
 
 
-def _validar_reportes(u, ejercicio, expedientes, fecha):
-    """PEG: el CASPEG valida la evaluación de los reportes del periodo (sesión de seguimiento, 5 días hábiles de anticipación)."""
+def _validar_reportes(u, ejercicio, periodos, fecha):
+    """PEG: el CASPEG valida la evaluación de los reportes (sesión de seguimiento, 5 días hábiles de anticipación).
+    ``periodos``: ``[(clave del periodo, nombre, expedientes evaluados)]``."""
     st = u["comite"]
     fecha = habil(fecha)
+    nombres = " y ".join(n for _, n, _ in periodos)
     with paso(habil_antes(fecha, 7), 12):
         s = sesiones.crear_sesion(st, ejercicio, TipoSesion.SEGUIMIENTO, cuando(fecha, 11), "Sala de juntas de PROBOSQUE, Metepec",
                                   "Lista de asistencia y declaración de quórum\nValidación de la evaluación de reportes\nAsuntos generales")
-        sesiones.agregar_documento(st, s, ContentFile(_pdf_demo("Evaluación de reportes de junio"), name="reportes.pdf"),
+        sesiones.agregar_documento(st, s, ContentFile(_pdf_demo(f"Evaluación de reportes de {nombres}"), name="reportes.pdf"),
                                    "Evaluación de reportes")
     with paso(habil_antes(fecha, 5), 10):
         sesiones.enviar_convocatoria(st, s)
     with paso(fecha, 12):
-        seguimiento.registrar_acuerdo(st, s, "validacion_reportes", "Se valida la evaluación de los reportes mensuales de junio "
-                                      "de los Guardabosques de la lista.", expedientes, periodo=PERIODO_VALIDADO)
+        for clave, nombre, expedientes in periodos:
+            seguimiento.registrar_acuerdo(st, s, "validacion_reportes", f"Se valida la evaluación de los reportes mensuales de "
+                                          f"{nombre} de los Guardabosques de la lista.", expedientes, periodo=clave)
 
 
 def _lote(u, ejercicio, clave):
@@ -147,7 +158,9 @@ def _lote(u, ejercicio, clave):
             solicitudes.adjuntar_comprobante(deleg, exp, archivo_demo(f"cuenta_{exp.folio}.pdf", f"Estado de cuenta {exp.folio}"),
                                              "Estado de cuenta bancario (demostración)")
     if clave == "PEG":
-        _validar_reportes(u, ejercicio, pagados, c["validacion"])
+        _portal_demo()
+        _reportes_junio(u, ejercicio, [exp for exp, _ in exps])
+        _validar_reportes(u, ejercicio, [(PERIODO_VALIDADO, "junio", [exp for exp, _ in exps])], c["validacion"])
     for exp in pagados:
         with paso(c["solicitud"], 10):
             sol = solicitudes.enviar_solicitud(direccion, exp, 1, "Solicitud de demostración.")
@@ -194,6 +207,7 @@ def cargar_demo():
             hechas += _recibida(u, ejercicio, clave)
     _portal_demo()
     _comprobaciones(u)
+    _evaluaciones(u)
     _verificaciones(u)
     return hechas
 
@@ -209,11 +223,12 @@ def _envio(usuario, exp, tipo, fecha, hora=10, **kw):
         return comprobaciones.registrar_envio(usuario, exp, tipo, archivo=archivo, **kw)
 
 
-def _revisar(u, c, fecha):
-    from . import comprobaciones
+def _revisar(u, c, fecha, resultado="revisado", observaciones="", hora=16):
+    """La Delegación revisa un reporte o un acuse de depósito (HU-4.3)."""
+    from . import reportes
 
-    with paso(fecha, 16):
-        comprobaciones.marcar_revisada(_delegacion(u, c.expediente), c)
+    with paso(fecha, hora):
+        return reportes.revisar(_delegacion(u, c.expediente), c, resultado, observaciones)
 
 
 def _comprobaciones(u):
@@ -229,18 +244,23 @@ def _comprobaciones(u):
                descripcion="Copia de la Bitácora ingresada para la autorización del Programa de Manejo.")
     san_juan = exp_de("Ejido San Juan")
     margarito = Usuario.objects.filter(username="SARM800101HMCNZR09", cuenta_externa__activada_en__isnull=False).first()
-    if san_juan is not None and margarito is not None and not san_juan.comprobaciones.exists():
-        for periodo, fecha in (("2026-06", "2026-07-03"), ("2026-07", "2026-08-04"), ("2026-08", "2026-09-03"),
-                               ("2026-09", "2026-10-05"), ("2026-10", "2026-11-04")):
+    if san_juan is not None and margarito is not None:
+        for periodo, fecha, revision in (("2026-07", "2026-08-04", ("revisado", "")), ("2026-08", "2026-09-03", ("revisado", "")),
+                                         ("2026-09", "2026-10-05", ("con_observaciones", "Falta la evidencia fotográfica de dos recorridos.")),
+                                         ("2026-10", "2026-11-04", None)):
+            if san_juan.comprobaciones.filter(tipo="reporte_mensual", periodo=periodo).exists():
+                continue
             c = _envio(margarito, san_juan, "reporte_mensual", fecha, 9, periodo=periodo,
                        descripcion="Recorridos de vigilancia y brechas cortafuego.")
-            if periodo != "2026-10":
-                _revisar(u, c, fecha)
-        _envio(_delegacion(u, san_juan), san_juan, "acuse_deposito", "2026-07-16", fecha_hecho=date(2026, 7, 14))
+            if revision:
+                _revisar(u, c, fecha, *revision)
+        if not san_juan.comprobaciones.filter(tipo="acuse_deposito").exists():
+            c = _envio(_delegacion(u, san_juan), san_juan, "acuse_deposito", "2026-07-16", fecha_hecho=date(2026, 7, 14))
+            _revisar(u, c, "2026-07-16")
     san_bartolo = exp_de("Ejido San Bartolo")
-    if san_bartolo is not None and not san_bartolo.comprobaciones.exists():
-        for periodo, fecha in (("2026-06", "2026-07-06"), ("2026-07", "2026-08-05")):
-            _envio(_delegacion(u, san_bartolo), san_bartolo, "reporte_mensual", fecha, periodo=periodo)
+    if san_bartolo is not None and not san_bartolo.comprobaciones.filter(tipo="reporte_mensual", periodo="2026-07").exists():
+        c = _envio(_delegacion(u, san_bartolo), san_bartolo, "reporte_mensual", "2026-08-05", periodo="2026-07")
+        _revisar(u, c, "2026-08-05")  # agosto no lo entrega: «no entregó»
     for nombre, fecha, termino in (("Plantación La Mesa", "2026-09-28", date(2026, 9, 25)),
                                    ("Manantial Alto", "2026-10-28", date(2026, 10, 27)),
                                    ("Predio La Ciénega", "2026-11-10", date(2026, 11, 9))):
@@ -300,3 +320,62 @@ def _verificaciones(u):
         with paso("2026-11-19", 10):
             verificacion.dar_por_concluida(u["dir_drff"], cienega)
 
+
+# ----------------------------------------------------------------------------- HU-4.3
+def _reportes_junio(u, ejercicio, exps):
+    """HU-4.3 (primer periodo, antes del primer depósito): los reportes de junio de San Juan (portal, 3-jul) y San Bartolo
+    (ventanilla, 6-jul) se revisan, la Dirección los evalúa «cumple» y envía la evaluación del periodo al CASPEG el 6-jul. Santa
+    Ana no entregó: «no entregó» en automático."""
+    from . import reportes
+
+    por_predio = {e.predio.nombre: e for e in exps}
+    margarito = Usuario.objects.filter(username="SARM800101HMCNZR09", cuenta_externa__activada_en__isnull=False).first()
+    direccion = u["dir_dpf"]
+    san_juan, san_bartolo = por_predio["Ejido San Juan"], por_predio["Ejido San Bartolo"]
+    c1 = _envio(margarito, san_juan, "reporte_mensual", "2026-07-03", 9, periodo="2026-06",
+                descripcion="Recorridos de vigilancia y brechas cortafuego.")
+    _revisar(u, c1, "2026-07-03")
+    c2 = _envio(_delegacion(u, san_bartolo), san_bartolo, "reporte_mensual", "2026-07-06", 10, periodo="2026-06")
+    _revisar(u, c2, "2026-07-06", hora=12)
+    for exp in (san_juan, san_bartolo):
+        with paso("2026-07-06", 14):
+            reportes.evaluar_periodo(direccion, exp, "2026-06", "cumple")
+    with paso("2026-07-06", 15):
+        reportes.enviar_evaluacion(direccion, ejercicio, "2026-06")
+
+
+def _evaluaciones(u):
+    """HU-4.3: julio y agosto se evalúan y se envían al CASPEG (6-ago y 4-sep), que los valida el 15-sep; San Juan cobra su segunda
+    ministración y San Bartolo, que no entregó agosto, no (idempotente por periodo)."""
+    from . import reportes
+    from .models import EnvioEvaluacion
+
+    ejercicio = Ejercicio.objects.filter(programa__clave="PEG", reglas_cargadas__isnull=False).order_by("-anio").first()
+    if ejercicio is None:
+        return
+    direccion = u["dir_dpf"]
+    exps = {e.predio.nombre: e for e in Expediente.objects.filter(ejercicio=ejercicio, firma_contrato__isnull=False)
+            .select_related("predio")}
+    if not {"Ejido San Juan", "Ejido San Bartolo", "Ejido Santa Ana"} <= set(exps):
+        return
+    san_juan, san_bartolo = exps["Ejido San Juan"], exps["Ejido San Bartolo"]
+    if EnvioEvaluacion.objects.filter(ejercicio=ejercicio, periodo="2026-07").exists():
+        return
+    # El reporte de julio de los dos llegó en agosto; el de agosto solo lo entregó San Juan (3-sep).
+    for exp in (san_juan, san_bartolo):
+        with paso("2026-08-06", 14):
+            reportes.evaluar_periodo(direccion, exp, "2026-07", "cumple")
+    with paso("2026-08-06", 15):
+        reportes.enviar_evaluacion(direccion, ejercicio, "2026-07")
+    with paso("2026-09-04", 14):
+        reportes.evaluar_periodo(direccion, san_juan, "2026-08", "cumple")
+    with paso("2026-09-04", 15):
+        reportes.enviar_evaluacion(direccion, ejercicio, "2026-08")
+    todos = list(exps.values())
+    _validar_reportes(u, ejercicio, [("2026-07", "julio", todos), ("2026-08", "agosto", todos)], "2026-09-15")
+    with paso("2026-09-17", 10):
+        sol = solicitudes.enviar_solicitud(direccion, san_juan, 2, "Segunda ministración con la evaluación de julio y agosto validada.")
+    with paso("2026-09-21", 10):
+        pagos.revisar_solicitud(u["finanzas"], sol, "aceptada", "Soportes completos.")
+    with paso("2026-09-22", 11):
+        pagos.registrar_pago(u["finanzas"], sol, f"DEP-{sol.pk:06d}", cuando("2026-09-22").date())

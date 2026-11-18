@@ -194,22 +194,22 @@ def test_hu_4_1_peg_entrega_sus_reportes_mensuales_y_el_acuse_de_deposito(peg_co
         exp = peg_contratado()
         guardabosque = cuenta_portal(exp)
     estado = exp.estado.clave
-    with reloj.en("2026-07-03 10:00"):
-        junio = comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("reporte_junio.pdf"), periodo="2026-06")
+    with reloj.en("2026-08-03 10:00"):
+        julio = comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("reporte_julio.pdf"), periodo="2026-07")
         with pytest.raises(ValidationError, match="Ya se entregó"):
-            comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("otra.pdf"), periodo="2026-06")
+            comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("otra.pdf"), periodo="2026-07")
         with pytest.raises(ValidationError, match="todavía no empieza"):
-            comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("x.pdf"), periodo="2026-09")
+            comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("x.pdf"), periodo="2026-10")
         with pytest.raises(ValidationError, match="periodo"):
             comprobaciones.registrar_envio(guardabosque, exp, "reporte_mensual", pdf("x.pdf"))
         deposito = comprobaciones.registrar_envio(delegado_de(usuarios, exp), exp, "acuse_deposito", pdf("acuse.pdf"),
-                                                  fecha_hecho=date(2026, 7, 1))
-    assert junio.periodo == "2026-06" and junio.en_plazo is None and "R-18" in junio.plazo_texto
-    assert dict(junio.acuse.contenido["renglones"])["Periodo que reporta"] == "Junio 2026"
-    assert Hito.objects.get(expediente=exp, clave="reporte_mensual").datos["periodo"] == "2026-06"
-    assert deposito.medio == MedioEnvio.VENTANILLA and deposito.fecha_hecho == date(2026, 7, 1)
+                                                  fecha_hecho=date(2026, 7, 14))
+    assert julio.periodo == "2026-07" and julio.en_plazo is None and "R-18" in julio.plazo_texto
+    assert dict(julio.acuse.contenido["renglones"])["Periodo que reporta"] == "Julio 2026"
+    assert Hito.objects.get(expediente=exp, clave="reporte_mensual", datos__periodo="2026-07").datos["periodo"] == "2026-07"
+    assert deposito.medio == MedioEnvio.VENTANILLA and deposito.fecha_hecho == date(2026, 7, 14)
     exp.refresh_from_db()
-    assert exp.estado.clave == estado                     # la evaluación de los reportes es de HU-4.3
+    assert exp.estado.clave == estado                     # la evaluación de los reportes (HU-4.3) no cambia el estado
 
 
 # ----------------------------------------------------------------------------- permisos y validaciones

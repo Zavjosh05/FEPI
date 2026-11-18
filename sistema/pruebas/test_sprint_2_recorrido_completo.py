@@ -50,12 +50,22 @@ class Rastro:
         self.eventos = exp.eventos.count()
         self.acuses = exp.acuses.count()
 
+    @property
+    def eventos(self):
+        return self._ultimo_evento
+
+    @eventos.setter
+    def eventos(self, _cuenta):
+        """Los renglones nuevos se cuentan por orden de alta (no por fecha: la evaluación de reportes de PEG ocurre al
+        terminar el periodo, con el reloj simulado en una fecha posterior)."""
+        self._ultimo_evento = self.exp.eventos.order_by("-pk").values_list("pk", flat=True).first() or 0
+
     def relevo(self, estado, quien, unidad_clave, bandeja_de, usuarios, nuevos_acuses=1, tipo_acuse=None):
         """El estado, la bandeja, el acuse y la bitácora del paso recién hecho."""
         self.exp.refresh_from_db()
         assert self.exp.estado.clave == estado, f"estado: {self.exp.estado.clave} (se esperaba {estado})"
         assert atiende(self.exp, usuarios) == set(bandeja_de), f"bandejas en {estado}: {atiende(self.exp, usuarios)}"
-        nuevos = list(self.exp.eventos.order_by("-fecha_hora", "-pk")[: self.exp.eventos.count() - self.eventos])
+        nuevos = list(self.exp.eventos.filter(pk__gt=self.eventos).order_by("-fecha_hora", "-pk"))
         assert nuevos, "el paso no dejó renglón en la bitácora"
         assert all(e.fecha_hora for e in nuevos)
         if quien is not None:
@@ -231,7 +241,7 @@ def test_sprint_2_una_solicitud_se_publica_se_contrata_y_cobra_su_primera_minist
         if programa == "PEG":
             with pytest.raises(ValidationError, match="Evaluación de los reportes"):
                 solicitudes.enviar_solicitud(dir_, exp, 1)
-            validar_reportes(u, exp, ["2026-01"])                   # el CASPEG valida el primer periodo (HU-2.4)
+            validar_reportes(u, exp)                                   # evaluación del primer periodo validada por el CASPEG (HU-4.3)
     else:
         with pytest.raises(ValidationError, match="instruye el pago de la ministración 1"):
             solicitudes.enviar_solicitud(dir_, exp, 1)

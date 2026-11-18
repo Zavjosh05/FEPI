@@ -27,14 +27,38 @@ def instruir_pago(usuarios, expediente, ministracion=1):
         Unidad.objects.get(clave="FIDUCIARIA"), ministracion=ministracion)
 
 
-def validar_reportes(usuarios, expediente, periodos=("2026-01",)):
-    """PEG: sesión de seguimiento del CASPEG que valida la evaluación de los reportes de los periodos dados (HU-2.4)."""
-    s = sesiones.crear_sesion(usuarios["comite"], expediente.ejercicio, TipoSesion.SEGUIMIENTO, fecha_sesion(8), "Sala",
-                              "Quórum\nValidación de reportes")
-    sesiones.agregar_documento(usuarios["comite"], s, documento_sesion(), "Reportes")
-    sesiones.enviar_convocatoria(usuarios["comite"], s)
-    return [seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes", f"Se validan los reportes de {p}",
-                                          [expediente], periodo=p) for p in periodos]
+def validar_reportes(usuarios, expediente, periodos=None, ministracion=1):
+    """PEG: cadena completa de la evaluación de reportes (HU-4.3) para los periodos que cubre la ministración dada (o los
+    ``periodos`` que se pidan): el Guardabosque entrega su reporte en la Delegación, la Delegación lo revisa, la Dirección de
+    Protección Forestal lo evalúa «cumple» y envía la evaluación al CASPEG, y la sesión de seguimiento del CASPEG la valida con
+    su acuerdo (HU-2.4). Todo ocurre el día siguiente al fin del último periodo (reloj simulado)."""
+    from datetime import date, datetime, time, timedelta
+
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from django.utils import timezone
+
+    from ejecucion import comprobaciones, reportes
+    from nucleo import reloj
+    from nucleo.demo import _pdf_demo
+
+    claves = list(periodos or [p["clave"] for p in reportes.periodos_de_ministracion(expediente, ministracion)])
+    assert claves, "la ministración no cubre periodos de reportes"
+    fin = max(date.fromisoformat(p["fin"]) for p in comprobaciones.periodos(expediente) if p["clave"] in claves)
+    momento = max(timezone.now(), timezone.make_aware(datetime.combine(fin + timedelta(days=1), time(12, 0))))
+    deleg, direccion, ejercicio = delegado_de(usuarios, expediente), usuarios["dir_dpf"], expediente.ejercicio
+    with reloj.en(momento):
+        for clave in claves:
+            doc = SimpleUploadedFile(f"reporte_{clave}.pdf", _pdf_demo(f"Reporte {clave}"), content_type="application/pdf")
+            c = comprobaciones.registrar_envio(deleg, expediente, "reporte_mensual", archivo=doc, periodo=clave)
+            reportes.revisar(deleg, c, "revisado")
+            reportes.evaluar_periodo(direccion, expediente, clave, "cumple")
+            reportes.enviar_evaluacion(direccion, ejercicio, clave, expedientes=[expediente])
+        s = sesiones.crear_sesion(usuarios["comite"], ejercicio, TipoSesion.SEGUIMIENTO, fecha_sesion(8), "Sala",
+                                  "Quórum\nValidación de reportes")
+        sesiones.agregar_documento(usuarios["comite"], s, documento_sesion(), "Reportes")
+        sesiones.enviar_convocatoria(usuarios["comite"], s)
+        return [seguimiento.registrar_acuerdo(usuarios["comite"], s, "validacion_reportes", f"Se valida la evaluación de {p}",
+                                              [expediente], periodo=p) for p in claves]
 
 
 @pytest.fixture

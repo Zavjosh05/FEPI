@@ -337,5 +337,40 @@
       }
     }
   },
-  "nota_verificacion_peg": "PEG no tiene verificación en campo: su ministración depende de la evaluación de los reportes (HU-4.3)."
+  "nota_verificacion_peg": "PEG no tiene verificación en campo: su ministración depende de la evaluación de los reportes (HU-4.3).",
+  "reportes": {
+    "nota": "HU-4.3 · Evaluación de los reportes mensuales de los Guardabosques. Lo que dicen las ROP: la persona beneficiaria entrega el reporte mensual en la Delegación (8.1.7 l, línea 8814); la Delegación lo revisa cada mes desde la firma (Convocatoria base quinta, actividad VII, líneas 9534 a 9538); la Dirección de Protección Forestal, como Instancia Ejecutora, hace la evaluación interna (glosario, líneas 8433 y 8434; 10.1 fr. XIII, líneas 9024 y 9025); el CASPEG valida el otorgamiento con base en esa revisión documental (Convocatoria base cuarta, líneas 9505 y 9506). Lo que las ROP no dicen (R-18) y aquí es supuesto: cuál periodo cubre cada ministración y el día de entrega de cada mes.",
+    "resultados_revision": {
+      "revisado": "Revisado",
+      "con_observaciones": "Revisado con observaciones",
+      "devuelto": "Devuelto para corregir"
+    },
+    "resultados_evaluacion": {
+      "cumple": "Cumple",
+      "no_cumple": "No cumple",
+      "no_entrego": "No entregó"
+    },
+    "programas": {
+      "PEG": {
+        "tipos_revisables": [
+          "reporte_mensual",
+          "acuse_deposito"
+        ],
+        "tipo_reporte": "reporte_mensual",
+        "primer_periodo": "mes_de_la_firma",
+        "meses_por_ministracion": {
+          "1": 1,
+          "2": 2,
+          "3": 2,
+          "4": null
+        },
+        "supuesto_correspondencia": "Las ROP no dicen qué meses cubre cada ministración (R-18; reglas/PEG.json, periodos_reportes y ministraciones). Supuesto configurable: cada ministración cubre los meses que van desde la ministración previa. Se reporta desde el mes de la firma del contrato (Convocatoria base quinta, actividad VII, línea 9534) y la ministración 1 cubre ese primer mes, la 2 los dos siguientes, la 3 los dos siguientes y la 4 el resto del ejercicio. Por confirmar con el cliente.",
+        "supuesto_periodos": "Los 12 periodos son los meses calendario del ejercicio (derivados: las ROP hablan de «reportes mensuales» sin publicar el calendario de entrega) y las 4 ministraciones del 25 % son un supuesto del archivo de reglas (R-18).",
+        "fundamento_revision": "ROP PEG 8.1.7 l) (líneas 8814 y 8815): los reportes se entregan en las oficinas de la Delegación; Convocatoria base quinta, actividad VII (líneas 9534 a 9538): se revisan mensualmente desde la firma; 10.1 fr. XV (línea 9028): la Delegación recaba el acuse de recibo del depósito.",
+        "fundamento_evaluacion": "ROP PEG, glosario «Evaluación interna» (líneas 8433 y 8434) y 10.1 fr. XIII (líneas 9024 y 9025): la Dirección de Protección Forestal evalúa los reportes para constatar el cumplimiento de las actividades comprometidas.",
+        "fundamento_validacion": "ROP PEG, Convocatoria base cuarta (líneas 9505 y 9506): el otorgamiento es con base en la revisión documental de los reportes, validada por el Comité (CASPEG); 9.4.3 c).",
+        "fundamento_incumplimiento": "ROP PEG 8.1.8 a) (línea 8827) y 8.1.9.1 a) (línea 8852): no entregar el reporte mensual en tiempo y forma es causa de suspensión temporal por ministración; 8.1.8 i) (línea 8838) y 8.1.9.2 f) (línea 8864): no presentar tres informes mensuales es causa de baja. Lo atiende el seguimiento de incumplimientos."
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@ from datetime import date
 from decimal import Decimal
 
 import pytest
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from ejecucion import comprobaciones, verificacion
@@ -116,3 +117,59 @@ def test_sprint_3_la_ejecucion_se_comprueba_se_verifica_y_cobra_la_segunda_minis
     else:                                                # RHF verificó todo; PSAHEM y MFS pagan el 30 % completo
         assert total_pagado == aprobado
     assert not verificacion.ministraciones_pendientes(exp)
+
+
+def test_sprint_3_peg_guardabosques_reportan_se_evaluan_y_cobran_dos_ministraciones(contratadas, usuarios, pdf):
+    """HU-4.1 y HU-4.3 en Guardabosques: dos Guardabosques firman el 16-jun y entregan en la Delegación sus reportes; la Delegación los
+    revisa, la Dirección de Protección Forestal los evalúa y envía cada periodo al CASPEG, que lo valida. Quien cumple cobra la
+    ministración 1 (junio) y la 2 (julio y agosto); quien no entregó agosto queda señalado y su segunda ministración no se solicita."""
+    from ejecucion import reportes
+
+    from .test_hu_4_3 import _reporte, _validar
+
+    u = usuarios
+    with reloj.en("2026-06-16 10:00"):
+        _, (a, b) = contratadas("PEG", cuantas=2)
+    dpf, finanzas = u["dir_dpf"], u["finanzas"]
+    for exp in (a, b):
+        solicitudes.adjuntar_comprobante(delegado_de(u, exp), exp, pdf("cuenta.pdf"))
+    def periodo(clave, entregan, fecha_revision, fecha_eval, fecha_acuerdo):
+        for exp, dia in entregan:
+            c = _reporte(u, exp, clave, pdf, dia)
+            with reloj.en(fecha_revision):
+                reportes.revisar(delegado_de(u, exp), c, "revisado")
+        with reloj.en(fecha_eval):
+            for exp, _ in entregan:
+                reportes.evaluar_periodo(dpf, exp, clave, "cumple")
+            envio = reportes.enviar_evaluacion(dpf, a.ejercicio, clave)
+        _validar(u, a.ejercicio, clave, [a, b], fecha_acuerdo)
+        return envio
+
+    junio = periodo("2026-06", [(a, "2026-07-02 10:00"), (b, "2026-07-02 11:00")], "2026-07-03 10:00", "2026-07-06 11:00",
+                    "2026-07-07 11:00")
+    assert (junio.cumplen, junio.no_entregaron) == (2, 0) and junio.acuse.tipo == "evaluacion_reportes"
+    for exp in (a, b):
+        with reloj.en("2026-07-08 10:00"):
+            sol = solicitudes.enviar_solicitud(dpf, exp, 1)
+            pagos.revisar_solicitud(finanzas, sol, "aceptada")
+            sol.refresh_from_db()
+            pagos.registrar_pago(finanzas, sol, f"DEP-{exp.pk:04d}", timezone.localdate())
+        exp.refresh_from_db()
+        assert exp.estado.clave == "pagada" and sol.importe == Decimal("6387.50")
+    julio = periodo("2026-07", [(a, "2026-08-04 10:00"), (b, "2026-08-04 11:00")], "2026-08-05 10:00", "2026-08-06 11:00",
+                    "2026-08-10 11:00")
+    agosto = periodo("2026-08", [(a, "2026-09-02 10:00")], "2026-09-03 10:00", "2026-09-04 11:00", "2026-09-10 11:00")
+    assert (julio.cumplen, agosto.cumplen, agosto.no_entregaron) == (2, 1, 1)
+    with reloj.en("2026-09-11 10:00"):
+        sol2 = solicitudes.enviar_solicitud(dpf, a, 2)                   # cumplió julio y agosto, validados por el CASPEG
+        assert sol2.ministracion == 2 and all(s["cumple"] for s in sol2.soportes)
+        pagos.revisar_solicitud(finanzas, sol2, "aceptada")
+        sol2.refresh_from_db()
+        pagos.registrar_pago(finanzas, sol2, "DEP-A-0002", timezone.localdate())
+        soporte_b = {s["clave"]: s for s in solicitudes.soportes(b, 2)}["evaluacion_reportes"]
+        assert not soporte_b["cumple"] and "Agosto 2026: no entregó su reporte" in soporte_b["detalle"]
+        with pytest.raises(ValidationError, match="no entregó"):
+            solicitudes.enviar_solicitud(dpf, b, 2)
+    a.refresh_from_db()
+    assert a.estado.clave == "pagada" and sorted(a.solicitudes_pago.filter(estado="pagada").values_list("ministracion", flat=True)) == [1, 2]
+    assert [e.nombre_periodo for e in reportes.periodos_senalados(b)] == ["Agosto 2026"] and not reportes.periodos_senalados(a)

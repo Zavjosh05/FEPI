@@ -96,7 +96,9 @@ def por_revisar(usuario):
     """Delegación: lo que llegó por el portal a sus expedientes y todavía no revisa."""
     if usuario.tipo_unidad != TipoUnidad.DELEGACION:
         return Comprobacion.objects.none()
-    return comprobaciones_visibles(usuario).filter(medio=MedioEnvio.PORTAL, revisada_en__isnull=True)
+    # Los reportes y los acuses de depósito de los Guardabosques se revisan con su resultado (HU-4.3, ``reportes.revisar``).
+    tipos = sorted({t for c in datos_ejecucion()["reportes"]["programas"].values() for t in c["tipos_revisables"]})
+    return comprobaciones_visibles(usuario).filter(medio=MedioEnvio.PORTAL, revisada_en__isnull=True).exclude(tipo__in=tipos)
 
 
 def fuente_entregable(expediente, numero):
@@ -174,7 +176,9 @@ def registrar_envio(usuario, expediente, tipo, archivo=None, descripcion="", fec
         if date.fromisoformat(disponibles[periodo]["inicio"]) > hoy:
             raise ValidationError("No se puede reportar un periodo que todavía no empieza.")
         nombre_periodo = disponibles[periodo].get("nombre", periodo)
-        if t.get("un_envio_por_periodo") and expediente.comprobaciones.filter(tipo=tipo, periodo=periodo).exists():
+        from . import reportes  # HU-4.3: un reporte devuelto para corregir se puede volver a enviar
+
+        if t.get("un_envio_por_periodo") and reportes.hay_envio_vigente(expediente, tipo, periodo):
             raise ValidationError(f"Ya se entregó el {t['nombre'].lower()} de {nombre_periodo}.")
     else:
         periodo = ""
@@ -290,6 +294,11 @@ def marcar_revisada(usuario, comprobacion, momento=None):
     exp = comprobacion.expediente
     if usuario.tipo_unidad != TipoUnidad.DELEGACION or usuario.unidad_id != exp.delegacion_id:
         raise PermissionDenied("La revisa la Delegación del expediente.")
+    from . import reportes
+
+    if reportes.es_revisable(comprobacion):
+        raise ValidationError("Los reportes mensuales y los acuses de depósito se revisan con su resultado: revisado, con "
+                              "observaciones o devuelto para corregir.")
     if not comprobacion.por_portal:
         raise ValidationError("Lo entregado en ventanilla ya lo recibió la Delegación.")
     if comprobacion.revisada_en:

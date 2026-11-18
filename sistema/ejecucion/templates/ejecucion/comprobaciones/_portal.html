@@ -5,7 +5,8 @@
     <li data-comprobacion="{{ c.tipo }}"><strong>{{ c.nombre }}</strong>{% if c.periodo %} ({{ c.periodo }}){% endif %} · {{ c.get_medio_display|lower }} · {{ c.enviada_en|date:"d/m/Y H:i" }} h
       {% if c.en_plazo is True %}<span class="badge text-bg-success">en plazo</span>{% elif c.en_plazo is False %}<span class="badge text-bg-danger">fuera de plazo</span>{% endif %}
       {% if c.acuse %} · acuse <a href="{% url 'portal:acuse' exp.folio c.acuse.folio %}">{{ c.acuse.folio }}</a>{% endif %}
-      {% if c.archivo %} · <a href="{% url 'ejecucion_portal:archivo' exp.folio c.pk %}">documento</a>{% endif %}</li>
+      {% if c.archivo %} · <a href="{% url 'ejecucion_portal:archivo' exp.folio c.pk %}">documento</a>{% endif %}
+      {% with r=c.revisiones.all.0 %}{% if r %}<div data-prueba="revision-delegacion" data-resultado="{{ r.resultado }}">Revisión de la Delegación: <strong>{{ r.get_resultado_display }}</strong>{% if r.observaciones %}. {{ r.observaciones }}{% endif %}{% if r.resultado == "devuelto" %} Corríjalo y envíelo de nuevo.{% endif %}</div>{% endif %}{% endwith %}</li>
   {% endfor %}</ul>
   {% else %}<div class="small text-secondary mb-2">Todavía no hay envíos.</div>{% endif %}
 

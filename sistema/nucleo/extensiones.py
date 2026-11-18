@@ -35,6 +35,9 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
   verificación se paga por lo verificado donde las reglas lo dicen.
 - AL_INCIDENCIA: funciones ``(incidencia) -> None`` que corren al registrar una incidencia de la verificación en campo
   (HU-4.2); HU-6.2 conecta aquí el seguimiento de los incumplimientos.
+- AL_REPORTE_INCUMPLIDO: funciones ``(evaluacion) -> None`` que corren, al enviar al CASPEG la evaluación de un periodo, por cada
+  Guardabosque que no cumplió o no entregó su reporte (``ejecucion.models.EvaluacionPeriodo``; HU-4.3). HU-6.2 conecta aquí el
+  seguimiento (suspensión por ministración o baja por tres reportes no presentados, PEG 8.1.9.1 a y 8.1.9.2 f).
 """
 
 FILTROS_BANDEJA = []
@@ -55,3 +58,4 @@ AL_LIBERAR_RECURSO = []
 SECCIONES_PORTAL = []
 AJUSTES_MONTO = []
 AL_INCIDENCIA = []
+AL_REPORTE_INCUMPLIDO = []

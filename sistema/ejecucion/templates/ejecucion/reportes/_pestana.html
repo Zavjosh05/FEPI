@@ -1,0 +1,39 @@
+{% if reportes_aplica %}
+<div class="titulo-seccion mt-3">Evaluación de reportes mensuales por periodo</div>
+<div class="small text-secondary mb-2" data-prueba="supuestos-reportes">{{ cfg_reportes.supuesto_periodos }} {{ cfg_reportes.supuesto_correspondencia }}</div>
+
+{% if revisiones_pendientes %}
+<div class="tarjeta mb-3" data-prueba="revisiones-pendientes">
+  <div class="fw-semibold mb-1">Por revisar en la Delegación ({{ revisiones_pendientes|length }})</div>
+  <div class="small text-secondary mb-2">{{ cfg_reportes.fundamento_revision }}</div>
+  {% for c in revisiones_pendientes %}
+  <div class="mb-2" data-comprobacion="{{ c.tipo }}"><div class="small"><strong>{{ c.nombre }}{% if c.periodo %} · {{ c.periodo }}{% endif %}</strong>, recibido el {{ c.enviada_en|date:"d/m/Y H:i" }} h{% if c.archivo %} · <a href="{% url 'ejecucion:archivo' c.pk %}" target="_blank">documento</a>{% endif %}</div>
+    {% url 'recepcion:expediente' exp.folio as destino %}{% include "ejecucion/reportes/_forma_revision.html" with siguiente=destino|add:"?pestana=ejecucion" %}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="tarjeta mb-3" data-prueba="historial-reportes">
+  {% if historial_reportes %}
+  <div class="table-responsive"><table class="table table-sm small align-middle mb-0">
+    <thead class="table-light"><tr><th>Periodo</th><th>Reporte</th><th>Revisión de la Delegación</th><th>Evaluación</th><th>CASPEG</th><th>Ministración</th></tr></thead>
+    <tbody>{% for f in historial_reportes %}
+      <tr data-periodo="{{ f.periodo.clave }}" data-estado="{{ f.estado }}">
+        <td class="fw-semibold">{{ f.periodo.nombre }}</td>
+        <td>{% if f.reporte %}{{ f.reporte.enviada_en|date:"d/m/Y H:i" }} h{% if f.reporte.acuse %} · <a href="{% url 'nucleo:acuse' f.reporte.acuse.folio %}" target="_blank">{{ f.reporte.acuse.folio }}</a>{% endif %}{% else %}<span class="text-secondary">Sin reporte</span>{% endif %}</td>
+        <td>{% if f.revision %}{{ f.revision.get_resultado_display }}{% if f.revision.observaciones %}<div class="text-secondary">{{ f.revision.observaciones }}</div>{% endif %}{% elif f.reporte %}<span class="text-secondary">Sin revisar</span>{% else %}—{% endif %}</td>
+        <td><span class="badge text-bg-{{ f.clase }}" data-prueba="estado-periodo">{{ f.etiqueta }}</span>
+          {% if f.evaluacion and f.evaluacion.motivo and f.estado != 'no_entrego' %}<div class="text-secondary">{{ f.evaluacion.motivo }}</div>{% endif %}
+          {% if f.estado == 'no_entrego' or f.estado == 'no_cumple' %}<div class="text-danger">Señalado para el seguimiento{% if f.automatico %} (automático){% endif %}</div>{% endif %}
+          {% if puede_evaluar_reportes and f.envio is None and f.reporte and f.revision and f.estado != 'devuelto' %}{% url 'recepcion:expediente' exp.folio as destino %}<div class="mt-1">{% include "ejecucion/reportes/_forma_evaluacion.html" with e=exp p=f.periodo siguiente=destino|add:"?pestana=ejecucion" actual=f.evaluacion.resultado motivo=f.evaluacion.motivo %}</div>{% endif %}</td>
+        <td>{% if f.envio %}Enviada el {{ f.envio.enviado_en|date:"d/m/Y H:i" }} h{% if f.envio.acuse %} · <a href="{% url 'nucleo:acuse' f.envio.acuse.folio %}" target="_blank">{{ f.envio.acuse.folio }}</a>{% endif %}
+          <div>{% if f.validacion %}<span class="badge text-bg-success" data-prueba="validada">Validada · acuerdo {{ f.validacion.numero }}</span>{% else %}<span class="badge text-bg-secondary">Por validar</span>{% endif %}</div>{% else %}<span class="text-secondary">No enviada</span>{% endif %}</td>
+        <td>{% if f.ministracion %}{{ f.ministracion }} <span class="text-secondary">(supuesto)</span>{% else %}—{% endif %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary" data-prueba="sin-periodos">Todavía no hay periodos que reportar: se reporta desde el mes de la firma del contrato.</div>{% endif %}
+  <div class="small mt-2"><a href="{{ pagina_reportes }}">Ver la evaluación de todos los Guardabosques por periodo</a></div>
+</div>
+{% if senalados_reportes %}
+<div class="alert alert-warning small" data-prueba="senalado-reportes">Señalado para el seguimiento de incumplimientos: {% for e in senalados_reportes %}{{ e.nombre_periodo }} ({{ e.get_resultado_display|lower }}){% if not forloop.last %}; {% endif %}{% endfor %}. {{ cfg_reportes.fundamento_incumplimiento }}</div>
+{% endif %}
+{% endif %}

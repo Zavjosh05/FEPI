@@ -22,7 +22,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
     assert apps.is_installed("ejecucion") and apps.is_installed("seguimiento")
     claves = [p["clave"] for p in extensiones.PESTANAS_EXPEDIENTE]
     assert {"ejecucion", "seguimiento"} <= set(claves) and claves.index("pagos") < claves.index("ejecucion")
-    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == ["HU-4.3"]   # HU-4.1 y HU-4.2 ya construidas
+    assert [h[0] for h in reg_ejecucion.historias_pendientes()] == []   # HU-4.1, HU-4.2 y HU-4.3 ya construidas
     assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.1", "HU-6.2", "HU-6.3"]
     assert apps.get_app_config("ejecucion").get_models() is not None
 
@@ -30,7 +30,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
 def test_nucleo_pestanas_ejecucion_y_seguimiento_dicen_que_historia_las_llenara(contratadas, client, contrasena):
     _, (exp,) = contratadas("CC")
     client.login(username="dir_drff", password=contrasena)
-    for pestana, historia, plazo in (("ejecucion", "HU-4.3 Evaluación de reportes", "Entrega del informe final"),
+    for pestana, historia, plazo in (("ejecucion", "Ejecución y verificación", "Entrega del informe final"),
                                      ("seguimiento", "HU-6.2 Incumplimientos y reintegros", "Subsanar las omisiones")):
         html = client.get(reverse("recepcion:expediente", args=[exp.folio]) + f"?pestana={pestana}").content.decode()
         assert historia in html and plazo in html and 'data-prueba="monto-aprobado"' in html, pestana
@@ -39,6 +39,7 @@ def test_nucleo_pestanas_ejecucion_y_seguimiento_dicen_que_historia_las_llenara(
 
 def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
     from ejecucion import demo
+    from ejecucion import reportes as ejecucion_reportes
     from portal.models import CuentaExterna
 
     crear_usuarios()
@@ -55,8 +56,10 @@ def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
     assert volcanes.poligonos.get(vigente=True).levantado_por == "prestador"
     assert pagadas.get(predio__nombre="Aserradero La Cumbre").pagos.get().importe == Decimal("70000.00")  # 50 % FSC
     san_juan = pagadas.get(predio__nombre="Ejido San Juan")
-    pago = san_juan.pagos.get()
-    assert pago.tipo == "deposito" and pago.importe == Decimal("6387.50")
+    pago = san_juan.pagos.order_by("solicitud__ministracion").first()   # la segunda (22-sep) la cobra con la evaluación de HU-4.3
+    assert san_juan.pagos.count() == 2 and pago.tipo == "deposito" and pago.importe == Decimal("6387.50")
+    assert san_juan.pagos.count() == 2 and ejecucion_reportes.periodos_senalados(san_juan) == []
+    assert [e.resultado for e in ejecucion_reportes.periodos_senalados(pagadas.get(predio__nombre="Ejido San Bartolo"))] == ["no_entrego"]
     assert san_juan.beneficiaria.nombre == "Margarito Sánchez Ruiz"
     assert CuentaExterna.objects.get(usuario__username="SARM800101HMCNZR09").activada_en
     # HU-4.1: reportes de junio a octubre por el portal (el último por revisar) y en ventanilla los de San Bartolo.

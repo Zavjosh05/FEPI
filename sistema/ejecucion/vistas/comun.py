@@ -28,10 +28,12 @@ def contexto_ejecucion(request, exp):
     """Cada historia (HU-4.x) suma aquí lo suyo a la pestaña."""
     from ..registro import USOS_DE_PLAZO, historias_pendientes
     from .comprobaciones import contexto_comprobaciones_exp
+    from .reportes import contexto_reportes_exp
     from .verificacion import contexto_verificacion_exp
 
     contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
                 "vencimientos": [v for v in plazos.vencimientos(exp, USOS_DE_PLAZO).values() if v is not None]}
     contexto.update(contexto_comprobaciones_exp(request, exp))
     contexto.update(contexto_verificacion_exp(request, exp))
+    contexto.update(contexto_reportes_exp(request, exp))
     return contexto

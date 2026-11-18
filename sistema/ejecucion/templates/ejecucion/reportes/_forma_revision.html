@@ -1,0 +1,6 @@
+<form method="post" action="{% url 'ejecucion:revisar_reporte' c.pk %}" class="d-flex flex-wrap gap-1 align-items-start" data-prueba="form-revision" data-comprobacion-id="{{ c.pk }}">{% csrf_token %}
+  <input type="hidden" name="siguiente" value="{{ siguiente }}">
+  <select name="resultado" class="form-select form-select-sm w-auto" aria-label="Resultado de la revisión">{% for valor, nombre in form_revision.fields.resultado.choices %}<option value="{{ valor }}">{{ nombre }}</option>{% endfor %}</select>
+  <input name="observaciones" class="form-control form-control-sm w-auto" placeholder="Observaciones (si las hay)" aria-label="Observaciones de la revisión" style="min-width: 14rem">
+  <button class="btn btn-sm btn-outline-primary text-nowrap" type="submit">Registrar la revisión</button>
+</form>

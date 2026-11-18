@@ -1,0 +1,6 @@
+<form method="post" action="{% url 'ejecucion:evaluar_reporte' e.folio p.clave %}" class="d-flex flex-wrap gap-1 align-items-start" data-prueba="form-evaluacion" data-folio="{{ e.folio }}">{% csrf_token %}
+  <input type="hidden" name="siguiente" value="{{ siguiente }}">
+  <select name="resultado" class="form-select form-select-sm w-auto" aria-label="Evaluación de {{ e.folio }}">{% for valor, nombre in form_evaluacion.fields.resultado.choices %}<option value="{{ valor }}"{% if actual == valor %} selected{% endif %}>{{ nombre }}</option>{% endfor %}</select>
+  <input name="motivo" class="form-control form-control-sm w-auto" placeholder="Motivo (si no cumple)" aria-label="Motivo de {{ e.folio }}" value="{{ motivo }}" style="min-width: 14rem">
+  <button class="btn btn-sm btn-primary text-nowrap" type="submit">Guardar la evaluación</button>
+</form>
