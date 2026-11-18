@@ -4,6 +4,10 @@ Repositorio para la materia de FEPI. Contiene el prototipo de la **Calculadora d
 una propuesta para PROBOSQUE (Protectora de Bosques del Estado de México) dentro del levantamiento
 de necesidades de sus programas 2026. La calculadora estima cómo cambia la superficie de bosque con
 los incendios y las reforestaciones, usando imágenes satelitales y datos públicos de libre uso.
+Desde noviembre de 2026 contiene también el **Sistema de programas** (carpeta `sistema/`).
+
+> **Para ponerlo a funcionar** (el sistema con Docker y la página de la Calculadora), sigue la
+> [Guía de inicio](GUIA_DE_INICIO.md).
 
 > **Estado: prototipo.** El umbral de NDVI es provisional (falta calibrarlo con puntos de
 > referencia) y todavía no se tienen los polígonos de reforestación de los programas.

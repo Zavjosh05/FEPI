@@ -18,6 +18,9 @@ público (`/padron/`). Cómo recorrerlo de punta a punta: «Recorrer el sistema 
 
 ## Cómo levantar
 
+Paso a paso, con la instalación de Docker en WSL, los usuarios y qué hacer si algo falla:
+[`GUIA_DE_INICIO.md`](../GUIA_DE_INICIO.md). Aquí, lo esencial.
+
 Requisitos: Docker con Compose 2.24 o posterior. En Windows, Docker vive en WSL:
 
 ```
