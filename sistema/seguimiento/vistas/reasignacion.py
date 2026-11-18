@@ -112,13 +112,15 @@ def registrar_solicitud(request, folio):
 def proponer(request, folio):
     exp = expediente_visible(request, folio)
     form = PropuestaForm(request.POST, tipos=reasignacion.tipos_propuesta(exp),
-                         resoluciones=reasignacion.datos_seguimiento()["propuestas"]["resoluciones_caso_fortuito"])
+                         resoluciones=reasignacion.datos_seguimiento()["propuestas"]["resoluciones_caso_fortuito"],
+                         bases=reasignacion.datos_seguimiento()["incumplimientos"]["reintegro"]["bases"])
     if not form.is_valid():
         messages.error(request, "Elija la propuesta.")
         return redirect(_destino(folio))
     d = form.cleaned_data
     try:
-        p = reasignacion.proponer(request.user, exp, d["tipo"], d.get("descripcion", ""), d.get("resolucion", ""))
+        p = reasignacion.proponer(request.user, exp, d["tipo"], d.get("descripcion", ""), d.get("resolucion", ""),
+                                  base=d.get("base") or "ministrado")
     except (ValidationError, PermissionDenied) as e:
         _errores(request, e)
     else:
@@ -191,8 +193,11 @@ def contexto_reasignacion_exp(request, exp):
         "form_solicitud": SolicitudForm(tipos=tipos, puntos=reasignacion.puntos_firma(exp)) if puede_solicitar else None,
         "propuestas_exp": list(exp.propuestas_seguimiento.select_related("acuse", "acuerdo__sesion")),
         "recursos_exp": list(exp.recursos_liberados.all()),
-        "form_propuesta": PropuestaForm(tipos=tipos_prop, resoluciones=resoluciones) if tipos_prop else None,
+        "form_propuesta": PropuestaForm(tipos=tipos_prop, resoluciones=resoluciones,
+                                        bases=reasignacion.datos_seguimiento()["incumplimientos"]["reintegro"]["bases"])
+        if tipos_prop else None,
         "hay_caso_fortuito": any(t == "caso_fortuito" for t, _ in tipos_prop),
+        "hay_cancelacion": any(t in ("cancelacion", "baja_cheque", "baja_reportes") for t, _ in tipos_prop),
         "por_ministrar": reasignacion.por_ministrar(exp) if es_area and tipos_prop else None,
         "ministrado": reasignacion.ministrado(exp) if es_area and tipos_prop else None,
         "prorroga": cfg_prorroga, "prorrogas": prorrogas,

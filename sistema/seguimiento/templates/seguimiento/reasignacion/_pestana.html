@@ -55,10 +55,11 @@
 {% if form_propuesta %}
 <div class="tarjeta mb-3" data-prueba="proponer-comite">
   <div class="fw-semibold mb-1">Proponer al Comité</div>
-  <div class="small text-secondary mb-2">Ministrado a la fecha: {{ ministrado|moneda }}; por ministrar: {{ por_ministrar|moneda }}. Una baja libera lo no ministrado para la lista de espera; si ya se ministró algo, el expediente queda cancelado y la persona debe reintegrarlo.</div>
+  <div class="small text-secondary mb-2">Ministrado a la fecha: {{ ministrado|moneda }}; por ministrar: {{ por_ministrar|moneda }}. Una baja libera lo no ministrado para la lista de espera; si ya se ministró algo, el expediente queda cancelado y la persona debe reintegrarlo. La cancelación por incumplimiento inscribe además a la persona en el Listado de Personas Beneficiarias Incumplidas.</div>
   <form method="post" action="{% url 'seguimiento:proponer' exp.folio %}" class="row g-2" id="form-propuesta">{% csrf_token %}
     <div class="col-12 col-md-6">{{ form_propuesta.tipo.label_tag }}{{ form_propuesta.tipo }}</div>
     {% if hay_caso_fortuito %}<div class="col-12 col-md-6">{{ form_propuesta.resolucion.label_tag }}{{ form_propuesta.resolucion }}</div>{% endif %}
+    {% if hay_cancelacion %}<div class="col-12 col-md-6">{{ form_propuesta.base.label_tag }}{{ form_propuesta.base }}</div>{% endif %}
     <div class="col-12">{{ form_propuesta.descripcion.label_tag }}{{ form_propuesta.descripcion }}</div>
     <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Enviar la propuesta a la Secretaría Técnica</button></div>
   </form>

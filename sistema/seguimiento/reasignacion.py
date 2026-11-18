@@ -449,6 +449,9 @@ def tipos_propuesta(expediente):
                 and not (v.datos or {}).get("aprobada_por_comite") \
                 and any("sobrevivencia" in m for m in (v.datos or {}).get("motivos_incumplimiento", [])):
             tipos.append("sobrevivencia_menor")
+    from . import incumplimientos  # HU-6.2: cancelación, suspensión y bajas
+
+    tipos += incumplimientos.tipos_propuesta(None, expediente)
     return [(t, nombres[t]) for t in dict.fromkeys(tipos)]
 
 
@@ -462,7 +465,7 @@ def estado_previo(expediente):
     return e.estado_origen.clave if e is not None and e.estado_origen_id else None
 
 
-def proponer(usuario, expediente, tipo, descripcion="", resolucion="", momento=None):
+def proponer(usuario, expediente, tipo, descripcion="", resolucion="", momento=None, base="ministrado"):
     """Propuesta al Comité para un expediente (sustitución, baja, caso fortuito, sobrevivencia menor), con su acuse."""
     _exigir_area(usuario, expediente.ejercicio)
     exigir_acceso(usuario, expediente)
@@ -485,11 +488,26 @@ def proponer(usuario, expediente, tipo, descripcion="", resolucion="", momento=N
              "total_aprobado": str(total)}
     if tipo in ("desistimiento", "fallecimiento") or (tipo == "caso_fortuito" and resolucion == "liberar"):
         libera = max(CERO, total - pagado)
+    cfg_tipo = cfg_tipos["tipos"][tipo]
+    if cfg_tipo.get("listado"):                      # HU-6.2: cancelación y bajas
+        from . import incumplimientos
+
+        if base not in datos_seguimiento()["incumplimientos"]["reintegro"]["bases"]:
+            raise ValidationError("Base del reintegro no reconocida.")
+        libera = por_ministrar(expediente)
+        datos["base"] = base
+        datos["por_devolver"] = str(incumplimientos.monto_por_devolver(expediente, base))
     if tipo == "sustitucion":
         datos["persona_nueva"] = solicitud.segunda_persona_id
         datos["persona_anterior"] = expediente.beneficiaria.pk
     especiales = datos_seguimiento()["casos_especiales"].get(expediente.programa.clave, {})
-    fundamento = (especiales.get(tipo) or fundamento_solicitud(expediente, "desistimiento" if tipo == "desistimiento" else "sustitucion"))
+    if tipo in ("cancelacion", "baja_cheque", "baja_reportes", "suspension", "levantar_suspension"):
+        from . import incumplimientos
+
+        fundamento = incumplimientos._sancion(expediente, "suspension_temporal" if "suspension" in tipo else "baja_del_programa",
+                                              "cancelacion_baja")
+    else:
+        fundamento = (especiales.get(tipo) or fundamento_solicitud(expediente, "desistimiento" if tipo == "desistimiento" else "sustitucion"))
     texto = (descripcion or "").strip() or _texto_propuesta(expediente, tipo, solicitud, resolucion, libera, pagado, resoluciones)
     with transaction.atomic():
         p = Propuesta.objects.create(
@@ -526,6 +544,14 @@ def _texto_propuesta(expediente, tipo, solicitud, resolucion, libera, pagado, re
         if pagado:
             texto += f" Lo ministrado ({formato_moneda(pagado)}) se debe reintegrar de inmediato."
         return texto
+    if tipo in ("cancelacion", "baja_cheque", "baja_reportes"):
+        return (f"Cancelar el apoyo del expediente {expediente.folio} y dar de baja a {expediente.beneficiaria.nombre}; inscribirla en "
+                f"el Listado de Personas Beneficiarias Incumplidas y requerir la devolución; liberar {formato_moneda(libera)} no "
+                "ministrados para la lista de espera.")
+    if tipo == "suspension":
+        return f"Suspender temporalmente el apoyo del expediente {expediente.folio} para que se subsanen las omisiones."
+    if tipo == "levantar_suspension":
+        return f"Levantar la suspensión del apoyo del expediente {expediente.folio}."
     if tipo == "caso_fortuito":
         return f"Atender el caso fortuito del expediente {expediente.folio}: {resoluciones[resolucion].lower()}" + (
             f"; se liberan {formato_moneda(libera)}." if libera else ".")
@@ -556,7 +582,7 @@ def llevar_a_sesion(usuario, propuesta, sesion, aprueba=True, descripcion=""):
     texto = (descripcion or "").strip() or (("Se aprueba: " if aprueba else "No se aprueba: ") + propuesta.descripcion)
     with transaction.atomic():
         acuerdo = dictamen_seguimiento.registrar_acuerdo(usuario, sesion, tipo, texto, list(propuesta.expedientes.all()),
-                                                        direccion_del_programa(propuesta.ejercicio))
+                                                        dictamen_seguimiento.unidad_sugerida(tipo, propuesta.ejercicio))
         propuesta.acuerdo, propuesta.aprobada, propuesta.estado = acuerdo, bool(aprueba), EstadoPropuesta.EN_SESION
         propuesta.save(update_fields=["acuerdo", "aprobada", "estado"])
     return acuerdo
@@ -568,8 +594,10 @@ def ejecutar_acuerdo(acuerdo):
     if propuesta is None or propuesta.estado == EstadoPropuesta.EJECUTADA:
         return  # acuerdo registrado sin propuesta: solo constancia (HU-2.4)
     usuario = acuerdo.cumplido_por
-    if usuario.tipo_unidad != TipoUnidad.DIRECCION:
-        raise ValidationError("Este acuerdo lo cumple el área responsable del programa.")
+    ejecuta = datos_seguimiento()["propuestas"].get("unidad_que_ejecuta", {})
+    requerida = ejecuta.get(propuesta.tipo, ejecuta.get("por_omision", TipoUnidad.DIRECCION))
+    if usuario.tipo_unidad != requerida:
+        raise ValidationError(f"Este acuerdo lo cumple {TipoUnidad(requerida).label}.")
     EJECUTORES.get(propuesta.tipo, _sin_efecto)(propuesta, acuerdo, usuario)
     propuesta.estado, propuesta.ejecutada_en = EstadoPropuesta.EJECUTADA, timezone.now()
     propuesta.save(update_fields=["estado", "ejecutada_en"])
@@ -655,6 +683,10 @@ def _ejecutar_baja(propuesta, acuerdo, usuario):
                        datos={"acuerdo": acuerdo.pk, "propuesta": propuesta.pk})
     registrar_recurso(exp, propuesta.tipo if propuesta.tipo in ("desistimiento", "fallecimiento") else "caso_fortuito",
                       max(CERO, total_aprobado(exp) - pagado), usuario, f"Acuerdo {acuerdo.numero}", propuesta.nombre_tipo)
+    if destino == "cancelada":  # HU-6.2: lo ministrado se requiere a la persona (sin inscripción en el Listado)
+        from . import incumplimientos
+
+        incumplimientos.preparar_requerimiento(exp, propuesta.nombre_tipo, propuesta, acuerdo)
 
 
 def _ejecutar_caso_fortuito(propuesta, acuerdo, usuario):

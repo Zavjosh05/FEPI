@@ -280,7 +280,7 @@ def test_hu_6_1_el_caso_fortuito_se_atiende_con_propuesta_y_acuerdo_y_reanuda(pa
                                    "Incendio en el predio.", fecha_hecho=timezone.localdate())
     exp.refresh_from_db()
     assert exp.estado.clave == "caso_fortuito"
-    assert [t for t, _ in reasignacion.tipos_propuesta(exp)] == ["caso_fortuito"]
+    assert [t for t, _ in reasignacion.tipos_propuesta(exp)][0] == "caso_fortuito"   # y, de HU-6.2, cancelación y suspensión
     with pytest.raises(ValidationError, match="Elija"):
         reasignacion.proponer(usuarios["dir_drff"], exp, "caso_fortuito")
     p = reasignacion.proponer(usuarios["dir_drff"], exp, "caso_fortuito", resolucion="continuar")

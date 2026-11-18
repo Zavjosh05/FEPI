@@ -11,7 +11,7 @@ HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
 módulo M4, HU-4.1 Envío de comprobaciones, HU-4.2 Verificación en campo y HU-4.3 Evaluación de reportes; del módulo M6, HU-6.1 Lista de
-espera y sustituciones.
+espera y sustituciones y HU-6.2 Incumplimientos y reintegros.
 Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
 beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
@@ -158,7 +158,12 @@ aprobado el 8-sep con recurso para dos: Loma del Aire avisa el fallecimiento de 
 continuar en plazo (9-oct); Arroyo Seco desiste por escrito (6-oct); el Comité acuerda las dos el 22-oct y el área las cumple el 23-oct
 (Loma del Aire sigue con Rosa Robles Díaz; Arroyo Seco libera su recurso); la reasignación del 26-oct alcanza al lugar 1 de la lista de
 espera, se acuerda el 10-nov, Paraje El Rocío queda aprobada el 11-nov y se le notifica el 13-nov; Cerro La Mina sigue en lista de espera.
-En MFS, Aserradero La Cumbre tiene una prórroga por causa externa por resolver (16-nov). El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+En MFS, Aserradero La Cumbre tiene una prórroga por causa externa por resolver (16-nov). **Incumplimientos y reintegros:**
+Administración y Finanzas registró las cuentas para reintegros de CC, PS, RHF y PSAHEM (12-nov); Loma del Aire recibió un aviso de
+omisiones con fecha límite del 6-nov, el sistema lo señaló vencido, el área propuso la cancelación, el Comité la acordó y la Unidad
+Jurídica la cumplió (Rosa Robles Díaz en el Listado de Incumplidas), emitió el requerimiento por la planta no establecida ($3,500) y
+Administración y Finanzas comprobó el depósito (18-nov, reintegrada); los reportes no entregados de Ejido San Bartolo y Ejido Santa Ana
+quedan señalados para que el área los confirme. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -180,7 +185,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3, hechas) y M6 (HU-6.1 a 6.3; HU-6.1 hecha): models/ (un módulo por historia,
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3, hechas) y M6 (HU-6.1 a 6.3; HU-6.1 y 6.2 hechas): models/ (un módulo por historia,
 │                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
 │                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
@@ -1108,6 +1113,63 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   fortuito, sobrevivencia menor, prórroga, acuerdo sin propuesta, pantallas) y el recorrido `pruebas/e2e/test_recorrido_hu_6_1.py`
   (capturas `hu_6_1_*`).
 
+### M6 · HU-6.2 Incumplimientos y reintegros
+
+- **Organización.** `seguimiento/models/incumplimientos.py` (migración `0002_hu_6_2_incumplimientos`: `AvisoOmision`, `Senalamiento`,
+  `CuentaReintegro`, `Requerimiento`), servicio `seguimiento/incumplimientos.py`, vistas `vistas/incumplimientos.py`, formularios
+  `formularios/incumplimientos.py`, plantillas `templates/seguimiento/incumplimientos/` y los datos en `datos/seguimiento.json` →
+  `incumplimientos` y `propuestas` (tipos `cancelacion`, `suspension`, `levantar_suspension`, `baja_cheque`, `baja_reportes`). Las
+  propuestas usan el mismo `Propuesta` y el mismo camino de HU-6.1: la Secretaría Técnica registra el acuerdo y, al cumplirlo la unidad
+  responsable del tipo de acuerdo (`datos/dictamen.json`: la cancelación y la baja, la Unidad Jurídica; la suspensión, el área
+  responsable), se ejecuta.
+- **Criterio 1: cada omisión tiene su plazo para corregirse.** `avisar_omision` (área responsable, pestaña «Seguimiento»): omisiones,
+  causa de las reglas (lista `causas_incumplimiento` del programa) y **fecha límite obligatoria** que fija el área, porque las reglas no
+  dan días («durante el periodo que determine el Comité», CC 8.1.9 a, línea 4699; el aviso y la pantalla lo dicen; el formulario sugiere 10
+  días hábiles, decisión propia). Deja el hito `aviso_omision` con `datos.vence` (uso `subsanar_omisiones` y aviso «Por vencer»), el acuse,
+  la notificación de tipo `omision` por conducto de la Delegación y el estado `omisiones_por_subsanar`. `dar_por_subsanadas` regresa al
+  estado previo.
+- **Lo que prepara el sistema y confirma una persona (P-08).** `Senalamiento`, una vez por situación, con su renglón en la bitácora sin
+  persona: omisión vencida sin subsanar (`manage.py revisar_plazos`, `incumplimientos.revisar`) → propuesta de cancelación; **cheque
+  vencido sin cobrar** (PSAHEM 8.1.9.2 fr. VII, línea 2126) → propuesta de baja; reporte de Guardabosque no entregado o que no cumple
+  (`extensiones.AL_REPORTE_INCUMPLIDO`, HU-4.3) → propuesta de suspensión (8.1.9.1 a, línea 8852) y, con tres no presentados, de baja
+  (8.1.9.2 f, línea 8864), que libera su lugar para la lista de espera; **faltantes de la recepción vencidos** → desecho de la solicitud
+  (la Delegación o el área, según quién avisó; CC 8.1.1.2 fr. XIV), y la incidencia de incumplimiento de la verificación
+  (`extensiones.AL_INCIDENCIA`, HU-4.2) → aviso de omisión (marca `Incidencia.atendida_en`). Nada cambia de estado hasta el clic
+  (`confirmar`); el panel «Incumplimientos por atender» está en la bandeja del área responsable y de la Delegación.
+- **Cancelación** (acuerdo `cancelacion` o `baja` que cumple la Unidad Jurídica): estado `cancelada`; **criterio 3**: la persona
+  beneficiaria se inscribe en el **Listado de Personas Beneficiarias Incumplidas** con el acuerdo como fundamento
+  (`dictamen.juridico.registrar_incumplida`; el cotejo de HU-2.2 ya la encuentra); lo no ministrado queda como recurso liberado
+  (HU-6.1); se prepara el requerimiento; la Delegación notifica la cancelación. La baja por desistimiento con ministraciones (HU-6.1)
+  también prepara el requerimiento, sin inscripción (en PS, quien desiste y no reintegra en 10 días hábiles se considera incumplida:
+  queda dicho en el plazo del requerimiento).
+- **Criterio 2: requerimiento con el monto y la cuenta.** El monto es lo ministrado (sin los cheques vencidos sin cobrar) o, si la
+  propuesta lo dice, lo **ministrado de más según la verificación** (`Verificacion.excedente_ministrado`, HU-4.2), **más el valor de la
+  planta no establecida** donde las reglas lo piden (PS 8.1.9 c d, línea 6042; RHF 8.1.9 c fr. 5, línea 3412; se lee de las reglas
+  cargadas, `valor_planta_no_establecida`): plantas por el precio oficial, que las reglas no traen, así que la Unidad Jurídica lo captura
+  con su fuente. La **cuenta para reintegros** la registra Administración y Finanzas por programa (página «Incumplimientos y
+  reintegros»; la anterior deja de estar vigente). **PSAHEM:** el titular es configurable (`incumplimientos.cuentas.PSA`, hoy la
+  Fiduciaria) y la pantalla y el acuse dicen la duda abierta (R-14: las reglas la nombran de PROBOSQUE y del Fideicomiso). Sin cuenta no
+  se emite. Al emitir: acuse con el desglose, la cuenta y el plazo de las reglas («inmediato», sin días), notificación de tipo
+  `devolucion` por la Delegación y estado `en_devolucion`.
+- **Reintegro.** Administración y Finanzas registra el depósito (fecha, importe igual al requerido, referencia y comprobante con su
+  huella): acuse, estado `reintegrada` y el importe vuelve como recurso liberado para la lista de espera.
+- **Transiciones agregadas** (34): a `cancelada` desde los estados de ejecución para la Unidad Jurídica; a `suspendida` y de regreso
+  (levantar) para el área responsable; `omisiones_por_subsanar → <estado previo>` para el área. **Visibilidad:** la Unidad Jurídica consulta
+  ahora `cheque_entregado`, `planta_entregada` y `vale_entregado` (debe poder cancelar desde ahí).
+- **Pantallas.** Página «Incumplimientos y reintegros» (`/seguimiento/incumplimientos/`; menú de la Unidad Jurídica y de Administración y
+  Finanzas, enlace desde «Seguimiento» para el área): señalamientos por confirmar, requerimientos, avisos y cuentas. Pestaña
+  «Seguimiento»: señalamientos con su botón, avisos con su plazo y situación, inscripción en el Listado, requerimiento con monto y cuenta,
+  formularios de emisión (Jurídica) y de depósito (Finanzas). Paneles «Requerimientos de devolución por emitir» (Jurídica) y «Reintegros
+  por comprobar» (Finanzas) y siguiente paso de cada unidad.
+- **Pruebas.** `pruebas/test_hu_6_2.py` (13: criterios, señalamiento sin ejecución automática, cancelación completa hasta el reintegro,
+  planta no establecida, excedente de la verificación con la incidencia, cuenta de PSAHEM, cheque vencido, Guardabosque, suspensión y su
+  levantamiento, desecho por faltantes, desistimiento con ministraciones, pantallas) y el recorrido
+  `pruebas/e2e/test_recorrido_hu_6_2.py` (capturas `hu_6_2_*`).
+- **Para HU-6.3 (cierre y padrón).** Los estados finales de M6 quedan listos: `reintegrada` (con `Requerimiento` depositado),
+  `cancelada` con requerimiento `sin_monto` (cerrar «sin recurso por devolver»), `recurso_liberado` y los reasignados; `RecursoLiberado`
+  dice cuánto se liberó y cuánto se reasignó por ejercicio; `PersonaIncumplida` trae las inscripciones del ejercicio
+  (`programa` y `acuerdo`).
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
@@ -1163,6 +1225,9 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
 - MFS (R-17): superficie de los conceptos ETF 5 y 6 (7 contra 10 ha), columnas del cuadro de montos FSC (hoy se suman los
   componentes de la certificación grupal) y quién pide y quién autoriza la prórroga (hoy la Delegación y el área responsable, supuesto).
+- Incumplimientos (HU-6.2): titular de la cuenta de reintegros de PSAHEM (R-14); cuántos días se dan para subsanar una omisión
+  (hoy los fija el área en cada aviso); precio oficial por planta para el valor de la planta no establecida; si una baja por cheque
+  vencido debe inscribir en el Listado de Incumplidas.
 - Lista de espera (HU-6.1): si la reasignación se detiene en la primera solicitud a la que no le alcanza o pasa a la siguiente que sí
   alcance; si las reasignadas deben aparecer en la página pública de resultados. PEG (R-18): reparto de las 4 ministraciones (25 % es
   supuesto), calendario de reportes (se usan los 12 meses), desde cuándo corren los 10 días naturales para notificar faltantes.

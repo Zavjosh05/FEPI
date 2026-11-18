@@ -4,7 +4,7 @@
 {% block contenido %}
 <div class="mb-3">
   <h1 class="h4 mb-0">Lista de espera y sustituciones</h1>
-  <div class="small text-secondary">Recurso liberado y su reasignación a la lista de espera, sustituciones, desistimientos y casos especiales. El área responsable propone; la Secretaría Técnica lleva cada propuesta a la sesión de seguimiento y el acuerdo se ejecuta cuando el área lo cumple.</div>
+  <div class="small text-secondary">Recurso liberado y su reasignación a la lista de espera, sustituciones, desistimientos y casos especiales. El área responsable propone; la Secretaría Técnica lleva cada propuesta a la sesión de seguimiento y el acuerdo se ejecuta cuando el área lo cumple. Las omisiones, cancelaciones y reintegros están en <a href="{% url 'seguimiento:incumplimientos' %}" data-prueba="enlace-incumplimientos">Incumplimientos y reintegros</a>.</div>
 </div>
 
 {% if es_area %}

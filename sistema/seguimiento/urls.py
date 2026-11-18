@@ -1,7 +1,7 @@
 """Rutas del módulo M6 (Seguimiento y cierre); cada historia agrega las suyas con su vista en vistas/<historia>.py."""
 from django.urls import path
 
-from .vistas import reasignacion
+from .vistas import incumplimientos, reasignacion
 
 app_name = "seguimiento"
 
@@ -15,4 +15,13 @@ urlpatterns = [
     path("expediente/<str:folio>/prorroga/", reasignacion.solicitar_prorroga, name="solicitar_prorroga"),
     path("prorroga/<int:pk>/resolver/", reasignacion.resolver_prorroga, name="resolver_prorroga"),
     path("solicitud/<int:pk>/archivo/", reasignacion.archivo_solicitud, name="archivo_solicitud"),
+    # HU-6.2: incumplimientos y reintegros
+    path("incumplimientos/", incumplimientos.pagina, name="incumplimientos"),
+    path("expediente/<str:folio>/omision/", incumplimientos.avisar, name="avisar_omision"),
+    path("omision/<int:pk>/subsanada/", incumplimientos.subsanar, name="subsanar"),
+    path("senalamiento/<int:pk>/confirmar/", incumplimientos.confirmar, name="confirmar"),
+    path("requerimiento/<int:pk>/emitir/", incumplimientos.emitir, name="emitir_requerimiento"),
+    path("requerimiento/<int:pk>/deposito/", incumplimientos.comprobar, name="comprobar_deposito"),
+    path("requerimiento/<int:pk>/comprobante/", incumplimientos.archivo_deposito, name="archivo_deposito"),
+    path("cuentas/", incumplimientos.registrar_cuenta, name="registrar_cuenta"),
 ]

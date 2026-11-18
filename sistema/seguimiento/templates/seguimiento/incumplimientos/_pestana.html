@@ -1,0 +1,86 @@
+{% load moneda %}
+<div class="titulo-seccion mt-3">Incumplimientos y reintegros</div>
+
+{% for s in senalamientos_exp %}
+<div class="alert alert-warning small d-flex flex-wrap justify-content-between align-items-center gap-2" data-prueba="senalamiento" data-tipo="{{ s.tipo }}">
+  <div><strong>{{ s.config.nombre }}.</strong> {{ s.descripcion }} {% if s.fundamento %}<span class="text-secondary">{{ s.fundamento }}.</span>{% endif %}
+    <div class="text-secondary">Lo preparó el sistema el {{ s.creado_en|date:"d/m/Y H:i" }} h; nada se ejecuta hasta que una persona lo confirma.</div></div>
+  {% if s.config.propuesta or s.tipo == "faltantes_vencidos" %}
+  <form method="post" action="{% url 'seguimiento:confirmar' s.pk %}">{% csrf_token %}
+    <button class="btn btn-sm btn-warning" type="submit">{{ s.config.accion }}</button></form>
+  {% else %}<span class="text-secondary">{{ s.config.accion }}: use el formulario de abajo.</span>{% endif %}
+</div>
+{% endfor %}
+
+{% if avisos_omision %}
+<table class="table table-sm small" data-prueba="avisos-omision">
+  <thead class="table-light"><tr><th>Aviso de omisión</th><th>Plazo para subsanar</th><th>Situación</th><th>Acuse</th></tr></thead>
+  <tbody>{% for a in avisos_omision %}<tr><td>{{ a.omisiones }}{% if a.causa %}<div class="text-secondary">{{ a.causa }}</div>{% endif %}</td>
+    <td class="text-nowrap" data-prueba="vence-omision">{{ a.vence|date:"d/m/Y" }}<div class="text-secondary">fijado por el área</div></td>
+    <td>{% with sit=a.situacion %}<span class="badge text-bg-{% if sit == 'subsanada' %}success{% elif sit == 'vencida' %}danger{% else %}warning{% endif %}">{{ sit }}</span>{% endwith %}
+      {% if a.notificacion %}<div class="text-secondary">{% if a.notificacion.notificada %}notificada el {{ a.notificacion.notificada_en|date:"d/m/Y" }}{% else %}por notificar en la Delegación{% endif %}</div>{% endif %}</td>
+    <td>{% if a.acuse %}<a href="{% url 'nucleo:acuse' a.acuse.folio %}" target="_blank">{{ a.acuse.folio }}</a>{% endif %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endif %}
+
+{% if form_aviso %}
+<details class="tarjeta mb-3" data-prueba="avisar-omision" {% if senalamientos_exp %}open{% endif %}>
+  <summary class="fw-semibold">Avisar omisiones por subsanar</summary>
+  <div class="small text-secondary my-2">{{ nota_plazo_omision }} La Delegación notifica el aviso a la persona.</div>
+  <form method="post" action="{% url 'seguimiento:avisar_omision' exp.folio %}" class="row g-2" id="form-omision">{% csrf_token %}
+    {{ form_aviso.incidencia }}
+    <div class="col-12">{{ form_aviso.omisiones.label_tag }}{{ form_aviso.omisiones }}</div>
+    <div class="col-12 col-md-4">{{ form_aviso.vence.label_tag }}{{ form_aviso.vence }}<div class="form-text">{{ form_aviso.vence.help_text }}</div></div>
+    <div class="col-12 col-md-8">{{ form_aviso.causa.label_tag }}{{ form_aviso.causa }}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Enviar el aviso con su plazo</button></div>
+  </form>
+</details>
+{% endif %}
+
+{% if aviso_por_subsanar %}
+<form method="post" action="{% url 'seguimiento:subsanar' aviso_por_subsanar.pk %}" class="tarjeta mb-3 d-flex flex-wrap gap-2 align-items-end" id="form-subsanar">{% csrf_token %}
+  <div class="flex-grow-1">{{ form_subsanar.motivo.label_tag }}{{ form_subsanar.motivo }}</div>
+  <button class="btn btn-sm btn-success" type="submit">Dar por subsanadas</button>
+</form>
+{% endif %}
+
+{% if inscripcion_listado %}
+<div class="small mb-2" data-prueba="inscripcion-listado"><span class="badge text-bg-danger">Listado de Personas Beneficiarias Incumplidas</span>
+  {{ inscripcion_listado.nombre }}, inscrita el {{ inscripcion_listado.fecha_inscripcion|date:"d/m/Y" }} · {{ inscripcion_listado.acuerdo }}.</div>
+{% endif %}
+
+{% for r in requerimientos_exp %}
+<div class="tarjeta mb-3" data-prueba="requerimiento" data-estado="{{ r.estado }}">
+  <div class="d-flex flex-wrap justify-content-between gap-2">
+    <div><strong>Requerimiento de devolución</strong> <span class="badge text-bg-secondary">{{ r.get_estado_display }}</span></div>
+    {% if r.acuse %}<div class="small"><a href="{% url 'nucleo:acuse' r.acuse.folio %}" target="_blank">{{ r.acuse.folio }}</a></div>{% endif %}
+  </div>
+  <div class="small mt-1">{{ r.motivo }}{% if r.acuerdo %} · acuerdo {{ r.acuerdo.numero }}{% endif %}.
+    Ministrado: {{ r.monto_ministrado|moneda }}; se requiere {{ r.monto_base|moneda }}{% if r.base == "excedente" %} (lo ministrado de más según la verificación){% endif %}{% if r.monto_planta %} más {{ r.monto_planta|moneda }} de planta no establecida ({{ r.plantas_no_establecidas }} × {{ r.precio_planta|moneda }}, {{ r.fuente_precio }}){% endif %}.
+    <div data-prueba="monto-requerido"><strong>Monto por devolver: {{ r.monto_total|moneda }}</strong>{% if r.cuenta %} · cuenta para el depósito: <span data-prueba="cuenta-requerimiento">{{ r.cuenta.texto }}</span>{% endif %}</div>
+    {% if r.plazo_texto %}<div class="text-secondary">{{ r.plazo_texto }}</div>{% endif %}
+    {% if r.deposito_fecha %}<div>Depósito del {{ r.deposito_fecha|date:"d/m/Y" }} por {{ r.deposito_importe|moneda }} (ref. {{ r.deposito_referencia }}){% if r.acuse_deposito %} · <a href="{% url 'nucleo:acuse' r.acuse_deposito.folio %}" target="_blank">{{ r.acuse_deposito.folio }}</a>{% endif %} · <a href="{% url 'seguimiento:archivo_deposito' r.pk %}" target="_blank">comprobante</a></div>{% endif %}
+  </div>
+  {% if puede_emitir and r.estado == "por_emitir" %}
+  <form method="post" action="{% url 'seguimiento:emitir_requerimiento' r.pk %}" class="row g-2 mt-1" id="form-requerimiento">{% csrf_token %}
+    {% if planta_aplica %}
+    <div class="col-12 small text-secondary">Valor de la planta no establecida ({{ fundamento_planta }}): las reglas no traen el importe; indíquelo con su fuente.</div>
+    <div class="col-4 col-md-2">{{ form_requerimiento.plantas.label_tag }}{{ form_requerimiento.plantas }}</div>
+    <div class="col-4 col-md-2">{{ form_requerimiento.precio_planta.label_tag }}{{ form_requerimiento.precio_planta }}</div>
+    <div class="col-12 col-md-8">{{ form_requerimiento.fuente_precio.label_tag }}{{ form_requerimiento.fuente_precio }}</div>
+    {% endif %}
+    <div class="col-12 small">{% if cuenta_programa %}Cuenta para el depósito: {{ cuenta_programa.texto }}.{% else %}<span class="text-danger">Administración y Finanzas todavía no registra la cuenta para reintegros de este programa.</span>{% endif %}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Emitir el requerimiento con monto y cuenta</button></div>
+  </form>
+  {% endif %}
+  {% if puede_comprobar and r.estado == "emitido" %}
+  <form method="post" action="{% url 'seguimiento:comprobar_deposito' r.pk %}" enctype="multipart/form-data" class="row g-2 mt-1" id="form-deposito">{% csrf_token %}
+    <div class="col-6 col-md-3">{{ form_deposito.fecha.label_tag }}{{ form_deposito.fecha }}</div>
+    <div class="col-6 col-md-3">{{ form_deposito.importe.label_tag }}{{ form_deposito.importe }}</div>
+    <div class="col-12 col-md-6">{{ form_deposito.referencia.label_tag }}{{ form_deposito.referencia }}</div>
+    <div class="col-12">{{ form_deposito.archivo.label_tag }}{{ form_deposito.archivo }}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar el depósito del reintegro</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endfor %}

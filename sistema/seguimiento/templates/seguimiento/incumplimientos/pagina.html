@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Incumplimientos y reintegros{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Incumplimientos y reintegros</h1>
+  <div class="small text-secondary">Omisiones con su plazo, lo que el sistema señaló para confirmar, requerimientos de devolución con monto y cuenta, depósitos y cuentas para reintegros. La cancelación inscribe a la persona en el <a href="{% url 'dictamen:incumplidas' %}">Listado de Personas Beneficiarias Incumplidas</a>.</div>
+</div>
+
+{% if senalamientos %}
+<div class="tarjeta mb-3 border-warning" data-prueba="senalamientos">
+  <div class="titulo-seccion">Por atender: preparado por el sistema ({{ senalamientos|length }})</div>
+  <div class="small text-secondary mb-2">Nada se ejecuta solo: confirme cada propuesta con un clic o atiéndala en el expediente.</div>
+  <table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Expediente</th><th>Qué pasó</th><th></th></tr></thead>
+    <tbody>{% for s in senalamientos %}<tr data-tipo="{{ s.tipo }}"><td><a href="{% url 'recepcion:expediente' s.expediente.folio %}?pestana=seguimiento">{{ s.expediente.folio }}</a><div class="text-secondary">{{ s.expediente.ejercicio.programa.nombre }}</div></td>
+      <td><strong>{{ s.config.nombre }}.</strong> {{ s.descripcion }}<div class="text-secondary">{{ s.fundamento }}</div></td>
+      <td>{% if s.config.propuesta or s.tipo == "faltantes_vencidos" %}<form method="post" action="{% url 'seguimiento:confirmar' s.pk %}">{% csrf_token %}<input type="hidden" name="siguiente" value="{% url 'seguimiento:incumplimientos' %}">
+        <button class="btn btn-sm btn-warning text-nowrap" type="submit">{{ s.config.accion }}</button></form>
+        {% else %}<a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'recepcion:expediente' s.expediente.folio %}?pestana=seguimiento">{{ s.config.accion }}</a>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="tarjeta mb-3" data-prueba="requerimientos">
+  <div class="titulo-seccion">Requerimientos de devolución ({{ requerimientos|length }})</div>
+  {% if requerimientos %}<div class="table-responsive"><table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Expediente</th><th>Motivo</th><th>Monto</th><th>Cuenta</th><th>Situación</th></tr></thead>
+    <tbody>{% for r in requerimientos %}<tr data-requerimiento="{{ r.pk }}" data-estado="{{ r.estado }}"><td><a href="{% url 'recepcion:expediente' r.expediente.folio %}?pestana=seguimiento">{{ r.expediente.folio }}</a></td>
+      <td>{{ r.motivo }}{% if r.acuerdo %}<div class="text-secondary">acuerdo {{ r.acuerdo.numero }}</div>{% endif %}</td>
+      <td class="text-nowrap">{{ r.monto_total|moneda }}</td><td>{% if r.cuenta %}{{ r.cuenta.texto }}{% else %}—{% endif %}</td>
+      <td>{{ r.get_estado_display }}{% if r.acuse %}<div><a href="{% url 'nucleo:acuse' r.acuse.folio %}" target="_blank">{{ r.acuse.folio }}</a></div>{% endif %}
+        {% if es_juridica and r.estado == "por_emitir" or es_finanzas and r.estado == "emitido" %}<div><a href="{% url 'recepcion:expediente' r.expediente.folio %}?pestana=seguimiento">{% if es_juridica %}Emitir{% else %}Registrar el depósito{% endif %}</a></div>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguno.</div>{% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="avisos">
+  <div class="titulo-seccion">Avisos de omisión ({{ avisos|length }})</div>
+  {% if avisos %}<table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Expediente</th><th>Omisiones</th><th>Vence</th><th>Situación</th></tr></thead>
+    <tbody>{% for a in avisos %}<tr><td><a href="{% url 'recepcion:expediente' a.expediente.folio %}?pestana=seguimiento">{{ a.expediente.folio }}</a></td><td>{{ a.omisiones }}</td>
+      <td class="text-nowrap">{{ a.vence|date:"d/m/Y" }}</td><td>{{ a.situacion }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}<div class="small text-secondary">Ninguno.</div>{% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="cuentas">
+  <div class="titulo-seccion">Cuentas para reintegros</div>
+  <table class="table table-sm small">
+    <thead class="table-light"><tr><th>Programa</th><th>Cuenta vigente</th><th>Titular según las reglas</th></tr></thead>
+    <tbody>{% for c in cuentas %}<tr data-programa="{{ c.programa.clave }}"><td>{{ c.programa.nombre }}</td><td>{% if c.cuenta %}{{ c.cuenta.texto }}<div class="text-secondary">registrada el {{ c.cuenta.registrada_en|date:"d/m/Y" }}</div>{% else %}<span class="text-secondary">sin registrar</span>{% endif %}</td>
+      <td>{{ c.config.titular }}{% if c.config.duda %} <span class="badge text-bg-warning">duda abierta</span><div class="text-secondary">{{ c.config.duda }}</div>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% if form_cuenta %}
+  <form method="post" action="{% url 'seguimiento:registrar_cuenta' %}" class="row g-2" id="form-cuenta">{% csrf_token %}
+    <div class="col-12 col-md-3">{{ form_cuenta.programa.label_tag }}{{ form_cuenta.programa }}</div>
+    <div class="col-12 col-md-3">{{ form_cuenta.titular.label_tag }}{{ form_cuenta.titular }}</div>
+    <div class="col-6 col-md-2">{{ form_cuenta.banco.label_tag }}{{ form_cuenta.banco }}</div>
+    <div class="col-6 col-md-2">{{ form_cuenta.cuenta.label_tag }}{{ form_cuenta.cuenta }}</div>
+    <div class="col-12 col-md-2">{{ form_cuenta.referencia.label_tag }}{{ form_cuenta.referencia }}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar la cuenta del programa</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

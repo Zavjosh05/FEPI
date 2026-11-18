@@ -17,9 +17,10 @@ HISTORIAS = [
     ("HU-6.2", "Incumplimientos y reintegros", "registra cada omisión con su plazo, el caso fortuito, la cancelación, el requerimiento de devolución con monto y cuenta, el reintegro y el Listado de Incumplidas"),
     ("HU-6.3", "Cierre del ejercicio", "cuadra los resultados finales con las verificaciones y los pagos, publica el padrón y registra el envío del informe al Comité"),
 ]
-HISTORIAS_CONSTRUIDAS = {"HU-6.1"}
+HISTORIAS_CONSTRUIDAS = {"HU-6.1", "HU-6.2"}
 USOS_DE_PLAZO = ['aviso_caso_fortuito', 'interes_segunda_beneficiaria', 'subsanar_omisiones']
-TIPOS_ACUERDO_M6 = ("reasignacion", "sustitucion", "liberacion_recurso", "caso_fortuito", "caso_especial")
+TIPOS_ACUERDO_M6 = ("reasignacion", "sustitucion", "liberacion_recurso", "caso_fortuito", "caso_especial", "cancelacion",
+                    "suspension", "baja")
 
 
 def historias_pendientes():
@@ -33,6 +34,9 @@ def contexto_pestana(request, exp):
     contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
                 "vencimientos": [v for v in plazos.vencimientos(exp, USOS_DE_PLAZO).values() if v is not None]}
     contexto.update(contexto_reasignacion_exp(request, exp))
+    from .vistas.incumplimientos import contexto_incumplimientos_exp
+
+    contexto.update(contexto_incumplimientos_exp(request, exp))
     return contexto
 
 
@@ -42,9 +46,19 @@ def _pestana(exp):
 
 def siguiente_paso(usuario, exp):
     """Siguiente paso de M6 en el expediente."""
-    from . import reasignacion
+    from . import incumplimientos, reasignacion
 
     estado = exp.estado.clave
+    abierto = incumplimientos.senalamientos_de(usuario).filter(expediente=exp).first() if usuario.tipo_unidad in (
+        TipoUnidad.DIRECCION, TipoUnidad.DELEGACION) else None
+    if abierto is not None:
+        return {"texto": abierto.config.get("accion", "Atender el señalamiento"), "url": _pestana(exp),
+                "ayuda": f"{abierto.descripcion} Lo preparó el sistema; lo confirma usted."}
+    if usuario.tipo_unidad == TipoUnidad.JURIDICA and estado == "cancelada" and incumplimientos.por_emitir().filter(expediente=exp).exists():
+        return {"texto": "Emitir el requerimiento de devolución", "url": _pestana(exp),
+                "ayuda": "Con el monto y la cuenta para el depósito que registró Administración y Finanzas."}
+    if usuario.tipo_unidad == TipoUnidad.ADMIN_FINANZAS and estado == "en_devolucion":
+        return {"texto": "Comprobar el depósito del reintegro", "url": _pestana(exp), "ayuda": "Fecha, importe, referencia y comprobante."}
     if usuario.tipo_unidad == TipoUnidad.DIRECCION and estado in ("sustitucion", "caso_fortuito", "prorroga_solicitada",
                                                                   "verificada"):
         if not usuario.unidad.programas.filter(pk=exp.programa.pk).exists():
@@ -52,7 +66,7 @@ def siguiente_paso(usuario, exp):
         if estado == "prorroga_solicitada" and exp.prorrogas.filter(autorizada__isnull=True).exists():
             return {"texto": "Resolver la prórroga por causa externa", "url": _pestana(exp),
                     "ayuda": "Autorizada con adendum (plazo nuevo) o negada, con su motivo."}
-        tipos = reasignacion.tipos_propuesta(exp)
+        tipos = [t for t in reasignacion.tipos_propuesta(exp) if t[0] not in incumplimientos.TIPOS_HU_6_2]
         if tipos and reasignacion.propuesta_abierta(exp) is None:
             return {"texto": f"Proponer al Comité: {tipos[0][1].lower()}", "url": _pestana(exp),
                     "ayuda": "La Secretaría Técnica la lleva a la sesión de seguimiento; el acuerdo se ejecuta al cumplirlo."}
@@ -111,6 +125,40 @@ def panel_propuestas(request):
                   "Ver las propuestas")
 
 
+def panel_senalamientos(request):
+    """Área responsable y Delegación: lo que el sistema preparó para confirmar (P-08)."""
+    from . import incumplimientos
+
+    pendientes = list(incumplimientos.senalamientos_de(request.user)[:50])
+    if not pendientes:
+        return None
+    return _panel("panel-senalamientos", "Incumplimientos por atender (preparados por el sistema)", len(pendientes),
+                  [{"url": _pestana(s.expediente), "texto": s.expediente.folio,
+                    "detalle": f"{s.config.get('nombre', s.tipo)} · {s.config.get('accion', '')}"} for s in pendientes[:6]],
+                  reverse("seguimiento:incumplimientos"), "El sistema los señaló al vencer el plazo o al recibir la evaluación; "
+                  "nada se ejecuta solo: confírmelos.", "Ver los incumplimientos")
+
+
+def panel_requerimientos(request):
+    """Unidad Jurídica: requerimientos por emitir. Administración y Finanzas: depósitos por comprobar."""
+    from . import incumplimientos
+
+    tipo = request.user.tipo_unidad
+    if tipo == TipoUnidad.JURIDICA:
+        qs, titulo, ayuda = incumplimientos.por_emitir(), "Requerimientos de devolución por emitir",             "Apoyos cancelados: emita el requerimiento con el monto y la cuenta para el depósito."
+    elif tipo == TipoUnidad.ADMIN_FINANZAS:
+        qs, titulo, ayuda = incumplimientos.por_comprobar(), "Reintegros por comprobar",             "Requerimientos notificados: registre el depósito con su comprobante."
+    else:
+        return None
+    pendientes = list(qs.select_related("expediente")[:50])
+    if not pendientes:
+        return None
+    return _panel("panel-requerimientos", titulo, len(pendientes),
+                  [{"url": _pestana(r.expediente), "texto": r.expediente.folio,
+                    "detalle": f"{formato_moneda(r.monto_total)} · {r.motivo}"} for r in pendientes[:6]],
+                  reverse("seguimiento:incumplimientos"), ayuda, "Abrir incumplimientos y reintegros")
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -129,6 +177,20 @@ def registrar():
     extensiones.PANELES_BANDEJA.append(panel_recurso_liberado)
     extensiones.PANELES_BANDEJA.append(panel_solicitudes)
     extensiones.PANELES_BANDEJA.append(panel_propuestas)
+    extensiones.PANELES_BANDEJA.append(panel_senalamientos)
+    extensiones.PANELES_BANDEJA.append(panel_requerimientos)
+    from . import incumplimientos
+
+    extensiones.MENU.append({"nombre": "Incumplimientos y reintegros", "url": "seguimiento:incumplimientos",
+                             "grupo": "Seguimiento y cierre", "tipos": [T.JURIDICA, T.ADMIN_FINANZAS], "estricto": True})
+    extensiones.AL_INCIDENCIA.append(incumplimientos.al_incidencia)
+    extensiones.AL_REPORTE_INCUMPLIDO.append(incumplimientos.al_reporte_incumplido)
+    extensiones.REVISIONES_PLAZO.append(incumplimientos.revisar)
+    reasignacion.EJECUTORES.update({"cancelacion": incumplimientos._ejecutar_cancelacion,
+                                    "baja_cheque": incumplimientos._ejecutar_cancelacion,
+                                    "baja_reportes": incumplimientos._ejecutar_cancelacion,
+                                    "suspension": incumplimientos._ejecutar_suspension,
+                                    "levantar_suspension": incumplimientos._ejecutar_suspension})
     extensiones.AL_LIBERAR_RECURSO.append(reasignacion.al_liberar_recurso)
     extensiones.AL_NOTIFICAR.append(reasignacion.al_notificar)
     extensiones.SECCIONES_PORTAL.append(seccion_portal)

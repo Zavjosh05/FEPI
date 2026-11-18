@@ -23,7 +23,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
     claves = [p["clave"] for p in extensiones.PESTANAS_EXPEDIENTE]
     assert {"ejecucion", "seguimiento"} <= set(claves) and claves.index("pagos") < claves.index("ejecucion")
     assert [h[0] for h in reg_ejecucion.historias_pendientes()] == []   # HU-4.1, HU-4.2 y HU-4.3 ya construidas
-    assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.2", "HU-6.3"]   # HU-6.1 ya construida
+    assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.3"]   # HU-6.1 y HU-6.2 ya construidas
     assert apps.get_app_config("ejecucion").get_models() is not None
 
 
@@ -31,7 +31,7 @@ def test_nucleo_pestanas_ejecucion_y_seguimiento_dicen_que_historia_las_llenara(
     _, (exp,) = contratadas("CC")
     client.login(username="dir_drff", password=contrasena)
     for pestana, historia, plazo in (("ejecucion", "Ejecución y verificación", "Entrega del informe final"),
-                                     ("seguimiento", "HU-6.2 Incumplimientos y reintegros", "Subsanar las omisiones")):
+                                     ("seguimiento", "HU-6.3 Cierre del ejercicio", "Subsanar las omisiones")):
         html = client.get(reverse("recepcion:expediente", args=[exp.folio]) + f"?pestana={pestana}").content.decode()
         assert historia in html and plazo in html and 'data-prueba="monto-aprobado"' in html, pestana
         assert "sprint" not in html.lower()
@@ -84,7 +84,7 @@ def test_nucleo_demo_de_seguimiento_lista_de_espera_y_sustituciones_e_idempotent
         assert demo.cargar_demo() == 4
         assert demo.cargar_demo() == 0
     de = {e.predio.nombre: e for e in Expediente.objects.filter(predio__nombre__in=demo.NOMBRES_LOTE)}
-    assert {n: e.estado.clave for n, e in de.items()} == {"Arroyo Seco": "recurso_liberado", "Loma del Aire": "contratada",
+    assert {n: e.estado.clave for n, e in de.items()} == {"Arroyo Seco": "recurso_liberado", "Loma del Aire": "reintegrada",
                                                          "Paraje El Rocío": "notificada", "Cerro La Mina": "lista_espera"}
     assert de["Loma del Aire"].beneficiaria.nombre == "Rosa Robles Díaz"
     assert [s.tipo for s in de["Loma del Aire"].solicitudes_seguimiento.order_by("presentada_en")] == ["fallecimiento", "sustitucion"]
@@ -95,4 +95,14 @@ def test_nucleo_demo_de_seguimiento_lista_de_espera_y_sustituciones_e_idempotent
     assert reas.estado == "ejecutada" and list(reas.expedientes.all()) == [de["Paraje El Rocío"]] and reas.saldo == 0
     assert all(p.acuerdo and p.acuerdo.estado == "cumplido" for p in Propuesta.objects.all())
     assert not Expediente.objects.filter(predio__nombre__in=demo.NOMBRES_LOTE, fecha_recepcion__year__gt=2026).exists()
+    # HU-6.2: omisión vencida, cancelación por acuerdo, Listado, requerimiento (planta no establecida) y depósito comprobado.
+    from dictamen.models import PersonaIncumplida
+    from seguimiento.models import CuentaReintegro
+
+    loma = de["Loma del Aire"]
+    assert loma.avisos_omision.get().vence.isoformat() == "2026-11-06" and loma.senalamientos.get().propuesta.tipo == "cancelacion"
+    assert PersonaIncumplida.objects.get(persona__nombre="Rosa Robles Díaz").acuerdo.startswith("Acuerdo")
+    req = loma.requerimientos.get()
+    assert req.estado == "depositado" and req.monto_total == Decimal("3500.00") and req.cuenta.cuenta == "CUENTA-DEMO-RHF"
+    assert CuentaReintegro.objects.get(programa__clave="PSA").titular.startswith("Fiduciaria")
 

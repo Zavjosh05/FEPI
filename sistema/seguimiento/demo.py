@@ -16,6 +16,16 @@ y deja a Paraje El Rocío y Cerro La Mina en lista de espera (lugares 1 y 2).
   13-nov: firma en los 10 días hábiles siguientes. Cerro La Mina sigue en lista de espera.
 - MFS: el 16-nov la Delegación de Toluca registra la solicitud de prórroga por causa externa de Aserradero La Cumbre (la entidad
   certificadora pospuso la auditoría), por resolver en el área responsable.
+
+**HU-6.2 · Incumplimientos y reintegros** (``_incumplimientos``): Administración y Finanzas registra el 12-nov las cuentas para
+reintegros de CC, PS, RHF y PSAHEM (en PSAHEM, la de la Fiduciaria: duda abierta R-14). En Loma del Aire el área responsable avisa
+el 27-oct omisiones por subsanar con fecha límite del 6-nov (la Delegación lo notifica el 28-oct); vence sin subsanarse, el sistema lo
+señala el 9-nov y el área confirma el 10-nov la propuesta de cancelación; el Comité la acuerda el 10-nov y la Unidad Jurídica la
+cumple el 11-nov (cancelada, inscrita en el Listado de Personas Beneficiarias Incumplidas, requerimiento preparado). El 13-nov la
+Unidad Jurídica emite el requerimiento por el valor de la planta no establecida (500 plantas por $7.00 = $3,500, precio de
+demostración) a la cuenta de RHF; la Delegación lo notifica el 16-nov y Administración y Finanzas comprueba el depósito el 18-nov
+(reintegrada). En la fecha de corte la revisión de plazos señala lo demás (faltantes vencidos de la recepción; los reportes no
+entregados de los Guardabosques ya los señaló la evaluación de HU-4.3) para que una persona lo confirme.
 """
 from decimal import Decimal
 
@@ -33,7 +43,7 @@ from nucleo.demo import _pdf_demo, archivo_demo
 from nucleo.demo_calendario import cuando, habil, habil_antes
 from nucleo.models import Ejercicio, Expediente, Usuario
 
-from . import reasignacion
+from . import incumplimientos, reasignacion
 
 # (usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas)
 LOTE = [("del_valle", "Amanalco", "Arroyo Seco", "Inés Bernal Castro", "bosques_de_agua", 2),
@@ -46,7 +56,11 @@ CALENDARIO = dict(registro="2026-03-18", tecnico="2026-04-23", juridico="2026-04
                   fallecimiento="2026-09-28", aviso="2026-10-05", desistimiento="2026-10-06", propuesta_baja="2026-10-08",
                   sustitucion="2026-10-09", propuesta_sustitucion="2026-10-12", sesion_1="2026-10-22", cumplir_1="2026-10-23",
                   propuesta_reasignacion="2026-10-26", sesion_2="2026-11-10", cumplir_2="2026-11-11",
-                  notificacion_reasignada="2026-11-13", prorroga="2026-11-16")
+                  notificacion_reasignada="2026-11-13", prorroga="2026-11-16", omision="2026-10-27",
+                  notificacion_omision="2026-10-28", vence_omision="2026-11-06", revision="2026-11-09",
+                  propuesta_cancelacion="2026-11-10", cumplir_cancelacion="2026-11-11", cuentas="2026-11-12",
+                  requerimiento="2026-11-13", notificacion_requerimiento="2026-11-16", deposito="2026-11-18")
+CUENTAS = {"CC": "PROBOSQUE", "PS": "PROBOSQUE", "RHF": "PROBOSQUE", "PSA": "Fiduciaria del FIPASAHEM"}
 
 
 def _ejercicio(clave):
@@ -142,6 +156,53 @@ def _prorroga_mfs(u):
     return 0
 
 
+def _incumplimientos(u):
+    from dictamen.models import SesionComite
+    from nucleo.demo_calendario import fecha_corte
+    from nucleo.models import Programa
+
+    c = CALENDARIO
+    with paso(c["cuentas"], 9):
+        for clave, titular in CUENTAS.items():
+            p = Programa.objects.filter(clave=clave).first()
+            if p is not None and incumplimientos.cuenta_vigente(p) is None:
+                incumplimientos.registrar_cuenta(u["finanzas"], p, titular, "Banco de demostración", f"CUENTA-DEMO-{clave}",
+                                                 f"REINTEGRO-{clave}-2026", "Cuenta de demostración.")
+    loma = Expediente.objects.filter(predio__nombre="Loma del Aire", estado__clave="contratada").first()
+    if loma is not None and not loma.avisos_omision.exists():
+        drff = u["dir_drff"]
+        with paso(c["omision"], 12):
+            aviso = incumplimientos.avisar_omision(drff, loma, "Entregar el programa de trabajo actualizado con la persona "
+                                                   "sustituta y la evidencia del inicio de los trabajos de conservación.",
+                                                   habil(c["vence_omision"]))
+        with paso(c["notificacion_omision"], 11):
+            publicacion.registrar_entrega(_delegacion(u, loma), aviso.notificacion, "personal", observaciones="Entregado (demostración).")
+        with paso(c["revision"], 7):
+            incumplimientos.revisar(habil(c["revision"]))
+        with paso(c["propuesta_cancelacion"], 10):
+            s = loma.senalamientos.get(tipo="omision_vencida")
+            incumplimientos.confirmar(drff, s)
+        s.refresh_from_db()
+        sesion = SesionComite.objects.filter(ejercicio=loma.ejercicio, tipo="seguimiento",
+                                             fecha_hora__date=habil(c["sesion_2"])).first()
+        with paso(c["sesion_2"], 12, 30):
+            acuerdo = reasignacion.llevar_a_sesion(u["comite"], s.propuesta, sesion)
+        with paso(c["cumplir_cancelacion"], 10):
+            dictamen_seguimiento.cumplir(u["juridica"], acuerdo, "Cancelación registrada e inscripción en el Listado.")
+        req = loma.requerimientos.get()
+        with paso(c["requerimiento"], 11):
+            incumplimientos.emitir_requerimiento(u["juridica"], req, 500, "7.00",
+                                                 "Precio de demostración (listado oficial de la Secretaría de Finanzas por confirmar)")
+        req.refresh_from_db()
+        with paso(c["notificacion_requerimiento"], 11):
+            publicacion.registrar_entrega(_delegacion(u, loma), req.notificacion, "personal", observaciones="Entregado (demostración).")
+        with paso(c["deposito"], 10):
+            incumplimientos.comprobar_deposito(u["finanzas"], req, habil(c["deposito"]), req.monto_total, "DEP-DEMO-0001",
+                                               archivo_demo("deposito.pdf", "Comprobante de deposito"))
+    with paso(fecha_corte(), 8):
+        incumplimientos.revisar(fecha_corte())
+
+
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -150,4 +211,5 @@ def cargar_demo():
     if rhf is not None and not Expediente.objects.filter(ejercicio=rhf, predio__nombre=LOTE[0][2]).exists():
         hechas += _lote_reasignacion(u, rhf)
     _prorroga_mfs(u)
+    _incumplimientos(u)
     return hechas

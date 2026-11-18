@@ -62,8 +62,14 @@
       "desistimiento": {"nombre": "Baja por desistimiento y liberación del recurso", "acuerdo": "liberacion_recurso"},
       "fallecimiento": {"nombre": "Baja por fallecimiento sin sustitución y liberación del recurso", "acuerdo": "liberacion_recurso"},
       "caso_fortuito": {"nombre": "Atención del caso fortuito o fuerza mayor", "acuerdo": "caso_fortuito"},
-      "sobrevivencia_menor": {"nombre": "Apoyo con sobrevivencia menor por causas no imputables", "acuerdo": "caso_especial"}
+      "sobrevivencia_menor": {"nombre": "Apoyo con sobrevivencia menor por causas no imputables", "acuerdo": "caso_especial"},
+      "cancelacion": {"nombre": "Cancelación del apoyo por omisiones no subsanadas o incumplimiento", "acuerdo": "cancelacion", "listado": true},
+      "suspension": {"nombre": "Suspensión temporal del apoyo", "acuerdo": "suspension"},
+      "levantar_suspension": {"nombre": "Levantar la suspensión del apoyo", "acuerdo": "suspension"},
+      "baja_cheque": {"nombre": "Baja por cheque vencido sin cobrar", "acuerdo": "baja", "listado": true},
+      "baja_reportes": {"nombre": "Baja por tres reportes mensuales no presentados", "acuerdo": "baja", "listado": true}
     },
+    "unidad_que_ejecuta": {"cancelacion": "juridica", "baja_cheque": "juridica", "baja_reportes": "juridica", "por_omision": "direccion"},
     "resoluciones_caso_fortuito": {
       "continuar": "Continuar con la meta ajustada (recuperar la superficie dañada)",
       "liberar": "Dar por terminado el apoyo sin sanción y liberar el recurso no ministrado"
@@ -76,6 +82,29 @@
     "PSA": {"caso_fortuito": "PSAHEM 8.1.7 fr. VII (línea 2034; líneas 2038 a 2042)"},
     "PEG": {"caso_fortuito": "Las reglas de PEG no traen aviso de caso fortuito con plazo; el flujo lo admite y lo resuelve el CASPEG"},
     "MFS": {}
+  },
+  "incumplimientos": {
+    "omisiones": {
+      "plazo_por_omision_dias_habiles": 10,
+      "nota_plazo": "Las reglas no fijan días para subsanar una omisión (CC 8.1.9 a, línea 4699: «durante el periodo que determine el Comité»): el área responsable fija la fecha límite en cada aviso y el aviso lo dice. El valor por omisión del formulario (10 días hábiles) es una decisión propia."
+    },
+    "reintegro": {
+      "nota_plazo": "Las reglas piden el reintegro de manera inmediata desde la notificación, sin días (plazo «reintegro» de cada programa); en PS, quien desiste y no reintegra en 10 días hábiles se considera incumplida (plazo «desistimiento_reintegro»).",
+      "bases": {"ministrado": "Lo ministrado", "excedente": "Lo ministrado de más según la verificación (ajuste de superficie)"}
+    },
+    "cuentas": {
+      "por_omision": {"titular": "PROBOSQUE", "fundamento": "La cuenta de PROBOSQUE la proporciona la Dirección de Administración, Finanzas y de Gestión Documental (CC 8.1.7 fr. VII, línea 4652; 8.1.9 c, línea 4732)"},
+      "PSA": {"titular": "Fiduciaria del FIPASAHEM", "fundamento": "PSAHEM 8.1.9.3 fr. V (cuenta de la FIDUCIARIA) y 8.1.7 fr. XIV (cuenta de PROBOSQUE)", "duda": "Duda abierta (R-14): las reglas de PSAHEM nombran la cuenta de reintegros como de PROBOSQUE y como del Fideicomiso; se usa la que registre Administración y Finanzas para el programa."}
+    },
+    "senalamientos": {
+      "incidencia": {"nombre": "Incidencia de incumplimiento en la verificación", "accion": "Avisar la omisión con su plazo"},
+      "omision_vencida": {"nombre": "Omisiones no subsanadas en el plazo", "accion": "Proponer la cancelación al Comité", "propuesta": "cancelacion"},
+      "cheque_vencido": {"nombre": "Cheque vencido sin cobrar", "accion": "Proponer la baja al Comité", "propuesta": "baja_cheque", "fundamento": "PSAHEM 8.1.9.2 fr. VII (línea 2126): cancelación del apoyo cuando el cheque concluye su vigencia"},
+      "reportes_incumplidos": {"nombre": "Reporte mensual no entregado o que no cumple", "accion": "Proponer la suspensión al Comité", "propuesta": "suspension", "fundamento": "PEG 8.1.9.1 a: suspensión por incumplimiento mensual, por ministración (línea 8852); 9.4.3 c"},
+      "baja_reportes": {"nombre": "Tres reportes mensuales no presentados", "accion": "Proponer la baja al Comité", "propuesta": "baja_reportes", "fundamento": "PEG 8.1.9.2 f (línea 8864): baja por no presentar tres informes mensuales en el ejercicio"},
+      "faltantes_vencidos": {"nombre": "Faltantes no entregados en el plazo", "accion": "Confirmar el desecho de la solicitud", "fundamento": "CC 8.1.1.2 fr. XIV: si no se complementa la documentación en el plazo, «se tendrá por desechada» (P-08: lo confirma una persona)"}
+    },
+    "reportes_para_baja": 3
   },
   "prorroga": {
     "programas": ["MFS"],

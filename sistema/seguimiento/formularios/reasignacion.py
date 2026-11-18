@@ -39,13 +39,15 @@ class SolicitudForm(Bs, forms.Form):
 class PropuestaForm(Bs, forms.Form):
     tipo = forms.ChoiceField(label="Propuesta", choices=())
     resolucion = forms.ChoiceField(label="Qué se propone (caso fortuito)", required=False, choices=())
+    base = forms.ChoiceField(label="Qué se requiere devolver (cancelación o baja)", required=False, choices=())
     descripcion = forms.CharField(label="Texto del acuerdo que se propone (opcional: si se deja vacío, lo arma el sistema)",
                                   required=False, widget=forms.Textarea(attrs={"rows": 2}))
 
-    def __init__(self, *args, tipos=(), resoluciones=None, **kwargs):
+    def __init__(self, *args, tipos=(), resoluciones=None, bases=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["tipo"].choices = list(tipos)
         self.fields["resolucion"].choices = [("", "—")] + list((resoluciones or {}).items())
+        self.fields["base"].choices = list((bases or {"ministrado": "Lo ministrado"}).items())
 
 
 class ReasignacionForm(Bs, forms.Form):
