@@ -2,8 +2,8 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-59 tablas propias en seis apps (`nucleo`, `recepcion`, `dictamen`, `contrato`, `pagos` y `portal`) sobre PostgreSQL + PostGIS; las
-apps `ejecucion` (M4) y `seguimiento` (M6) ya existen sin tablas: cada historia agrega las suyas. El diagrama
+76 tablas propias en ocho apps (`nucleo`, `recepcion`, `dictamen`, `contrato`, `pagos`, `portal`, `ejecucion` y
+`seguimiento`) sobre PostgreSQL + PostGIS, en ocho áreas (secciones 1 a 8). El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
 Para leerlo: `||--o{` es «uno a muchos» obligatorio, `|o--o{` «uno a muchos» opcional, `||--o|` «uno a uno»
@@ -858,8 +858,8 @@ erDiagram
 
 La cuenta externa (`CuentaExterna`: un `Usuario` sin unidad interna, con la CURP como usuario, ligado a la `Persona`), los
 expedientes que ve (`AccesoExpediente`, con el papel de persona beneficiaria o de prestador) y el código de consulta del
-expediente (`CodigoConsulta`, respaldo sin cuenta). Los códigos se guardan cifrados y se imprimen en un `Acuse`. Desde
-S3-02 el `Expediente` guarda además a la persona beneficiaria cuando no es quien solicita (`persona_beneficiaria`: el
+expediente (`CodigoConsulta`, respaldo sin cuenta). Los códigos se guardan cifrados y se imprimen en un `Acuse`. Además,
+el `Expediente` guarda además a la persona beneficiaria cuando no es quien solicita (`persona_beneficiaria`: el
 Guardabosque en PEG).
 
 ```mermaid
@@ -927,5 +927,323 @@ erDiagram
     texto codigo_hash
     fecha_hora codigo_emitido_en
     fecha_hora activada_en
+  }
+```
+
+## 7. Ejecución y verificación (M4)
+
+Lo que la persona beneficiaria (o el Guardabosque, o el prestador con RFN) envía desde el portal o entrega en la Delegación, con
+su acuse y el medio (`Comprobacion`); el resultado de la verificación en campo con la superficie verificada, su ajuste y lo
+ministrado de más (`Verificacion`) y las incidencias con su tipo y documento (`Incidencia`). En Guardabosques, la revisión de la
+Delegación de cada reporte mensual (`RevisionReporte`), la evaluación interna por Guardabosque y por periodo
+(`EvaluacionPeriodo`) y su envío al CASPEG (`EnvioEvaluacion`), que lo valida con un `Acuerdo` de su sesión de seguimiento.
+
+```mermaid
+erDiagram
+  Acuerdo }o--o{ Expediente : expedientes
+  Comprobacion |o--o{ EvaluacionPeriodo : comprobacion
+  Comprobacion |o--o{ Verificacion : comprobacion
+  Comprobacion ||--o{ RevisionReporte : comprobacion
+  EnvioEvaluacion |o--o{ EvaluacionPeriodo : envio
+  Expediente ||--o{ Comprobacion : expediente
+  Expediente ||--o{ EvaluacionPeriodo : expediente
+  Expediente ||--o{ Incidencia : expediente
+  Expediente ||--o{ RevisionReporte : expediente
+  Expediente ||--o{ Verificacion : expediente
+  Verificacion ||--o{ Incidencia : verificacion
+  Acuerdo {
+    int id PK
+    texto numero
+    texto tipo
+    texto descripcion
+    int ministracion
+    texto periodo
+    texto estado
+  }
+  Comprobacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    texto fundamento
+    texto medio
+    fecha_hora enviada_en
+    texto persona_entrega
+  }
+  EnvioEvaluacion {
+    int id PK
+    texto periodo
+    texto nombre_periodo
+    fecha_hora enviado_en
+    int cumplen
+    int no_cumplen
+    int no_entregaron
+  }
+  EvaluacionPeriodo {
+    int id PK
+    int expediente_id FK
+    texto periodo
+    texto nombre_periodo
+    texto resultado
+    texto motivo
+    int comprobacion_id FK
+    bool automatica
+    fecha_hora evaluada_en
+    int envio_id FK
+  }
+  Incidencia {
+    int id PK
+    int verificacion_id FK
+    int expediente_id FK
+    texto tipo
+    texto descripcion
+    archivo archivo
+    texto huella
+    fecha_hora registrada_en
+    fecha_hora atendida_en
+  }
+  RevisionReporte {
+    int id PK
+    int comprobacion_id FK
+    int expediente_id FK
+    texto periodo
+    texto resultado
+    texto observaciones
+    fecha_hora revisada_en
+  }
+  Verificacion {
+    int id PK
+    int expediente_id FK
+    int comprobacion_id FK
+    texto tipo_documento
+    texto nombre_documento
+    fecha fecha_visita
+    decimal superficie_aprobada_ha
+    decimal superficie_verificada_ha
+    decimal ajuste_pct
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
+  }
+```
+
+## 8. Seguimiento y cierre (M6)
+
+**Lista de espera, sustituciones e incumplimientos.** Las solicitudes de la persona (sustitución, desistimiento, fallecimiento)
+con su acuse (`SolicitudPersona`); las propuestas del área responsable al Comité (`Propuesta`: reasignación, baja, sustitución,
+caso fortuito, cancelación, suspensión), que se ejecutan al cumplirse su `Acuerdo`; el recurso liberado y a quién se reasigna
+(`RecursoLiberado`); el aviso de omisiones con la fecha que fija el área (`AvisoOmision`); lo que el sistema señala para que una
+persona lo confirme (`Senalamiento`) y el requerimiento de devolución con su monto, la cuenta (`CuentaReintegro`) y el depósito
+(`Requerimiento`). La prórroga de MFS (`Prorroga`) y el adendum (`Adendum`, sección 4) no se dibujan.
+
+```mermaid
+erDiagram
+  Acuerdo |o--o{ Requerimiento : acuerdo
+  Acuerdo ||--o| Propuesta : acuerdo
+  Acuerdo }o--o{ Expediente : expedientes
+  CuentaReintegro |o--o{ Requerimiento : cuenta
+  Expediente |o--o{ RecursoLiberado : expediente
+  Expediente ||--o{ AvisoOmision : expediente
+  Expediente ||--o{ Requerimiento : expediente
+  Expediente ||--o{ Senalamiento : expediente
+  Expediente ||--o{ SolicitudPersona : expediente
+  Propuesta |o--o{ RecursoLiberado : propuesta
+  Propuesta |o--o{ Requerimiento : propuesta
+  Propuesta |o--o{ Senalamiento : propuesta
+  Propuesta |o--o{ SolicitudPersona : propuesta
+  Propuesta }o--o{ Expediente : expedientes
+  Acuerdo {
+    int id PK
+    texto numero
+    texto tipo
+    texto descripcion
+    int ministracion
+    texto periodo
+    texto estado
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
+  }
+  AvisoOmision {
+    int id PK
+    int expediente_id FK
+    texto omisiones
+    texto causa
+    fecha vence
+    texto plazo_texto
+    texto estado_al_avisar
+    fecha_hora creado_en
+  }
+  CuentaReintegro {
+    int id PK
+    texto titular
+    texto banco
+    texto cuenta
+    texto referencia
+    texto nota
+    bool vigente
+  }
+  Propuesta {
+    int id PK
+    texto tipo
+    texto descripcion
+    texto fundamento
+    decimal monto_liberado
+    decimal monto_asignado
+    decimal saldo
+    int acuerdo_id FK
+  }
+  RecursoLiberado {
+    int id PK
+    int expediente_id FK
+    texto origen
+    decimal monto
+    texto descripcion
+    texto referencia
+    fecha_hora liberado_en
+    int propuesta_id FK
+    fecha_hora reasignado_en
+  }
+  Requerimiento {
+    int id PK
+    int expediente_id FK
+    int propuesta_id FK
+    int acuerdo_id FK
+    texto motivo
+    texto base
+    decimal monto_ministrado
+    decimal monto_base
+    int plantas_no_establecidas
+    decimal precio_planta
+    int cuenta_id FK
+  }
+  Senalamiento {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto clave
+    texto descripcion
+    texto fundamento
+    json datos
+    fecha_hora creado_en
+    int propuesta_id FK
+  }
+  SolicitudPersona {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    texto medio
+    fecha_hora presentada_en
+    texto persona_presenta
+    texto motivo
+    int propuesta_id FK
+  }
+```
+
+**Cierre del ejercicio.** La copia de los resultados finales de cada expediente al cerrarlo (`CierreExpediente`), la publicación del
+padrón por programa y ejercicio (`PadronPublicacion`; el padrón se calcula en cada consulta) y el informe anual al Comité con la
+fecha y la hora de su envío y de su recepción, y la sesión en que se presenta (`InformeAnual`).
+
+```mermaid
+erDiagram
+  Acuse |o--o{ CierreExpediente : acuse
+  Acuse |o--o{ InformeAnual : acuse
+  Acuse |o--o{ InformeAnual : acuse_recepcion
+  Acuse |o--o{ PadronPublicacion : acuse
+  Acuse |o--o{ SesionComite : acuse_acta
+  Acuse |o--o{ SesionComite : acuse_convocatoria
+  Ejercicio ||--o{ Expediente : ejercicio
+  Ejercicio ||--o{ SesionComite : ejercicio
+  Ejercicio ||--o| InformeAnual : ejercicio
+  Ejercicio ||--o| PadronPublicacion : ejercicio
+  Expediente |o--o{ Acuse : expediente
+  Expediente ||--o| CierreExpediente : expediente
+  SesionComite |o--o{ InformeAnual : sesion
+  SesionComite {
+    int id PK
+    int ejercicio_id FK
+    texto tipo
+    texto caracter
+    texto numero
+    fecha_hora fecha_hora
+    texto lugar
+    texto orden_del_dia
+    int acuse_convocatoria_id FK
+    int acuse_acta_id FK
+  }
+  Acuse {
+    int id PK
+    texto folio UK
+    int expediente_id FK
+    texto referencia
+    texto tipo
+    texto titulo
+    fecha_hora fecha_hora
+    texto destinatario
+    json contenido
+  }
+  Ejercicio {
+    int id PK
+    int anio
+    bool vigente
+    texto fuente
+    texto archivo_reglas
+    fecha_hora reglas_cargadas
+    json datos
+  }
+  Expediente {
+    int id PK
+    texto folio UK
+    int ejercicio_id FK
+    bool es_refrendo
+    bool con_representante_legal
+    decimal superficie_solicitada_ha
+    fecha_hora fecha_recepcion
+    fecha_hora enviado_direccion
+    texto observaciones
+  }
+  CierreExpediente {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    json resumen
+    texto motivo
+    fecha_hora cerrado_en
+    int acuse_id FK
+  }
+  InformeAnual {
+    int id PK
+    int ejercicio_id FK
+    json resumen
+    archivo archivo
+    texto huella
+    fecha_hora enviado_en
+    int acuse_id FK
+    int sesion_id FK
+    fecha_hora recibido_en
+    int acuse_recepcion_id FK
+    texto observaciones
+  }
+  PadronPublicacion {
+    int id PK
+    int ejercicio_id FK
+    fecha_hora publicada_en
+    int acuse_id FK
+    texto fundamento
   }
 ```

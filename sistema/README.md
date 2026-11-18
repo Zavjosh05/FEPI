@@ -1,6 +1,7 @@
 # Sistema de programas de PROBOSQUE
 
-Prototipo de los sprints 1 y 2 (módulos M1, Recepción y expediente; M2, Dictamen y Comité; M3, Publicación y contrato, y M5, Pagos) del sistema que lleva el trámite de los
+Prototipo completo (módulos M1, Recepción y expediente; M2, Dictamen y Comité; M3, Publicación y contrato; M4, Ejecución y verificación;
+M5, Pagos, y M6, Seguimiento y cierre: las 26 historias) del sistema que lleva el trámite de los
 seis programas de apoyo de PROBOSQUE: Capturando Carbono (CC), Manejo Forestal Sustentable (MFS),
 Plantaciones Sustentables (PS), Restauración Hidrológico-Forestal (RHF), PSAHEM (PSA) y
 Guardabosques (PEG). Los seis programas tienen reglas cargadas (`reglas/<CLAVE>.json`; MFS y PEG desde la base de
@@ -12,8 +13,8 @@ jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del 
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
 módulo M4, HU-4.1 Envío de comprobaciones, HU-4.2 Verificación en campo y HU-4.3 Evaluación de reportes; del módulo M6, HU-6.1 Lista de
 espera y sustituciones, HU-6.2 Incumplimientos y reintegros y HU-6.3 Cierre del ejercicio.
-Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
-beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
+Además, el portal de personas beneficiarias (`/portal/`), la página pública de resultados (`/contrato/resultados/`) y el padrón
+público (`/padron/`). Cómo recorrerlo de punta a punta: «Recorrer el sistema completo», abajo.
 
 ## Cómo levantar
 
@@ -169,6 +170,39 @@ acuse «Acceso al portal» de su expediente. La página pública de resultados e
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
+## Recorrer el sistema completo
+
+Con `cargar_demo` hecho (lo corre el arranque), entrar en **http://localhost:8080/entrar/** con cada usuario de la tabla de arriba
+(contraseña `Probosque2026`) y salir con «Salir» para cambiar de unidad. Un trámite completo de Capturando Carbono, en el orden en que
+se relevan las unidades (es el guion de `pruebas/e2e/test_recorrido_sprint_3_completo.py`):
+
+| Paso | Quién | Dónde |
+| --- | --- | --- |
+| 1. Registra la solicitud, revisa requisitos, levanta el polígono y la envía | `del_amecameca` | Bandeja → «Registrar solicitud»; pestañas Requisitos y Ubicación |
+| 2. Valida (o avisa faltantes) y dictamen técnico | `dir_drff` | Bandeja → expediente → botón del siguiente paso |
+| 3. Dictamen jurídico (cotejo con el Listado de Incumplidas) | `juridica` | Bandeja → expediente |
+| 4. Sesión de aprobación: convocatoria, listados, acta | `comite` | Menú «Dictamen y Comité» → «Sesiones del Comité» |
+| 5. Publica los listados; la persona los consulta sin sesión | `dir_drff`; cualquiera | Menú «Publicación y contrato» → «Publicación»; `/contrato/resultados/` |
+| 6. Notifica el resultado | `del_amecameca` | Menú «Publicación y contrato» → «Notificaciones» |
+| 7. Valida el modelo de contrato; elabora y envía el contrato | `juridica`; `dir_drff` | Menú «Publicación y contrato» → «Modelos»; pestaña Contrato |
+| 8. Registra la firma (crea la cuenta del portal: códigos en el acuse «Acceso al portal»), oficio y comprobante | `del_amecameca` | Pestaña Contrato; panel «Contratos firmados por emitir el oficio de solicitud de pago» |
+| 9. Solicita la ministración; la paga | `dir_drff`; `finanzas` | Panel «Ministraciones por solicitar»; pestaña Pagos |
+| 10. Entra al portal (CURP y código del acuse), envía el aviso de término y el Informe Final | la persona | `/portal/` → «Primer acceso» |
+| 11. Revisa lo recibido y registra la verificación en campo | `del_amecameca` | Panel «Comprobaciones recibidas por el portal, por revisar»; pestaña Ejecución |
+| 12. Solicita y paga la segunda ministración | `dir_drff`; `finanzas` | Pestaña Pagos |
+| 13. Cierra el expediente, publica el padrón y envía el informe anual | `dir_drff` | Pestaña Seguimiento; menú «Seguimiento y cierre» → Cierre del ejercicio |
+| 14. Registra la recepción del informe en la sesión del Comité | `comite` | Panel «Informes anuales por recibir» |
+| 15. Consulta el padrón; la persona consulta su expediente con folio y código | cualquiera | `/padron/`; `/portal/consulta/` |
+
+Otros caminos: PSAHEM paga con cheque (`comite` remite a la Fiduciaria, `fiduciaria` emite y envía el cheque, la Delegación lo
+entrega); PS y RHF entregan planta (`del_*` emite el Vale de Planta y `vivero` registra las salidas); Guardabosques (`dir_dpf`) reporta
+cada mes (portal o ventanilla), la Delegación revisa, la Dirección de Protección Forestal evalúa en «Evaluación de reportes» y el CASPEG
+valida con un acuerdo de su sesión de seguimiento; los incumplimientos (aviso de omisiones, señalamiento, cancelación, Listado de
+Incumplidas, requerimiento y depósito) están en la pestaña Seguimiento y en «Incumplimientos y reintegros» (`juridica`, `finanzas`); la
+lista de espera y las sustituciones, en «Seguimiento». El panel «Por vencer» de la bandeja avisa los plazos de ejecución y
+seguimiento (5 días hábiles o menos). Rutas públicas sin sesión: `/contrato/resultados/`, `/padron/`, `/portal/entrar/` y
+`/portal/consulta/`.
+
 ## Estructura
 
 ```
@@ -200,9 +234,10 @@ sistema/
 ├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json, contrato.json, ejecucion.json,
 │                      pagos.json, dias_inhabiles_2026.json
 ├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
-├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación)
+├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación por áreas, ocho secciones)
 ├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON) y diagrama_er.py
-└── pruebas/           pytest (test_nucleo_*, test_hu_1_* a test_hu_5_*, recorrido completo, fixtures_m2/m3/m5.py) y e2e/ (Playwright)
+└── pruebas/           pytest (test_nucleo_*, test_hu_1_1 a test_hu_6_3, recorridos completos test_sprint_*_recorrido_*,
+                       test_cierre_tecnico_interfaz.py, fixtures_m2 a m5) y e2e/ (Playwright)
 ```
 
 ## Estados del trámite (sprints 1 y 2)
@@ -1205,6 +1240,41 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   Lineamientos de 28-nov-2025, que no están en el texto): las columnas son decisión propia. MFS no trae la fracción de «listados de
   resultados finales»: se aplica el mismo cierre.
 
+### Cierre técnico: recorrido completo y pendientes de interfaz (P-33 a P-38)
+
+- **Recorrido completo por servicios** (`pruebas/test_sprint_3_recorrido_completo.py`): una solicitud por programa (CC, PS, RHF,
+  PSAHEM y MFS) de la solicitud al padrón: registro, validación, dictámenes, Comité, publicación, contrato y firma (con la cuenta del
+  portal), Vale de Planta en PS y RHF, primera ministración (cheque en PSAHEM), comprobación (por el portal en CC), verificación,
+  segunda ministración, cierre del expediente, padrón consultado sin cuenta e informe anual enviado y recibido; en cada relevo, el
+  estado, la bandeja, el acuse y la bitácora. PEG con sus siete periodos de reportes (junio a diciembre, por el portal y en ventanilla),
+  evaluación, validación del CASPEG y las cuatro ministraciones hasta el cierre (enero de 2027). Y dos caminos alternos: incumplimiento
+  (omisión vencida, cancelación, Listado de Incumplidas, requerimiento, depósito y cierre) y reasignación a la lista de espera hasta la
+  firma de la reasignada y su alta en el padrón.
+- **Recorrido completo por la interfaz** (`pruebas/e2e/test_recorrido_sprint_3_completo.py`, capturas `s3_11_*` en
+  `entregas/sprint_3/capturas/`): Capturando Carbono de la firma al padrón público con un cambio de usuario en cada relevo (incluida la
+  persona en el portal: primer acceso, envíos y consulta con folio y código) y el ciclo de reportes de Guardabosques (aviso «Por
+  vencer», reporte por el portal, revisión, evaluación, validación del CASPEG y pago). Cada paso ocurre en su fecha con el reloj
+  simulado.
+- **P-33.** Ningún texto visible dice «sprint» ni nombra historias: se quitaron los «(HU-x.y)» de los títulos de las pestañas, de los
+  mensajes de los servicios, de los fundamentos de los soportes (`datos/pagos.json`), de las acciones de las transiciones y de las
+  descripciones de los estados (`datos/flujo_tramite.json`, que también ve la persona en el portal); el historial de cambios del
+  registro ya no dice «Changed» ni «django-simple-history»; se quitó el aviso «Esta pestaña la llenarán estas historias» (ya no queda
+  ninguna) y se actualizaron las notas que hablaban de funciones futuras (la baja por cheque vencido, la evaluación de reportes). Lo
+  comprueba `pruebas/test_cierre_tecnico_interfaz.py` recorriendo, con cada usuario, la bandeja, el menú y todas las pestañas de
+  cuatro expedientes, el portal y las páginas públicas.
+- **P-36.** Las pestañas del expediente (11) caben en una fila a 1366 px (`.pestanas-exp` en `estaticos/css/probosque.css`: menos
+  relleno y letra un poco menor); si la ventana es más angosta pasan a una segunda fila y en el teléfono se desplazan a lo ancho. El
+  recorrido de interfaz mide que ninguna quede cortada.
+- **P-37.** «Plazos de esta etapa» muestra para «Subsanar las omisiones» la fecha que fijó el área en el aviso vigente, con el texto
+  «fijada por el área responsable»; sin aviso, «la fija el área responsable en el aviso de la omisión» (antes: «sin plazo en las
+  reglas» o la fecha guardada en el hito).
+- **P-38.** El padrón público ya no mezcla el reloj del servidor con las fechas registradas: dice cuándo se publicó y a qué fecha está
+  actualizado (el último movimiento), las dos del mismo reloj. El botón del cierre concuerda en número («Cerrar el expediente que ya
+  cuadra» / «Cerrar los N expedientes que ya cuadran»).
+- **P-35.** El prestador de servicios forestales (RFN) ya tiene pantalla: la Delegación del expediente le da acceso al portal desde la
+  pestaña «Ejecución» (nombre, CURP y RFN; `portal.cuentas.dar_acceso_prestador`, papel «prestador»), con su acuse y código de primer
+  acceso; el prestador ve el expediente en el portal y envía lo que le toca (por ejemplo, la Bitácora de MFS).
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
@@ -1270,7 +1340,8 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen, contrato, pagos y portal: 59 tablas, seis áreas), generado desde los modelos con `herramientas/diagrama_er.py`
+  dictamen, contrato, pagos, portal, ejecución y seguimiento: 76 tablas, ocho áreas; en las dos últimas, solo las tablas
+  principales), generado desde los modelos con `herramientas/diagrama_er.py`
   (`herramientas/regenerar_modelo_datos.py` rehace todos los diagramas); el completo, con todos los
   campos, está en `docs/modelo_datos.mmd`.
 - `pruebas/test_sprint_1_recorrido_completo.py` y `test_sprint_2_recorrido_completo.py` (parametrizadas con los seis programas: CC,
