@@ -5,6 +5,10 @@ una propuesta para PROBOSQUE (Protectora de Bosques del Estado de México) dentr
 de necesidades de sus programas 2026. La calculadora estima cómo cambia la superficie de bosque con
 los incendios y las reforestaciones, usando imágenes satelitales y datos públicos de libre uso.
 
+> **Rama `sprint-1`:** el proyecto tal como quedó al cerrar el sprint 1 (14-nov-2026), con el Sistema de programas
+> (carpeta `sistema/`) hasta la aprobación del Comité. Para ponerlo a funcionar: [Guía de inicio](GUIA_DE_INICIO.md).
+> Para usarlo: [Manual de usuario](MANUAL_DE_USUARIO.md). La versión completa está en la rama `main`.
+
 > **Estado: prototipo.** El umbral de NDVI es provisional (falta calibrarlo con puntos de
 > referencia) y todavía no se tienen los polígonos de reforestación de los programas.
 
