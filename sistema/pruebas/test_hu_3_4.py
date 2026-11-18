@@ -302,7 +302,7 @@ def test_hu_3_4_pantallas_de_la_delegacion_emision_pestana_y_pdf(contratadas, ca
     html = r.content.decode()
     assert vale.folio in html and "Vigente" in html and "Ver el vale en PDF" in html
     pestana = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    assert 'data-prueba="vale"' in pestana and vale.folio in pestana and "HU-3.4" in pestana
+    assert 'data-prueba="vale"' in pestana and vale.folio in pestana and "Entrega de planta" in pestana
     assert "por-construir" not in pestana
     pdf = client.get(f"/contrato/vales/{vale.folio}/pdf/")
     assert pdf.status_code == 200 and pdf["Content-Type"] == "application/pdf"

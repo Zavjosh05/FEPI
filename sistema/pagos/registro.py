@@ -201,7 +201,7 @@ def panel_cheques_por_vencer(request):
              for f in alertas[:6]]
     return {"plantilla": "pagos/_panel.html", "contexto": {
         "clave": "panel-cheques-por-vencer", "titulo": "Cheques entregados por vencer o vencidos sin cobro",
-        "total": len(alertas), "filas": filas, "ayuda": "Tienen 3 meses desde la entrega para cobrarse (solo aviso; la baja la registra HU-6.2, incumplimientos y reintegros).",
+        "total": len(alertas), "filas": filas, "ayuda": "Tienen 3 meses desde la entrega para cobrarse. Al vencer sin cobro, el sistema lo señala y el área responsable propone la baja (incumplimientos y reintegros).",
         "enlace": reverse("pagos:cheques"), "accion": "Abrir los cheques"}}
 
 

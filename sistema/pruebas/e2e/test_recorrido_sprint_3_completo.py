@@ -221,6 +221,15 @@ def test_sprint_3_cc_del_contrato_al_padron_publico_por_la_interfaz(  # noqa: F8
                                    "Comprobación enviada", "Verificada", "Ministración solicitada", "Ministración pagada",
                                    "Actividades concluidas", "Ejercicio cerrado"],
                            [r.unidades[u] for u in (delegacion, "dir_drff", "finanzas")])
+        # P-36: a 1366 px caben todas las pestañas del expediente (11), en una fila y sin cortes.
+        medida = page.locator("[data-prueba=pestanas-expediente]").evaluate(
+            "ul => ({ancho: window.innerWidth, desborda: ul.scrollWidth > ul.clientWidth, "
+            "pestanas: [...ul.querySelectorAll('a')].map(a => {const r = a.getBoundingClientRect(); "
+            "return {texto: a.innerText.trim(), derecha: r.right, arriba: r.top};})})")
+        assert medida["ancho"] == 1366 and not medida["desborda"] and len(medida["pestanas"]) == 11
+        assert all(p["derecha"] <= medida["ancho"] for p in medida["pestanas"]), medida
+        assert len({round(p["arriba"]) for p in medida["pestanas"]}) == 1, medida
+        assert medida["pestanas"][-1]["texto"] == "Bitácora"
         captura("s3_11_10_bitacora_de_la_firma_al_cierre")
     assert Expediente.objects.get(folio=folio).estado.clave == "ejercicio_cerrado"
 

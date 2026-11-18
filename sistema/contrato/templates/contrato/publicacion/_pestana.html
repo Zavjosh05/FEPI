@@ -1,4 +1,4 @@
-<div class="titulo-seccion">Publicación y notificaciones (HU-3.1)</div>
+<div class="titulo-seccion">Publicación y notificaciones</div>
 {% if sesion_por_publicar %}
 <div class="alert alert-info small" data-prueba="por-publicar-exp">Aprobada por el Comité: falta publicar los listados. <a href="{% url 'contrato:publicacion' sesion_por_publicar.pk %}">Ir a la publicación de la sesión {{ sesion_por_publicar.numero }}</a>.</div>
 {% endif %}

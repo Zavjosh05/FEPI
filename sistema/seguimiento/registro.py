@@ -31,8 +31,14 @@ def contexto_pestana(request, exp):
     """Cada historia suma aquí lo suyo a la pestaña."""
     from .vistas.reasignacion import contexto_reasignacion_exp
 
-    contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp),
-                "vencimientos": [v for v in plazos.vencimientos(exp, USOS_DE_PLAZO).values() if v is not None]}
+    from .incumplimientos import aviso_vigente
+
+    vencimientos = [v for v in plazos.vencimientos(exp, USOS_DE_PLAZO).values() if v is not None]
+    aviso = aviso_vigente(exp)
+    for v in vencimientos:
+        if v.uso == "subsanar_omisiones" and aviso is not None:
+            v.vencimiento = aviso.vence                 # P-37: la fecha que fijó el área en el aviso vigente
+    contexto = {"historias": historias_pendientes(), "monto": montos.monto_si_aprobado(exp), "vencimientos": vencimientos}
     contexto.update(contexto_reasignacion_exp(request, exp))
     from .vistas.incumplimientos import contexto_incumplimientos_exp
 

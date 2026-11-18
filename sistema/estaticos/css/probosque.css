@@ -23,6 +23,13 @@ body { background: #f5f6f4; }
 .encabezado-exp .dato { font-size: .85rem; color: #555; }
 .nav-tabs .nav-link { color: #333; }
 .nav-tabs .nav-link.active { font-weight: 600; color: var(--pb-verde); }
+/* P-36: las pestañas del expediente (11 o más) caben a 1366 px; si la ventana es más angosta pasan a una segunda fila en lugar
+   de quedar cortadas, y en el teléfono se desplazan a lo ancho. */
+.pestanas-exp { flex-wrap: wrap; row-gap: .15rem; }
+.pestanas-exp .nav-link { padding: .45rem .7rem; font-size: .92rem; }
+@media (max-width: 576px) {
+  .pestanas-exp { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+}
 .btn-primary { --bs-btn-bg: #1f5130; --bs-btn-border-color: #1f5130; --bs-btn-hover-bg: #173f25; --bs-btn-hover-border-color: #173f25; --bs-btn-active-bg: #12321d; --bs-btn-disabled-bg: #5f7f69; --bs-btn-disabled-border-color: #5f7f69; }
 .btn-outline-primary { --bs-btn-color: #1f5130; --bs-btn-border-color: #1f5130; --bs-btn-hover-bg: #1f5130; --bs-btn-hover-border-color: #1f5130; --bs-btn-active-bg: #1f5130; }
 .table-sm td, .table-sm th { vertical-align: middle; }

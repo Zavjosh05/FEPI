@@ -32,7 +32,7 @@
     <div class="titulo-seccion mb-0">Resultados por persona beneficiaria</div>
     <div class="d-flex gap-2">
       <a class="btn btn-sm btn-outline-secondary" href="{% url 'seguimiento:resultados_csv' ejercicio.pk %}" data-prueba="exportar-resultados">Exportar a CSV</a>
-      {% if es_area and total.listos %}<form method="post" action="{% url 'seguimiento:cerrar_listos' ejercicio.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit" data-prueba="cerrar-listos">Cerrar los {{ total.listos }} que ya cuadran</button></form>{% endif %}
+      {% if es_area and total.listos %}<form method="post" action="{% url 'seguimiento:cerrar_listos' ejercicio.pk %}">{% csrf_token %}<button class="btn btn-sm btn-primary" type="submit" data-prueba="cerrar-listos">{% if total.listos == 1 %}Cerrar el expediente que ya cuadra{% else %}Cerrar los {{ total.listos }} expedientes que ya cuadran{% endif %}</button></form>{% endif %}
     </div>
   </div>
   <div class="table-responsive">

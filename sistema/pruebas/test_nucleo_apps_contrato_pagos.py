@@ -23,10 +23,10 @@ def test_nucleo_pestanas_contrato_y_pagos_dicen_que_historia_las_llena(client, n
     exp = nueva_solicitud(superficie_solicitada_ha=6)
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
-    assert "Entrega de planta (HU-3.4)" in html and 'data-prueba="por-construir"' not in html and "El monto se calcula cuando el Comité" in html
+    assert "Entrega de planta" in html and 'data-prueba="por-construir"' not in html and "El monto se calcula cuando el Comité" in html
     Expediente.objects.filter(pk=exp.pk).update(estado=Estado.objects.get(clave="aprobada"))
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=pagos").content.decode()
-    assert 'data-prueba="por-construir"' not in html and "Solicitud de pago (HU-5.1)" in html  # M5 completo
+    assert 'data-prueba="por-construir"' not in html and "Solicitud de pago" in html  # M5 completo
     assert 'data-prueba="monto-aprobado"' in html and "$12,000.00" in html
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
     assert "Fecha programada de firma del contrato" in html and "sin fecha todavía" in html

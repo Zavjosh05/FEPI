@@ -251,9 +251,9 @@ def elaborar_contrato(usuario, expediente, modelo, momento=None):
         raise ValidationError("El contrato ya se envió a la Delegación; no se rehace.")
     if existente is None and estado != "notificada":
         if estado == "aprobada":
-            raise ValidationError("La solicitud está aprobada pero sus resultados aún no se publican (HU-3.1).")
+            raise ValidationError("La solicitud está aprobada pero sus resultados aún no se publican.")
         if estado == "publicada":
-            raise ValidationError("Falta que la Delegación notifique a la persona beneficiaria (HU-3.1).")
+            raise ValidationError("Falta que la Delegación notifique a la persona beneficiaria del resultado.")
         raise ValidationError(f"El expediente está «{expediente.estado}»; el contrato se elabora solo de una "
                               "solicitud aprobada, publicada y notificada.")
     if modelo.ejercicio_id != expediente.ejercicio_id:

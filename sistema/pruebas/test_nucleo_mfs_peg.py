@@ -111,7 +111,7 @@ def test_peg_la_evaluacion_de_reportes_validada_condiciona_cada_ministracion(peg
     exp = peg_contratado()                      # con un periodo validado por el CASPEG
     assert all(s["cumple"] for s in solicitudes.soportes(exp, 1))
     segunda = {s["clave"]: s for s in solicitudes.soportes(exp, 2)}["evaluacion_reportes"]
-    assert not segunda["cumple"] and "HU-4.3" in segunda["detalle"] + segunda["responsable"]
+    assert not segunda["cumple"] and "evaluación de reportes" in segunda["detalle"] + segunda["responsable"]
 
 
 # ----------------------------------------------------------------------------- MFS
@@ -140,7 +140,7 @@ def test_mfs_segunda_ministracion_contra_bitacora_o_auditoria_segun_el_regimen(m
     assert [s["clave"] for s in solicitudes.soportes_requeridos(fsc, 2)][-1] == "entregable_fsc"
     assert "auditoría" in solicitudes.soportes_requeridos(fsc, 2)[-1]["nombre"]
     falta = solicitudes.soportes(etf, 2)[-1]
-    assert not falta["cumple"] and "HU-4.1" in falta["detalle"]
+    assert not falta["cumple"] and "envío de comprobaciones" in falta["detalle"]
     assert "comprobante_cuenta" in [s["clave"] for s in solicitudes.soportes_requeridos(etf, 1)]
 
 

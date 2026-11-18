@@ -5,7 +5,7 @@
 <div class="mb-3">
   <div class="small"><a href="{% url 'padron:indice' %}">Todos los programas</a></div>
   <h1 class="h4 mb-1">Padrón de personas beneficiarias · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
-  <div class="text-secondary small" data-prueba="actualizacion">Publicado el {{ publicacion.publicada_en|date:"d/m/Y" }} a las {{ publicacion.publicada_en|date:"H:i" }} h. Consulta del {{ ahora|date:"d/m/Y" }} a las {{ ahora|date:"H:i" }} h{% if padron.ultimo_movimiento %}; último movimiento registrado el {{ padron.ultimo_movimiento|date:"d/m/Y" }}{% endif %}.
+  <div class="text-secondary small" data-prueba="actualizacion">Publicado el {{ publicacion.publicada_en|date:"d/m/Y" }} a las {{ publicacion.publicada_en|date:"H:i" }} h. Se calcula en cada consulta con lo registrado en los expedientes{% if padron.ultimo_movimiento %}: actualizado al {{ padron.ultimo_movimiento|date:"d/m/Y" }} a las {{ padron.ultimo_movimiento|date:"H:i" }} h (último movimiento){% endif %}.
     {{ padron.vigentes }} persona(s) vigente(s) de {{ padron.filas|length }}. Fundamento: {{ ejercicio.programa.clave }} {{ padron.config.numeral }}, línea {{ padron.config.linea }}.</div>
   {% if padron.config.reserva %}<div class="small text-secondary mt-1" data-prueba="reserva">{{ padron.config.reserva }}</div>{% endif %}
 </div>

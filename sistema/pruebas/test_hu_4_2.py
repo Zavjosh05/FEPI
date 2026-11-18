@@ -111,7 +111,7 @@ def test_hu_4_2_un_ajuste_menor_al_70_por_ciento_es_incumplimiento_y_bloquea_el_
     assert v.resultado == "incumplimiento" and "menor al 70 %" in v.datos["motivos_incumplimiento"][0]
     assert v.importe_ajustado == 0 and v.excedente_ministrado > 0                 # lo ministrado de más: HU-6.2
     cumple, detalle, *_ = verificacion.fuente_verificacion(exp, 2)
-    assert not cumple and "HU-6.2" in detalle
+    assert not cumple and "seguimiento de incumplimientos" in detalle
     with pytest.raises(ValidationError, match="incumplimiento"):
         solicitudes.enviar_solicitud(usuarios["dir_drff"], exp, 2)
 

@@ -165,7 +165,7 @@ def fuente_verificacion(expediente, numero):
     """Soporte «verificacion_campo» de ``pagos.solicitudes.FUENTES``."""
     v = vigente(expediente)
     if v is None:
-        return (False, "Todavía no se registra la verificación en campo (HU-4.2); hasta entonces la ministración no se puede "
+        return (False, "Todavía no se registra la verificación en campo; hasta entonces la ministración no se puede "
                        "solicitar.", "", "")
     if v.resultado == ResultadoVerificacion.INCUMPLIMIENTO and (v.datos or {}).get("aprobada_por_comite"):
         return (True, f"{v.nombre_documento}: sobrevivencia menor a la mínima aprobada por el Comité por causas no imputables "
@@ -173,7 +173,7 @@ def fuente_verificacion(expediente, numero):
                 reverse("ejecucion:verificacion_archivo", args=[v.pk]))
     if v.resultado == ResultadoVerificacion.INCUMPLIMIENTO:
         return (False, f"La verificación del {timezone.localtime(v.registrada_en):%d/%m/%Y} registró un incumplimiento: lo "
-                       "atiende el área responsable con el seguimiento de incumplimientos (HU-6.2).", v.acuse.folio if v.acuse else "",
+                       "atiende el área responsable con el seguimiento de incumplimientos.", v.acuse.folio if v.acuse else "",
                 reverse("ejecucion:verificacion_archivo", args=[v.pk]))
     if v.ministracion_ajustada == numero and v.importe_ajustado is not None and v.importe_ajustado <= 0:
         return (False, "Con lo verificado no queda importe por pagar en esta ministración.", v.acuse.folio if v.acuse else "",
@@ -363,7 +363,7 @@ def dar_por_concluida(usuario, expediente):
     if expediente.estado.clave != "verificada" or v is None:
         raise ValidationError("Se concluye con la verificación registrada (estado «verificada»).")
     if v.resultado == ResultadoVerificacion.INCUMPLIMIENTO:
-        raise ValidationError("La verificación registró un incumplimiento: lo atiende el seguimiento de incumplimientos (HU-6.2).")
+        raise ValidationError("La verificación registró un incumplimiento: lo atiende el seguimiento de incumplimientos.")
     pendientes = ministraciones_pendientes(expediente)
     if pendientes:
         raise ValidationError(f"Falta pagar la ministración {pendientes[0]}: solicítela antes de concluir.")

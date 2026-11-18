@@ -17,9 +17,9 @@
 </table>
 </div>
 <details class="mt-3">
-  <summary class="small text-secondary">Historial de cambios del registro (django-simple-history)</summary>
+  <summary class="small text-secondary">Historial de cambios del registro del expediente</summary>
   <table class="table table-sm small mt-2">
     <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Cambio</th><th>Estado</th></tr></thead>
-    <tbody>{% for h in historial %}<tr><td>{{ h.history_date|date:"d/m/Y H:i:s" }}</td><td>{{ h.history_user|default:"—" }}</td><td>{{ h.get_history_type_display }} {{ h.history_change_reason|default:"" }}</td><td>{{ h.estado }}</td></tr>{% endfor %}</tbody>
+    <tbody>{% for h in historial %}<tr><td>{{ h.history_date|date:"d/m/Y H:i:s" }}</td><td>{{ h.history_user|default:"—" }}</td><td>{% if h.history_type == "+" %}Alta del registro{% elif h.history_type == "-" %}Baja del registro{% else %}Cambio{% endif %}{% if h.history_change_reason %}: {{ h.history_change_reason }}{% endif %}</td><td>{{ h.estado }}</td></tr>{% endfor %}</tbody>
   </table>
 </details>

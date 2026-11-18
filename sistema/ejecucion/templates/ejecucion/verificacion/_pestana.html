@@ -1,6 +1,6 @@
 {% load moneda %}
 {% if verificacion_aplica %}
-<div class="titulo-seccion mt-3">Verificación en campo (HU-4.2)</div>
+<div class="titulo-seccion mt-3">Verificación en campo</div>
 <div class="small text-secondary mb-2">{{ config_verificacion.fundamento }}
   {% if plazo_entrega %}<br>Plazo de entrega del documento de verificación: <strong data-prueba="plazo-entrega-verificacion">{{ plazo_entrega.texto }}</strong> (mide la entrega, no la visita).{% endif %}</div>
 
@@ -17,7 +17,7 @@
     {% if v.fecha_visita %}Visita del {{ v.fecha_visita|date:"d/m/Y" }}. {% endif %}
     {% if v.superficie_verificada_ha is not None %}<span data-prueba="superficie-verificada">Superficie verificada {{ v.verificada_texto }} ha de {{ v.aprobada_texto }} aprobadas: ajuste del <strong>{{ v.ajuste_pct|floatformat:"-2" }} %</strong></span>.{% endif %}
     {% if v.sobrevivencia_pct is not None %} Sobrevivencia {{ v.sobrevivencia_pct|floatformat:"-2" }} %.{% endif %}
-    {% if v.importe_ajustado is not None %}<div data-prueba="importe-ajustado">Ministración {{ v.ministracion_ajustada }}: <strong>{{ v.importe_ajustado|moneda }}</strong> (lo verificado, {{ v.total_verificado|moneda }}, menos lo ya ministrado){% if v.excedente_ministrado %}; ministrado de más: {{ v.excedente_ministrado|moneda }} (lo atiende HU-6.2){% endif %}.</div>{% endif %}
+    {% if v.importe_ajustado is not None %}<div data-prueba="importe-ajustado">Ministración {{ v.ministracion_ajustada }}: <strong>{{ v.importe_ajustado|moneda }}</strong> (lo verificado, {{ v.total_verificado|moneda }}, menos lo ya ministrado){% if v.excedente_ministrado %}; ministrado de más: {{ v.excedente_ministrado|moneda }} (lo atiende el seguimiento de incumplimientos y reintegros){% endif %}.</div>{% endif %}
     {% if v.datos.motivos_incumplimiento %}<div class="text-danger">Incumplimiento: {{ v.datos.motivos_incumplimiento|join:"; " }}.</div>{% endif %}
     <div class="text-secondary">{{ v.plazo_texto }}</div>
     {% if v.observaciones %}<div>{{ v.observaciones }}</div>{% endif %}

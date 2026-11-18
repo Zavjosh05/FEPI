@@ -66,7 +66,7 @@
     {% endif %}
     <div class="tarjeta">
       <div class="titulo-seccion">Historial del Listado</div>
-      <ul class="small mb-0">{% for h in historial %}<li>{{ h.history_date|date:"d/m/Y H:i" }} · {{ h.get_history_type_display }} · {{ h.nombre }}{% if not h.activa %} (baja){% endif %} · {{ h.history_user|default:"—" }}{% if h.history_change_reason %} — {{ h.history_change_reason }}{% endif %}</li>{% empty %}<li class="text-secondary">Sin movimientos.</li>{% endfor %}</ul>
+      <ul class="small mb-0">{% for h in historial %}<li>{{ h.history_date|date:"d/m/Y H:i" }} · {% if h.history_type == "+" %}Alta{% elif h.history_type == "-" %}Baja{% else %}Cambio{% endif %} · {{ h.nombre }}{% if not h.activa %} (baja){% endif %} · {{ h.history_user|default:"—" }}{% if h.history_change_reason %} — {{ h.history_change_reason }}{% endif %}</li>{% empty %}<li class="text-secondary">Sin movimientos.</li>{% endfor %}</ul>
     </div>
   </div>
 </div>

@@ -54,7 +54,7 @@
         },
         {
           "clave": "oficio_delegacion",
-          "fundamento": "Oficio de la Delegación en cuanto el contrato está firmado (HU-5.1; el formato no viene en las ROP, R-07)."
+          "fundamento": "Oficio de la Delegación en cuanto el contrato está firmado (el formato no viene en las ROP, R-07)."
         }
       ],
       "siguientes": [
@@ -68,7 +68,7 @@
         },
         {
           "clave": "verificacion_campo",
-          "fundamento": "La segunda ministración se paga con la verificación del cumplimiento (HU-5.1)."
+          "fundamento": "La segunda ministración se paga con la verificación del cumplimiento."
         }
       ]
     }
@@ -192,7 +192,7 @@
           },
           {
             "clave": "instruccion_comite",
-            "fundamento": "ROP PSAHEM 10.1 fr. VIII (líneas 2281 a 2283): el Comité Técnico instruye a la Fiduciaria; HU-2.4."
+            "fundamento": "ROP PSAHEM 10.1 fr. VIII (líneas 2281 a 2283): el Comité Técnico instruye a la Fiduciaria por acuerdo de una sesión de seguimiento."
           }
         ],
         "siguientes": [
@@ -210,7 +210,7 @@
           },
           {
             "clave": "instruccion_comite",
-            "fundamento": "Instrucción del Comité Técnico para esta ministración (HU-2.4)."
+            "fundamento": "Instrucción del Comité Técnico para esta ministración (acuerdo de una sesión de seguimiento)."
           },
           {
             "clave": "verificacion_campo",
@@ -221,12 +221,12 @@
     },
     "PEG": {
       "tipo_pago": "deposito",
-      "nota": "PEG: transferencia interbancaria (depósito) a la persona Guardabosque, previa entrega de los reportes mensuales (7.2.1, líneas 8497 a 8504); la Instancia Ejecutora genera la solicitud del recurso tras la evaluación interna de los reportes (10.1 fr. XIII, líneas 9024 y 9025) y el Comité la valida (Convocatoria, líneas 9505 y 9506). La ROP no prevé oficio de la Delegación para el pago. Mientras no exista la evaluación por Guardabosque (HU-4.3), la fuente «evaluacion_reportes» cuenta los periodos que el CASPEG ya validó para el expediente (acuerdos de HU-2.4): la ministración N pide N periodos validados (decisión propia; el reparto de periodos por ministración no está en las ROP, R-18).",
+      "nota": "PEG: transferencia interbancaria (depósito) a la persona Guardabosque, previa entrega de los reportes mensuales (7.2.1, líneas 8497 a 8504); la Instancia Ejecutora genera la solicitud del recurso tras la evaluación interna de los reportes (10.1 fr. XIII, líneas 9024 y 9025) y el Comité la valida (Convocatoria, líneas 9505 y 9506). La ROP no prevé oficio de la Delegación para el pago. Cada ministración pide la evaluación «cumple» de los periodos que cubre, validada por el CASPEG con un acuerdo de su sesión de seguimiento (supuesto: la 1 cubre el primer mes, la 2 y la 3 dos meses cada una y la 4 el resto del ejercicio; el reparto no está en las ROP, R-18).",
       "soportes": {
         "1": [
           {
             "clave": "contrato_firmado",
-            "fundamento": "Contrato de Adhesión firmado y credencial entregada (HU-3.3; ROP PEG 10.1 fr. XII, líneas 9021 a 9023)."
+            "fundamento": "Contrato de Adhesión firmado y credencial entregada (ROP PEG 10.1 fr. XII, líneas 9021 a 9023)."
           },
           {
             "clave": "comprobante_cuenta",
@@ -255,16 +255,16 @@
     },
     "MFS": {
       "tipo_pago": "transferencia",
-      "nota": "MFS: el 70 % (ETF) o 50 % (FSC) se paga tras la firma del Contrato de Adhesión y, en su caso, del contrato de Prestación de Servicios Técnicos (10.1.1 inciso l, línea 8090); la segunda ministración, contra la entrega de la Bitácora o la autorización (ETF) o de la solicitud o Plan de auditoría (FSC), no contra una verificación en campo (7.2, líneas 6871 y 6885; 10.1.1 inciso m). La entrega la registra HU-4.1 (envío de comprobaciones).",
+      "nota": "MFS: el 70 % (ETF) o 50 % (FSC) se paga tras la firma del Contrato de Adhesión y, en su caso, del contrato de Prestación de Servicios Técnicos (10.1.1 inciso l, línea 8090); la segunda ministración, contra la entrega de la Bitácora o la autorización (ETF) o de la solicitud o Plan de auditoría (FSC), no contra una verificación en campo (7.2, líneas 6871 y 6885; 10.1.1 inciso m). La entrega se registra como comprobación, en la Delegación o desde el portal.",
       "soportes": {
         "1": [
           {
             "clave": "contrato_firmado",
-            "fundamento": "ROP MFS 10.1.1 inciso l) (línea 8090): el recurso se entrega con el Contrato de Adhesión y, en su caso, el de Prestación de Servicios Técnicos firmados (HU-3.3)."
+            "fundamento": "ROP MFS 10.1.1 inciso l) (línea 8090): el recurso se entrega con el Contrato de Adhesión y, en su caso, el de Prestación de Servicios Técnicos firmados."
           },
           {
             "clave": "oficio_delegacion",
-            "fundamento": "MFS-ARP-05: oficio de la Delegación (HU-5.1; el formato no viene en las ROP, R-07)."
+            "fundamento": "MFS-ARP-05: oficio de la Delegación (el formato no viene en las ROP, R-07)."
           },
           {
             "clave": "comprobante_cuenta",

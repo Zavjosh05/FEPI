@@ -81,7 +81,7 @@ def soportes_requeridos(expediente, numero):
 def _contrato_firmado(exp, numero):
     firma = getattr(exp, "firma_contrato", None)
     if firma is None:
-        return False, "Falta el contrato firmado (HU-3.3).", "", ""
+        return False, "Falta el contrato firmado.", "", ""
     return (True, f"Firmado el {timezone.localtime(firma.firmado_en):%d/%m/%Y %H:%M} h.", firma.contrato.folio,
             reverse("contrato:firma_archivo", args=[exp.folio, "contrato"]))
 
@@ -107,7 +107,7 @@ def _instruccion_comite(exp, numero):
 
     a = Acuerdo.objects.filter(tipo="instruccion_pago", expedientes=exp, ministracion=numero).order_by("registrado").first()
     if a is None:
-        return False, f"El Comité Técnico aún no instruye el pago de la ministración {numero} a la Fiduciaria (HU-2.4).", "", ""
+        return False, f"El Comité Técnico aún no instruye el pago de la ministración {numero} a la Fiduciaria (acuerdo de una sesión de seguimiento).", "", ""
     return True, f"Acuerdo {a.numero}.", a.numero, ""
 
 
@@ -119,13 +119,13 @@ def _dictamen(exp, numero):
 
 
 def _verificacion_campo(exp, numero):
-    return (False, "Todavía no se registra la verificación en campo (HU-4.2); hasta entonces la ministración no se puede "
+    return (False, "Todavía no se registra la verificación en campo; hasta entonces la ministración no se puede "
                    "solicitar.", "", "")
 
 
 def _entregable(exp, numero):
     """MFS: Bitácora o autorización (ETF), solicitud o Plan de auditoría (FSC). Gancho de HU-4.1."""
-    return (False, "Todavía no se registra la entrega del documento que condiciona esta ministración (HU-4.1, envío de "
+    return (False, "Todavía no se registra la entrega del documento que condiciona esta ministración (envío de "
                    "comprobaciones); hasta entonces no se puede solicitar.", "", "")
 
 
@@ -138,7 +138,7 @@ def _evaluacion_reportes(exp, numero):
                           .values_list("periodo", flat=True)))
     if len(periodos) < numero:
         return (False, f"El CASPEG ha validado {len(periodos)} periodo(s) de reportes de este Guardabosque y la ministración "
-                       f"{numero} pide {numero} (la evaluación por periodo es HU-4.3).", "", "")
+                       f"{numero} pide {numero} (evaluación de los reportes por periodo).", "", "")
     return True, f"Periodos validados por el CASPEG: {', '.join(periodos)}.", ", ".join(periodos[:numero]), ""
 
 
@@ -158,9 +158,9 @@ def fuente_de(clave):
 RESPONSABLE = {
     "contrato_firmado": "la Delegación (registra la firma)", "oficio_delegacion": "la Delegación (emite el oficio)",
     "comprobante_cuenta": "la Delegación (recaba el comprobante)", "instruccion_comite": "la Secretaría Técnica del Comité",
-    "dictamen": "la Dirección y la Unidad Jurídica", "verificacion_campo": "la Delegación y la Dirección (HU-4.2)",
-    "entregable": "la Delegación, que recibe la comprobación (HU-4.1)",
-    "evaluacion_reportes": "la Dirección de Protección Forestal y el CASPEG (HU-4.3)",
+    "dictamen": "la Dirección y la Unidad Jurídica", "verificacion_campo": "la Delegación y la Dirección (verificación en campo)",
+    "entregable": "la Delegación, que recibe la comprobación",
+    "evaluacion_reportes": "la Dirección de Protección Forestal y el CASPEG (evaluación de reportes)",
 }
 
 
@@ -214,7 +214,7 @@ def puede_solicitar(expediente, numero):
     if ministracion is None:
         return False, f"La solicitud no tiene la ministración {numero}."
     if getattr(expediente, "firma_contrato", None) is None:
-        return False, "Sin contrato firmado no se puede solicitar el pago (HU-3.3)."
+        return False, "Sin contrato firmado no se puede solicitar el pago."
     existente = expediente.solicitudes_pago.filter(ministracion=numero).first()
     if existente is not None and existente.estado in EN_CURSO:
         return False, f"La ministración {numero} ya está solicitada: {existente.get_estado_display().lower()}."

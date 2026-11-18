@@ -1,7 +1,6 @@
 """HU-6.3 · Página pública del padrón de personas beneficiarias (sin iniciar sesión), igual que la de resultados de HU-3.1."""
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils import timezone
 
 from nucleo.models import Ejercicio
 
@@ -29,7 +28,7 @@ def programa(request, clave, anio):
     filas = [f for f in p["filas"] if not buscar or buscar in str(f.get("folio", "")).lower()]
     return render(request, "seguimiento/cierre/padron_programa.html", {
         "ejercicio": ejercicio, "publicacion": publicacion, "padron": p, "filas": filas[:LIMITE_PUBLICO],
-        "recortadas": max(len(filas) - LIMITE_PUBLICO, 0), "folio": buscar, "ahora": timezone.localtime()})
+        "recortadas": max(len(filas) - LIMITE_PUBLICO, 0), "folio": buscar})
 
 
 def archivo_csv(request, clave, anio):

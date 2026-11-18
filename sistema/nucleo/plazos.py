@@ -91,6 +91,8 @@ class Vencimiento:
 
     @property
     def texto_plazo(self):
+        if self.config.get("vence_en_hito"):
+            return "fecha que fija el área responsable"
         if self.plazo is None:
             return "—"
         if self.config.get("unidad") and self.plazo.cantidad is not None:
@@ -110,6 +112,10 @@ class Vencimiento:
     @property
     def texto(self):
         """Frase para pantallas y acuses."""
+        if self.config.get("vence_en_hito"):                 # P-37: la fecha la fija el área en el aviso, no las reglas
+            if not self.tiene_fecha:
+                return f"{SIN_FECHA} (la fija el área responsable en {self.nombre_evento})"
+            return f"{self.vencimiento:%d/%m/%Y} (fijada por el área responsable en {self.nombre_evento})"
         if not self.tiene_fecha and self.sin_plazo_en_reglas:
             return f"{SIN_PLAZO}" + (f" ({self.fundamento})" if self.fundamento else "")
         if not self.tiene_fecha:
