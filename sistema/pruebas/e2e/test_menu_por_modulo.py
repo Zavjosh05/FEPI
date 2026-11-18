@@ -51,7 +51,8 @@ def test_p_21_la_direccion_ve_sus_grupos_en_el_orden_de_los_modulos(page, datos_
     page.set_viewport_size({"width": 1366, "height": 900})
     entrar("dir_drff")
     grupos = [g.strip() for g in page.locator("nav.barra-probosque button.dropdown-toggle").all_inner_texts()]
-    assert grupos == ["Dictamen y Comité", "Publicación y contrato"]   # «Pagos» es un solo enlace para la Dirección
+    # «Pagos» es un solo enlace para la Dirección; «Ejecución y verificación» es grupo desde la evaluación de reportes.
+    assert grupos == ["Dictamen y Comité", "Publicación y contrato", "Ejecución y verificación"]
     expect(page.locator("nav.barra-probosque a.nav-link:text-is('Pagos')")).to_be_visible()
     page.click("button.dropdown-toggle:text-is('Publicación y contrato')")
     expect(page.locator("a.dropdown-item:text-is('Contratos')")).to_be_visible()
