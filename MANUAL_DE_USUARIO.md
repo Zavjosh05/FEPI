@@ -833,7 +833,7 @@ Solo existe para lo ya publicado (si no, la página no se encuentra). Hay un enl
 **Padrón.** Elige el programa y pulsa **Ver el padrón**; **Buscar** por folio o **Exportar a CSV**. Dice cuándo se
 publicó y hasta qué movimiento está actualizado; **Altas, bajas y sustituciones** aparece en PEG.
 
-![Padrón público sin iniciar sesión](entregas/sprint_3/capturas/hu_6_3_05_padron_publico_sin_iniciar_sesion.png)
+![Padrón público sin iniciar sesión](entregas/sprint_3/capturas/s3_11_08_padron_publico_sin_iniciar_sesion.png)
 
 ---
 
