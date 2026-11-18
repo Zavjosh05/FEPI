@@ -1,0 +1,294 @@
+<section class="portada">
+  <p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+  <h1>Resumen del sprint 3<br>Ejecución, seguimiento y cierre</h1>
+  <p class="sub">Qué se agregó al sistema en el tercer y último prototipo, cómo quedaron cubiertas sus necesidades, qué
+  se encontró en las Reglas de Operación, y el estado final del proyecto.</p>
+  <table>
+    <tr><td class="gris">Prototipo</td><td>Ejecución y verificación (M4), seguimiento y cierre (M6), portal de personas beneficiarias; uso del suelo y especies (M7.4 y M7.5)</td></tr>
+    <tr><td class="gris">Construcción</td><td>16 al 18 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Historias</td><td>8 de 26 (39 de 112 puntos); con los sprints 1 y 2, las 26</td></tr>
+    <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>prototipos</code></td></tr>
+    <tr><td class="gris">Autor</td><td>Joshua Zavaleta</td></tr>
+    <tr><td class="gris">Antecedentes</td><td>Resúmenes de los sprints 1 y 2 (<code>entregas/sprint_1/</code> y <code>entregas/sprint_2/</code>)</td></tr>
+  </table>
+  <div class="caja" style="margin-top:1cm">
+    <b>En una frase.</b> Una solicitud de cualquiera de los seis programas con reglas ya recorre el trámite entero: de
+    la ventanilla al contrato y el primer pago, de ahí a las comprobaciones que la persona envía por un portal, la
+    verificación en campo y el segundo pago, y al final el cierre del ejercicio, con su padrón público y el informe al
+    Comité; y cuando algo falla hay lista de espera, sustitución, cancelación y reintegro.
+  </div>
+</section>
+
+<h2 class="salto">1. De dónde se parte y qué atiende este sprint</h2>
+<p>Al cerrar el sprint 2 el trámite llegaba hasta la primera ministración en cuatro programas (Capturando Carbono, PS,
+RHF y PSAHEM). MFS y Guardabosques tenían funciones construidas pero no reglas, y la segunda ministración estaba
+bloqueada porque no existía la verificación en campo.</p>
+<p>Este sprint atiende la parte del trámite que sucede después del pago y que hoy se lleva casi toda en papel:</p>
+<ul>
+  <li><b>Lo que la persona beneficiaria entrega no deja huella.</b> Avisos de término, informes finales, bitácoras,
+  reportes mensuales y acuses de depósito llegan a la Delegación sin registro común, y con ellos se decide el segundo
+  pago o una cancelación.</li>
+  <li><b>El dinero liberado y el dinero por devolver no se siguen.</b> Un desistimiento, una baja o una cancelación
+  liberan recurso que debe ir a la lista de espera en orden, y una cancelación genera un requerimiento de devolución
+  cuyo depósito hay que comprobar.</li>
+  <li><b>El cierre se arma a mano.</b> Los resultados finales, el padrón de personas beneficiarias y el informe anual al
+  Comité se reconstruyen al final del año cotejando listados, verificaciones y pagos de distintas unidades.</li>
+</ul>
+
+<h2>2. Qué cambió en la arquitectura</h2>
+<p>La arquitectura es la de los sprints anteriores (Django con GeoDjango, PostgreSQL con PostGIS, HTMX, Docker
+Compose). Lo nuevo:</p>
+<table>
+  <thead><tr><th style="width:24%">Pieza</th><th>Qué es</th><th style="width:34%">Por qué</th></tr></thead>
+  <tbody>
+    <tr><td>Reglas de los seis programas</td><td>Se extrajeron las de MFS y Guardabosques con su numeral y su línea, igual que las de los otros cuatro. Los montos se calculan por hectárea, por apoyo o por persona según el programa, y la persona beneficiaria puede ser distinta de quien solicita (el Guardabosque frente al núcleo agrario).</td><td>Con ellas los seis programas recorren el mismo trámite con sus diferencias como datos, no como código aparte.</td></tr>
+    <tr><td>Portal de personas beneficiarias</td><td>App <code>portal</code>: cuenta creada al firmar el contrato (usuario CURP y un código de un solo uso impreso en el acuse); como respaldo, consulta con folio y código. Cada cuenta ve solo sus expedientes.</td><td>Decisión de Joshua del 15 de noviembre. La consulta sin cuenta no identifica a la persona, por eso solo consulta y no envía.</td></tr>
+    <tr><td>Estados de ejecución y seguimiento</td><td>Quince estados y un centenar de transiciones nuevas en la tabla del trámite, con los flujos alternos de caso fortuito, prórroga, sustitución, suspensión, cancelación y devolución.</td><td>El trámite sigue teniendo una sola tabla de estados que dice qué unidad puede hacer cada paso.</td></tr>
+    <tr><td>Panel «Por vencer»</td><td>Cada bandeja muestra los plazos de ejecución y seguimiento que vencen pronto: avisos, informes, reportes, plazos para subsanar.</td><td>Solo avisa; ninguna sanción se aplica sola (la confirma una persona, como se decidió en el sprint 2).</td></tr>
+    <tr><td>Módulos <code>ejecucion</code> y <code>seguimiento</code></td><td>Dos apps nuevas con un archivo de código, sus tablas y sus pruebas por historia, enganchadas al núcleo por el mismo mecanismo que las anteriores.</td><td>Cada historia se construyó, probó y registró por separado.</td></tr>
+  </tbody>
+</table>
+<p>El sistema pasó de 56 a {{tablas}} tablas. El diagrama entidad-relación, generado desde el código, tiene ahora ocho
+áreas (<code>sistema/docs/modelo_datos.md</code>).</p>
+<h3>Las tablas nuevas</h3>
+<!--DIAGRAMA_ER:er_portal|Portal de personas beneficiarias: cuenta externa, acceso por expediente y código de consulta.-->
+<!--DIAGRAMA_ER:er_ejecucion|Ejecución y verificación (M4): comprobaciones, verificación con sus incidencias, revisión de reportes y evaluación por periodo de los Guardabosques.-->
+<!--DIAGRAMA_ER:er_seguimiento|Seguimiento y cierre (M6): propuestas al Comité, recurso liberado, avisos de omisión, requerimientos de devolución, cierre del expediente, padrón e informe anual.-->
+
+<h2 class="salto">3. Qué se trabajó en el sprint 3</h2>
+<p>Se construyeron completos los módulos <b>M4 Ejecución y verificación</b> y <b>M6 Seguimiento y cierre</b>, el portal
+de personas beneficiarias y las funciones <b>M7.4</b> y <b>M7.5</b> de la Calculadora. Con la verificación quedó
+conectada la segunda ministración.</p>
+<!--TABLA_HISTORIAS-->
+
+<h3>El recorrido del trámite en este sprint</h3>
+<pre class="mermaid" data-nombre="estados_sprint_3" data-pie="Estados del trámite desde el contrato firmado hasta el cierre del ejercicio (simplificado: la tabla completa tiene 39 estados y 159 transiciones). En verde, el camino principal que agregó el sprint 3; en ámbar, los flujos alternos.">flowchart TB
+  contratada([Contratada]) --> pagada1[Primera ministración pagada]
+  pagada1 --> ejec[En ejecución]
+  ejec -->|"Persona por el portal o Delegación"| comp[Comprobación enviada]
+  comp -->|Delegación| verif[Verificada]
+  verif -->|"Adm. y Finanzas: segunda ministración"| concl[Concluida]
+  concl -->|Dirección| cerrado([Ejercicio cerrado])
+  ejec -.->|aviso| caso[Caso fortuito]
+  ejec -.->|"MFS, causa externa"| prorroga[Prórroga solicitada]
+  ejec -.->|"fallecimiento"| sust[Sustitución]
+  ejec -.->|"Dirección: aviso con plazo"| omis[Omisiones por subsanar]
+  omis -.->|subsana| ejec
+  ejec -.->|suspensión| susp[Suspendida]
+  omis -.->|"no subsana: acuerdo del Comité"| canc[Cancelada]
+  canc -.->|"Unidad Jurídica: requerimiento"| devol[En devolución]
+  devol -.->|"Adm. y Finanzas: depósito"| reint[Reintegrada]
+  reint -.->|Dirección| cerrado
+  canc -.->|"recurso liberado al Comité"| espera[Lista de espera: reasignación en orden]
+  classDef nuevo fill:#d8eedf,stroke:#2e7d4f,color:#123;
+  classDef alterno fill:#fdebc8,stroke:#b7791f,color:#321;
+  class ejec,comp,verif,concl,cerrado nuevo;
+  class caso,prorroga,sust,omis,susp,canc,devol,reint,espera alterno;
+</pre>
+<p>Cada flecha dice qué unidad hace el paso. En Guardabosques el camino es otro: reportes mensuales, evaluación por
+periodo y validación del CASPEG antes de cada una de las cuatro ministraciones; esa evaluación no mueve el expediente
+de estado (decisión D-19 de la bitácora).</p>
+<pre class="mermaid" data-nombre="secuencia_ejecucion" data-pie="Del pago a la segunda ministración: quién hace cada paso y qué queda registrado.">sequenceDiagram
+  autonumber
+  actor P as Persona beneficiaria
+  participant D as Delegación
+  participant A as Dirección (área responsable)
+  participant F as Adm. y Finanzas
+  D->>P: Firma: crea la cuenta del portal (código en el acuse)
+  P->>D: Envía aviso de término e informe final por el portal (acuse)
+  Note over P,D: o los entrega en ventanilla: mismo registro y mismo acuse
+  D->>D: Verifica en campo: superficie, sobrevivencia, incidencias (acuse)
+  alt Cumple
+    A->>F: Segunda ministración, proporcional a lo verificado (acuse)
+    F->>F: Registra el pago
+  else Incumple
+    D->>P: Aviso de omisión con plazo para subsanar
+  end
+</pre>
+<pre class="mermaid" data-nombre="secuencia_cierre" data-pie="Seguimiento y cierre: incumplimiento, reasignación y cierre del ejercicio.">sequenceDiagram
+  autonumber
+  participant A as Dirección (área responsable)
+  participant C as Comité
+  participant J as Unidad Jurídica
+  participant D as Delegación
+  actor P as Persona beneficiaria
+  participant F as Adm. y Finanzas
+  participant T as Secretaría Técnica
+  opt Omisión no subsanada
+    A->>C: Propone la cancelación (recurso liberado)
+    C->>C: Acuerdo en sesión de seguimiento
+    J->>J: Inscribe en el Listado de Incumplidas
+    J->>D: Requerimiento de devolución (monto y cuenta)
+    D->>P: Notifica el requerimiento
+    F->>F: Comprueba el depósito
+    A->>C: Propone reasignar a la lista de espera, en su orden
+  end
+  A->>A: Resultados finales: coteja aprobado, verificado, pagado y reintegrado
+  A->>A: Cierra los expedientes que cuadran (acuse)
+  A->>A: Publica el padrón (página pública, sin cuenta)
+  A->>T: Envía el informe anual en PDF (fecha y hora)
+  T->>C: Registra la recepción en la sesión
+</pre>
+
+<h3>Algunas pantallas</h3>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_4_1_02_mis_expedientes_solo_los_suyos.png" alt=""></div>
+    <figcaption>HU-4.1 · Portal: la persona solo ve sus expedientes.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_4_2_04_segunda_ministracion_ajustada_con_el_soporte_de_la_verificacion.png" alt=""></div>
+    <figcaption>HU-4.2 · Segunda ministración ajustada a la superficie verificada.</figcaption></figure>
+</div>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_4_3_03_tabla_por_periodo_con_quien_no_entrego.png" alt=""></div>
+    <figcaption>HU-4.3 · Evaluación por periodo: quien no entregó su reporte queda señalado.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_6_2_06_requerimiento_de_devolucion_con_monto_y_cuenta.png" alt=""></div>
+    <figcaption>HU-6.2 · Cancelación, Listado de Incumplidas y requerimiento con monto y cuenta.</figcaption></figure>
+</div>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_6_3_02_resultados_finales_coinciden_con_verificaciones_y_pagos.png" alt=""></div>
+    <figcaption>HU-6.3 · Resultados finales cotejados con verificaciones y pagos.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/s3_11_08_padron_publico_sin_iniciar_sesion.png" alt=""></div>
+    <figcaption>HU-6.3 · Padrón público, sin iniciar sesión y sin datos personales protegidos.</figcaption></figure>
+</div>
+
+<h2 class="salto">4. Cómo se cubrieron las necesidades</h2>
+<p>Historia por historia: qué pide cada criterio de aceptación, cómo quedó resuelto y qué necesidades atiende. Los
+identificadores empiezan con la clave del programa y siguen con el rol: DRF Delegación, ARP área responsable (DPF en
+Guardabosques), UJ Unidad Jurídica, AF Administración y Finanzas, COM Comité, BEN persona beneficiaria, PSF prestador
+de servicios forestales, DEV equipo desarrollador.</p>
+<!--TABLA_COBERTURA-->
+
+<h3>Cuántas necesidades toca este sprint</h3>
+<!--RESUMEN_NECESIDADES-->
+<p>«Atendida» significa que al menos una de las funciones que la cubren se construyó en este sprint; «completa», que ya
+no le falta ninguna función. El anexo A las lista una por una y el anexo B reúne las capturas de cada historia.</p>
+
+<h2>5. Lo que dijeron las Reglas de Operación</h2>
+<p>Como en los sprints anteriores, construir sobre el texto de las Reglas sacó a la luz huecos y diferencias. Todas
+están en la bitácora con su numeral y su línea; estas son las que cambiaron el diseño:</p>
+<table>
+  <thead><tr><th style="width:23%">Tema</th><th>Qué dicen las Reglas</th><th style="width:33%">Qué se hizo</th></tr></thead>
+  <tbody>
+    <tr><td>Segunda ministración</td><td>En Capturando Carbono, PS y RHF se paga la parte proporcional a lo verificado; PSAHEM no lo dice y paga el 30 % completo.</td><td>Superficie verificada por monto por hectárea, menos lo ya pagado. En PSAHEM, el 30 % completo hasta que el cliente diga otra cosa.</td></tr>
+    <tr><td>Reportes de Guardabosques</td><td>Piden reportes mensuales y una evaluación antes de cada pago, pero no publican el calendario ni qué meses cubre cada una de las 4 ministraciones.</td><td>Reparto configurable desde el mes de la firma (1, 2, 2 y el resto), dicho en pantalla.</td></tr>
+    <tr><td>Omisiones</td><td>Prevén avisar y dar plazo para subsanar, pero no dicen cuántos días.</td><td>El área fija el plazo en cada aviso; el sistema lo vigila y avisa al vencer.</td></tr>
+    <tr><td>Reintegro</td><td>Es «inmediato» desde la notificación, sin días; la cuenta para el depósito la da Administración y Finanzas, y en PSAHEM no está claro.</td><td>Cuenta configurable por programa; el requerimiento queda abierto hasta comprobar el depósito.</td></tr>
+    <tr><td>Lista de espera</td><td>Se reasigna en orden de prelación, sin decir qué pasa si lo liberado no alcanza para la siguiente solicitud.</td><td>Se detiene en la primera que no alcanza; puede configurarse para saltarla.</td></tr>
+    <tr><td>Fallecimiento</td><td>La segunda persona beneficiaria tiene 30 días hábiles para manifestar interés; en Guardabosques no hay segunda persona y la defunción es baja.</td><td>Sustitución con su plazo; en Guardabosques, baja.</td></tr>
+    <tr><td>Padrón</td><td>Todos los programas lo mandan publicar (8.1.5), pero remiten las columnas a la Ley de Transparencia del Estado y a unos Lineamientos de noviembre de 2025 que no están en el texto; en Guardabosques parte de la información es clasificada.</td><td>Folio, persona, municipio, predio, modalidad, monto y situación; nunca CURP, RFC, domicilio ni cuenta. En Guardabosques se publica el núcleo agrario.</td></tr>
+    <tr><td>Cierre e informe anual</td><td>No hay plazo en días para publicar el padrón ni para cerrar; el informe anual va a la Instancia Normativa al final del ejercicio (en Guardabosques, en la primera sesión del siguiente).</td><td>Se registra la fecha y la hora del envío y de la recepción; donde no hay plazo, la pantalla lo dice.</td></tr>
+  </tbody>
+</table>
+
+<h2 class="salto">6. Calculadora forestal: uso del suelo y especies</h2>
+<div class="dos">
+  <figure class="recorte"><div><img src="capturas/hu_7_4_tarjeta_destino.png" alt="A qué uso pasó el terreno perdido"></div>
+    <figcaption>HU-7.4 · A qué uso pasó el terreno perdido, como estimación con su exactitud.</figcaption></figure>
+  <figure class="recorte"><div><img src="capturas/hu_7_5_vista_cobertura.png" alt="Municipios con registros del inventario"></div>
+    <figcaption>HU-7.5 · Municipios con especies registradas en el inventario forestal.</figcaption></figure>
+</div>
+<ul>
+  <li><b>Uso del suelo al que pasó el terreno perdido (HU-7.4).</b> De las «otras pérdidas» (las que no son por
+  incendio), cuántas hectáreas pasaron a uso agrícola, pecuario, urbano u otro. No hay uso del suelo oficial posterior a
+  la Serie VII del INEGI, así que se estima clasificando imágenes Sentinel-2 con un modelo entrenado en las clases no
+  forestales de esa serie. Su exactitud medida es de 55 % (kappa 0.39) y la página lo dice junto con el año de las
+  imágenes; es una estimación, no un dato oficial. Un periodo sin clasificación dice «sin dato».</li>
+  <li><b>Especies por municipio (HU-7.5).</b> Del Inventario Nacional Forestal y de Suelos 2015–2020 de CONAFOR: 10,391
+  árboles en 135 conglomerados de una malla de 5 km. 55 de los 125 municipios tienen registros; los demás dicen «sin
+  registros en el inventario», no «sin especies», porque el muestreo no los tocó. Solo el 56 % de los registros llega a
+  especie. La licencia de estos datos está por confirmar con CONAFOR antes de publicar la página con ellos.</li>
+</ul>
+
+<h2>7. Cómo se comprobó</h2>
+<table>
+  <thead><tr><th style="width:36%">Comprobación</th><th>Resultado al cierre del sprint</th></tr></thead>
+  <tbody>
+    <tr><td>Pruebas automáticas del sistema</td><td>{{pruebas_sistema}} en verde, corridas también con todos los documentos PDF reales</td></tr>
+    <tr><td>Pruebas de la Calculadora</td><td>{{pruebas_calculadora}} en verde</td></tr>
+    <tr><td>Recorrido completo por servicios</td><td>Una solicitud por cada uno de los seis programas, de la solicitud al informe anual recibido: firma con cuenta del portal, planta donde aplica, ministraciones, comprobaciones, verificación, cierre y padrón. En Guardabosques, siete periodos de reportes, evaluación, CASPEG, cuatro ministraciones y cierre. Más un caso de incumplimiento hasta el reintegro y uno de reasignación hasta la firma</td></tr>
+    <tr><td>Recorrido completo por la interfaz</td><td>Con clics y cambio de usuario en cada relevo: Capturando Carbono de la firma al padrón público, incluida la persona en el portal y la consulta con folio y código; y Guardabosques en su ciclo de reportes</td></tr>
+    <tr><td>Revisión de los textos de la interfaz</td><td>Con todos los datos de demostración y cada usuario: ninguna pantalla habla de «sprint» ni de identificadores de historia</td></tr>
+    <tr><td>Tiempo de la batería</td><td>En paralelo: rápidas {{tiempo_rapidas}}; completa {{tiempo_completa}}</td></tr>
+    <tr><td>Capturas</td><td>{{capturas}} imágenes en <code>entregas/sprint_3/capturas/</code></td></tr>
+  </tbody>
+</table>
+<p>Los recorridos encontraron un error y tres detalles. El error: el acuse de un envío por el portal nombraba siempre a
+la persona beneficiaria aunque enviara el prestador de servicios; se corrigió. Los detalles: las once pestañas del
+expediente ya no cabían en una pantalla de portátil, la tabla de plazos no mostraba la fecha que el área fijó para
+subsanar y el padrón mezclaba la hora real con el reloj simulado de la demostración. Todo se corrigió dentro del
+sprint y está en la bitácora.</p>
+
+<h2>8. Cómo se trabajó</h2>
+<ul>
+  <li><b>Coordinación por tareas delegadas.</b> Desde este sprint la construcción se repartió en tareas delegadas de una
+  o dos historias, con un encargo escrito completo y un modelo de proceso acorde: el más capaz para la base del sprint,
+  los bloques de varias historias vecinas y el cierre técnico; uno más económico para las historias acotadas y la
+  Calculadora. Quien coordina no dio nada por bueno con el informe de quien construyó: revisó los commits, las
+  capturas y corrió la batería completa después de cada historia.</li>
+  <li><b>Pruebas que no se cuelgan.</b> Una corrida se quedó detenida unas seis horas sin avanzar. Desde entonces cada
+  prueba tiene un límite de cinco minutos y la batería un tope total: una prueba colgada falla con su traza.</li>
+  <li><b>Trabajo que se puede retomar.</b> Las interrupciones por límite de uso siguieron pasando; cada vez se retomó
+  desde el tablero, las notas de la tarea y lo que había sin registrar, sin perder ni rehacer nada.</li>
+  <li><b>Lo propuesto y su porqué quedan escritos.</b> <code>entregas/BITACORA.md</code> registra cada propuesta,
+  hallazgo y decisión con su estado; <code>entregas/AVANCE.md</code>, cada tarea con su commit.</li>
+</ul>
+
+<h2 class="salto">9. Estado final del proyecto</h2>
+<p>Las <b>26 historias</b> de la propuesta (112 puntos) están construidas, probadas y registradas en la rama
+<code>prototipos</code>: 9 en el sprint 1, 9 en el 2 y 8 en el 3. Los seis programas con reglas de operación recorren
+el trámite completo y la Calculadora forestal tiene sus cinco funciones.</p>
+<table>
+  <thead><tr><th style="width:26%">Módulo</th><th>Qué hace</th></tr></thead>
+  <tbody>
+    <tr><td>M1 Recepción</td><td>Solicitud en ventanilla con requisitos por programa, polígono dibujado o cargado, faltantes con plazo, acuses y bitácora</td></tr>
+    <tr><td>M2 Dictamen y Comité</td><td>Validación, dictámenes técnico y jurídico, priorización, sesiones del Comité con acta y acuerdos, lista de espera</td></tr>
+    <tr><td>M3 Publicación y contrato</td><td>Listados publicados, notificación por la Delegación, modelos de contrato validados, firma, vale y salida de planta</td></tr>
+    <tr><td>M5 Pagos</td><td>Oficio y solicitud de pago con soportes, pago, remisión a la Fiduciaria y cheques</td></tr>
+    <tr><td>M4 Ejecución</td><td>Portal de personas beneficiarias, comprobaciones, verificación en campo, evaluación de reportes de Guardabosques</td></tr>
+    <tr><td>M6 Seguimiento y cierre</td><td>Lista de espera y sustituciones, omisiones, cancelación, Listado de Incumplidas, reintegros, resultados finales, padrón e informe anual</td></tr>
+    <tr><td>M7 Calculadora</td><td>Masa forestal por año, balance, incendios, uso del suelo al que pasó lo perdido y especies por municipio</td></tr>
+  </tbody>
+</table>
+<h3>Lo que queda por decidir con el cliente</h3>
+<p>El sistema funciona con decisiones propias, marcadas como tales en pantalla y en la bitácora, donde las Reglas no
+alcanzan. Para pasar de prototipo a operación hace falta que el cliente confirme:</p>
+<ul>
+  <li><b>Plazos.</b> Desde qué hecho corre la firma del contrato donde las Reglas se contradicen; cuántos días da la
+  Dirección para faltantes; desde cuándo corren los 10 días de Guardabosques; días del vale de PS; plazo para subsanar
+  omisiones; días inhábiles oficiales.</li>
+  <li><b>Dinero.</b> Si la segunda ministración de PSAHEM es proporcional; qué meses cubre cada ministración de
+  Guardabosques; la cuenta real para reintegros (en PSAHEM, quién la da); si la reasignación salta la solicitud a la que
+  no le alcanza; si el valor de la planta que se reintegra vuelve a la bolsa que se reasigna; quién remite el pago a la
+  Fiduciaria.</li>
+  <li><b>Documentos.</b> Los modelos oficiales de contrato, oficio de pago y formatos de verificación (FO-PB-509-A,
+  520-B), que las Reglas no traen; el Reglamento Interno del Comité Técnico de PSAHEM; la tabla de puntos de
+  priorización de Capturando Carbono.</li>
+  <li><b>Transparencia.</b> Las columnas del padrón según los Lineamientos de 2025; si se publica el nombre del
+  Guardabosque; si las solicitudes reasignadas se agregan a la página de resultados ya publicada.</li>
+  <li><b>MFS.</b> Superficies de dos conceptos de ETF, la matriz de ubicación por tipo de bosque (ilegible en el texto),
+  el cuadro de montos FSC y quién autoriza la prórroga.</li>
+  <li><b>Calculadora.</b> Publicar las especies (licencia del inventario por confirmar); la selva baja caducifolia
+  pierde 7 % al año, probablemente por la caída de hojas en noviembre y diciembre, y conviene otra ventana o un umbral
+  propio; el uso del suelo es una estimación de 55 % de exactitud.</li>
+</ul>
+<h3>Límites del prototipo</h3>
+<ul>
+  <li><b>Datos de demostración.</b> Personas, predios, viveros, especies y cuentas son inventados; faltan los catálogos
+  reales y los polígonos de reforestación de PS, RHF y Capturando Carbono, que la Calculadora espera para la
+  recuperación esperada.</li>
+  <li><b>Sin probar.</b> Dos personas sobre el mismo expediente al mismo tiempo, navegadores distintos de Chromium, un
+  servidor real con su correo y su respaldo, el volumen de un año completo en todas las etapas, y la Calculadora en un
+  teléfono real y publicada.</li>
+  <li><b>Fuera del alcance.</b> Firma electrónica, pagos reales, conexión con sistemas de Finanzas o de la Fiduciaria, y
+  envío de avisos por correo o mensaje (hoy los notifica la Delegación y el sistema registra que lo hizo).</li>
+</ul>
+<div class="caja"><b>Dónde está cada cosa.</b> Código: <code>sistema/</code> y, de la Calculadora, <code>src/</code> y
+<code>docs/calculadora/</code>. Cómo levantar y probar, usuarios de demostración y decisiones:
+<code>sistema/README.md</code>. Reglas de cada programa: <code>sistema/reglas/</code>. Modelo de datos:
+<code>sistema/docs/modelo_datos.md</code>. Avance: <code>entregas/AVANCE.md</code>. Propuestas, hallazgos y
+decisiones: <code>entregas/BITACORA.md</code>. Resúmenes de cada sprint: <code>entregas/sprint_N/</code>.</div>
+
+<h2 class="salto">Anexo A. Necesidades atendidas en el sprint 3</h2>
+<!--ANEXO_NECESIDADES-->
+
+<h2 class="salto">Anexo B. Capturas del sprint 3</h2>
+<!--ANEXO_CAPTURAS-->

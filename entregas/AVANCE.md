@@ -134,5 +134,5 @@ registra por separado; las que dicen «en paralelo» no tocan los mismos archivo
 | S3-10 | HU-7.5 Especies por municipio (Calculadora) | S3-09 | Hecho | `807186c` |
 | S3-11 | Cierre técnico: recorrido de un programa completo, de la solicitud al padrón, por servicios (seis programas) y por la interfaz; tropiezos; textos de la interfaz sin la palabra «sprint»; modelo de datos y README | S3-08 | Hecho | `e68c3c2` a `b147b95` (5 commits) |
 | S3-12 | Verificación final: batería con PDF reales, Calculadora, sitio con base nueva | S3-10, S3-11 | Hecho | batería con PDF reales 564 + 40 (1 omitida a propósito); Calculadora 77; base nueva y navegador |
-| S3-13 | Resumen en PDF del sprint 3 (`sprint_3/Resumen_sprint_3.pdf`) | S3-12 | En curso |  |
-| S3-14 | Entrega a Joshua para revisión (sin subir hasta que lo indique) | S3-13 | Pendiente | |
+| S3-13 | Resumen en PDF del sprint 3 (`sprint_3/Resumen_sprint_3.pdf`) | S3-12 | Hecho | 36 páginas, con diagramas y anexo de capturas |
+| S3-14 | Entrega a Joshua para revisión (sin subir hasta que lo indique) | S3-13 | En curso |  |

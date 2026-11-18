@@ -1,0 +1,146 @@
+{
+  "cifras": {
+    "pruebas_sistema": "604",
+    "pruebas_calculadora": "77",
+    "capturas": "75",
+    "tablas": "76",
+    "tiempo_rapidas": "5 minutos",
+    "tiempo_completa": "7 minutos, y 14 con todos los PDF reales"
+  },
+  "situacion_programa": {
+    "CC": "Con reglas; recorrido completo de la solicitud al padrón y al informe anual",
+    "PS": "Con reglas; recorrido completo de la solicitud al padrón, con vale y planta",
+    "RHF": "Con reglas; recorrido completo de la solicitud al padrón, con vale y planta",
+    "PSA": "Con reglas; recorrido completo de la solicitud al padrón, con cheques",
+    "MFS": "Con reglas; recorrido completo de la solicitud al padrón, con bitácora y auditoría",
+    "PEG": "Con reglas; ciclo de reportes, evaluación, CASPEG, 4 ministraciones y cierre",
+    "CF": "Página publicada con los datos 2023 a 2025, uso del suelo y especies"
+  },
+  "historias": {
+    "HU-4.1": {
+      "commit": "9b3149c",
+      "como": "La persona beneficiaria o el Guardabosque entra al portal con la cuenta creada al firmar y envía avisos, informes, bitácoras, auditorías, reportes y acuses de depósito según su programa; la Delegación registra la misma entrega en ventanilla con el mismo acuse. Cada envío tiene fecha, hora y acuse, y uno fuera de plazo se registra y se señala. La consulta con folio y código ve los envíos pero no envía."
+    },
+    "HU-4.2": {
+      "commit": "030688c",
+      "como": "La Delegación registra la verificación con su documento, la superficie verificada, la sobrevivencia y las incidencias. Con ella se habilita la segunda ministración, proporcional a lo verificado; un ajuste menor al 70 %, la falta de sobrevivencia mínima o una incidencia de ese tipo cuentan como incumplimiento."
+    },
+    "HU-4.3": {
+      "commit": "133dc4a",
+      "como": "La Delegación revisa los reportes mensuales y los acuses de depósito de los Guardabosques; la Dirección de Protección Forestal evalúa por Guardabosque y periodo, y quien no entregó queda señalado solo. La evaluación va al CASPEG con acuse, que la valida con un acuerdo; solo se paga a quien cumplió los periodos de esa ministración."
+    },
+    "HU-6.1": {
+      "commit": "80c4b9d",
+      "como": "Cada propuesta de reasignación dice el recurso liberado y sigue el orden de la lista de espera; el Comité la acuerda y el sistema mueve los expedientes. Las sustituciones por la segunda persona beneficiaria, los desistimientos y los casos especiales tienen su acuse con fecha y hora y su acuerdo."
+    },
+    "HU-6.2": {
+      "commit": "1e0c644",
+      "como": "Cada omisión tiene su aviso y su plazo para subsanarse; al vencer, el Comité acuerda la cancelación, la persona entra al Listado de Personas Beneficiarias Incumplidas y se emite el requerimiento de devolución con el monto y la cuenta para el depósito. También la suspensión y el valor de la planta entregada."
+    },
+    "HU-6.3": {
+      "commit": "f7e8687",
+      "como": "Resultados finales por programa (aprobado, verificado, pagado, reintegrado y reasignado) con una comprobación de seis diferencias que impide cerrar si hay una grave. Padrón público sin cuenta, al día con bajas y sustituciones y sin datos personales protegidos. Informe anual al Comité en PDF con fecha y hora de envío y de recepción. Exportación a CSV."
+    },
+    "HU-7.4": {
+      "commit": "545b692",
+      "como": "Tarjeta y vista del uso al que pasó el terreno perdido (agrícola, pecuario, urbano, otro), presentado como estimación: clasificación de imágenes Sentinel-2 entrenada con la Serie VII del INEGI, con su exactitud medida (55 %), el año de las imágenes y la fuente. Un periodo sin clasificación dice «sin dato»."
+    },
+    "HU-7.5": {
+      "commit": "807186c",
+      "como": "Lista de especies registradas por municipio según el Inventario Nacional Forestal y de Suelos 2015–2020 de CONAFOR, con su periodo y el aviso de que es lo registrado en una malla de muestreo, no un inventario completo. Los 70 municipios sin conglomerados con árboles dicen «sin registros en el inventario»."
+    }
+  },
+  "estados": [
+    "contratada",
+    "pagada",
+    "cheque_entregado",
+    "en_ejecucion",
+    "comprobacion_enviada",
+    "verificada",
+    "concluida",
+    "caso_fortuito",
+    "prorroga_solicitada",
+    "sustitucion",
+    "suspendida",
+    "omisiones_por_subsanar",
+    "cancelada",
+    "en_devolucion",
+    "reintegrada",
+    "recurso_liberado",
+    "lista_espera",
+    "ejercicio_cerrado"
+  ],
+  "estados_nuevos": [
+    "en_ejecucion",
+    "comprobacion_enviada",
+    "verificada",
+    "concluida",
+    "caso_fortuito",
+    "prorroga_solicitada",
+    "sustitucion",
+    "suspendida",
+    "omisiones_por_subsanar",
+    "cancelada",
+    "en_devolucion",
+    "reintegrada",
+    "ejercicio_cerrado"
+  ],
+  "pie_estados": "Estados del trámite desde el contrato firmado hasta el cierre del ejercicio, y unidad que hace cada paso. En verde, los que agregó el sprint 3.",
+  "er": {
+    "er_portal": {
+      "area": 6,
+      "campos": 5,
+      "entidades": [
+        "Expediente",
+        "Persona",
+        "CuentaExterna",
+        "AccesoExpediente",
+        "CodigoConsulta",
+        "Acuse"
+      ]
+    },
+    "er_ejecucion": {
+      "area": 7,
+      "campos": 5,
+      "entidades": [
+        "Expediente",
+        "Comprobacion",
+        "Verificacion",
+        "Incidencia",
+        "RevisionReporte",
+        "EvaluacionPeriodo",
+        "EnvioEvaluacion",
+        "Acuerdo"
+      ]
+    },
+    "er_seguimiento": {
+      "area": 8,
+      "campos": 4,
+      "entidades": [
+        "Expediente",
+        "Propuesta",
+        "RecursoLiberado",
+        "SolicitudPersona",
+        "AvisoOmision",
+        "Requerimiento",
+        "CuentaReintegro",
+        "CierreExpediente",
+        "PadronPublicacion",
+        "InformeAnual"
+      ]
+    }
+  },
+  "capturas_por_historia": 4,
+  "capturas_extra": [
+    [
+      "Recorrido completo por la interfaz: Capturando Carbono, de la firma al padrón público",
+      "s3_11_0*.png",
+      6
+    ],
+    [
+      "Recorrido completo por la interfaz: Guardabosques, ciclo de reportes",
+      "s3_11_1*.png",
+      4
+    ]
+  ]
+}
