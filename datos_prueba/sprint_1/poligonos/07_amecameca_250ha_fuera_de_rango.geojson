@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "07_amecameca_250ha_fuera_de_rango",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nombre": "07_amecameca_250ha_fuera_de_rango", "descripcion": "Predio de 250 ha (el rango de CC es 1 a 200 ha)" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -98.714654418618622, 19.111389222047219 ], [ -98.699621873947152, 19.111365308371301 ], [ -98.699596059595393, 19.125654763655326 ], [ -98.714629896112669, 19.125678696562005 ], [ -98.714654418618622, 19.111389222047219 ] ] ] } }
+]
+}

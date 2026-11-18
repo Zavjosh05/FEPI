@@ -1,0 +1,8 @@
+﻿archivo,municipio,superficie_ha,que_debe_pasar
+"01_amecameca_12ha (.geojson, .kml, _shapefile.zip)",Amecameca,12.00,"Primer polígono: se acepta, «Dentro del municipio». Los tres formatos dan la misma superficie."
+02_amecameca_correccion.geojson,Amecameca,12.50,Cambio de polígono con motivo: el historial lo marca «Corrección» (traslape mayor a 50 %).
+03_amecameca_cambio_de_lugar.geojson,Amecameca,12.00,Cambio de polígono con motivo: el historial lo marca «Cambio de lugar» (traslape menor a 50 %).
+04_fuera_del_municipio.geojson,Amecameca,10.00,Se guarda con aviso: 50 % del polígono queda fuera del municipio.
+05_invalido_se_cruza.geojson,Amecameca,—,Se rechaza: la geometría se cruza a sí misma (no es válida).
+06_juchitepec_traslapa_demo.geojson,Juchitepec,6.00,El dictamen técnico muestra traslapes con Los Encinos del Monte (~3.2 ha) y La Joya Alta (~3.0 ha).
+07_amecameca_250ha_fuera_de_rango.geojson,Amecameca,250.00,El análisis del dictamen técnico dice «fuera» del rango de 1 a 200 ha.

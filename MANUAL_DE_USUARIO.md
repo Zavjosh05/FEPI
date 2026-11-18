@@ -276,8 +276,8 @@ Usuario de ejemplo: `comite`. En el menú, **Sesiones del Comité**.
    integrantes del Comité según las reglas.
 4. **Generar propuesta** de listados: ordena las solicitudes factibles por los criterios de priorización que se
    pueden leer del expediente (reforestaciones primero, luego refrendos, y por fecha y hora de registro) y asigna
-   hasta donde alcance el recurso disponible; las demás van a la lista de espera con su lugar. Las no factibles van a
-   su propia lista.
+   hasta donde alcance el **Recurso disponible** que escribas ($2,000 por hectárea factible); las demás van a la lista
+   de espera con su lugar. Las no factibles van a su propia lista.
 5. Si el Comité decide otra cosa, **Ajustar** mueve una solicitud de lista o de lugar, con un motivo obligatorio que
    queda en el acta. Una no factible no puede pasar a las listas de apoyo.
 6. **Registrar acta con los listados aprobados**: genera el acta en PDF con la Lista de Personas Beneficiarias, la
@@ -302,8 +302,9 @@ Usuario de ejemplo: `comite`. En el menú, **Sesiones del Comité**.
 
 ![Pendiente en la bandeja de la Dirección](entregas/sprint_1/capturas/hu_2_4_02_pendiente_en_la_bandeja_de_la_direccion.png)
 
-En esta versión los acuerdos se registran y se cumplen, pero todavía no ejecutan nada en otros módulos: por ejemplo,
-la instrucción de pago llega a la bandeja de la Fiduciaria (`fiduciaria`), pero los pagos llegan en el sprint 2.
+En esta versión los acuerdos se registran y se cumplen, pero todavía no ejecutan nada en otros módulos. Por ejemplo,
+una instrucción de pago de PSAHEM llegaría a la bandeja de la Fiduciaria (`fiduciaria`), pero los pagos llegan en el
+sprint 2. Además, PSAHEM todavía no tiene reglas cargadas: ese caso solo lo cubren las pruebas automáticas.
 
 ---
 
@@ -339,6 +340,11 @@ Al levantar el sistema se cargan solicitudes de Capturando Carbono 2026 en disti
 
 Para empezar de cero con los mismos datos: `docker compose down -v` y `docker compose up --build` (Guía de inicio,
 sección 1.5).
+
+Para probar también la carga de archivos y capturar solicitudes nuevas con resultados conocidos, hay polígonos,
+documentos PDF y fichas de solicitudes en `datos_prueba/sprint_1/`. La
+[secuencia de prueba](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) dice paso a paso qué hacer con ellos y qué debe
+pasar.
 
 ---
 

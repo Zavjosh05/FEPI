@@ -103,7 +103,7 @@ en un servidor real.
 | `dir_dpf` | Dirección de Protección Forestal | Lo mismo para Guardabosques (sin reglas cargadas todavía) |
 | `juridica` | Unidad Jurídica | Dictamen jurídico y Listado de Personas Beneficiarias Incumplidas |
 | `comite` | Secretaría Técnica del Comité | Sesiones de aprobación y de seguimiento |
-| `fiduciaria` | Fiduciaria | Ve las instrucciones de pago que acuerda el Comité (PSAHEM) |
+| `fiduciaria` | Fiduciaria | Vería las instrucciones de pago que acuerda el Comité de PSAHEM; en esta versión PSAHEM no tiene reglas, así que la demostración no trae ninguna |
 | `admin` | Superusuario | Administración de catálogos en http://localhost:8080/admin/ |
 
 `finanzas` y `vivero` existen pero no tienen tareas en esta versión (llegan en el sprint 2). Para cambiar de unidad,
@@ -187,6 +187,8 @@ con `pytest pruebas/calculadora` (15 pruebas).
 | Qué | Dónde |
 | --- | --- |
 | Manual de usuario de esta versión | [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md) |
+| Datos de prueba y secuencia para simular cada función | [`datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md`](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) |
+| Planeación del sprint 1 y tareas por persona | `entregas/sprint_1/planeacion/` |
 | Resumen del sprint 1 (PDF con diagramas y capturas) | `entregas/sprint_1/Resumen_sprint_1.pdf` |
 | Capturas de cada pantalla | `entregas/sprint_1/capturas/` |
 | Detalle técnico, decisiones y pendientes con el cliente | [`sistema/README.md`](sistema/README.md) |

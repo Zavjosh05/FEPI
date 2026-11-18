@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document id="root_doc">
+    <Schema id="01_amecameca_12ha" name="01_amecameca_12ha">
+      <SimpleField name="nombre" type="string"/>
+      <SimpleField name="descripcion" type="string"/>
+    </Schema>
+    <Schema id="_01_amecameca_12ha.schema">
+      <SimpleField name="nombre" type="string"/>
+      <SimpleField name="descripcion" type="string"/>
+    </Schema>
+    <Document id="_01_amecameca_12ha">
+      <name>01_amecameca_12ha</name>
+      <Placemark id="_01_amecameca_12ha.1">
+        <ExtendedData>
+          <SchemaData schemaUrl="#_01_amecameca_12ha.schema">
+            <SimpleData name="nombre">01_amecameca_12ha</SimpleData>
+            <SimpleData name="descripcion">Predio válido de 12 ha dentro de Amecameca</SimpleData>
+          </SchemaData>
+        </ExtendedData>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+                -98.6945135125204,19.1169363158431,0
+                -98.6912199412808,19.1169308197751,0
+                -98.6912141276458,19.1200614801267,0
+                -98.6945077608936,19.1200669771627,0
+                -98.6945135125204,19.1169363158431,0
+              </coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+    </Document>
+  </Document>
+</kml>

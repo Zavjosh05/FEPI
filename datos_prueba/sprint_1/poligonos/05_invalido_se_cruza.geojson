@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "05_invalido_se_cruza",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nombre": "05_invalido_se_cruza" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -98.694292499517601, 19.117145664090188 ], [ -98.691435148399606, 19.119852135751014 ], [ -98.691440179557915, 19.117140904299529 ], [ -98.694287514865437, 19.119856896267684 ], [ -98.694292499517601, 19.117145664090188 ] ] ] } }
+]
+}

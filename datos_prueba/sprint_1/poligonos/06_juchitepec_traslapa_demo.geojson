@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "06_juchitepec_traslapa_demo",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nombre": "06_juchitepec_traslapa_demo", "descripcion": "Predio en Juchitepec que se traslapa con la demostración" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -98.902682678763156, 19.09830821820232 ], [ -98.900354002722707, 19.098306973226929 ], [ -98.900352677537057, 19.100520717929601 ], [ -98.902681384546298, 19.100521963060178 ], [ -98.902682678763156, 19.09830821820232 ] ] ] } }
+]
+}
