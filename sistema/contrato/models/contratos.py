@@ -80,7 +80,8 @@ class EstadoContrato(models.TextChoices):
 
 
 def ruta_contrato(instancia, nombre):
-    return f"contratos/{instancia.expediente.ejercicio.anio}/{nombre}"
+    exp = getattr(instancia, "expediente", None) or instancia.contrato.expediente  # el adendum cuelga del contrato
+    return f"contratos/{exp.ejercicio.anio}/{nombre}"
 
 
 class Contrato(models.Model):

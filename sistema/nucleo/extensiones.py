@@ -44,7 +44,8 @@ FILTROS_BANDEJA = []
 EXTRAS_BANDEJA = []
 PANELES_BANDEJA = []
 PESTANAS_EXPEDIENTE = []
-GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos", "Ejecución y verificación"]
+GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos", "Ejecución y verificación",
+               "Seguimiento y cierre"]
 MENU = [{"nombre": "Registrar solicitud", "url": "recepcion:registrar", "grupo": "Recepción", "tipos": ["delegacion"],
          "estricto": True}]
 REVISIONES_PLAZO = []

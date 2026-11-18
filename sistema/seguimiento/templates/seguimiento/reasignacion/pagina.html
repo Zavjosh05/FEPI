@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Lista de espera y sustituciones{% endblock %}
+{% block contenido %}
+<div class="mb-3">
+  <h1 class="h4 mb-0">Lista de espera y sustituciones</h1>
+  <div class="small text-secondary">Recurso liberado y su reasignación a la lista de espera, sustituciones, desistimientos y casos especiales. El área responsable propone; la Secretaría Técnica lleva cada propuesta a la sesión de seguimiento y el acuerdo se ejecuta cuando el área lo cumple.</div>
+</div>
+
+{% if es_area %}
+{% for f in ejercicios %}
+<div class="tarjeta mb-3" data-prueba="lista-espera" data-ejercicio="{{ f.ejercicio.pk }}">
+  <div class="titulo-seccion">{{ f.ejercicio.programa.nombre }} {{ f.ejercicio.anio }}: recurso liberado y lista de espera</div>
+  <div class="small text-secondary mb-2">{{ f.regla }} {{ f.fundamento }}</div>
+  <div class="row g-3">
+    <div class="col-12 col-lg-5">
+      <div class="fw-semibold small">Recurso liberado disponible: <span data-prueba="total-liberado">{{ f.total|moneda }}</span></div>
+      <table class="table table-sm small mt-1" data-prueba="recursos-liberados">
+        <thead class="table-light"><tr><th>Expediente</th><th>Origen</th><th>Monto</th></tr></thead>
+        <tbody>{% for r in f.recursos %}<tr data-origen="{{ r.origen }}"><td>{% if r.expediente %}<a href="{% url 'recepcion:expediente' r.expediente.folio %}?pestana=seguimiento">{{ r.expediente.folio }}</a>{% else %}—{% endif %}</td>
+          <td>{{ r.nombre_origen }}<div class="text-secondary">{{ r.referencia }} · {{ r.liberado_en|date:"d/m/Y" }}</div></td><td class="text-nowrap">{{ r.monto|moneda }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-secondary">Sin recurso liberado por reasignar.</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+    <div class="col-12 col-lg-7">
+      <div class="fw-semibold small">Lista de espera, en su orden</div>
+      <table class="table table-sm small mt-1" data-prueba="renglones-espera">
+        <thead class="table-light"><tr><th>Lugar</th><th>Solicitud</th><th>Monto</th><th>Con el recurso liberado</th></tr></thead>
+        <tbody>{% for r in f.renglones %}<tr data-folio="{{ r.expediente.folio }}" data-alcanza="{{ r.alcanza|yesno:'si,no' }}"><td>{{ r.lugar }}</td>
+          <td><a href="{% url 'recepcion:expediente' r.expediente.folio %}">{{ r.expediente.folio }}</a> · {{ r.expediente.solicitante.nombre }}<div class="text-secondary">{{ r.sesion.numero }}</div></td>
+          <td class="text-nowrap">{{ r.monto|moneda }}</td>
+          <td>{% if r.alcanza %}<span class="badge text-bg-success">Alcanza</span> saldo {{ r.saldo|moneda }}{% else %}<span class="badge text-bg-secondary">No alcanza</span>{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">No hay solicitudes en lista de espera.</td></tr>{% endfor %}</tbody>
+      </table>
+      {% if f.total and f.alcanzadas %}
+      <form method="post" action="{% url 'seguimiento:proponer_reasignacion' f.ejercicio.pk %}" class="d-flex flex-wrap gap-2 align-items-end" data-prueba="form-reasignacion">{% csrf_token %}
+        <div class="flex-grow-1">{{ form_reasignacion.observaciones.label_tag }}{{ form_reasignacion.observaciones }}</div>
+        <button class="btn btn-sm btn-primary" type="submit">Proponer al Comité la reasignación de {{ f.asignado|moneda }}</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="small text-secondary mb-3">Sus programas no tienen recurso liberado ni solicitudes en lista de espera.</div>
+{% endfor %}
+{% endif %}
+
+{% if por_llevar %}
+<div class="tarjeta mb-3 border-warning" data-prueba="propuestas-por-llevar">
+  <div class="titulo-seccion">Propuestas por llevar a sesión ({{ por_llevar|length }})</div>
+  {% for x in por_llevar %}{% with p=x.propuesta %}
+  <div class="border-top pt-2 mt-2" data-propuesta="{{ p.pk }}">
+    <div class="small"><strong>{{ p.nombre_tipo }}</strong> · {{ p.ejercicio.programa.nombre }} {{ p.ejercicio.anio }} · {{ p.creada_en|date:"d/m/Y H:i" }} h
+      {% if p.acuse %}· <a href="{% url 'nucleo:acuse' p.acuse.folio %}" target="_blank">{{ p.acuse.folio }}</a>{% endif %}</div>
+    <div class="small">{{ p.descripcion }}</div>
+    {% if x.sesiones %}
+    <form method="post" action="{% url 'seguimiento:llevar_a_sesion' p.pk %}" class="row g-2 mt-1">{% csrf_token %}
+      <div class="col-12 col-md-4">{{ x.form.sesion.label_tag }}{{ x.form.sesion }}</div>
+      <div class="col-12 col-md-3">{{ x.form.aprueba.label_tag }}{{ x.form.aprueba }}</div>
+      <div class="col-12 col-md-5">{{ x.form.descripcion.label_tag }}{{ x.form.descripcion }}</div>
+      <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar el acuerdo del Comité</button></div>
+    </form>
+    {% else %}<div class="small text-secondary">No hay una sesión de seguimiento convocada de este programa: convóquela en «Sesiones del Comité».</div>{% endif %}
+  </div>
+  {% endwith %}{% endfor %}
+</div>
+{% endif %}
+
+<div class="tarjeta mb-3" data-prueba="propuestas">
+  <div class="titulo-seccion">Propuestas al Comité ({{ propuestas|length }})</div>
+  {% if propuestas %}<div class="table-responsive"><table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Propuesta</th><th>Expedientes</th><th>Recurso liberado</th><th>Estado</th><th>Acuerdo</th></tr></thead>
+    <tbody>{% for p in propuestas %}<tr data-propuesta="{{ p.pk }}" data-tipo="{{ p.tipo }}"><td><strong>{{ p.nombre_tipo }}</strong><div class="text-secondary">{{ p.ejercicio.programa.nombre }} · {{ p.creada_en|date:"d/m/Y H:i" }} h{% if p.acuse %} · <a href="{% url 'nucleo:acuse' p.acuse.folio %}" target="_blank">{{ p.acuse.folio }}</a>{% endif %}</div></td>
+      <td>{% for e in p.expedientes.all %}<a class="d-block text-nowrap" href="{% url 'recepcion:expediente' e.folio %}?pestana=seguimiento">{{ e.folio }}</a>{% endfor %}</td>
+      <td class="text-nowrap">{% if p.monto_liberado %}{{ p.monto_liberado|moneda }}{% if p.monto_asignado is not None %}<div class="text-secondary">se reasignan {{ p.monto_asignado|moneda }}</div>{% endif %}{% else %}—{% endif %}</td>
+      <td data-prueba="estado-propuesta">{{ p.get_estado_display }}{% if p.aprobada is False %} <span class="badge text-bg-secondary">no aprobada</span>{% endif %}</td>
+      <td>{% if p.acuerdo %}{{ p.acuerdo.numero }}<div class="text-secondary">{{ p.acuerdo.get_estado_display }}</div>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Todavía no hay propuestas.</div>{% endif %}
+</div>
+
+<div class="tarjeta mb-3" data-prueba="solicitudes">
+  <div class="titulo-seccion">Solicitudes de sustitución, desistimientos y avisos de fallecimiento ({{ solicitudes|length }})</div>
+  {% if solicitudes %}<div class="table-responsive"><table class="table table-sm small mb-0">
+    <thead class="table-light"><tr><th>Solicitud</th><th>Expediente</th><th>Presentada</th><th>Acuse</th><th>Propuesta</th></tr></thead>
+    <tbody>{% for s in solicitudes %}<tr><td>{{ s.nombre }}</td><td><a href="{% url 'recepcion:expediente' s.expediente.folio %}?pestana=seguimiento">{{ s.expediente.folio }}</a></td>
+      <td class="text-nowrap">{{ s.presentada_en|date:"d/m/Y H:i" }} h · {{ s.get_medio_display|lower }}{% if s.en_plazo is not None %} · {{ s.situacion_plazo }}{% endif %}</td>
+      <td>{% if s.acuse %}<a href="{% url 'nucleo:acuse' s.acuse.folio %}" target="_blank">{{ s.acuse.folio }}</a>{% endif %}</td>
+      <td>{% if s.propuesta %}{{ s.propuesta.get_estado_display }}{% else %}por proponer{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="small text-secondary">Ninguna.</div>{% endif %}
+</div>
+{% endblock %}

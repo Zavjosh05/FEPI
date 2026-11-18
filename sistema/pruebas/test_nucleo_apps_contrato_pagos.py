@@ -42,7 +42,10 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     # Lote de pagos (HU-5.1): expedientes propios de M5, aparte de los de M3 que siguen como estaban.
     nuevos = [fila[2] for plan in LOTES.values() for fila in plan]
     # (MFS y Guardabosques tienen su propio lote, ejecucion/demo.py, que se prueba en test_nucleo_apps_ejecucion_seguimiento.py.)
-    antes = Expediente.objects.exclude(predio__nombre__in=nuevos).exclude(ejercicio__programa__clave__in=["MFS", "PEG"])
+    # (El lote de lista de espera y sustituciones de RHF, seguimiento/demo.py, se prueba en test_nucleo_apps_ejecucion_seguimiento.py.)
+    from seguimiento.demo import NOMBRES_LOTE
+
+    antes = Expediente.objects.exclude(predio__nombre__in=nuevos + NOMBRES_LOTE).exclude(ejercicio__programa__clave__in=["MFS", "PEG"])
     # Primer lote (HU-3.1 y HU-3.2): PS y RHF ya publicaron y tienen contratos en distintos puntos; PSAHEM sigue con sus
     # dos aprobadas por publicar. Segundo lote (HU-3.3): tres más en PS y en RHF, con contratos firmados y uno sin firma.
     estados = {"PS": {"contrato_en_delegacion", "publicada", "vale_entregado", "sin_firma_en_plazo"},

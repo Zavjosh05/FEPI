@@ -10,7 +10,8 @@ Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del e
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
 jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
 notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques; del
-módulo M4, HU-4.1 Envío de comprobaciones y HU-4.2 Verificación en campo.
+módulo M4, HU-4.1 Envío de comprobaciones, HU-4.2 Verificación en campo y HU-4.3 Evaluación de reportes; del módulo M6, HU-6.1 Lista de
+espera y sustituciones.
 Además, la base de M4 (Ejecución y verificación) y M6 (Seguimiento y cierre): estados, plazos y avisos, el portal de personas
 beneficiarias y las apps `ejecucion` y `seguimiento` listas para las historias HU-4.x y HU-6.x.
 
@@ -152,7 +153,12 @@ por solicitar en $2,000 (proporcional); Manantial Alto, completo y en plazo (con
 verificado y con sus actividades concluidas. **Evaluación de reportes (HU-4.3):** el CASPEG validó la evaluación de junio (7-jul) y las de
 julio y agosto (15-sep); Margarito Sánchez Ruiz cobró su segunda ministración (22-sep); Ejido San Bartolo no entregó agosto y Ejido Santa
 Ana ningún mes, así que quedan señalados y sin ministración; septiembre (con observaciones) queda por evaluar y el reporte de octubre por
-revisar en la Delegación. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+revisar en la Delegación. **Lista de espera y sustituciones** (`seguimiento/demo.py`): un lote de RHF (Bosques de Agua, 2 ha)
+aprobado el 8-sep con recurso para dos: Loma del Aire avisa el fallecimiento de su titular (5-oct) y la segunda persona beneficiaria pide
+continuar en plazo (9-oct); Arroyo Seco desiste por escrito (6-oct); el Comité acuerda las dos el 22-oct y el área las cumple el 23-oct
+(Loma del Aire sigue con Rosa Robles Díaz; Arroyo Seco libera su recurso); la reasignación del 26-oct alcanza al lugar 1 de la lista de
+espera, se acuerda el 10-nov, Paraje El Rocío queda aprobada el 11-nov y se le notifica el 13-nov; Cerro La Mina sigue en lista de espera.
+En MFS, Aserradero La Cumbre tiene una prórroga por causa externa por resolver (16-nov). El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -174,7 +180,7 @@ sistema/
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
 │                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
-├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3; HU-4.1 y 4.2 hechas) y M6 (HU-6.1 a 6.3), listas: models/ (un módulo por historia,
+├── ejecucion/, seguimiento/  apps M4 (HU-4.1 a 4.3, hechas) y M6 (HU-6.1 a 6.3; HU-6.1 hecha): models/ (un módulo por historia,
 │                      con los ganchos que cada una llena en el docstring), vistas/, urls.py, registro.py (pestañas
 │                      «Ejecución» y «Seguimiento») y ejecucion/demo.py (MFS y Guardabosques)
 ├── portal/           portal de personas beneficiarias (cuentas externas, primer acceso, consulta con folio y código)
@@ -1048,6 +1054,60 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   `validar_reportes` arma toda la cadena para los periodos de una ministración, con el reloj simulado el día siguiente al fin del último
   periodo; `Rastro` cuenta los renglones nuevos de la bitácora por orden de alta, no por fecha.
 
+### M6 · HU-6.1 Lista de espera y sustituciones
+
+- **Organización.** `seguimiento/models/reasignacion.py` (migración `0001_hu_6_1_reasignacion`: `Propuesta`, `RecursoLiberado`,
+  `SolicitudPersona`, `Prorroga`), servicio `seguimiento/reasignacion.py`, vistas `vistas/reasignacion.py` y `vistas/portal.py` (rutas del
+  portal en `/portal/seguimiento/`), formularios `formularios/reasignacion.py`, plantillas `templates/seguimiento/reasignacion/` y los datos
+  por programa en **`datos/seguimiento.json`** (con numeral y línea de las ROP). `Propuesta` es común a M6: HU-6.2 suma sus tipos.
+- **Recurso liberado.** Se registra solo: al confirmar la liberación de un contrato sin firma (`extensiones.AL_LIBERAR_RECURSO`, HU-3.3), al
+  cumplirse la baja por desistimiento, por fallecimiento sin sustitución o por caso fortuito (lo no ministrado) y por el ajuste de superficie
+  de la verificación (HU-4.2: lo aprobado que ya no se pagará, total menos el mayor entre lo que no depende de la verificación y lo
+  verificado). Cada uno dice de qué expediente sale, por qué, cuánto y su acuse o acuerdo.
+- **Criterio 1: la propuesta indica el recurso liberado y sigue el orden de la lista de espera.** La página «Seguimiento» (menú del área
+  responsable, la Secretaría Técnica y la Unidad Jurídica) muestra por ejercicio el recurso liberado y la lista de espera en el orden del
+  acta (lugar de `ResolucionSesion`), con «alcanza» o «no alcanza». `proponer_reasignacion` recorre la lista en orden y **se detiene en la
+  primera a la que ya no le alcanza** (decisión propia, `reasignacion.saltar_si_no_alcanza` en `datos/seguimiento.json`; las reglas solo
+  dicen «con base en la Lista de espera», Convocatoria base sexta, línea 909; CC 8.1.9 c, línea 4744; 10.2, línea 4908). La propuesta guarda
+  el recurso (cada `RecursoLiberado` queda apartado), los renglones de la lista con su lugar, monto y saldo, y su acuse para la Secretaría
+  Técnica. Guardabosques sí tiene lista de espera (R-18; base sexta PEG, líneas 9544 a 9546).
+- **Comité.** La Secretaría Técnica lleva cada propuesta (panel de su bandeja y página «Seguimiento») a una sesión de seguimiento convocada,
+  como acuerdo del tipo de HU-2.4 (aprueba o no aprueba); el acuerdo queda en la bandeja del área responsable del programa y **al
+  cumplirlo se ejecuta** (`dictamen.seguimiento.RECEPTORES` → `reasignacion.ejecutar_acuerdo`). Un acuerdo registrado sin propuesta sigue
+  dejando solo constancia (el de la demostración de HU-2.4). Reasignación: las solicitudes que alcanzan pasan de `lista_espera` a
+  `aprobada`, con el hito `aprobacion_comite` (en PEG la firma corre desde ahí) y el aviso del resultado a la Delegación; al notificarlo
+  pasan a `notificada` (`extensiones.AL_NOTIFICAR`) y su firma corre desde esa notificación, con el tope de las reasignadas
+  (`evento_reasignada` y `fecha_limite_reasignados`, que ya existían en `nucleo.plazos`). El saldo queda como recurso liberado.
+- **Criterio 2: cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora.** `registrar_solicitud`, un solo
+  servicio para la Delegación (ventanilla) y el portal (la persona con cuenta): aviso del fallecimiento de la persona titular (fecha del
+  fallecimiento, hito `fallecimiento_titular`), solicitud de sustitución por la segunda persona beneficiaria (por fallecimiento, calificada
+  contra los 30 días hábiles de `interes_segunda_beneficiaria`; fuera de plazo se registra igual y queda señalada, causa de baja CC 8.1.9 b
+  fr. VIII, línea 4717; o por imposibilidad con causa justificada, glosario, línea 1294) y desistimiento por escrito con sus motivos y la
+  **verificación de firmas por tipo de persona** (en núcleos agrarios, Presidencia, Secretaría, Tesorería y sello; CC 8.1.9 b fr. VII,
+  líneas 4714 a 4716). El expediente pasa a `sustitucion`; lo que llega por el portal cambia el estado como el sistema (sin persona en la
+  bitácora, que dice quién lo envió). PEG no tiene segunda persona beneficiaria: la defunción es baja (8.1.9.2 g, línea 8865) y el lugar se
+  sustituye desde la lista de espera (10.2, líneas 9057 a 9059).
+- **Propuestas por expediente** (el área responsable, pestaña «Seguimiento»; una a la vez): sustitución (la persona sustituta queda como
+  persona beneficiaria del expediente, con su historial, y el trámite vuelve al estado del que salió), baja por desistimiento o por
+  fallecimiento sin sustitución (sin nada ministrado → `recurso_liberado`; con algo ministrado → `cancelada`, el reintegro es de HU-6.2),
+  **caso fortuito** (continuar con la meta ajustada, vuelve al estado previo, o terminar sin sanción y liberar lo no ministrado; CC 8.1.7 fr.
+  VI, líneas 4642 a 4651) y **sobrevivencia menor por causas no imputables** (PS y RHF 9.4.3 c, líneas 6127 y 3489: con el acuerdo, la
+  verificación con ese incumplimiento vuelve a ser soporte de la siguiente ministración). Cada propuesta dice el recurso que libera.
+- **Prórroga por causa externa (MFS, flujo G).** La Delegación registra la solicitud con su acuse (`prorroga_solicitada`) y el área
+  responsable la resuelve: autorizada con el **adendum** al contrato (`contrato.Adendum`, plazo nuevo y archivo) o negada; la Delegación
+  notifica la resolución. **Supuesto (R-17):** las reglas no dicen quién la pide ni quién la autoriza (10.1.1 n, línea 8100): está en
+  `datos/seguimiento.json` → `prorroga` (`solicita`, `autoriza`) y la pantalla lo dice.
+- **Transiciones agregadas** (`datos/flujo_tramite.json`, 30): `lista_espera → aprobada` (área responsable) y `aprobada → notificada`
+  (Delegación) para la reasignación; `→ sustitucion` también desde `publicada`, `notificada`, `contrato_elaborado`,
+  `contrato_en_delegacion`, `cheque_entregado`, `comprobacion_enviada` y `verificada` (desistimiento antes de firmar o en cualquier punto
+  de la ejecución); `sustitucion → <estado previo>`, `→ recurso_liberado` y `→ cancelada`, y `caso_fortuito → <estado previo>` y
+  `→ recurso_liberado` para el área responsable, que cumple los acuerdos. Las de la Secretaría Técnica siguen en la tabla. Tipos de acuerdo
+  nuevos en `datos/dictamen.json`: `liberacion_recurso` y `caso_especial`.
+- **Corrección.** `contrato.models.ruta_contrato` fallaba con el adendum (no tiene `expediente`): ahora lo toma de su contrato.
+- **Pruebas.** `pruebas/test_hu_6_1.py` (21: criterios, los seis programas en el desistimiento, portal, sustitución con historial, caso
+  fortuito, sobrevivencia menor, prórroga, acuerdo sin propuesta, pantallas) y el recorrido `pruebas/e2e/test_recorrido_hu_6_1.py`
+  (capturas `hu_6_1_*`).
+
 ### Cómo se engancha una historia nueva a `contrato` o `pagos`
 
 1. **Modelos:** un archivo por historia en `contrato/models/` o `pagos/models/` (por ejemplo,
@@ -1102,7 +1162,9 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - Clave INEGI de los municipios (la capa de IDEFOR no la trae).
 - Nombre de la fiduciaria del FIPASAHEM y departamento responsable de cada programa.
 - MFS (R-17): superficie de los conceptos ETF 5 y 6 (7 contra 10 ha), columnas del cuadro de montos FSC (hoy se suman los
-  componentes de la certificación grupal) y quién autoriza la prórroga. PEG (R-18): reparto de las 4 ministraciones (25 % es
+  componentes de la certificación grupal) y quién pide y quién autoriza la prórroga (hoy la Delegación y el área responsable, supuesto).
+- Lista de espera (HU-6.1): si la reasignación se detiene en la primera solicitud a la que no le alcanza o pasa a la siguiente que sí
+  alcance; si las reasignadas deben aparecer en la página pública de resultados. PEG (R-18): reparto de las 4 ministraciones (25 % es
   supuesto), calendario de reportes (se usan los 12 meses), desde cuándo corren los 10 días naturales para notificar faltantes.
 
 ## Modelo de datos y recorrido completo

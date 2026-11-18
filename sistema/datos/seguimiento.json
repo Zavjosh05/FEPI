@@ -1,0 +1,87 @@
+{
+  "nota": "Datos del módulo M6 (Seguimiento y cierre) por programa, con su fundamento (numeral y línea del texto de las ROP 2026, sistema/especificacion/ROP_PROBOSQUE_2026_texto.txt). Lo que las reglas no dicen está marcado como decisión propia o supuesto.",
+  "extensiones_archivo": [".pdf", ".jpg", ".jpeg", ".png"],
+  "reasignacion": {
+    "saltar_si_no_alcanza": false,
+    "regla_orden": "La propuesta recorre la lista de espera en su orden (lugar del acta del Comité) y se detiene en la primera solicitud a la que ya no le alcanza el recurso liberado; el saldo queda para una propuesta posterior. Decisión propia: las reglas solo dicen «con base en la Lista de espera» (Convocatoria base sexta, línea 909). Con «saltar_si_no_alcanza» en true se pasa a la siguiente que sí alcance.",
+    "origenes": {
+      "sin_firma": "Contrato sin firma en plazo",
+      "desistimiento": "Desistimiento de la persona beneficiaria",
+      "fallecimiento": "Fallecimiento sin sustitución",
+      "caso_fortuito": "Caso fortuito o fuerza mayor",
+      "ajuste_superficie": "Ajuste de superficie (verificación)",
+      "cancelacion": "Cancelación del apoyo",
+      "reintegro": "Reintegro depositado",
+      "saldo": "Saldo de una reasignación anterior"
+    },
+    "programas": {
+      "CC": {"fundamento": "Convocatoria base sexta (línea 909); CC 8.1.9 c, último párrafo (línea 4744); CC 10.2 (línea 4908)"},
+      "MFS": {"fundamento": "Convocatoria base sexta (línea 909); MFS 8.1.9.3, último párrafo (línea 7916); MFS 10.2 b (línea 8111)"},
+      "PS": {"fundamento": "Convocatoria base sexta (línea 909); PS 8.1.9 c, último párrafo (línea 6057); PS 10.2 (línea 6223)"},
+      "RHF": {"fundamento": "Convocatoria base sexta (línea 909); RHF 8.1.9 c (línea 3418); RHF 10.2 (línea 3621)"},
+      "PSA": {"fundamento": "Convocatoria base sexta (línea 909); PSAHEM 8.1.9.3 fr. IV (línea 2157); PSAHEM 10.2 (línea 2330)"},
+      "PEG": {"fundamento": "Convocatoria PEG base sexta (líneas 9544 a 9546); PEG 10.2 (líneas 9057 a 9059): sí tiene lista de espera (R-18)"}
+    }
+  },
+  "solicitudes": {
+    "tipos": {
+      "fallecimiento": {
+        "nombre": "Aviso del fallecimiento de la persona titular",
+        "descripcion": "Quien avisa entrega el acta de defunción u otro documento; desde la fecha del fallecimiento corren los días para que la segunda persona beneficiaria manifieste su interés.",
+        "hito": "fallecimiento_titular", "pide_fecha_hecho": "Fecha del fallecimiento", "requiere_archivo": true, "portal": false
+      },
+      "sustitucion": {
+        "nombre": "Solicitud de sustitución por la segunda persona beneficiaria",
+        "descripcion": "La segunda persona beneficiaria manifiesta por escrito su interés en continuar (por fallecimiento de la persona titular o por su imposibilidad con causa justificada).",
+        "pide_segunda_persona": true, "requiere_archivo": true, "portal": true
+      },
+      "desistimiento": {
+        "nombre": "Desistimiento por escrito",
+        "descripcion": "Escrito dirigido a la Instancia Normativa, firmado por la persona beneficiaria, con los motivos; en núcleos agrarios, sellado y firmado por Presidencia, Secretaría y Tesorería.",
+        "requiere_archivo": true, "pide_firmas": true, "portal": true
+      }
+    },
+    "firmas_desistimiento": {
+      "por_omision": ["Firma de la persona beneficiaria"],
+      "nucleo_agrario": ["Firma de la persona que ocupa la Presidencia del Comisariado", "Firma de la persona que ocupa la Secretaría", "Firma de la persona que ocupa la Tesorería", "Sello del núcleo agrario"],
+      "juridica_colectiva": ["Firma de la persona representante legal"]
+    },
+    "programas": {
+      "CC": {"tipos": ["fallecimiento", "sustitucion", "desistimiento"], "fundamento_desistimiento": "CC 8.1.9 b fr. VII (líneas 4714 a 4716)", "fundamento_sustitucion": "CC 8.1.9 b fr. VIII y IX (líneas 4717 a 4720); 10.2 (línea 4908)"},
+      "MFS": {"tipos": ["fallecimiento", "sustitucion", "desistimiento"], "fundamento_desistimiento": "MFS 8.1.9.2 h (líneas 7889 a 7891)", "fundamento_sustitucion": "MFS 8.1.9.2 i (línea 7892); 10.2 b (línea 8111)"},
+      "PS": {"tipos": ["fallecimiento", "sustitucion", "desistimiento"], "fundamento_desistimiento": "PS 8.1.9 b g (línea 6021); reintegro en 10 días hábiles (plazo desistimiento_reintegro)", "fundamento_sustitucion": "PS 8.1.9 b h (línea 6023); 10.2 (línea 6223)"},
+      "RHF": {"tipos": ["fallecimiento", "sustitucion", "desistimiento"], "fundamento_desistimiento": "RHF 8.1.9 b fr. 9 (líneas 3369 a 3371)", "fundamento_sustitucion": "RHF 8.1.9 b fr. 10; 10.2 (línea 3621)"},
+      "PSA": {"tipos": ["fallecimiento", "sustitucion", "desistimiento"], "fundamento_desistimiento": "PSAHEM 8.1.9.2 fr. X (línea 2129)", "fundamento_sustitucion": "PSAHEM 8.1.9.2 fr. XI y XII (líneas 2131 a 2134); 10.2 (línea 2330)"},
+      "PEG": {"tipos": ["fallecimiento", "desistimiento"], "fundamento_desistimiento": "PEG 8.1.6 i: desistir de fungir como Guardabosque de manera voluntaria (línea 8774)", "fundamento_sustitucion": "PEG 8.1.9.2 g: baja por defunción (línea 8865); el CASPEG aprueba la sustitución desde la lista de espera (10.2, líneas 9057 a 9059). PEG no tiene segunda persona beneficiaria (la persona cobeneficiaria de 8.1.6 h, línea 8771, solo gestiona el apoyo por enfermedad grave)"}
+    }
+  },
+  "propuestas": {
+    "tipos": {
+      "reasignacion": {"nombre": "Reasignación del recurso liberado a la lista de espera", "acuerdo": "reasignacion"},
+      "sustitucion": {"nombre": "Sustitución de la persona beneficiaria", "acuerdo": "sustitucion"},
+      "desistimiento": {"nombre": "Baja por desistimiento y liberación del recurso", "acuerdo": "liberacion_recurso"},
+      "fallecimiento": {"nombre": "Baja por fallecimiento sin sustitución y liberación del recurso", "acuerdo": "liberacion_recurso"},
+      "caso_fortuito": {"nombre": "Atención del caso fortuito o fuerza mayor", "acuerdo": "caso_fortuito"},
+      "sobrevivencia_menor": {"nombre": "Apoyo con sobrevivencia menor por causas no imputables", "acuerdo": "caso_especial"}
+    },
+    "resoluciones_caso_fortuito": {
+      "continuar": "Continuar con la meta ajustada (recuperar la superficie dañada)",
+      "liberar": "Dar por terminado el apoyo sin sanción y liberar el recurso no ministrado"
+    }
+  },
+  "casos_especiales": {
+    "CC": {"caso_fortuito": "CC 8.1.7 fr. VI: el siniestro por caso fortuito o fuerza mayor puede ser sujeto de apoyos si así lo aprueba la Instancia Normativa; si no, se sanciona (líneas 4642 a 4651)"},
+    "PS": {"caso_fortuito": "PS 8.1.7 k (línea 5954; líneas 5958 a 5962)", "sobrevivencia_menor": "PS 9.4.3 c: el Comité aprueba la asignación en predios con sobrevivencia menor por causas no imputables (líneas 6127 y 6128)"},
+    "RHF": {"caso_fortuito": "RHF 8.1.7 i (línea 3294; líneas 3298 a 3302)", "sobrevivencia_menor": "RHF 9.4.3 c (líneas 3489 y 3490)"},
+    "PSA": {"caso_fortuito": "PSAHEM 8.1.7 fr. VII (línea 2034; líneas 2038 a 2042)"},
+    "PEG": {"caso_fortuito": "Las reglas de PEG no traen aviso de caso fortuito con plazo; el flujo lo admite y lo resuelve el CASPEG"},
+    "MFS": {}
+  },
+  "prorroga": {
+    "programas": ["MFS"],
+    "fundamento": "MFS 10.1.1 n: si al término del contrato no se cumple la meta por un motivo externo a la persona, el plazo puede ampliarse con el instrumento legal correspondiente (línea 8100); el adendum lo valida la Instancia Ejecutora con apoyo de la Unidad Jurídica (10.1.1 j, línea 8084)",
+    "solicita": "delegacion",
+    "autoriza": "direccion",
+    "supuesto": "Las reglas no dicen quién pide la prórroga, quién la autoriza ni por cuánto tiempo (R-17): se supone que la Delegación registra la solicitud de la persona con su acuse y que el área responsable la resuelve con el adendum. Se cambia aquí («solicita» y «autoriza»)."
+  }
+}

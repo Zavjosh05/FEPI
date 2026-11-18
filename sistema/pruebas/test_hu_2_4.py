@@ -112,16 +112,14 @@ def test_hu_2_4_acuerdos_propios_de_otro_programa_no_aplican(cc, validada, usuar
         seguimiento.registrar_acuerdo(usuarios["comite"], s, "instruccion_pago", "Pagar", [exp], ministracion=1)
 
 
-def test_hu_2_4_punto_de_conexion_con_los_modulos_siguientes(cc, validada, usuarios):
+def test_hu_2_4_punto_de_conexion_con_los_modulos_siguientes(cc, validada, usuarios, monkeypatch):
     exp = validada()
     s = _sesion(usuarios, cc)
     llamados = []
-    seguimiento.RECEPTORES["sustitucion"] = [llamados.append]
-    try:
-        a = seguimiento.registrar_acuerdo(usuarios["comite"], s, "sustitucion", "Sustituir", [exp])
-        seguimiento.cumplir(usuarios["dir_drff"], a)
-    finally:
-        seguimiento.RECEPTORES.pop("sustitucion")
+    # Se agrega un receptor más y se restaura la lista al terminar (M6 ya registra los suyos, HU-6.1).
+    monkeypatch.setitem(seguimiento.RECEPTORES, "sustitucion", [*seguimiento.RECEPTORES.get("sustitucion", []), llamados.append])
+    a = seguimiento.registrar_acuerdo(usuarios["comite"], s, "sustitucion", "Sustituir", [exp])
+    seguimiento.cumplir(usuarios["dir_drff"], a)
     assert llamados == [a]
 
 

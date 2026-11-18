@@ -167,6 +167,10 @@ def fuente_verificacion(expediente, numero):
     if v is None:
         return (False, "Todavía no se registra la verificación en campo (HU-4.2); hasta entonces la ministración no se puede "
                        "solicitar.", "", "")
+    if v.resultado == ResultadoVerificacion.INCUMPLIMIENTO and (v.datos or {}).get("aprobada_por_comite"):
+        return (True, f"{v.nombre_documento}: sobrevivencia menor a la mínima aprobada por el Comité por causas no imputables "
+                      f"(acuerdo {v.datos['aprobada_por_comite']}).", v.acuse.folio if v.acuse else f"Verificación {v.pk}",
+                reverse("ejecucion:verificacion_archivo", args=[v.pk]))
     if v.resultado == ResultadoVerificacion.INCUMPLIMIENTO:
         return (False, f"La verificación del {timezone.localtime(v.registrada_en):%d/%m/%Y} registró un incumplimiento: lo "
                        "atiende el área responsable con el seguimiento de incumplimientos (HU-6.2).", v.acuse.folio if v.acuse else "",

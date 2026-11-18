@@ -1,0 +1,99 @@
+{% load moneda %}
+<div class="titulo-seccion mt-1">Sustituciones, desistimientos y casos especiales</div>
+
+{% if solicitudes_seg %}
+<table class="table table-sm small" data-prueba="solicitudes-seguimiento">
+  <thead class="table-light"><tr><th>Solicitud</th><th>Presentada</th><th>Detalle</th><th>Acuse</th></tr></thead>
+  <tbody>{% for s in solicitudes_seg %}<tr data-solicitud="{{ s.tipo }}"><td><strong>{{ s.nombre }}</strong><div class="text-secondary">{{ s.get_medio_display }}</div></td>
+    <td class="text-nowrap" data-prueba="fecha-solicitud">{{ s.presentada_en|date:"d/m/Y H:i" }} h
+      {% if s.en_plazo is True %}<span class="badge text-bg-success">en plazo</span>{% elif s.en_plazo is False %}<span class="badge text-bg-danger">fuera de plazo</span>{% endif %}</td>
+    <td>Presenta {{ s.persona_presenta }}.
+      {% if s.fecha_hecho %} Fallecimiento: {{ s.fecha_hecho|date:"d/m/Y" }}.{% endif %}
+      {% if s.segunda_persona %} Segunda persona beneficiaria: <strong>{{ s.segunda_persona.nombre }}</strong>.{% endif %}
+      {% if s.motivo %} {{ s.motivo }}{% endif %}
+      {% if s.firmas %}<div class="text-secondary">Verificado: {{ s.firmas|join:"; " }}.</div>{% endif %}
+      {% if s.plazo_texto %}<div class="text-secondary">{{ s.plazo_texto }}</div>{% endif %}
+      {% if s.archivo %}<a href="{% url 'seguimiento:archivo_solicitud' s.pk %}" target="_blank">{{ s.nombre_archivo }}</a>{% endif %}</td>
+    <td>{% if s.acuse %}<a href="{% url 'nucleo:acuse' s.acuse.folio %}" target="_blank">{{ s.acuse.folio }}</a>{% endif %}
+      {% if s.propuesta %}<div class="text-secondary">{{ s.propuesta.get_estado_display|lower }}</div>{% endif %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endif %}
+
+{% if puede_solicitar %}
+<div class="tarjeta mb-3" data-prueba="registrar-solicitud">
+  <div class="fw-semibold mb-1">Recibir una solicitud de la persona</div>
+  <ul class="small text-secondary mb-2">{% for t in tipos_solicitud %}<li><strong>{{ t.nombre }}</strong>: {{ t.descripcion }}</li>{% endfor %}</ul>
+  <form method="post" action="{% url 'seguimiento:registrar_solicitud' exp.folio %}" enctype="multipart/form-data" class="row g-2" id="form-solicitud">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_solicitud.tipo.label_tag }}{{ form_solicitud.tipo }}</div>
+    <div class="col-12 col-md-6">{{ form_solicitud.archivo.label_tag }}{{ form_solicitud.archivo }}</div>
+    <div class="col-12 col-md-6">{{ form_solicitud.persona_presenta.label_tag }}{{ form_solicitud.persona_presenta }}</div>
+    <div class="col-6 col-md-3">{{ form_solicitud.fecha_hecho.label_tag }}{{ form_solicitud.fecha_hecho }}</div>
+    <div class="col-6 col-md-3">{{ form_solicitud.causa.label_tag }}{{ form_solicitud.causa }}</div>
+    <div class="col-12">{{ form_solicitud.motivo.label_tag }}{{ form_solicitud.motivo }}</div>
+    <div class="col-12 col-md-4">{{ form_solicitud.segunda_nombre.label_tag }}{{ form_solicitud.segunda_nombre }}</div>
+    <div class="col-6 col-md-3">{{ form_solicitud.segunda_curp.label_tag }}{{ form_solicitud.segunda_curp }}</div>
+    <div class="col-6 col-md-2">{{ form_solicitud.segunda_telefono.label_tag }}{{ form_solicitud.segunda_telefono }}</div>
+    <div class="col-12 col-md-3">{{ form_solicitud.segunda_parentesco.label_tag }}{{ form_solicitud.segunda_parentesco }}</div>
+    <div class="col-12"><div class="form-label">{{ form_solicitud.firmas.label }} (desistimiento)</div>
+      {% for c in form_solicitud.firmas %}<div class="form-check form-check-inline">{{ c.tag }}<label class="form-check-label" for="{{ c.id_for_label }}">{{ c.choice_label }}</label></div>{% endfor %}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar con su acuse</button></div>
+  </form>
+</div>
+{% endif %}
+
+{% if propuestas_exp %}
+<table class="table table-sm small" data-prueba="propuestas-expediente">
+  <thead class="table-light"><tr><th>Propuesta al Comité</th><th>Recurso liberado</th><th>Estado</th><th>Acuerdo</th></tr></thead>
+  <tbody>{% for p in propuestas_exp %}<tr data-tipo="{{ p.tipo }}"><td><strong>{{ p.nombre_tipo }}</strong><div>{{ p.descripcion }}</div>
+      <div class="text-secondary">{{ p.creada_en|date:"d/m/Y H:i" }} h{% if p.acuse %} · <a href="{% url 'nucleo:acuse' p.acuse.folio %}" target="_blank">{{ p.acuse.folio }}</a>{% endif %}</div></td>
+    <td class="text-nowrap">{% if p.monto_liberado %}{{ p.monto_liberado|moneda }}{% else %}Ninguno{% endif %}</td>
+    <td data-prueba="estado-propuesta">{{ p.get_estado_display }}{% if p.aprobada is False %} <span class="badge text-bg-secondary">no aprobada</span>{% endif %}</td>
+    <td>{% if p.acuerdo %}{{ p.acuerdo.numero }} ({{ p.acuerdo.sesion.numero }})<div class="text-secondary">{{ p.acuerdo.get_estado_display }}</div>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endif %}
+
+{% if form_propuesta %}
+<div class="tarjeta mb-3" data-prueba="proponer-comite">
+  <div class="fw-semibold mb-1">Proponer al Comité</div>
+  <div class="small text-secondary mb-2">Ministrado a la fecha: {{ ministrado|moneda }}; por ministrar: {{ por_ministrar|moneda }}. Una baja libera lo no ministrado para la lista de espera; si ya se ministró algo, el expediente queda cancelado y la persona debe reintegrarlo.</div>
+  <form method="post" action="{% url 'seguimiento:proponer' exp.folio %}" class="row g-2" id="form-propuesta">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_propuesta.tipo.label_tag }}{{ form_propuesta.tipo }}</div>
+    {% if hay_caso_fortuito %}<div class="col-12 col-md-6">{{ form_propuesta.resolucion.label_tag }}{{ form_propuesta.resolucion }}</div>{% endif %}
+    <div class="col-12">{{ form_propuesta.descripcion.label_tag }}{{ form_propuesta.descripcion }}</div>
+    <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Enviar la propuesta a la Secretaría Técnica</button></div>
+  </form>
+</div>
+{% endif %}
+
+{% if recursos_exp %}
+<div class="small mb-2" data-prueba="recursos-expediente">Recurso liberado de este expediente:
+  {% for r in recursos_exp %}{{ r.monto|moneda }} ({{ r.nombre_origen|lower }}{% if r.reasignado_en %}, reasignado el {{ r.reasignado_en|date:"d/m/Y" }}{% endif %}){% if not forloop.last %}; {% endif %}{% endfor %}.</div>
+{% endif %}
+
+{% if prorroga %}
+<div class="titulo-seccion mt-3">Prórroga por causa externa</div>
+<div class="small text-secondary mb-2">{{ prorroga.fundamento }}. <span class="badge text-bg-warning">supuesto</span> {{ prorroga.supuesto }}</div>
+{% for p in prorrogas %}
+<div class="small mb-2" data-prueba="prorroga">Solicitada el {{ p.solicitada_en|date:"d/m/Y H:i" }} h ({% if p.acuse %}<a href="{% url 'nucleo:acuse' p.acuse.folio %}" target="_blank">{{ p.acuse.folio }}</a>{% endif %}): {{ p.causa }}.
+  {% if p.autorizada is True %}<span class="badge text-bg-success">Autorizada</span> con adendum hasta el {{ p.adendum.plazo_nuevo|date:"d/m/Y" }}.{% elif p.autorizada is False %}<span class="badge text-bg-secondary">Negada</span>.{% else %}<span class="badge text-bg-warning">Por resolver</span>{% endif %}
+  {% if p.motivo_resolucion %} {{ p.motivo_resolucion }}{% endif %}</div>
+{% endfor %}
+{% if puede_pedir_prorroga %}
+<form method="post" action="{% url 'seguimiento:solicitar_prorroga' exp.folio %}" enctype="multipart/form-data" class="tarjeta mb-3 row g-2" id="form-prorroga">{% csrf_token %}
+  <div class="col-12">{{ form_prorroga.causa.label_tag }}{{ form_prorroga.causa }}</div>
+  <div class="col-6 col-md-3">{{ form_prorroga.plazo_original.label_tag }}{{ form_prorroga.plazo_original }}</div>
+  <div class="col-6 col-md-3">{{ form_prorroga.plazo_solicitado.label_tag }}{{ form_prorroga.plazo_solicitado }}</div>
+  <div class="col-12 col-md-6">{{ form_prorroga.archivo.label_tag }}{{ form_prorroga.archivo }}</div>
+  <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Registrar la solicitud de prórroga con su acuse</button></div>
+</form>
+{% endif %}
+{% if prorroga_pendiente %}
+<form method="post" action="{% url 'seguimiento:resolver_prorroga' prorroga_pendiente.pk %}" enctype="multipart/form-data" class="tarjeta mb-3 row g-2" id="form-resolver-prorroga">{% csrf_token %}
+  <div class="col-6 col-md-3">{{ form_resolucion_prorroga.autorizada.label_tag }}{{ form_resolucion_prorroga.autorizada }}</div>
+  <div class="col-6 col-md-3">{{ form_resolucion_prorroga.plazo_nuevo.label_tag }}{{ form_resolucion_prorroga.plazo_nuevo }}</div>
+  <div class="col-12 col-md-6">{{ form_resolucion_prorroga.archivo.label_tag }}{{ form_resolucion_prorroga.archivo }}</div>
+  <div class="col-12">{{ form_resolucion_prorroga.motivo.label_tag }}{{ form_resolucion_prorroga.motivo }}</div>
+  <div class="col-12"><button class="btn btn-sm btn-primary" type="submit">Resolver la prórroga</button></div>
+</form>
+{% endif %}
+{% endif %}

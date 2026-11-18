@@ -23,7 +23,7 @@ def test_nucleo_apps_de_m4_y_m6_registradas_con_su_pestana():
     claves = [p["clave"] for p in extensiones.PESTANAS_EXPEDIENTE]
     assert {"ejecucion", "seguimiento"} <= set(claves) and claves.index("pagos") < claves.index("ejecucion")
     assert [h[0] for h in reg_ejecucion.historias_pendientes()] == []   # HU-4.1, HU-4.2 y HU-4.3 ya construidas
-    assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.1", "HU-6.2", "HU-6.3"]
+    assert [h[0] for h in reg_seguimiento.historias_pendientes()] == ["HU-6.2", "HU-6.3"]   # HU-6.1 ya construida
     assert apps.get_app_config("ejecucion").get_models() is not None
 
 
@@ -72,3 +72,27 @@ def test_nucleo_demo_de_mfs_y_peg_lista_para_comprobar_e_idempotente(catalogos):
     assert all(c.acuse and c.enviada_en.year == 2026 for c in san_juan.comprobaciones.all())
     assert Expediente.objects.filter(predio__nombre__in=["Predio Agua Fría", "Ejido San Lorenzo"], estado__clave="recibida").count() == 2
     assert not Expediente.objects.filter(fecha_recepcion__year__gt=2026).exists()
+
+
+def test_nucleo_demo_de_seguimiento_lista_de_espera_y_sustituciones_e_idempotente(catalogos):
+    """HU-6.1: lote de RHF con dos aprobadas y dos en lista de espera; sustitución, desistimiento y reasignación por acuerdo."""
+    from seguimiento import demo
+    from seguimiento.models import Propuesta, RecursoLiberado
+
+    crear_usuarios()
+    with reloj.en("2031-03-01 08:00"):                   # el día de la carga no cuenta
+        assert demo.cargar_demo() == 4
+        assert demo.cargar_demo() == 0
+    de = {e.predio.nombre: e for e in Expediente.objects.filter(predio__nombre__in=demo.NOMBRES_LOTE)}
+    assert {n: e.estado.clave for n, e in de.items()} == {"Arroyo Seco": "recurso_liberado", "Loma del Aire": "contratada",
+                                                         "Paraje El Rocío": "notificada", "Cerro La Mina": "lista_espera"}
+    assert de["Loma del Aire"].beneficiaria.nombre == "Rosa Robles Díaz"
+    assert [s.tipo for s in de["Loma del Aire"].solicitudes_seguimiento.order_by("presentada_en")] == ["fallecimiento", "sustitucion"]
+    assert de["Loma del Aire"].solicitudes_seguimiento.get(tipo="sustitucion").en_plazo is True
+    recurso = RecursoLiberado.objects.get(expediente=de["Arroyo Seco"])
+    assert recurso.origen == "desistimiento" and recurso.reasignado_en is not None
+    reas = Propuesta.objects.get(tipo="reasignacion")
+    assert reas.estado == "ejecutada" and list(reas.expedientes.all()) == [de["Paraje El Rocío"]] and reas.saldo == 0
+    assert all(p.acuerdo and p.acuerdo.estado == "cumplido" for p in Propuesta.objects.all())
+    assert not Expediente.objects.filter(predio__nombre__in=demo.NOMBRES_LOTE, fecha_recepcion__year__gt=2026).exists()
+

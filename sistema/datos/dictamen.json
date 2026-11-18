@@ -92,6 +92,22 @@
       "fundamento": "Convocatoria PEG base cuarta (línea 9505)"
     },
     {
+      "clave": "liberacion_recurso",
+      "nombre": "Baja por desistimiento o por fallecimiento sin sustitución y liberación del recurso",
+      "unidad": "DRFF",
+      "fundamento": "CC 8.1.9 b fr. VII y VIII (líneas 4714 a 4718); 10.2 (línea 4908)"
+    },
+    {
+      "clave": "caso_especial",
+      "nombre": "Atención de un caso especial (sobrevivencia menor por causas no imputables)",
+      "unidad": "DRFF",
+      "programas": [
+        "PS",
+        "RHF"
+      ],
+      "fundamento": "PS 9.4.3 c (líneas 6127 y 6128); RHF 9.4.3 c (líneas 3489 y 3490)"
+    },
+    {
       "clave": "otro",
       "nombre": "Otro acuerdo",
       "unidad": "DRFF",

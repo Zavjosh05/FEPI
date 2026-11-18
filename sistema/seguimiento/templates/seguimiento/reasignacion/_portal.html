@@ -1,0 +1,31 @@
+<div class="tarjeta mt-3" data-prueba="desistimiento-sustitucion">
+  <div class="titulo-seccion">Desistimiento o sustitución</div>
+  {% if solicitudes_seg %}
+  <ul class="small" data-prueba="lista-solicitudes">{% for s in solicitudes_seg %}
+    <li data-solicitud="{{ s.tipo }}"><strong>{{ s.nombre }}</strong> · {{ s.get_medio_display|lower }} · {{ s.presentada_en|date:"d/m/Y H:i" }} h
+      {% if s.acuse %} · acuse <a href="{% url 'portal:acuse' exp.folio s.acuse.folio %}">{{ s.acuse.folio }}</a>{% endif %}
+      {% if s.archivo %} · <a href="{% url 'seguimiento_portal:archivo' exp.folio s.pk %}">documento</a>{% endif %}</li>
+  {% endfor %}</ul>
+  {% endif %}
+  {% if puede_solicitar %}
+  <div class="small text-secondary mb-2">El escrito va dirigido a la Instancia Normativa (el Comité). Al enviarlo queda el acuse con la fecha y la hora; el área responsable lo propone al Comité, que resuelve.</div>
+  <form method="post" action="{% url 'seguimiento_portal:enviar' exp.folio %}" enctype="multipart/form-data" class="row g-2" id="form-solicitud-portal">{% csrf_token %}
+    <div class="col-12 col-md-6">{{ form_solicitud.tipo.label_tag }}{{ form_solicitud.tipo }}</div>
+    <div class="col-12 col-md-6">{{ form_solicitud.archivo.label_tag }}{{ form_solicitud.archivo }}</div>
+    <div class="col-12">{{ form_solicitud.motivo.label_tag }}{{ form_solicitud.motivo }}</div>
+    <div class="col-12 col-md-6">{{ form_solicitud.causa.label_tag }}{{ form_solicitud.causa }}</div>
+    <div class="col-12 col-md-6">{{ form_solicitud.segunda_nombre.label_tag }}{{ form_solicitud.segunda_nombre }}</div>
+    <div class="col-6 col-md-4">{{ form_solicitud.segunda_curp.label_tag }}{{ form_solicitud.segunda_curp }}</div>
+    <div class="col-6 col-md-4">{{ form_solicitud.segunda_telefono.label_tag }}{{ form_solicitud.segunda_telefono }}</div>
+    <div class="col-12 col-md-4">{{ form_solicitud.segunda_parentesco.label_tag }}{{ form_solicitud.segunda_parentesco }}</div>
+    <div class="col-12"><div class="form-label">{{ form_solicitud.firmas.label }} (desistimiento)</div>
+      {% for c in form_solicitud.firmas %}<div class="form-check form-check-inline">{{ c.tag }}<label class="form-check-label" for="{{ c.id_for_label }}">{{ c.choice_label }}</label></div>{% endfor %}</div>
+    <div class="col-12"><button class="btn btn-primary" type="submit">Enviar con acuse</button></div>
+  </form>
+  <ul class="small text-secondary mt-2 mb-0">{% for t in tipos_solicitud %}<li><strong>{{ t.nombre }}</strong>: {{ t.descripcion }}</li>{% endfor %}</ul>
+  {% elif not con_cuenta %}
+  <div class="small text-secondary">En la consulta sin cuenta solo se ven las solicitudes y sus acuses. Para enviar, entre con su cuenta o preséntela en la Delegación: queda el mismo registro.</div>
+  {% elif motivo_sin_solicitud %}
+  <div class="small text-secondary">{{ motivo_sin_solicitud }}</div>
+  {% endif %}
+</div>
