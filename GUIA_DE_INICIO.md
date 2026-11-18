@@ -122,7 +122,8 @@ contraseña.
 
 **Por dónde empezar.** La sección «Recorrer el sistema completo» de [`sistema/README.md`](sistema/README.md) da el
 orden de un trámite de Capturando Carbono, de la firma al padrón público, con el usuario de cada paso. En
-`entregas/sprint_N/Resumen_sprint_N.pdf` están las pantallas de cada parte.
+`entregas/sprint_N/Resumen_sprint_N.pdf` están las pantallas de cada parte. Para saber qué hace cada unidad y cada botón, el
+[Manual de usuario](MANUAL_DE_USUARIO.md).
 
 **Sobre las fechas de la demostración.** Los datos de ejemplo están fechados en el calendario 2026 de cada
 convocatoria, hasta el 19 de noviembre de 2026. El sistema usa la fecha real, así que en días posteriores verás más
@@ -210,6 +211,7 @@ python src/prototipo_masa_forestal.py demo
 
 | Qué | Dónde |
 | --- | --- |
+| Manual de usuario (qué hace cada unidad, paso a paso) | [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md) |
 | Código del sistema | `sistema/` |
 | Reglas de cada programa, con numeral y línea de las Reglas de Operación | `sistema/reglas/` |
 | Modelo de datos (diagramas entidad-relación) | `sistema/docs/modelo_datos.md` |

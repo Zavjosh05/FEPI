@@ -7,7 +7,7 @@ los incendios y las reforestaciones, usando imágenes satelitales y datos públi
 Desde noviembre de 2026 contiene también el **Sistema de programas** (carpeta `sistema/`).
 
 > **Para ponerlo a funcionar** (el sistema con Docker y la página de la Calculadora), sigue la
-> [Guía de inicio](GUIA_DE_INICIO.md).
+> [Guía de inicio](GUIA_DE_INICIO.md). Para usarlo, el [Manual de usuario](MANUAL_DE_USUARIO.md).
 
 > **Estado: prototipo.** El umbral de NDVI es provisional (falta calibrarlo con puntos de
 > referencia) y todavía no se tienen los polígonos de reforestación de los programas.
