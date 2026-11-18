@@ -116,3 +116,43 @@ def test_p_38_el_padron_usa_un_solo_reloj_y_el_boton_de_cierre_concuerda(pagada,
     html = texto_visible(client.get(reverse("padron:programa", args=["CC", 2026])).content.decode())
     assert "Publicado el 24/11/2026 a las 09:15 h" in html and "actualizado al 24/11/2026 a las 09:00 h" in html
     assert "Consulta del" not in html                        # ninguna fecha del reloj del servidor junto a las registradas
+
+
+def test_p_35_la_delegacion_da_acceso_al_prestador_y_este_envia_desde_el_portal(pagada, usuarios, client, contrasena):
+    """MFS: la Delegación da acceso al portal al prestador de servicios forestales (RFN) desde la pestaña «Ejecución»; con el
+    código del acuse define su contraseña, ve el expediente con el papel de prestador y entrega la Bitácora."""
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from ejecucion import comprobaciones
+    from nucleo.demo import _pdf_demo
+    from portal import cuentas
+    from portal.models import RolAcceso
+
+    from .fixtures_m4 import CONTRASENA_PORTAL, _codigos
+
+    with reloj.en("2026-08-03 10:00"):
+        exp = pagada("MFS")
+    pestana = reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=ejecucion"
+    client.login(username="dir_drff", password=contrasena)
+    assert 'data-prueba="dar-acceso-prestador"' not in client.get(pestana).content.decode()   # solo la Delegación
+    client.login(username=delegado_de(usuarios, exp).username, password=contrasena)
+    assert 'data-prueba="dar-acceso-prestador"' in client.get(pestana).content.decode()
+    url = reverse("ejecucion:acceso_prestador", args=[exp.folio])
+    client.post(url, {"nombre": "Ing. Tomás Ríos Peña", "curp": "CURP-MALA", "rfn": "RFN-MEX-0042"})
+    assert not cuentas.prestadores_de(exp).exists()
+    r = client.post(url, {"nombre": "Ing. Tomás Ríos Peña", "curp": "RIPT750101HMCSXM03", "rfn": "RFN-MEX-0042"}, follow=True)
+    assert "Acceso al portal para el prestador" in r.content.decode()
+    acceso = cuentas.prestadores_de(exp).get()
+    assert acceso.rol == RolAcceso.PRESTADOR and acceso.cuenta.persona.rfn == "RFN-MEX-0042" and acceso.acuse.tipo == "alta_portal"
+    html = texto_visible(client.get(pestana).content.decode())
+    assert "Ing. Tomás Ríos Peña · RFN RFN-MEX-0042 · usuario RIPT750101HMCSXM03 · falta su primer acceso" in html
+    codigo = _codigos(acceso.acuse)[0]
+    prestador = cuentas.primer_acceso("RIPT750101HMCSXM03", codigo, CONTRASENA_PORTAL)
+    client.logout()
+    client.force_login(prestador)
+    assert exp.folio in client.get(reverse("portal:inicio")).content.decode()
+    assert 'id="form-envio-portal"' in client.get(reverse("portal:expediente", args=[exp.folio])).content.decode()
+    with reloj.en("2026-10-01 10:00"):
+        c = comprobaciones.registrar_envio(prestador, exp, "bitacora_etf",
+                                           SimpleUploadedFile("bitacora.pdf", _pdf_demo("Bitácora"), content_type="application/pdf"))
+    assert c.medio == "portal" and c.acuse.tipo == "comprobacion" and "Tomás Ríos" in c.persona_entrega

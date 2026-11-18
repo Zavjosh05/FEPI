@@ -110,6 +110,33 @@ def dar_acceso(usuario, expediente, persona=None, rol=RolAcceso.BENEFICIARIA, mo
     return {"cuenta": cuenta, "codigo_acceso": codigo_acceso, "codigo_consulta": codigo_consulta, "acuse": acuse}
 
 
+def dar_acceso_prestador(usuario, expediente, nombre, curp, rfn=""):
+    """La Delegación del expediente da acceso al portal al prestador de servicios forestales (RFN) que atiende el predio: se
+    registra como persona (tipo prestador; se reutiliza si ya existe con esa CURP) y entra con el papel «prestador»."""
+    from nucleo.models import Persona, TipoPersonaGeneral
+
+    nombre, curp, rfn = (nombre or "").strip(), (curp or "").strip().upper(), (rfn or "").strip()
+    if not nombre:
+        raise ValidationError("Escriba el nombre del prestador de servicios forestales.")
+    if not curp_valida(curp):
+        raise ValidationError("La CURP del prestador no es válida: sin ella no se crea la cuenta del portal.")
+    if usuario.tipo_unidad != TipoUnidad.DELEGACION or usuario.unidad_id != expediente.delegacion_id:
+        raise PermissionDenied("Da el acceso al portal la Delegación del expediente.")
+    persona = Persona.objects.filter(curp=curp, tipo=TipoPersonaGeneral.PRESTADOR).first()
+    if persona is None:
+        persona = Persona.objects.create(tipo=TipoPersonaGeneral.PRESTADOR, nombre=nombre, curp=curp, rfn=rfn)
+    elif rfn and persona.rfn != rfn:
+        persona.rfn = rfn
+        persona.save(update_fields=["rfn"])
+    return dar_acceso(usuario, expediente, persona, rol=RolAcceso.PRESTADOR)
+
+
+def prestadores_de(expediente):
+    """Accesos del portal de los prestadores de servicios forestales del expediente."""
+    return (AccesoExpediente.objects.filter(expediente=expediente, rol=RolAcceso.PRESTADOR)
+            .select_related("cuenta__persona", "cuenta__usuario", "acuse"))
+
+
 def al_firmar(firma):
     """Gancho de HU-3.3: al registrar la firma se da acceso al portal a la persona beneficiaria (en PEG, el
     Guardabosque)."""

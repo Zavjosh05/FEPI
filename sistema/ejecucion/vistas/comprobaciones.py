@@ -67,6 +67,27 @@ def registrar(request, folio):
 
 @login_required
 @require_POST
+def acceso_prestador(request, folio):
+    """La Delegación da acceso al portal al prestador de servicios forestales (RFN): los códigos van en el acuse."""
+    from portal import cuentas
+
+    exp = expediente_visible(request, folio)
+    try:
+        res = cuentas.dar_acceso_prestador(request.user, exp, request.POST.get("nombre", ""), request.POST.get("curp", ""),
+                                           request.POST.get("rfn", ""))
+    except (ValidationError, PermissionDenied) as e:
+        _errores(request, e)
+    else:
+        if res["acuse"] is None:
+            messages.info(request, "El prestador ya tenía acceso a este expediente con su cuenta activa.")
+        else:
+            messages.success(request, f"Acceso al portal para el prestador: acuse {res['acuse'].folio} con su usuario (CURP) y el "
+                                      "código de primer acceso para entregárselo.")
+    return redirect(_destino(folio))
+
+
+@login_required
+@require_POST
 def revisada(request, pk):
     c = Comprobacion.objects.filter(pk=pk).select_related("expediente").first()
     if c is None:
@@ -93,6 +114,12 @@ def archivo(request, pk):
     return responder_archivo(request, c.archivo)
 
 
+def _prestadores(exp):
+    from portal.cuentas import prestadores_de
+
+    return prestadores_de(exp)
+
+
 def contexto_comprobaciones_exp(request, exp):
     es_delegacion = request.user.tipo_unidad == TipoUnidad.DELEGACION and request.user.unidad_id == exp.delegacion_id
     puede, motivo = comprobaciones.puede_enviar(exp)
@@ -104,5 +131,6 @@ def contexto_comprobaciones_exp(request, exp):
         "comprobaciones": lista,
         "tipos_envio": tipos, "puede_registrar": es_delegacion and puede and bool(tipos), "motivo_sin_envio": motivo,
         "es_delegacion_exp": es_delegacion,
+        "prestadores": list(_prestadores(exp)),
         "form_envio": EnvioForm(tipos=tipos, periodos=comprobaciones.periodos(exp), ventanilla=True),
     }

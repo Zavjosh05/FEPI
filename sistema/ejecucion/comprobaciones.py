@@ -108,7 +108,7 @@ def fuente_entregable(expediente, numero):
     c = expediente.comprobaciones.filter(tipo__in=[t["clave"] for t in tipos]).order_by("enviada_en", "id").first()
     if c is None:
         nombres = " o ".join(t["nombre"][:1].lower() + t["nombre"][1:] for t in tipos) or "el entregable"
-        return (False, f"Todavía no se entrega la {nombres} (envío de comprobaciones, HU-4.1); hasta entonces la ministración "
+        return (False, f"Todavía no se entrega la {nombres} (envío de comprobaciones); hasta entonces la ministración "
                        "no se puede solicitar.", "", "")
     medio = "por el portal" if c.por_portal else "en la Delegación"
     return (True, f"{c.nombre}: entregada {medio} el {timezone.localtime(c.enviada_en):%d/%m/%Y %H:%M} h.",
@@ -186,7 +186,9 @@ def registrar_envio(usuario, expediente, tipo, archivo=None, descripcion="", fec
     if contenido is None and t.get("requiere_archivo"):
         raise ValidationError(f"Falta el documento de «{t['nombre']}».")
     portal = medio == MedioEnvio.PORTAL
-    persona = (persona_entrega or "").strip() or expediente.beneficiaria.nombre
+    cuenta = getattr(usuario, "cuenta_externa", None) if portal else None
+    # Desde el portal envía el titular de la cuenta (la persona beneficiaria o el prestador con RFN).
+    persona = (persona_entrega or "").strip() or (cuenta.persona.nombre if cuenta else expediente.beneficiaria.nombre)
     estado_previo = expediente.estado.clave
     with transaction.atomic():
         c = Comprobacion(

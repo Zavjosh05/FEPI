@@ -11,6 +11,7 @@ urlpatterns = [
     path("comprobacion/<str:folio>/registrar/", comprobaciones.registrar, name="registrar"),
     path("comprobacion/<int:pk>/revisada/", comprobaciones.revisada, name="revisada"),
     path("comprobacion/<int:pk>/archivo/", comprobaciones.archivo, name="archivo"),
+    path("comprobacion/<str:folio>/prestador/", comprobaciones.acceso_prestador, name="acceso_prestador"),
     # HU-4.2: verificación en campo
     path("verificacion/<str:folio>/registrar/", verificacion.registrar, name="verificar"),
     path("verificacion/<str:folio>/devolver/", verificacion.devolver, name="devolver"),

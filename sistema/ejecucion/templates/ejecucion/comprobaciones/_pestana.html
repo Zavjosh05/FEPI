@@ -39,3 +39,22 @@
 {% elif es_delegacion_exp and motivo_sin_envio %}
 <div class="small text-secondary mb-3" data-prueba="motivo-sin-envio">{{ motivo_sin_envio }}</div>
 {% endif %}
+
+{% if prestadores or es_delegacion_exp %}
+<div class="tarjeta mb-3" data-prueba="prestadores-portal">
+  <div class="fw-semibold mb-1">Prestador de servicios forestales (RFN) en el portal</div>
+  {% if prestadores %}<ul class="small mb-2">{% for a in prestadores %}<li data-prueba="prestador">{{ a.cuenta.persona.nombre }}{% if a.cuenta.persona.rfn %} · RFN {{ a.cuenta.persona.rfn }}{% endif %} · usuario {{ a.cuenta.usuario.username }} · {% if a.cuenta.activada_en %}cuenta activa desde el {{ a.cuenta.activada_en|date:"d/m/Y" }}{% else %}falta su primer acceso{% endif %}{% if a.acuse %} · acuse <a href="{% url 'nucleo:acuse' a.acuse.folio %}" target="_blank">{{ a.acuse.folio }}</a>{% endif %}</li>{% endfor %}</ul>
+  {% else %}<div class="small text-secondary mb-2">Ningún prestador tiene acceso a este expediente.</div>{% endif %}
+  {% if es_delegacion_exp %}
+  <details data-prueba="dar-acceso-prestador"><summary class="small">Dar acceso al portal al prestador que atiende el predio</summary>
+    <div class="small text-secondary my-1">Con su CURP como usuario ve este expediente y envía lo que le toca (por ejemplo, la Bitácora); el código de primer acceso va en el acuse.</div>
+    <form method="post" action="{% url 'ejecucion:acceso_prestador' exp.folio %}" class="row g-2" id="form-prestador">{% csrf_token %}
+      <div class="col-12 col-md-5"><label class="form-label small mb-0" for="prestador-nombre">Nombre</label><input class="form-control form-control-sm" id="prestador-nombre" name="nombre" maxlength="250" required></div>
+      <div class="col-6 col-md-4"><label class="form-label small mb-0" for="prestador-curp">CURP</label><input class="form-control form-control-sm" id="prestador-curp" name="curp" maxlength="18" required></div>
+      <div class="col-6 col-md-3"><label class="form-label small mb-0" for="prestador-rfn">RFN</label><input class="form-control form-control-sm" id="prestador-rfn" name="rfn" maxlength="40"></div>
+      <div class="col-12"><button class="btn btn-sm btn-outline-primary" type="submit">Dar acceso con su acuse</button></div>
+    </form>
+  </details>
+  {% endif %}
+</div>
+{% endif %}
