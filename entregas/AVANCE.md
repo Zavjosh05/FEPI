@@ -127,9 +127,9 @@ registra por separado; las que dicen «en paralelo» no tocan los mismos archivo
 | S3-03 | HU-4.1 Envío de comprobaciones, en el portal o en la Delegación | S3-02 | Hecho | `9b3149c` |
 | S3-04 | HU-4.2 Verificación en campo y conexión con la segunda ministración | S3-03 | Hecho | `030688c` |
 | S3-05 | HU-4.3 Evaluación de reportes de Guardabosques | S3-04 | Hecho | `133dc4a` (y `d856dc3`, límite de tiempo por prueba) |
-| S3-06 | HU-6.1 Lista de espera y sustituciones | S3-05 | En curso |  |
-| S3-07 | HU-6.2 Incumplimientos y reintegros | S3-06 | En curso |  |
-| S3-08 | HU-6.3 Cierre del ejercicio y padrón | S3-07 | Pendiente | |
+| S3-06 | HU-6.1 Lista de espera y sustituciones | S3-05 | Hecho | `80c4b9d` |
+| S3-07 | HU-6.2 Incumplimientos y reintegros | S3-06 | Hecho | `1e0c644` |
+| S3-08 | HU-6.3 Cierre del ejercicio y padrón | S3-07 | En curso |  |
 | S3-09 | HU-7.4 Uso del suelo al que pasó el terreno perdido (Calculadora) | — (en paralelo) | Hecho | `545b692` |
 | S3-10 | HU-7.5 Especies por municipio (Calculadora) | S3-09 | Hecho | `807186c` |
 | S3-11 | Cierre técnico: recorrido de un programa completo, de la solicitud al padrón, por servicios (seis programas) y por la interfaz; tropiezos; textos de la interfaz sin la palabra «sprint»; modelo de datos y README | S3-08 | Pendiente | |
