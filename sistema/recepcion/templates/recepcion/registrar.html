@@ -13,7 +13,7 @@
   <div class="row g-3">
     <div class="col-12 col-lg-6">
       <div class="tarjeta h-100">
-        <div class="titulo-seccion">Programa y solicitud</div>
+        <div class="titulo-seccion">Datos específicos del programa</div>
         {% include "recepcion/_campo.html" with campo=form.ejercicio %}
         {% include "recepcion/_campo.html" with campo=form.tipo_persona %}
         {% if form.modalidad.field.queryset.exists %}{% include "recepcion/_campo.html" with campo=form.modalidad %}{% endif %}
@@ -24,7 +24,7 @@
     </div>
     <div class="col-12 col-lg-6">
       <div class="tarjeta">
-        <div class="titulo-seccion">Predio</div>
+        <div class="titulo-seccion">Datos del predio</div>
         {% include "recepcion/_campo.html" with campo=form.folio_predio %}
         <div class="mb-3">
           <label class="form-label" for="{{ form.municipio.id_for_label }}">{{ form.municipio.label }}</label>
@@ -45,7 +45,7 @@
         {% include "recepcion/_campo.html" with campo=form.localidad %}
       </div>
       <div class="tarjeta">
-        <div class="titulo-seccion">Persona solicitante</div>
+        <div class="titulo-seccion">Datos generales de la persona solicitante</div>
         {% include "recepcion/_campo.html" with campo=form.solicitante_nombre %}
         <div class="row g-2">
           <div class="col-sm-6">{% include "recepcion/_campo.html" with campo=form.curp %}</div>
