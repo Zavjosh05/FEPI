@@ -1,0 +1,1297 @@
+{
+ "version": "v13 de la propuesta (12-nov-2026), necesidades v12 (9-nov-2026)",
+ "modulos": [
+  {
+   "id": "M1",
+   "nombre": "Recepción y expediente",
+   "descripcion": "Recibe la solicitud en la Delegación, integra el expediente digital del predio con su ubicación y lo deja validado para dictaminarse.",
+   "funciones": [
+    {
+     "id": "M1.1",
+     "texto": "Registro de la solicitud a nombre del predio en la Delegación que le corresponde, con su acuse y la fecha y la hora de recepción.",
+     "necesidades": [
+      "CC-DRF-01",
+      "MFS-DRF-01",
+      "PS-DRF-01",
+      "RHF-DRF-01",
+      "PSA-DRF-01",
+      "PEG-DRF-01"
+     ]
+    },
+    {
+     "id": "M1.2",
+     "texto": "Revisión de los requisitos según el programa, el tipo de persona y la modalidad; digitalización del expediente (incluido el PTRFI en RHF) y su envío a la Dirección, con la fecha y la hora del envío.",
+     "necesidades": [
+      "CC-DRF-01",
+      "MFS-DRF-01",
+      "PS-DRF-01",
+      "RHF-PSF-01",
+      "RHF-DRF-01",
+      "PSA-DRF-01",
+      "PEG-DRF-01"
+     ]
+    },
+    {
+     "id": "M1.3",
+     "texto": "Ubicación del predio: polígono levantado en campo por la Delegación o por el prestador de servicios forestales, Diagnóstico Técnico (RHF) y cambio de lugar del polígono antes de plantar (PS).",
+     "necesidades": [
+      "CC-DRF-01",
+      "MFS-PSF-01",
+      "MFS-DRF-01",
+      "PS-BEN-01",
+      "PS-DRF-01",
+      "PS-DRF-05",
+      "RHF-DRF-01",
+      "PSA-DRF-01"
+     ]
+    },
+    {
+     "id": "M1.4",
+     "texto": "Validación del expediente por la Dirección que es Instancia Ejecutora, incluidos los refrendos, y aviso de los faltantes dentro del plazo de evaluación.",
+     "necesidades": [
+      "CC-ARP-01",
+      "MFS-ARP-01",
+      "PS-ARP-01",
+      "RHF-ARP-01",
+      "PSA-ARP-01",
+      "PEG-DPF-01"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M2",
+   "nombre": "Dictamen y Comité",
+   "descripcion": "Determina si cada solicitud procede y lleva al Comité lo que debe aprobar o acordar durante el ejercicio.",
+   "funciones": [
+    {
+     "id": "M2.1",
+     "texto": "Dictamen técnico con los criterios del programa y su análisis cartográfico (diagnóstico técnico forestal en CC, revisión de polígonos en MFS, Índice de Presión Económica a la Deforestación en PSAHEM), y listado preliminar de solicitudes factibles y no factibles.",
+     "necesidades": [
+      "CC-ARP-02",
+      "MFS-ARP-02",
+      "PS-ARP-02",
+      "RHF-ARP-02",
+      "PSA-ARP-02",
+      "PEG-DPF-02"
+     ]
+    },
+    {
+     "id": "M2.2",
+     "texto": "Dictamen jurídico de la documentación legal, con el cotejo del Listado de Personas Beneficiarias Incumplidas y de los predios con procedimiento o sanción (en PEG, acta de asamblea y representación del núcleo agrario).",
+     "necesidades": [
+      "CC-UJ-01",
+      "MFS-UJ-01",
+      "PS-UJ-01",
+      "RHF-UJ-01",
+      "PSA-UJ-01",
+      "PEG-UJ-01"
+     ]
+    },
+    {
+     "id": "M2.3",
+     "texto": "Sesión de aprobación: convocatoria y documentos de la sesión, y acta con la lista de personas beneficiarias o el padrón, la lista de espera, las no factibles y la autorización de publicación.",
+     "necesidades": [
+      "CC-COM-01",
+      "MFS-COM-01",
+      "PS-COM-01",
+      "RHF-COM-01",
+      "PSA-COM-01",
+      "PEG-COM-01"
+     ]
+    },
+    {
+     "id": "M2.4",
+     "texto": "Sesiones de seguimiento: acuerdos de reasignación, sustitución, caso fortuito, suspensión, cancelación, baja y reintegro; en PSAHEM, instrucción de pago a la Fiduciaria; en PEG, validación de la evaluación de reportes.",
+     "necesidades": [
+      "CC-COM-02",
+      "MFS-COM-02",
+      "PS-COM-02",
+      "RHF-COM-02",
+      "PSA-COM-02",
+      "PSA-COM-03",
+      "PEG-COM-02"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M3",
+   "nombre": "Publicación y contrato",
+   "descripcion": "Publica los resultados, notifica a las personas y formaliza el apoyo con el contrato firmado y, cuando aplica, la entrega de planta.",
+   "funciones": [
+    {
+     "id": "M3.1",
+     "texto": "Publicación de los resultados o del padrón en la página de PROBOSQUE y en las Delegaciones, y avisos y notificaciones por conducto de la Delegación (faltantes, cita a firma, omisiones, devoluciones), con la fecha y la hora y su acuse.",
+     "necesidades": [
+      "CC-ARP-01",
+      "CC-ARP-03",
+      "CC-ARP-07",
+      "CC-UJ-03",
+      "MFS-ARP-01",
+      "MFS-ARP-03",
+      "MFS-ARP-07",
+      "MFS-UJ-03",
+      "PS-DRF-02",
+      "PS-ARP-01",
+      "PS-ARP-03",
+      "PS-ARP-07",
+      "PS-UJ-03",
+      "RHF-ARP-01",
+      "RHF-ARP-03",
+      "RHF-ARP-07",
+      "RHF-UJ-03",
+      "PSA-ARP-01",
+      "PSA-ARP-03",
+      "PSA-ARP-07",
+      "PSA-UJ-03",
+      "PEG-DPF-01",
+      "PEG-DPF-03"
+     ]
+    },
+    {
+     "id": "M3.2",
+     "texto": "Validación jurídica del modelo de Contrato de Adhesión o Convenio de Concertación (y su adendum) y elaboración de cada contrato con los datos de la solicitud aprobada; ampliación de plazo por causa externa en MFS.",
+     "necesidades": [
+      "CC-ARP-04",
+      "CC-UJ-02",
+      "MFS-ARP-04",
+      "MFS-ARP-06",
+      "MFS-UJ-02",
+      "PS-ARP-04",
+      "PS-UJ-02",
+      "RHF-ARP-04",
+      "RHF-UJ-02",
+      "PSA-ARP-04",
+      "PSA-UJ-02",
+      "PEG-DPF-04",
+      "PEG-UJ-02"
+     ]
+    },
+    {
+     "id": "M3.3",
+     "texto": "Firma del contrato por la persona beneficiaria dentro de los 10 días hábiles (en PSAHEM, el plazo de la convocatoria), con verificación de firmas y sello; contrato de servicios técnicos en MFS y credencial del Guardabosque en PEG.",
+     "necesidades": [
+      "CC-DRF-02",
+      "MFS-PSF-02",
+      "MFS-DRF-02",
+      "PS-DRF-02",
+      "RHF-DRF-02",
+      "PSA-DRF-02",
+      "PEG-DRF-02",
+      "PEG-DPF-04"
+     ]
+    },
+    {
+     "id": "M3.4",
+     "texto": "Entrega de planta: Vale de Planta (con carta compromiso si se pide antes del contrato), salida de planta del vivero por especie y cantidad, y vigencia del vale (30 días en PS, 15 días hábiles en RHF) con su reposición.",
+     "necesidades": [
+      "PS-DRF-03",
+      "PS-VIV-01",
+      "RHF-BEN-01",
+      "RHF-DRF-03",
+      "RHF-VIV-01"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M4",
+   "nombre": "Ejecución y verificación",
+   "descripcion": "Recibe lo que comprueba la ejecución de las actividades, desde el portal o en la Delegación, y registra la verificación en campo.",
+   "funciones": [
+    {
+     "id": "M4.1",
+     "texto": "Envío de avisos (término, caso fortuito, cambio de polígono), informes, bitácoras, reportes mensuales y acuses de depósito por la persona beneficiaria o el Guardabosque, en el portal o en la Delegación, con la fecha y la hora y su acuse.",
+     "necesidades": [
+      "CC-BEN-01",
+      "CC-BEN-02",
+      "MFS-BEN-01",
+      "PS-BEN-01",
+      "PS-BEN-02",
+      "RHF-BEN-01",
+      "RHF-BEN-02",
+      "PSA-BEN-01",
+      "PSA-BEN-02",
+      "PEG-BEN-01",
+      "PEG-BEN-02"
+     ]
+    },
+    {
+     "id": "M4.2",
+     "texto": "Verificación en campo y su resultado (formato, Informe Final o minuta, ajuste de superficie) y documentación de incidencias: caso fortuito, incumplimiento o causa externa.",
+     "necesidades": [
+      "CC-DRF-03",
+      "CC-DRF-04",
+      "MFS-DRF-03",
+      "PS-DRF-04",
+      "PS-DRF-05",
+      "RHF-DRF-04",
+      "PSA-DRF-04"
+     ]
+    },
+    {
+     "id": "M4.3",
+     "texto": "Revisión de los reportes mensuales y acuses de depósito de los Guardabosques en la Delegación y su evaluación por la Dirección, para validarse en el CASPEG.",
+     "necesidades": [
+      "PEG-BEN-01",
+      "PEG-BEN-02",
+      "PEG-DRF-03",
+      "PEG-DPF-05"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M5",
+   "nombre": "Pagos",
+   "descripcion": "Solicita y realiza cada ministración con sus soportes, incluidos los cheques de PSAHEM.",
+   "funciones": [
+    {
+     "id": "M5.1",
+     "texto": "Oficio de solicitud de pago de la Delegación en cuanto el contrato está firmado y solicitud de cada ministración con sus soportes a Administración y Finanzas, con la fecha y la hora del envío.",
+     "necesidades": [
+      "CC-DRF-02",
+      "CC-ARP-05",
+      "MFS-DRF-02",
+      "MFS-ARP-05",
+      "PS-DRF-02",
+      "PS-ARP-05",
+      "RHF-DRF-02",
+      "RHF-ARP-05",
+      "PSA-ARP-05",
+      "PEG-DPF-06"
+     ]
+    },
+    {
+     "id": "M5.2",
+     "texto": "Revisión de la solicitud y pago por transferencia (con cheque solo en casos excepcionales); en PSAHEM, remisión a la Fiduciaria; en PEG, depósito al Guardabosque.",
+     "necesidades": [
+      "CC-AF-01",
+      "MFS-AF-01",
+      "PS-AF-01",
+      "RHF-AF-01",
+      "PSA-AF-01",
+      "PEG-AF-01"
+     ]
+    },
+    {
+     "id": "M5.3",
+     "texto": "Emisión de los cheques del 70% y del 30% por la Fiduciaria, su envío a las Delegaciones y su entrega a cada persona beneficiaria, que debe cobrarlos en un máximo de 3 meses.",
+     "necesidades": [
+      "PSA-DRF-03",
+      "PSA-FID-01"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M6",
+   "nombre": "Seguimiento y cierre",
+   "descripcion": "Atiende lo que se sale del camino normal (lista de espera, sustituciones, incumplimientos y reintegros) y cierra el ejercicio con el padrón.",
+   "funciones": [
+    {
+     "id": "M6.1",
+     "texto": "Reasignación del recurso liberado a la lista de espera, sustitución por la segunda persona beneficiaria, desistimiento y atención de casos fortuitos, de sobrevivencia menor y de causa externa; solicitudes de la persona beneficiaria con acuse.",
+     "necesidades": [
+      "CC-BEN-03",
+      "CC-ARP-06",
+      "MFS-BEN-02",
+      "MFS-ARP-06",
+      "PS-BEN-03",
+      "PS-ARP-06",
+      "RHF-BEN-03",
+      "RHF-ARP-06",
+      "PSA-BEN-03",
+      "PSA-ARP-06"
+     ]
+    },
+    {
+     "id": "M6.2",
+     "texto": "Suspensión, omisiones por subsanar, cancelación e inscripción en el Listado de Personas Beneficiarias Incumplidas; requerimiento de devolución (incluido el valor de la planta no establecida), cuenta para reintegros y comprobación del depósito.",
+     "necesidades": [
+      "CC-ARP-07",
+      "CC-UJ-03",
+      "CC-AF-02",
+      "MFS-ARP-07",
+      "MFS-UJ-03",
+      "MFS-AF-02",
+      "PS-DRF-05",
+      "PS-ARP-07",
+      "PS-UJ-03",
+      "PS-AF-02",
+      "RHF-ARP-07",
+      "RHF-UJ-03",
+      "RHF-AF-02",
+      "PSA-ARP-07",
+      "PSA-UJ-03",
+      "PSA-AF-02"
+     ]
+    },
+    {
+     "id": "M6.3",
+     "texto": "Listados de resultados finales, informe anual al Comité y padrón de personas beneficiarias publicado (en PEG, con altas, bajas y sustituciones).",
+     "necesidades": [
+      "CC-ARP-08",
+      "MFS-ARP-08",
+      "PS-ARP-08",
+      "RHF-ARP-08",
+      "PSA-ARP-08",
+      "PEG-DPF-07"
+     ]
+    }
+   ]
+  }
+ ],
+ "calculadora": {
+  "id": "M7",
+  "nombre": "Calculadora forestal",
+  "descripcion": "Permite conocer cuánta masa forestal hay en el Estado de México y en cada municipio, cómo cambia entre años, qué se perdió por incendios, a qué uso pasó el terreno y qué especies hay.",
+  "funciones": [
+   {
+    "id": "M7.1",
+    "texto": "Masa forestal de cada año por municipio y para el Estado, y su evolución año con año.",
+    "necesidades": [
+     "CF-DEV-01"
+    ]
+   },
+   {
+    "id": "M7.2",
+    "texto": "Balance entre un año inicial y uno final: masa forestal perdida, ganada y cambio neto, con su histograma.",
+    "necesidades": [
+     "CF-DEV-02"
+    ]
+   },
+   {
+    "id": "M7.3",
+    "texto": "Ubicación y fecha de los incendios forestales y masa forestal perdida por ellos.",
+    "necesidades": [
+     "CF-DEV-03"
+    ]
+   },
+   {
+    "id": "M7.4",
+    "texto": "Uso del suelo al que pasó el terreno donde se perdió masa forestal, en los años con datos.",
+    "necesidades": [
+     "CF-DEV-04"
+    ]
+   },
+   {
+    "id": "M7.5",
+    "texto": "Especies forestales registradas en el bosque de cada municipio.",
+    "necesidades": [
+     "CF-DEV-05"
+    ]
+   }
+  ],
+  "prototipo": [
+   {
+    "necesidad": "CF-DEV-01",
+    "nombre": "Cuantificación de la masa forestal",
+    "funcion": "M7.1",
+    "estado": "Cumplida en parte (calcula la superficie de cada año; falta mostrar su evolución)"
+   },
+   {
+    "necesidad": "CF-DEV-02",
+    "nombre": "Balance entre dos años",
+    "funcion": "M7.2",
+    "estado": "Pendiente (ya da las cifras entre dos años; falta el histograma)"
+   },
+   {
+    "necesidad": "CF-DEV-03",
+    "nombre": "Ubicación de incendios",
+    "funcion": "M7.3",
+    "estado": "Cumplida (falta 2025, que CONAFOR aún no publica)"
+   },
+   {
+    "necesidad": "CF-DEV-04",
+    "nombre": "Cambio de uso del suelo",
+    "funcion": "M7.4",
+    "estado": "Pendiente"
+   },
+   {
+    "necesidad": "CF-DEV-05",
+    "nombre": "Identificación de especies",
+    "funcion": "M7.5",
+    "estado": "Pendiente"
+   }
+  ]
+ },
+ "historias": [
+  {
+   "id": "HU-1.1",
+   "funcion": "M1.1",
+   "titulo": "Registro de la solicitud",
+   "rol": "personal de la Delegación",
+   "desea": "registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa",
+   "meta": "iniciar su trámite",
+   "texto": "Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite.",
+   "criterios": [
+    "Se genera un folio único para la solicitud."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-1.2",
+   "funcion": "M1.2",
+   "titulo": "Revisión del expediente",
+   "rol": "personal de la Delegación",
+   "desea": "revisar los requisitos del expediente y enviarlo digitalizado a la Dirección",
+   "meta": "que la solicitud no se detenga por falta de documentos",
+   "texto": "Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.",
+   "criterios": [
+    "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante.",
+    "El expediente digital está en la Dirección, con la fecha y la hora del envío."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-1.3",
+   "funcion": "M1.3",
+   "titulo": "Ubicación del predio",
+   "rol": "personal de la Delegación",
+   "desea": "registrar el polígono del predio levantado en campo",
+   "meta": "conocer su ubicación y su superficie real al dictaminar y verificar",
+   "texto": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar.",
+   "criterios": [
+    "Existe un polígono asociado al expediente del predio.",
+    "Si el polígono cambia de lugar, existen el anterior y el nuevo."
+   ],
+   "puntos": 5,
+   "sprint": 1
+  },
+  {
+   "id": "HU-1.4",
+   "funcion": "M1.4",
+   "titulo": "Validación del expediente",
+   "rol": "personal del área responsable del programa",
+   "desea": "validar el expediente contra las reglas del programa y avisar los faltantes",
+   "meta": "que la solicitud pase a dictamen o se corrija a tiempo",
+   "texto": "Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo.",
+   "criterios": [
+    "El expediente está validado o tiene un aviso de faltantes con fecha límite.",
+    "En un refrendo, la documentación legal vigente de hasta 3 años es válida."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-2.1",
+   "funcion": "M2.1",
+   "titulo": "Dictamen técnico",
+   "rol": "personal del área responsable del programa",
+   "desea": "elaborar el dictamen técnico de cada solicitud y el listado preliminar",
+   "meta": "proponer al Comité qué solicitudes apoyar",
+   "texto": "Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, para proponer al Comité qué solicitudes apoyar.",
+   "criterios": [
+    "Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo.",
+    "Existe un listado preliminar con el resultado técnico y jurídico de cada solicitud.",
+    "En PEG, el dictamen existe dentro de los 45 días hábiles."
+   ],
+   "puntos": 5,
+   "sprint": 1
+  },
+  {
+   "id": "HU-2.2",
+   "funcion": "M2.2",
+   "titulo": "Dictamen jurídico",
+   "rol": "personal de la Unidad Jurídica",
+   "desea": "dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas",
+   "meta": "que solo se aprueben solicitudes procedentes",
+   "texto": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes.",
+   "criterios": [
+    "Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo.",
+    "Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-2.3",
+   "funcion": "M2.3",
+   "titulo": "Sesión de aprobación",
+   "rol": "integrante del Comité",
+   "desea": "aprobar en sesión los listados de la convocatoria",
+   "meta": "que se puedan publicar",
+   "texto": "Como integrante del Comité, quiero aprobar en sesión los listados de la convocatoria, para que se puedan publicar.",
+   "criterios": [
+    "Existe la convocatoria con orden del día y documentos, y la fecha y la hora de su envío.",
+    "Existe un acta con los listados aprobados y la autorización de publicación."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-2.4",
+   "funcion": "M2.4",
+   "titulo": "Sesiones de seguimiento",
+   "rol": "integrante del Comité",
+   "desea": "tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo",
+   "meta": "atender los casos que surgen durante el ejercicio",
+   "texto": "Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio.",
+   "criterios": [
+    "Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo.",
+    "En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes."
+   ],
+   "puntos": 3,
+   "sprint": 1
+  },
+  {
+   "id": "HU-3.1",
+   "funcion": "M3.1",
+   "titulo": "Publicación y notificaciones",
+   "rol": "personal del área responsable del programa",
+   "desea": "publicar los listados aprobados y avisar a cada persona su resultado por conducto de la Delegación",
+   "meta": "que los plazos corran desde una notificación comprobable",
+   "texto": "Como personal del área responsable del programa, quiero publicar los listados aprobados y avisar a cada persona su resultado por conducto de la Delegación, para que los plazos corran desde una notificación comprobable.",
+   "criterios": [
+    "Los listados autorizados por el Comité están publicados en la fecha de la convocatoria.",
+    "Cada aviso tiene su acuse y la fecha y la hora de envío y de notificación."
+   ],
+   "puntos": 3,
+   "sprint": 2
+  },
+  {
+   "id": "HU-3.2",
+   "funcion": "M3.2",
+   "titulo": "Elaboración del contrato",
+   "rol": "personal del área responsable del programa",
+   "desea": "elaborar el contrato de cada solicitud aprobada sobre el modelo validado y enviarlo a la Delegación",
+   "meta": "que se firme",
+   "texto": "Como personal del área responsable del programa, quiero elaborar el contrato de cada solicitud aprobada sobre el modelo validado y enviarlo a la Delegación, para que se firme.",
+   "criterios": [
+    "Existe un contrato por solicitud aprobada, elaborado sobre un modelo validado.",
+    "Existe la fecha y la hora del envío a la Delegación."
+   ],
+   "puntos": 3,
+   "sprint": 2
+  },
+  {
+   "id": "HU-3.3",
+   "funcion": "M3.3",
+   "titulo": "Firma del contrato",
+   "rol": "personal de la Delegación",
+   "desea": "recabar la firma del contrato dentro del plazo y verificar las firmas y el sello",
+   "meta": "formalizar el apoyo",
+   "texto": "Como personal de la Delegación, quiero recabar la firma del contrato dentro del plazo y verificar las firmas y el sello, para formalizar el apoyo.",
+   "criterios": [
+    "Existe el contrato firmado, con la fecha y la hora de la firma, dentro del plazo.",
+    "En MFS existe el contrato de servicios técnicos con el RFN y la carta compromiso; en PEG, la credencial entregada.",
+    "Un contrato sin firma al vencer el plazo queda señalado para liberar el recurso."
+   ],
+   "puntos": 5,
+   "sprint": 2
+  },
+  {
+   "id": "HU-3.4",
+   "funcion": "M3.4",
+   "titulo": "Entrega de planta",
+   "rol": "personal del vivero",
+   "desea": "validar el Vale de Planta y registrar la salida de planta por especie y cantidad",
+   "meta": "entregar solo la planta autorizada",
+   "texto": "Como personal del vivero, quiero validar el Vale de Planta y registrar la salida de planta por especie y cantidad, para entregar solo la planta autorizada.",
+   "criterios": [
+    "Existe un Vale de Planta vigente por la especie y la cantidad entregadas.",
+    "La salida de planta tiene especie, cantidad y fecha.",
+    "Un vale vencido no es válido y puede reponerse."
+   ],
+   "puntos": 5,
+   "sprint": 2
+  },
+  {
+   "id": "HU-4.1",
+   "funcion": "M4.1",
+   "titulo": "Envío de comprobaciones",
+   "rol": "persona beneficiaria",
+   "desea": "enviar mis avisos, informes y reportes a la Delegación",
+   "meta": "comprobar mis actividades dentro del plazo",
+   "texto": "Como persona beneficiaria, quiero enviar mis avisos, informes y reportes a la Delegación, para comprobar mis actividades dentro del plazo.",
+   "criterios": [
+    "Cada envío tiene su acuse con la fecha y la hora.",
+    "Una entrega en persona en la Delegación tiene el mismo registro."
+   ],
+   "puntos": 5,
+   "sprint": 3
+  },
+  {
+   "id": "HU-4.2",
+   "funcion": "M4.2",
+   "titulo": "Verificación en campo",
+   "rol": "personal de la Delegación",
+   "desea": "registrar el resultado de la verificación en campo y sus incidencias",
+   "meta": "determinar el pago o el trámite que corresponde",
+   "texto": "Como personal de la Delegación, quiero registrar el resultado de la verificación en campo y sus incidencias, para determinar el pago o el trámite que corresponde.",
+   "criterios": [
+    "Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del plazo del programa.",
+    "Cada incidencia tiene su tipo y el documento que la avala."
+   ],
+   "puntos": 5,
+   "sprint": 3
+  },
+  {
+   "id": "HU-4.3",
+   "funcion": "M4.3",
+   "titulo": "Evaluación de reportes",
+   "rol": "personal del área responsable del programa",
+   "desea": "evaluar por periodo los reportes mensuales de cada Guardabosque",
+   "meta": "que el CASPEG valide la evaluación antes de cada pago",
+   "texto": "Como personal del área responsable del programa, quiero evaluar por periodo los reportes mensuales de cada Guardabosque, para que el CASPEG valide la evaluación antes de cada pago.",
+   "criterios": [
+    "Existe la evaluación por Guardabosque y por periodo.",
+    "Queda identificado quién no entregó su reporte."
+   ],
+   "puntos": 3,
+   "sprint": 3
+  },
+  {
+   "id": "HU-5.1",
+   "funcion": "M5.1",
+   "titulo": "Solicitud de pago",
+   "rol": "personal del área responsable del programa",
+   "desea": "solicitar el pago de cada ministración con todos sus soportes",
+   "meta": "que se pague sin pedir nada más",
+   "texto": "Como personal del área responsable del programa, quiero solicitar el pago de cada ministración con todos sus soportes, para que se pague sin pedir nada más.",
+   "criterios": [
+    "La solicitud tiene todos sus soportes.",
+    "Existe la fecha y la hora del envío a Administración y Finanzas."
+   ],
+   "puntos": 3,
+   "sprint": 2
+  },
+  {
+   "id": "HU-5.2",
+   "funcion": "M5.2",
+   "titulo": "Pago de la ministración",
+   "rol": "personal de Administración y Finanzas",
+   "desea": "revisar la solicitud de pago y pagar la ministración o remitirla a la Fiduciaria",
+   "meta": "que la persona beneficiaria reciba su apoyo",
+   "texto": "Como personal de Administración y Finanzas, quiero revisar la solicitud de pago y pagar la ministración o remitirla a la Fiduciaria, para que la persona beneficiaria reciba su apoyo.",
+   "criterios": [
+    "Cada pago está asociado a su solicitud, con la fecha del pago.",
+    "En PSAHEM existe la fecha de remisión a la Fiduciaria."
+   ],
+   "puntos": 5,
+   "sprint": 2
+  },
+  {
+   "id": "HU-5.3",
+   "funcion": "M5.3",
+   "titulo": "Entrega de cheques",
+   "rol": "personal de la Fiduciaria",
+   "desea": "emitir los cheques de PSAHEM y enviarlos a las Delegaciones",
+   "meta": "que se entreguen a cada persona beneficiaria",
+   "texto": "Como personal de la Fiduciaria, quiero emitir los cheques de PSAHEM y enviarlos a las Delegaciones, para que se entreguen a cada persona beneficiaria.",
+   "criterios": [
+    "Cada cheque está asociado a su persona beneficiaria y a su ministración, con la fecha y la hora del envío.",
+    "Existe la fecha de entrega de cada cheque."
+   ],
+   "puntos": 3,
+   "sprint": 2
+  },
+  {
+   "id": "HU-6.1",
+   "funcion": "M6.1",
+   "titulo": "Lista de espera y sustituciones",
+   "rol": "personal del área responsable del programa",
+   "desea": "proponer al Comité la reasignación del recurso liberado, las sustituciones y la atención de los casos especiales",
+   "meta": "aprovechar todo el presupuesto",
+   "texto": "Como personal del área responsable del programa, quiero proponer al Comité la reasignación del recurso liberado, las sustituciones y la atención de los casos especiales, para aprovechar todo el presupuesto.",
+   "criterios": [
+    "Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera.",
+    "Cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora."
+   ],
+   "puntos": 5,
+   "sprint": 3
+  },
+  {
+   "id": "HU-6.2",
+   "funcion": "M6.2",
+   "titulo": "Incumplimientos y reintegros",
+   "rol": "personal del área responsable del programa",
+   "desea": "dar seguimiento a las omisiones, la suspensión, la cancelación y la devolución del recurso",
+   "meta": "que los incumplimientos se corrijan o se sancionen",
+   "texto": "Como personal del área responsable del programa, quiero dar seguimiento a las omisiones, la suspensión, la cancelación y la devolución del recurso, para que los incumplimientos se corrijan o se sancionen.",
+   "criterios": [
+    "Cada omisión tiene su plazo para corregirse.",
+    "Un apoyo cancelado tiene su requerimiento de devolución con el monto y la cuenta para el depósito.",
+    "La persona con apoyo cancelado está en el Listado de Personas Beneficiarias Incumplidas."
+   ],
+   "puntos": 5,
+   "sprint": 3
+  },
+  {
+   "id": "HU-6.3",
+   "funcion": "M6.3",
+   "titulo": "Cierre del ejercicio",
+   "rol": "personal del área responsable del programa",
+   "desea": "integrar los resultados finales, el padrón y el informe anual del ejercicio",
+   "meta": "cerrar el ejercicio y cumplir con la Ley de Transparencia",
+   "texto": "Como personal del área responsable del programa, quiero integrar los resultados finales, el padrón y el informe anual del ejercicio, para cerrar el ejercicio y cumplir con la Ley de Transparencia.",
+   "criterios": [
+    "Los resultados finales coinciden con las verificaciones y los pagos.",
+    "El padrón está publicado y actualizado.",
+    "Existe la fecha y la hora del envío del informe al Comité."
+   ],
+   "puntos": 3,
+   "sprint": 3
+  },
+  {
+   "id": "HU-7.1",
+   "funcion": "M7.1",
+   "titulo": "Masa forestal por año",
+   "rol": "integrante del equipo desarrollador",
+   "desea": "calcular la superficie con masa forestal de cada año disponible",
+   "meta": "que PROBOSQUE conozca la cifra del Estado y de cada municipio y cómo evoluciona",
+   "texto": "Como integrante del equipo desarrollador, quiero calcular la superficie con masa forestal de cada año disponible, para que PROBOSQUE conozca la cifra del Estado y de cada municipio y cómo evoluciona.",
+   "criterios": [
+    "Existe la superficie en hectáreas de cada año disponible, por municipio y para el Estado.",
+    "Existe la evolución año con año."
+   ],
+   "puntos": 8,
+   "sprint": 1
+  },
+  {
+   "id": "HU-7.2",
+   "funcion": "M7.2",
+   "titulo": "Balance entre dos años",
+   "rol": "integrante del equipo desarrollador",
+   "desea": "calcular el balance de masa forestal entre el año inicial y el año final que se elijan",
+   "meta": "presentar en un histograma cuánto se perdió y cuánto se ganó",
+   "texto": "Como integrante del equipo desarrollador, quiero calcular el balance de masa forestal entre el año inicial y el año final que se elijan, para presentar en un histograma cuánto se perdió y cuánto se ganó.",
+   "criterios": [
+    "Existe la pérdida, la ganancia y el cambio neto en hectáreas, para el Estado y cada municipio.",
+    "Existe el histograma del periodo elegido."
+   ],
+   "puntos": 5,
+   "sprint": 2
+  },
+  {
+   "id": "HU-7.3",
+   "funcion": "M7.3",
+   "titulo": "Pérdida por incendios",
+   "rol": "integrante del equipo desarrollador",
+   "desea": "integrar los incendios que publica CONAFOR y la masa forestal que se perdió por ellos",
+   "meta": "ubicar las zonas más dañadas",
+   "texto": "Como integrante del equipo desarrollador, quiero integrar los incendios que publica CONAFOR y la masa forestal que se perdió por ellos, para ubicar las zonas más dañadas.",
+   "criterios": [
+    "Cada incendio tiene su ubicación y su fecha.",
+    "Existe la pérdida por incendio en hectáreas, por año y por municipio.",
+    "Un año que CONAFOR no ha publicado queda señalado."
+   ],
+   "puntos": 5,
+   "sprint": 2
+  },
+  {
+   "id": "HU-7.4",
+   "funcion": "M7.4",
+   "titulo": "Cambio de uso del suelo",
+   "rol": "integrante del equipo desarrollador",
+   "desea": "clasificar el uso del suelo al que pasó el terreno donde se perdió masa forestal",
+   "meta": "conocer las causas del cambio",
+   "texto": "Como integrante del equipo desarrollador, quiero clasificar el uso del suelo al que pasó el terreno donde se perdió masa forestal, para conocer las causas del cambio.",
+   "criterios": [
+    "La pérdida está clasificada como agrícola, urbana u otra, con el año y la fuente de los datos.",
+    "Un año sin datos de uso del suelo queda señalado."
+   ],
+   "puntos": 8,
+   "sprint": 3
+  },
+  {
+   "id": "HU-7.5",
+   "funcion": "M7.5",
+   "titulo": "Especies por municipio",
+   "rol": "integrante del equipo desarrollador",
+   "desea": "integrar las especies que registra el inventario forestal de CONAFOR en cada municipio",
+   "meta": "conocer la composición del bosque",
+   "texto": "Como integrante del equipo desarrollador, quiero integrar las especies que registra el inventario forestal de CONAFOR en cada municipio, para conocer la composición del bosque.",
+   "criterios": [
+    "Cada municipio tiene su lista de especies registradas, con el periodo del inventario.",
+    "Un municipio sin registros queda señalado."
+   ],
+   "puntos": 5,
+   "sprint": 3
+  }
+ ],
+ "sprints": [
+  {
+   "sprint": 1,
+   "prototipo": "Recepción y dictamen",
+   "alcance": "M1, M2; M7.1"
+  },
+  {
+   "sprint": 2,
+   "prototipo": "Contrato y pagos",
+   "alcance": "M3, M5; M7.2 y M7.3"
+  },
+  {
+   "sprint": 3,
+   "prototipo": "Ejecución, seguimiento y cierre",
+   "alcance": "M4, M6; M7.4 y M7.5"
+  }
+ ],
+ "escala_puntos": [
+  {
+   "puntos": 1,
+   "nivel": "Muy sencilla: un dato o una acción sin reglas."
+  },
+  {
+   "puntos": 2,
+   "nivel": "Sencilla: un registro o un aviso con pocas reglas."
+  },
+  {
+   "puntos": 3,
+   "nivel": "Media: varias reglas, varios documentos o dos actores."
+  },
+  {
+   "puntos": 5,
+   "nivel": "Compleja: reglas que cambian por programa, plazos, varios actores o cálculos."
+  },
+  {
+   "puntos": 8,
+   "nivel": "Muy compleja: procesamiento de datos externos o cálculos sobre el territorio."
+  }
+ ],
+ "necesidad_a_funciones": {
+  "CC-BEN-01": [
+   "M4.1"
+  ],
+  "CC-BEN-02": [
+   "M4.1"
+  ],
+  "CC-BEN-03": [
+   "M6.1"
+  ],
+  "CC-DRF-01": [
+   "M1.1",
+   "M1.2",
+   "M1.3"
+  ],
+  "CC-DRF-02": [
+   "M3.3",
+   "M5.1"
+  ],
+  "CC-DRF-03": [
+   "M4.2"
+  ],
+  "CC-DRF-04": [
+   "M4.2"
+  ],
+  "CC-ARP-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "CC-ARP-02": [
+   "M2.1"
+  ],
+  "CC-ARP-03": [
+   "M3.1"
+  ],
+  "CC-ARP-04": [
+   "M3.2"
+  ],
+  "CC-ARP-05": [
+   "M5.1"
+  ],
+  "CC-ARP-06": [
+   "M6.1"
+  ],
+  "CC-ARP-07": [
+   "M6.2",
+   "M3.1"
+  ],
+  "CC-ARP-08": [
+   "M6.3"
+  ],
+  "CC-UJ-01": [
+   "M2.2"
+  ],
+  "CC-UJ-02": [
+   "M3.2"
+  ],
+  "CC-UJ-03": [
+   "M6.2",
+   "M3.1"
+  ],
+  "CC-COM-01": [
+   "M2.3"
+  ],
+  "CC-COM-02": [
+   "M2.4"
+  ],
+  "CC-AF-01": [
+   "M5.2"
+  ],
+  "CC-AF-02": [
+   "M6.2"
+  ],
+  "MFS-BEN-01": [
+   "M4.1"
+  ],
+  "MFS-BEN-02": [
+   "M6.1"
+  ],
+  "MFS-PSF-01": [
+   "M1.3"
+  ],
+  "MFS-PSF-02": [
+   "M3.3"
+  ],
+  "MFS-DRF-01": [
+   "M1.1",
+   "M1.2",
+   "M1.3"
+  ],
+  "MFS-DRF-02": [
+   "M3.3",
+   "M5.1"
+  ],
+  "MFS-DRF-03": [
+   "M4.2"
+  ],
+  "MFS-ARP-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "MFS-ARP-02": [
+   "M2.1"
+  ],
+  "MFS-ARP-03": [
+   "M3.1"
+  ],
+  "MFS-ARP-04": [
+   "M3.2"
+  ],
+  "MFS-ARP-05": [
+   "M5.1"
+  ],
+  "MFS-ARP-06": [
+   "M6.1",
+   "M3.2"
+  ],
+  "MFS-ARP-07": [
+   "M6.2",
+   "M3.1"
+  ],
+  "MFS-ARP-08": [
+   "M6.3"
+  ],
+  "MFS-UJ-01": [
+   "M2.2"
+  ],
+  "MFS-UJ-02": [
+   "M3.2"
+  ],
+  "MFS-UJ-03": [
+   "M6.2",
+   "M3.1"
+  ],
+  "MFS-COM-01": [
+   "M2.3"
+  ],
+  "MFS-COM-02": [
+   "M2.4"
+  ],
+  "MFS-AF-01": [
+   "M5.2"
+  ],
+  "MFS-AF-02": [
+   "M6.2"
+  ],
+  "PS-BEN-01": [
+   "M4.1",
+   "M1.3"
+  ],
+  "PS-BEN-02": [
+   "M4.1"
+  ],
+  "PS-BEN-03": [
+   "M6.1"
+  ],
+  "PS-DRF-01": [
+   "M1.1",
+   "M1.2",
+   "M1.3"
+  ],
+  "PS-DRF-02": [
+   "M3.3",
+   "M5.1",
+   "M3.1"
+  ],
+  "PS-DRF-03": [
+   "M3.4"
+  ],
+  "PS-DRF-04": [
+   "M4.2"
+  ],
+  "PS-DRF-05": [
+   "M4.2",
+   "M1.3",
+   "M6.2"
+  ],
+  "PS-VIV-01": [
+   "M3.4"
+  ],
+  "PS-ARP-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "PS-ARP-02": [
+   "M2.1"
+  ],
+  "PS-ARP-03": [
+   "M3.1"
+  ],
+  "PS-ARP-04": [
+   "M3.2"
+  ],
+  "PS-ARP-05": [
+   "M5.1"
+  ],
+  "PS-ARP-06": [
+   "M6.1"
+  ],
+  "PS-ARP-07": [
+   "M6.2",
+   "M3.1"
+  ],
+  "PS-ARP-08": [
+   "M6.3"
+  ],
+  "PS-UJ-01": [
+   "M2.2"
+  ],
+  "PS-UJ-02": [
+   "M3.2"
+  ],
+  "PS-UJ-03": [
+   "M6.2",
+   "M3.1"
+  ],
+  "PS-COM-01": [
+   "M2.3"
+  ],
+  "PS-COM-02": [
+   "M2.4"
+  ],
+  "PS-AF-01": [
+   "M5.2"
+  ],
+  "PS-AF-02": [
+   "M6.2"
+  ],
+  "RHF-BEN-01": [
+   "M4.1",
+   "M3.4"
+  ],
+  "RHF-BEN-02": [
+   "M4.1"
+  ],
+  "RHF-BEN-03": [
+   "M6.1"
+  ],
+  "RHF-PSF-01": [
+   "M1.2"
+  ],
+  "RHF-DRF-01": [
+   "M1.1",
+   "M1.2",
+   "M1.3"
+  ],
+  "RHF-DRF-02": [
+   "M3.3",
+   "M5.1"
+  ],
+  "RHF-DRF-03": [
+   "M3.4"
+  ],
+  "RHF-DRF-04": [
+   "M4.2"
+  ],
+  "RHF-VIV-01": [
+   "M3.4"
+  ],
+  "RHF-ARP-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "RHF-ARP-02": [
+   "M2.1"
+  ],
+  "RHF-ARP-03": [
+   "M3.1"
+  ],
+  "RHF-ARP-04": [
+   "M3.2"
+  ],
+  "RHF-ARP-05": [
+   "M5.1"
+  ],
+  "RHF-ARP-06": [
+   "M6.1"
+  ],
+  "RHF-ARP-07": [
+   "M6.2",
+   "M3.1"
+  ],
+  "RHF-ARP-08": [
+   "M6.3"
+  ],
+  "RHF-UJ-01": [
+   "M2.2"
+  ],
+  "RHF-UJ-02": [
+   "M3.2"
+  ],
+  "RHF-UJ-03": [
+   "M6.2",
+   "M3.1"
+  ],
+  "RHF-COM-01": [
+   "M2.3"
+  ],
+  "RHF-COM-02": [
+   "M2.4"
+  ],
+  "RHF-AF-01": [
+   "M5.2"
+  ],
+  "RHF-AF-02": [
+   "M6.2"
+  ],
+  "PSA-BEN-01": [
+   "M4.1"
+  ],
+  "PSA-BEN-02": [
+   "M4.1"
+  ],
+  "PSA-BEN-03": [
+   "M6.1"
+  ],
+  "PSA-DRF-01": [
+   "M1.1",
+   "M1.2",
+   "M1.3"
+  ],
+  "PSA-DRF-02": [
+   "M3.3"
+  ],
+  "PSA-DRF-03": [
+   "M5.3"
+  ],
+  "PSA-DRF-04": [
+   "M4.2"
+  ],
+  "PSA-ARP-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "PSA-ARP-02": [
+   "M2.1"
+  ],
+  "PSA-ARP-03": [
+   "M3.1"
+  ],
+  "PSA-ARP-04": [
+   "M3.2"
+  ],
+  "PSA-ARP-05": [
+   "M5.1"
+  ],
+  "PSA-ARP-06": [
+   "M6.1"
+  ],
+  "PSA-ARP-07": [
+   "M6.2",
+   "M3.1"
+  ],
+  "PSA-ARP-08": [
+   "M6.3"
+  ],
+  "PSA-UJ-01": [
+   "M2.2"
+  ],
+  "PSA-UJ-02": [
+   "M3.2"
+  ],
+  "PSA-UJ-03": [
+   "M6.2",
+   "M3.1"
+  ],
+  "PSA-COM-01": [
+   "M2.3"
+  ],
+  "PSA-COM-02": [
+   "M2.4"
+  ],
+  "PSA-COM-03": [
+   "M2.4"
+  ],
+  "PSA-AF-01": [
+   "M5.2"
+  ],
+  "PSA-AF-02": [
+   "M6.2"
+  ],
+  "PSA-FID-01": [
+   "M5.3"
+  ],
+  "PEG-BEN-01": [
+   "M4.1",
+   "M4.3"
+  ],
+  "PEG-BEN-02": [
+   "M4.1",
+   "M4.3"
+  ],
+  "PEG-DRF-01": [
+   "M1.1",
+   "M1.2"
+  ],
+  "PEG-DRF-02": [
+   "M3.3"
+  ],
+  "PEG-DRF-03": [
+   "M4.3"
+  ],
+  "PEG-DPF-01": [
+   "M1.4",
+   "M3.1"
+  ],
+  "PEG-DPF-02": [
+   "M2.1"
+  ],
+  "PEG-DPF-03": [
+   "M3.1"
+  ],
+  "PEG-DPF-04": [
+   "M3.2",
+   "M3.3"
+  ],
+  "PEG-DPF-05": [
+   "M4.3"
+  ],
+  "PEG-DPF-06": [
+   "M5.1"
+  ],
+  "PEG-DPF-07": [
+   "M6.3"
+  ],
+  "PEG-UJ-01": [
+   "M2.2"
+  ],
+  "PEG-UJ-02": [
+   "M3.2"
+  ],
+  "PEG-COM-01": [
+   "M2.3"
+  ],
+  "PEG-COM-02": [
+   "M2.4"
+  ],
+  "PEG-AF-01": [
+   "M5.2"
+  ]
+ }
+}

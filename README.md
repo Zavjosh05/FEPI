@@ -8,6 +8,8 @@ Desde noviembre de 2026 contiene también el **Sistema de programas** (carpeta `
 
 > **Para ponerlo a funcionar** (el sistema con Docker y la página de la Calculadora), sigue la
 > [Guía de inicio](GUIA_DE_INICIO.md). Para usarlo, el [Manual de usuario](MANUAL_DE_USUARIO.md).
+> La propuesta de solución (PDF, matriz de funciones e historias, necesidades y su registro de cambios) está en
+> [`propuesta/`](propuesta/CAMBIOS_HU.md).
 
 > **Estado: prototipo.** El umbral de NDVI es provisional (falta calibrarlo con puntos de
 > referencia) y todavía no se tienen los polígonos de reforestación de los programas.

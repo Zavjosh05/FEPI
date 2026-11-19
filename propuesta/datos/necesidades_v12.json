@@ -1,0 +1,830 @@
+{
+ "CC-BEN-01": {
+  "programa": "CC",
+  "rol": "BEN",
+  "nombre_corto": "Entrega del Informe Final de Actividades",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite a la persona beneficiaria entregar a la Delegación el aviso de término de actividades y el Informe Final de Actividades (FO-PB- 509-A), firmado por la persona beneficiaria y por el personal comisionado por PROBOSQUE, sin exceder la vigencia del Contrato de Adhesión. Entrega Crítica Diagrama 1: act. 14 · ROP CC 2026 num. 7.2; 8.1.1.1 (lineamientos generales, fr. VII); 8.1.7, fr. XIII"
+ },
+ "CC-BEN-02": {
+  "programa": "CC",
+  "rol": "BEN",
+  "nombre_corto": "Aviso de caso fortuito",
+  "texto": "Mecanismo de soporte para los avisos de caso fortuito: permite a la persona beneficiaria dar aviso por escrito, en un máximo de 15 días hábiles, de conflictos o siniestros que impidan las actividades, con la documentación que lo sustente; el aviso llega a la Instancia Normativa por conducto de la Delegación o de la Dirección de Restauración y Fomento Forestal. Entrega Media Diagrama 1: flujo alterno D (D1) · ROP CC 2026 num. 8.1.7, fr. VI"
+ },
+ "CC-BEN-03": {
+  "programa": "CC",
+  "rol": "BEN",
+  "nombre_corto": "Sustitución o desistimiento",
+  "texto": "Mecanismo de soporte para la sustitución o la baja de la persona beneficiaria: permite a la segunda persona beneficiaria notificar su interés de continuar en un máximo de 30 días hábiles tras el fallecimiento del titular y a la persona beneficiaria presentar su desistimiento por escrito dirigido a la Instancia Normativa (en núcleos agrarios, firmado y sellado por Presidencia, Secretaría y Tesorería). Entrega Media Diagrama 1: flujos alternos F (F1) y E · ROP CC 2026 num. 8.1.1.2, fr. III; 8.1.9 b), fr. VII y VIII; 10.2"
+ },
+ "CC-DRF-01": {
+  "programa": "CC",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente y polígono",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud a nombre del predio, revisa que estén completos y legibles los requisitos (Solicitud Única, Registro de Información, identificación oficial, CURP, título de propiedad, plano o croquis y propuesta de actividades FO-PB-520-B), comprueba que el predio esté en un municipio que atiende la Delegación, levanta en la visita de campo el polígono y los datos técnicos, y remite el expediente integrado a la Dirección de Restauración y Fomento Forestal. Registro Crítica Diagrama 1: act. 1 a 3 · ROP CC 2026 num. 8.1.1.2; 8.1.3; 8.1.7, fr. II; 10.1, fr. III"
+ },
+ "CC-DRF-02": {
+  "programa": "CC",
+  "rol": "DRF",
+  "nombre_corto": "Firma del contrato",
+  "texto": "Mecanismo de soporte para la firma del contrato: recibe el Contrato de Adhesión firmado por la persona beneficiaria dentro de los 10 días hábiles posteriores a la notificación, verifica las firmas (y el sello, en núcleos agrarios), lo registra y remite a la Dirección el oficio de solicitud de pago; en casos excepcionales pide el pago con cheque, con visto bueno del titular de la Dirección. Formalización Crítica Diagrama 1: act. 9 y 10; flujo alterno C (C4) · ROP CC 2026 num. 7.1 a); 8.1.9 b), fr. IV; 10.1, fr. IX y XI"
+ },
+ "CC-DRF-03": {
+  "programa": "CC",
+  "rol": "DRF",
+  "nombre_corto": "Verificación en campo",
+  "texto": "Mecanismo de soporte para la verificación en campo: registra la visita a los predios, en la que comprueba que se realizaron las actividades de la propuesta FO-PB-520-B; con el resultado, recaba el Informe Final de Actividades firmado por la persona beneficiaria y el personal comisionado, o levanta la minuta de verificación, y remite ese documento al área responsable del programa, en un máximo de 15 días hábiles después de la conclusión; de él depende el 30% en predios de más de 5 ha. Verificación Crítica Diagrama 1: act. 15 y 16 · ROP CC 2026 num. 7.2; 8.1.1.1 (lineamientos generales, fr. VII); 8.2"
+ },
+ "CC-DRF-04": {
+  "programa": "CC",
+  "rol": "DRF",
+  "nombre_corto": "Atención de incidencias",
+  "texto": "Mecanismo de soporte para la atención de incidencias: comprueba en campo lo reportado en los avisos de caso fortuito y los incumplimientos detectados y registra lo que encontró; si hay siniestro o contingencia, ajusta con justificación técnica la propuesta de actividades FO-PB-520-B, concertada con la persona beneficiaria; remite al área responsable del programa el documento que lo avala. Verificación Media Diagrama 1: flujos alternos D (D2) y E (E1) · ROP CC 2026 num. 8.1.1.1 (lineamientos generales, fr. VI); 8.1.7, fr. VI; 8.1.8.1"
+ },
+ "CC-ARP-01": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; en refrendos de los tres años anteriores lo valida con la visita en campo y, en su caso, con la actualización de la documentación legal; si falta documentación o información, notifica a la persona solicitante, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Crítica Diagrama 1: act. 2 y 4; flujo alterno A (A1 y A2) · ROP CC 2026 num. 10.1, fr. IV y V"
+ },
+ "CC-ARP-02": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Dictaminación técnica",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada predio con el análisis cartográfico, el diagnóstico técnico forestal y la visita de campo de la Delegación, determina si es técnicamente factible y lo cruza con el dictamen jurídico; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite al Comité. Dictaminación Crítica Diagrama 1: act. 4 y 5; flujo alterno B (B1) · ROP CC 2026 num. 8.1.1.1; 10.1, fr. VI y VII"
+ },
+ "CC-ARP-03": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Publicación de resultados",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del Comité, publica la lista de personas beneficiarias, la lista de espera y la de solicitudes no factibles en las Delegaciones y en la página de PROBOSQUE, en la fecha que fije la convocatoria. Publicación Crítica Diagrama 1: act. 7; flujos alternos B (B3) y C (C2) · ROP CC 2026 num. 9.4.3, fr. III; 10.1, fr. VIII"
+ },
+ "CC-ARP-04": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Elaboración de contratos",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión con los datos de la solicitud que aprobó el Comité, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma. Formalización Crítica Diagrama 1: act. 8 · ROP CC 2026 num. 10.1, fr. IX y X"
+ },
+ "CC-ARP-05": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que existan el Contrato de Adhesión firmado y el oficio de la Delegación y, para la segunda ministración, elabora el listado de personas beneficiarias que concluyeron actividades con los ajustes que resulten de la verificación; con ello genera la solicitud de cada ministración (pago único o 70%, y 30% o la parte proporcional), que remite a Administración y Finanzas. Pago Crítica Diagrama 1: act. 11 y 17 · ROP CC 2026 num. 7.2; 10.1, fr. XI y XIII"
+ },
+ "CC-ARP-06": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Lista de espera y sustituciones",
+  "texto": "Mecanismo de soporte para la lista de espera y las sustituciones: identifica el recurso liberado por desistimientos, cancelaciones o disminución de superficie, propone su reasignación a solicitudes factibles sin recurso, analiza las sustituciones de personas beneficiarias y los casos de predios afectados por caso fortuito, y remite las propuestas al Comité. Seguimiento Media Diagrama 1: flujos alternos C (C3), D (D3) y F · ROP CC 2026 num. 7.1; 8.1.7, fr. VI; 8.1.9 c); 10.2"
+ },
+ "CC-ARP-07": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Seguimiento de incumplimientos",
+  "texto": "Mecanismo de soporte para el seguimiento de incumplimientos: analiza el incumplimiento que reporta la Delegación, notifica a la persona beneficiaria, durante la suspensión temporal, las omisiones que debe subsanar y comprueba si las subsana; si no lo hace, remite al Comité la propuesta de cancelación y baja, y registra la inscripción en el Listado de Personas Beneficiarias Incumplidas. Seguimiento Alta Diagrama 1: flujo alterno E (E2 y E5) · ROP CC 2026 num. 8.1.9 a) y b)"
+ },
+ "CC-ARP-08": {
+  "programa": "CC",
+  "rol": "ARP",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida las verificaciones, los ajustes y los pagos del ejercicio en los listados de resultados finales y el informe anual, que remite al Comité, y mantiene integrado, actualizado y publicado el padrón de personas beneficiarias conforme a la Ley de Transparencia. Cierre Alta Diagrama 1: act. 19 y 20 · ROP CC 2026 num. 8.1.5; 10.1, fr. XIV; 14; 15"
+ },
+ "CC-UJ-01": {
+  "programa": "CC",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa la documentación legal de cada solicitud o predio, la coteja con el Listado de Personas Beneficiarias Incumplidas y con los predios que tienen procedimiento o sanción administrativa, determina su procedencia o no procedencia y remite el dictamen a la Dirección de Restauración y Fomento Forestal. Dictaminación Crítica Diagrama 1: act. 4 · ROP CC 2026 num. 10.1, fr. II y VI"
+ },
+ "CC-UJ-02": {
+  "programa": "CC",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión y remite el modelo validado a la Dirección de Restauración y Fomento Forestal. Formalización Crítica Diagrama 1: act. 8 · ROP CC 2026 num. 10.1, fr. X"
+ },
+ "CC-UJ-03": {
+  "programa": "CC",
+  "rol": "UJ",
+  "nombre_corto": "Gestión de la devolución",
+  "texto": "Mecanismo de soporte para la gestión de la devolución: con el acuerdo e instrucción del Comité, genera el requerimiento de devolución de los recursos no ejercidos, lo notifica a la persona beneficiaria con la cuenta que proporciona Administración y Finanzas y comprueba que el depósito se realice. Reintegro Alta Diagrama 1: flujo alterno E (E3 y E4) · ROP CC 2026 num. 8.1.9 c); 9.4.3, fr. V; 10.1, fr. II"
+ },
+ "CC-COM-01": {
+  "programa": "CC",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del Comité: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban la lista de personas beneficiarias, la lista de espera y la de solicitudes no factibles y autorizan su publicación. Aprobación Crítica Diagrama 1: act. 5 y 6; flujos alternos B (B2) y C (C1) · ROP CC 2026 num. 9.4.3, fr. I y III; 10.1, fr. VII"
+ },
+ "CC-COM-02": {
+  "programa": "CC",
+  "rol": "COM",
+  "nombre_corto": "Sesiones de seguimiento",
+  "texto": "Mecanismo de soporte para las sesiones de seguimiento del Comité: pone a disposición de sus integrantes las propuestas y los avisos y registra en acta los acuerdos de reasignación del recurso liberado, sustitución, acciones de recuperación por caso fortuito, suspensión temporal, cancelación, baja y reintegro. Seguimiento Alta Diagrama 1: flujos alternos C (C3), D (D3), E (E3) y F · ROP CC 2026 num. 8.1.7, fr. VI; 8.1.9; 9.4.3, fr. V; 10.2"
+ },
+ "CC-AF-01": {
+  "programa": "CC",
+  "rol": "AF",
+  "nombre_corto": "Pago",
+  "texto": "Mecanismo de soporte para el pago: comprueba que la solicitud de la Dirección esté soportada con el Contrato de Adhesión firmado, realiza cada pago por transferencia electrónica (con cheque solo en casos excepcionales) y lo registra. Pago Crítica Diagrama 1: act. 12 y 18 · ROP CC 2026 num. 7.1 a); 10.1, fr. I y XII"
+ },
+ "CC-AF-02": {
+  "programa": "CC",
+  "rol": "AF",
+  "nombre_corto": "Cuenta para reintegros",
+  "texto": "Mecanismo de soporte para el reintegro: proporciona la cuenta bancaria de PROBOSQUE en la que se depositan los recursos no aplicados o depositados de más, una vez notificado el reintegro. Reintegro Media Diagrama 1: flujo alterno E (E4) · ROP CC 2026 num. 8.1.7, fr. VII y XIX; 8.1.9 c) Manejo Forestal Sustentable 7 roles y 22 necesidades. El monto depende de la modalidad, no de la superficie, y el contrato del prestador de servicios es condición del pago. En estas reglas la operación está en el numeral 10.1.1, con incisos. Contenido del expediente (bosquejo) Cada expediente varía según el tipo de persona, el predio y la modalidad; esto es lo que normalmente reúne: Solicitud Única, Registro de Información (FO-PB-502), identificación oficial (INE; si no trae domicilio, comprobante de domicilio) y CURP de la persona titular y, en su caso, de la segunda persona beneficiaria. Título de propiedad: en núcleos agrarios, Carpeta Básica, PHINA o ADDATE/ADDATBC; en particulares, escritura, inmatriculación, sentencia, contrato, certificado parcelario o constancia de posesión (usufructo o arrendamiento de hasta 5 años). Plano o croquis del predio con al menos una coordenada y, si la superficie no aparece en el documento de propiedad, constancia de superficie. Representación: en núcleos agrarios, acta de elección del órgano de representación inscrita en el RAN y acta de asamblea que aprueba la incorporación al programa; en personas jurídicas colectivas, acta constitutiva y poder notarial o carta poder. Propio del programa: documentos según la modalidad solicitada (num. 8.1.1.2, fr. XI), polígonos en shapefile, registro RFN del prestador de servicios forestales y contrato de prestación de servicios técnicos. Se agrega durante el proceso: polígono levantado en campo, dictámenes técnico y jurídico, acuerdo del Comité, Contrato de Adhesión firmado, documento bancario con CLABE (en núcleos agrarios, contrato de cuenta mancomunada), bitácora de autorización o solicitud de auditoría, formatos de verificación y comprobantes de pago."
+ },
+ "MFS-BEN-01": {
+  "programa": "MFS",
+  "rol": "BEN",
+  "nombre_corto": "Entrega de bitácora o solicitud de auditoría",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite a la persona beneficiaria entregar a la Delegación la copia de la Bitácora para la autorización del Programa de Manejo Forestal o del resolutivo (Estudios Técnicos Forestales), o la solicitud o el plan de auditoría ante la certificadora (certificación FSC y su mantenimiento). Entrega Crítica Diagrama 2: act. 14 · ROP MFS 2026 num. 8.1.7 m), n) y o); 8.2; 10.1.1 m)"
+ },
+ "MFS-BEN-02": {
+  "programa": "MFS",
+  "rol": "BEN",
+  "nombre_corto": "Sustitución o desistimiento",
+  "texto": "Mecanismo de soporte para la sustitución o la baja de la persona beneficiaria: permite a la segunda persona beneficiaria presentar la carta poder notariada para continuar (o notificar su interés en un máximo de 30 días hábiles tras el fallecimiento del titular) y a la persona beneficiaria presentar su desistimiento por escrito dirigido a la Instancia Normativa. Entrega Media Diagrama 2: flujos alternos F (F1) y E · ROP MFS 2026 num. 8.1.9.2 h) e i); 10.2 a) y b)"
+ },
+ "MFS-PSF-01": {
+  "programa": "MFS",
+  "rol": "PSF",
+  "nombre_corto": "Entrega del polígono levantado",
+  "texto": "Mecanismo de soporte para el levantamiento del polígono: permite al prestador entregar a la Delegación el polígono que levanta junto con la persona interesada para los Estudios Técnicos Forestales, para integrarlo al expediente. Entrega Alta Diagrama 2: act. 1 · ROP MFS 2026 num. 8.1.7 c)"
+ },
+ "MFS-PSF-02": {
+  "programa": "MFS",
+  "rol": "PSF",
+  "nombre_corto": "Contrato de servicios técnicos",
+  "texto": "Mecanismo de soporte para el contrato de servicios técnicos: registra el contrato firmado con la persona beneficiaria, con copia del RFN y la carta compromiso de que no está suspendido ni revocado; sin ese contrato no se entrega el recurso. Formalización Crítica Diagrama 2: act. 9 y 13 · ROP MFS 2026 num. 8.1.6 f) y g); 10.1.1 l)"
+ },
+ "MFS-DRF-01": {
+  "programa": "MFS",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente y polígono",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud a nombre del predio, revisa que estén completos y legibles los requisitos (Solicitud Única, Registro de Información, identificación oficial, CURP, título de propiedad, plano o croquis y documentos de la modalidad), comprueba que el predio esté en un municipio que atiende la Delegación, levanta en la visita de campo el polígono y los datos técnicos, y remite el expediente integrado a la Dirección de Restauración y Fomento Forestal. Registro Crítica Diagrama 2: act. 1 a 3 · ROP MFS 2026 num. 8.1.1.2; 8.1.3; 10.1.1 c)"
+ },
+ "MFS-DRF-02": {
+  "programa": "MFS",
+  "rol": "DRF",
+  "nombre_corto": "Firma del contrato",
+  "texto": "Mecanismo de soporte para la firma del contrato: recibe el Contrato de Adhesión firmado por la persona beneficiaria dentro de los 10 días hábiles posteriores a la notificación, verifica las firmas (y el sello, en núcleos agrarios) y que venga acompañado del contrato de servicios técnicos, lo registra y remite a la Dirección el oficio de solicitud de pago; en casos excepcionales pide el pago con cheque, con visto bueno del titular de la Dirección. Formalización Crítica Diagrama 2: act. 9 y 10; flujo alterno C (C4) · ROP MFS 2026 num. 7.1; 8.1.9.2 e); 10.1.1 i), k) y l)"
+ },
+ "MFS-DRF-03": {
+  "programa": "MFS",
+  "rol": "DRF",
+  "nombre_corto": "Incidencias y causa externa (prórroga)",
+  "texto": "Mecanismo de soporte para la atención de incidencias: comprueba en campo los incumplimientos detectados y la causa externa que impide cumplir la meta al término del contrato y registra lo que encontró; remite al área responsable del programa el documento que lo avala. Verificación Media Diagrama 2: flujos alternos E (E1) y G · ROP MFS 2026 num. 8.1.7 k); 10.1.1 n) y p)"
+ },
+ "MFS-ARP-01": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; si falta documentación o información, notifica a la persona solicitante, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Crítica Diagrama 2: act. 2 y 4; flujo alterno A (A1 y A2) · ROP MFS 2026 num. 10.1.1 d) y e)"
+ },
+ "MFS-ARP-02": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Dictaminación técnica",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada predio con la revisión de sus polígonos, determina si es técnicamente factible y lo cruza con el dictamen jurídico; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite al Comité. Dictaminación Crítica Diagrama 2: act. 4 y 5; flujo alterno B (B1) · ROP MFS 2026 num. 10.1.1 f) y g)"
+ },
+ "MFS-ARP-03": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Publicación de resultados",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del Comité, publica la lista de personas beneficiarias, la de solicitudes aprobadas sin recurso y la de no factibles en las Delegaciones y en la página de PROBOSQUE, en la fecha que fije la convocatoria. Publicación Crítica Diagrama 2: act. 7; flujos alternos B (B3) y C (C2) · ROP MFS 2026 num. 9.4.3 c); 10.1.1 h)"
+ },
+ "MFS-ARP-04": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Elaboración de contratos",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión y su adendum con los datos de la solicitud que aprobó el Comité, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma. Formalización Crítica Diagrama 2: act. 8 · ROP MFS 2026 num. 10.1.1 i) y j)"
+ },
+ "MFS-ARP-05": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que existan el Contrato de Adhesión y el contrato de servicios técnicos firmados y el oficio de la Delegación y, para la segunda ministración, la bitácora, la autorización o la solicitud de auditoría; con ello genera la solicitud de cada ministración (70% y 30% en Estudios Técnicos Forestales, 50% y 50% en certificación FSC), que remite a Administración y Finanzas. Pago Crítica Diagrama 2: act. 11 y 16 · ROP MFS 2026 num. 7.2; 10.1.1 k) y m)"
+ },
+ "MFS-ARP-06": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Lista de espera y sustituciones",
+  "texto": "Mecanismo de soporte para la lista de espera y las sustituciones: identifica el recurso liberado por desistimientos, cancelaciones o disminución de superficie, propone su reasignación a solicitudes factibles sin recurso, analiza las sustituciones de personas beneficiarias y los casos en que la meta no se cumple por causa externa, para el instrumento legal que amplía el plazo del contrato, y remite las propuestas al Comité. Seguimiento Media Diagrama 2: flujos alternos C (C3), F y G · ROP MFS 2026 num. 8.1.9.3; 10.1.1 n); 10.2 b) y c)"
+ },
+ "MFS-ARP-07": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Seguimiento de incumplimientos",
+  "texto": "Mecanismo de soporte para el seguimiento de incumplimientos: analiza el incumplimiento que reporta la Delegación, notifica a la persona beneficiaria, durante la suspensión temporal, las omisiones que debe subsanar y comprueba si las subsana; si no lo hace, remite al Comité la propuesta de cancelación y baja, y registra la inscripción en el Listado de Personas Beneficiarias Incumplidas. Seguimiento Alta Diagrama 2: flujo alterno E (E2 y E5) · ROP MFS 2026 num. 8.1.9.1; 8.1.9.2; 10.1.1 o)"
+ },
+ "MFS-ARP-08": {
+  "programa": "MFS",
+  "rol": "ARP",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida las verificaciones, los ajustes y los pagos del ejercicio en los listados de resultados finales y el informe anual, que remite al Comité, y mantiene integrado, actualizado y publicado el padrón de personas beneficiarias conforme a la Ley de Transparencia. Cierre Alta Diagrama 2: act. 18 y 19 · ROP MFS 2026 num. 8.1.5; 14; 15"
+ },
+ "MFS-UJ-01": {
+  "programa": "MFS",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa la documentación legal de cada solicitud o predio, la coteja con el Listado de Personas Beneficiarias Incumplidas y con los predios que tienen procedimiento o sanción administrativa, determina su procedencia o no procedencia y remite el dictamen a la Dirección de Restauración y Fomento Forestal. Dictaminación Crítica Diagrama 2: act. 4 · ROP MFS 2026 num. 10.1.1 b) y f)"
+ },
+ "MFS-UJ-02": {
+  "programa": "MFS",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión y su adendum y remite el modelo validado a la Dirección de Restauración y Fomento Forestal. Formalización Crítica Diagrama 2: act. 8 · ROP MFS 2026 num. 10.1.1 j)"
+ },
+ "MFS-UJ-03": {
+  "programa": "MFS",
+  "rol": "UJ",
+  "nombre_corto": "Gestión de la devolución",
+  "texto": "Mecanismo de soporte para la gestión de la devolución: con el acuerdo e instrucción del Comité, genera el requerimiento de devolución de los recursos no ejercidos, lo notifica a la persona beneficiaria con la cuenta que proporciona Administración y Finanzas y comprueba que el depósito se realice. Reintegro Alta Diagrama 2: flujo alterno E (E3 y E4) · ROP MFS 2026 num. 8.1.9.3; 9.4.3 f); 10.1.1 b)"
+ },
+ "MFS-COM-01": {
+  "programa": "MFS",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del Comité: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban la lista de personas beneficiarias, la lista de espera y la de solicitudes no procedentes y autorizan su publicación. Aprobación Crítica Diagrama 2: act. 5 y 6; flujos alternos B (B2) y C (C1) · ROP MFS 2026 num. 9.4.3 a) y c); 10.1.1 g)"
+ },
+ "MFS-COM-02": {
+  "programa": "MFS",
+  "rol": "COM",
+  "nombre_corto": "Sesiones de seguimiento",
+  "texto": "Mecanismo de soporte para las sesiones de seguimiento del Comité: pone a disposición de sus integrantes las propuestas y los avisos y registra en acta los acuerdos de reasignación del recurso liberado, sustitución, suspensión, cancelación, baja y devolución del recurso, previa garantía de audiencia. Seguimiento Alta Diagrama 2: flujos alternos C (C3), E (E3) y F · ROP MFS 2026 num. 9.4.3 e) y f); 10.2 b)"
+ },
+ "MFS-AF-01": {
+  "programa": "MFS",
+  "rol": "AF",
+  "nombre_corto": "Pago",
+  "texto": "Mecanismo de soporte para el pago: comprueba que la solicitud de la Dirección esté soportada con el Contrato de Adhesión firmado y el contrato de servicios técnicos, realiza cada pago por transferencia electrónica (con cheque solo en casos excepcionales) y lo registra. Pago Crítica Diagrama 2: act. 12 y 17 · ROP MFS 2026 num. 7.1; 10.1.1 a) y l)"
+ },
+ "MFS-AF-02": {
+  "programa": "MFS",
+  "rol": "AF",
+  "nombre_corto": "Cuenta para reintegros",
+  "texto": "Mecanismo de soporte para el reintegro: proporciona la cuenta bancaria de PROBOSQUE en la que se depositan los recursos no aplicados o depositados de más, una vez notificado el reintegro. Reintegro Media Diagrama 2: flujo alterno E (E4) · ROP MFS 2026 num. 8.1.7 j) y t); 8.1.9.3 Plantaciones Sustentables 7 roles y 24 necesidades. El vivero entra como proveedor de planta; plantar en menos del 70% de la superficie obliga al reintegro más el valor de la planta. En estas reglas el numeral 10.1 usa incisos. Contenido del expediente (bosquejo) Cada expediente varía según el tipo de persona, el predio y la modalidad; esto es lo que normalmente reúne: Solicitud Única, Registro de Información (FO-PB-502), identificación oficial (INE; si no trae domicilio, comprobante de domicilio) y CURP de la persona titular y, en su caso, de la segunda persona beneficiaria. Título de propiedad: en núcleos agrarios, Carpeta Básica, PHINA o ADDATE/ADDATBC; en particulares, escritura, inmatriculación, sentencia, contrato, certificado parcelario o constancia de posesión (usufructo o arrendamiento de hasta 5 años). Plano o croquis del predio con al menos una coordenada y, si la superficie no aparece en el documento de propiedad, constancia de superficie. Representación: en núcleos agrarios, acta de elección del órgano de representación inscrita en el RAN y acta de asamblea que aprueba la incorporación al programa; en personas jurídicas colectivas, acta constitutiva y poder notarial o carta poder. Propio del programa: concepto solicitado (establecimiento o mantenimiento). Se agrega durante el proceso: polígono levantado en campo, dictámenes técnico y jurídico, acuerdo del Comité, Contrato de Adhesión firmado, documento bancario con CLABE (en núcleos agrarios, contrato de cuenta mancomunada), Vale de Salida de Planta y, en su caso, carta compromiso, formatos de verificación y comprobantes de pago. Refrendo (mantenimiento): basta Solicitud, Registro de Información y CURP si la documentación legal ya está en el expediente y sigue vigente (hasta 3 años)."
+ },
+ "PS-BEN-01": {
+  "programa": "PS",
+  "rol": "BEN",
+  "nombre_corto": "Avisos de cambio de polígono y siniestro",
+  "texto": "Mecanismo de soporte para el seguimiento de la ejecución: permite a la persona beneficiaria entregar a la Delegación el aviso de cambio de lugar del polígono antes de plantar, para su revisión técnica y jurídica, y la justificación cuando no se concluyan las actividades (el ajuste no puede ser menor al 70% de la superficie) y dar aviso por escrito, en un máximo de 15 días hábiles, de conflictos o siniestros que impidan las actividades, con la documentación que lo sustente. Entrega Alta Diagrama 3: act. 17; flujo alterno D (D1) · ROP PS 2026 num. 7.2 (criterio general 10); 8.1.7 j) y k)"
+ },
+ "PS-BEN-02": {
+  "programa": "PS",
+  "rol": "BEN",
+  "nombre_corto": "Aviso de término de actividades",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite a la persona beneficiaria entregar a la Delegación el aviso de término de actividades, a más tardar el último día hábil de septiembre. Entrega Crítica Diagrama 3: act. 18 · ROP PS 2026 num. 7.2 (criterios generales 5 y 7)"
+ },
+ "PS-BEN-03": {
+  "programa": "PS",
+  "rol": "BEN",
+  "nombre_corto": "Sustitución o desistimiento",
+  "texto": "Mecanismo de soporte para la sustitución o la baja de la persona beneficiaria: permite a la segunda persona beneficiaria notificar su interés de continuar en un máximo de 30 días hábiles tras el fallecimiento del titular y a la persona beneficiaria presentar su desistimiento por escrito dirigido a la Instancia Normativa; quien desiste reintegra lo recibido dentro de los 10 días hábiles siguientes. Entrega Media Diagrama 3: flujos alternos F (F1) y E · ROP PS 2026 num. 8.1.8 j); 8.1.9 b) g) y h); 10.2"
+ },
+ "PS-DRF-01": {
+  "programa": "PS",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente y polígono",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud a nombre del predio, revisa que estén completos y legibles los requisitos (Solicitud Única, Registro de Información, identificación oficial, CURP, título de propiedad, plano o croquis y concepto de apoyo), comprueba que el predio esté en un municipio que atiende la Delegación, levanta en la visita de campo el polígono y los datos técnicos, y remite el expediente integrado a la Dirección de Restauración y Fomento Forestal. Registro Crítica Diagrama 3: act. 1 a 3 · ROP PS 2026 num. 8.1.1.2; 8.1.3; 8.1.7 b); 10.1 c)"
+ },
+ "PS-DRF-02": {
+  "programa": "PS",
+  "rol": "DRF",
+  "nombre_corto": "Cita y firma del contrato",
+  "texto": "Mecanismo de soporte para la firma del contrato: notifica y cita a las personas beneficiarias con recurso dentro de los 5 días hábiles siguientes a la publicación; recibe el Contrato de Adhesión firmado por la persona beneficiaria dentro de los 10 días hábiles posteriores a la notificación, verifica las firmas (y el sello, en núcleos agrarios), lo registra y remite a la Dirección el oficio de solicitud de pago; en casos excepcionales pide el pago con cheque, con visto bueno del titular de la Dirección. Formalización Crítica Diagrama 3: act. 8, 10 y 11; flujo alterno C (C4) · ROP PS 2026 num. 7.1; 8.1.9 b) d); 10.1 h), i) y k)"
+ },
+ "PS-DRF-03": {
+  "programa": "PS",
+  "rol": "DRF",
+  "nombre_corto": "Entrega del Vale de Planta",
+  "texto": "Mecanismo de soporte para la entrega del Vale de Planta: genera el Vale de Salida de Planta de cada persona beneficiaria y registra su entrega; si se pide antes de firmar el contrato, registra la carta compromiso. Registro Alta Diagrama 3: act. 14 · ROP PS 2026 num. 8.1.6 f); 8.1.7 e)"
+ },
+ "PS-DRF-04": {
+  "programa": "PS",
+  "rol": "DRF",
+  "nombre_corto": "Verificación en campo",
+  "texto": "Mecanismo de soporte para la verificación en campo: registra la visita a los predios, en la que comprueba que la planta esté distribuida en toda la superficie asignada y con la densidad definida (ajuste mínimo del 70%; en mantenimiento, sobrevivencia mínima del 50%); con el resultado, requisita el formato de verificación, y remite ese documento al área responsable del programa, dentro de los 30 días hábiles posteriores al último día hábil de septiembre. Verificación Crítica Diagrama 3: act. 19 y 20 · ROP PS 2026 num. 7.2 (conceptos I y II; criterios generales 6, 7, 9 y 10); 10.1 m)"
+ },
+ "PS-DRF-05": {
+  "programa": "PS",
+  "rol": "DRF",
+  "nombre_corto": "Atención de incidencias",
+  "texto": "Mecanismo de soporte para la atención de incidencias: comprueba en campo lo reportado en los avisos de caso fortuito y de cambio de lugar del polígono y los incumplimientos detectados y registra lo que encontró; remite al área responsable del programa el documento que lo avala; a quien debe reintegrar le informa la cuenta en la que debe depositar. Verificación Media Diagrama 3: flujos alternos D (D2) y E (E1) · ROP PS 2026 num. 8.1.7 j) y k); 8.1.8; 8.1.9 c) e)"
+ },
+ "PS-VIV-01": {
+  "programa": "PS",
+  "rol": "VIV",
+  "nombre_corto": "Salida de planta del vivero",
+  "texto": "Mecanismo de soporte para la entrega de planta: valida el Vale de Salida de Planta y registra la salida de la planta forestal (especie y cantidad asignadas), que la persona beneficiaria recoge dentro de los 30 días siguientes a la entrega del vale; si el vivero no tiene la especie, la persona beneficiaria puede adquirirla en otro vivero. Registro Crítica Diagrama 3: act. 15 y 16 · ROP PS 2026 num. 7.2 (criterio general 8); 8.1.7 d) y e)"
+ },
+ "PS-ARP-01": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; si falta documentación o información, notifica a la persona solicitante, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Crítica Diagrama 3: act. 2 y 4; flujo alterno A (A1 y A2) · ROP PS 2026 num. 10.1 d) y e)"
+ },
+ "PS-ARP-02": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Dictaminación técnica",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada predio, determina si es técnicamente factible y lo cruza con el dictamen jurídico; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite al Comité. Dictaminación Crítica Diagrama 3: act. 4 y 5; flujo alterno B (B1) · ROP PS 2026 num. 10.1 f) y g)"
+ },
+ "PS-ARP-03": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Publicación de resultados",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del Comité, publica las listas de solicitudes aprobadas con recurso, aprobadas con insuficiencia presupuestal y no factibles en las Delegaciones y en la página de PROBOSQUE, en la fecha que fije la convocatoria. Publicación Crítica Diagrama 3: act. 7; flujos alternos B (B3) y C (C2) · ROP PS 2026 num. 9.4.3 b); 10.1 h)"
+ },
+ "PS-ARP-04": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Elaboración de contratos",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión con los datos de la solicitud que aprobó el Comité, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma. Formalización Crítica Diagrama 3: act. 9 · ROP PS 2026 num. 10.1 i) y j)"
+ },
+ "PS-ARP-05": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que existan el Contrato de Adhesión firmado y el oficio de la Delegación y, para la segunda ministración, elabora el listado de personas beneficiarias que concluyeron actividades con los ajustes que resulten de la verificación; con ello genera la solicitud de cada ministración (70%, y 30% o la parte proporcional), que remite a Administración y Finanzas. Pago Crítica Diagrama 3: act. 12 y 21 · ROP PS 2026 num. 7.2; 10.1 k) y n)"
+ },
+ "PS-ARP-06": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Lista de espera y sustituciones",
+  "texto": "Mecanismo de soporte para la lista de espera y las sustituciones: identifica el recurso liberado por desistimientos, cancelaciones o disminución de superficie, propone su reasignación a solicitudes factibles sin recurso, analiza las sustituciones de personas beneficiarias y los casos de predios con sobrevivencia menor por causas no imputables o afectados por caso fortuito, y remite las propuestas al Comité. Seguimiento Media Diagrama 3: flujos alternos C (C3), D (D3) y F · ROP PS 2026 num. 8.1.9 c); 9.4.3 c) y d); 10.2"
+ },
+ "PS-ARP-07": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Seguimiento de incumplimientos",
+  "texto": "Mecanismo de soporte para el seguimiento de incumplimientos: analiza el incumplimiento que reporta la Delegación, notifica a la persona beneficiaria, durante la suspensión temporal, las omisiones que debe subsanar y comprueba si las subsana; si no lo hace, remite al Comité la propuesta de cancelación y baja, y registra la inscripción en el Listado de Personas Beneficiarias Incumplidas. Seguimiento Alta Diagrama 3: flujo alterno E (E2 y E5) · ROP PS 2026 num. 8.1.9 a) y b)"
+ },
+ "PS-ARP-08": {
+  "programa": "PS",
+  "rol": "ARP",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida las verificaciones, los ajustes y los pagos del ejercicio en los listados de resultados finales y el informe anual, que remite al Comité, y mantiene integrado, actualizado y publicado el padrón de personas beneficiarias conforme a la Ley de Transparencia. Cierre Alta Diagrama 3: act. 23 y 24 · ROP PS 2026 num. 8.1.5; 10.1 o); 14; 15"
+ },
+ "PS-UJ-01": {
+  "programa": "PS",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa la documentación legal de cada solicitud o predio, la coteja con el Listado de Personas Beneficiarias Incumplidas y con los predios que tienen procedimiento o sanción administrativa, determina su procedencia o no procedencia y remite el dictamen a la Dirección de Restauración y Fomento Forestal. Dictaminación Crítica Diagrama 3: act. 4 · ROP PS 2026 num. 10.1 b) y f)"
+ },
+ "PS-UJ-02": {
+  "programa": "PS",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión y remite el modelo validado a la Dirección de Restauración y Fomento Forestal. Formalización Crítica Diagrama 3: act. 9 · ROP PS 2026 num. 10.1 j)"
+ },
+ "PS-UJ-03": {
+  "programa": "PS",
+  "rol": "UJ",
+  "nombre_corto": "Gestión de la devolución",
+  "texto": "Mecanismo de soporte para la gestión de la devolución: con el acuerdo e instrucción del Comité, genera el requerimiento de devolución de las ministraciones o del valor de la planta no establecida, lo notifica a la persona beneficiaria con la cuenta que proporciona Administración y Finanzas y comprueba que el depósito se realice. Reintegro Alta Diagrama 3: flujo alterno E (E3 y E4) · ROP PS 2026 num. 8.1.9 c); 9.4.3 f); 10.1 b)"
+ },
+ "PS-COM-01": {
+  "programa": "PS",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del Comité: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban las solicitudes aprobadas con recurso, aprobadas con insuficiencia presupuestal y no factibles y autorizan su publicación. Aprobación Crítica Diagrama 3: act. 5 y 6; flujos alternos B (B2) y C (C1) · ROP PS 2026 num. 9.4.3 b); 10.1 g)"
+ },
+ "PS-COM-02": {
+  "programa": "PS",
+  "rol": "COM",
+  "nombre_corto": "Sesiones de seguimiento",
+  "texto": "Mecanismo de soporte para las sesiones de seguimiento del Comité: pone a disposición de sus integrantes las propuestas y los avisos y registra en acta los acuerdos de reasignación del recurso liberado, sustitución, apoyo con sobrevivencia menor, suspensión, cancelación, baja y devolución, previa garantía de audiencia. Seguimiento Alta Diagrama 3: flujos alternos C (C3), D (D3), E (E3) y F · ROP PS 2026 num. 8.1.9; 9.4.3 c), d) y f); 10.2"
+ },
+ "PS-AF-01": {
+  "programa": "PS",
+  "rol": "AF",
+  "nombre_corto": "Pago",
+  "texto": "Mecanismo de soporte para el pago: comprueba que la solicitud de la Dirección esté soportada con el Contrato de Adhesión firmado, realiza cada pago por transferencia electrónica (con cheque solo en casos excepcionales) y lo registra. Pago Crítica Diagrama 3: act. 13 y 22 · ROP PS 2026 num. 7.1; 10.1 a) y l)"
+ },
+ "PS-AF-02": {
+  "programa": "PS",
+  "rol": "AF",
+  "nombre_corto": "Cuenta para reintegros",
+  "texto": "Mecanismo de soporte para el reintegro: proporciona la cuenta bancaria de PROBOSQUE en la que se depositan los recursos no aplicados, el valor de la planta no establecida o lo depositado de más, una vez notificado el reintegro. Reintegro Media Diagrama 3: flujo alterno E (E4) · ROP PS 2026 num. 8.1.7 l) y r); 8.1.9 c) Restauración Hidrológico-Forestal 8 roles y 24 necesidades. El Vale de Planta no aplica en Restauración Forestal Integral Modalidad uno, que no incluye planta. En estas reglas el numeral 10.1 usa incisos. Contenido del expediente (bosquejo) Cada expediente varía según el tipo de persona, el predio y la modalidad; esto es lo que normalmente reúne: Solicitud Única, Registro de Información (FO-PB-502), identificación oficial (INE; si no trae domicilio, comprobante de domicilio) y CURP de la persona titular y, en su caso, de la segunda persona beneficiaria. Título de propiedad: en núcleos agrarios, Carpeta Básica, PHINA o ADDATE/ADDATBC; en particulares, escritura, inmatriculación, sentencia, contrato, certificado parcelario o constancia de posesión (usufructo o arrendamiento de hasta 5 años). Plano o croquis del predio con al menos una coordenada y, si la superficie no aparece en el documento de propiedad, constancia de superficie. Representación: en núcleos agrarios, acta de elección del órgano de representación inscrita en el RAN y acta de asamblea que aprueba la incorporación al programa; en personas jurídicas colectivas, acta constitutiva y poder notarial o carta poder. Propio del programa: PTRFI elaborado por un prestador de servicios forestales con RFN (en Modalidad uno; en Modalidad dos solo si cambian la superficie o las actividades). Se agrega durante el proceso: polígono levantado en campo, dictámenes técnico y jurídico, acuerdo del Comité, Contrato de Adhesión firmado, documento bancario con CLABE (en núcleos agrarios, contrato de cuenta mancomunada), Diagnóstico Técnico, Vale de Planta, formatos de verificación y comprobantes de pago. Refrendo (Preservación y Restauración Forestal Integral Modalidad dos): basta Solicitud, Registro de Información y CURP si la documentación legal ya está en el expediente y sigue vigente (hasta 3 años)."
+ },
+ "RHF-BEN-01": {
+  "programa": "RHF",
+  "rol": "BEN",
+  "nombre_corto": "Nuevo Vale de Planta y aviso de siniestro",
+  "texto": "Mecanismo de soporte para el seguimiento de la ejecución: permite a la persona beneficiaria entregar a la Delegación la solicitud de un nuevo Vale de Planta cuando el anterior venció y dar aviso por escrito, en un máximo de 15 días hábiles, de conflictos o siniestros que impidan las actividades, con la documentación que lo sustente. Entrega Alta Diagrama 4: act. 16; flujo alterno D (D1) · ROP RHF 2026 num. 8.1.7 e), h) e i)"
+ },
+ "RHF-BEN-02": {
+  "programa": "RHF",
+  "rol": "BEN",
+  "nombre_corto": "Aviso de término de actividades",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite a la persona beneficiaria entregar a la Delegación el aviso de término de actividades, a más tardar el último día hábil de septiembre (octubre en Restauración Forestal Integral Modalidad uno). Entrega Crítica Diagrama 4: act. 17 · ROP RHF 2026 num. 10.1 t)"
+ },
+ "RHF-BEN-03": {
+  "programa": "RHF",
+  "rol": "BEN",
+  "nombre_corto": "Sustitución o desistimiento",
+  "texto": "Mecanismo de soporte para la sustitución o la baja de la persona beneficiaria: permite a la segunda persona beneficiaria notificar su interés de continuar en un máximo de 30 días hábiles tras el fallecimiento del titular y a la persona beneficiaria presentar su desistimiento por escrito dirigido a la Instancia Normativa. Entrega Media Diagrama 4: flujos alternos F (F1) y E · ROP RHF 2026 num. 8.1.9 b) (causas 9 y 10); 10.2"
+ },
+ "RHF-PSF-01": {
+  "programa": "RHF",
+  "rol": "PSF",
+  "nombre_corto": "Entrega del PTRFI",
+  "texto": "Mecanismo de soporte para el proyecto técnico: permite al prestador entregar a la Delegación el Proyecto Técnico de Restauración Forestal Integral (PTRFI), apegado a la guía de contenido de PROBOSQUE, para integrarlo al expediente en Modalidad uno (y en Modalidad dos cuando cambia). Entrega Crítica Diagrama 4: act. 1 · ROP RHF 2026 num. 8.1.1.2 i)"
+ },
+ "RHF-DRF-01": {
+  "programa": "RHF",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente y diagnóstico",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud a nombre del predio, revisa que estén completos y legibles los requisitos (Solicitud Única, Registro de Información, identificación oficial, CURP, título de propiedad, plano o croquis y, cuando aplique, PTRFI), comprueba que el predio esté en un municipio que atiende la Delegación, levanta en la visita de campo el polígono y los datos técnicos y elabora el Diagnóstico Técnico, y remite el expediente integrado a la Dirección de Restauración y Fomento Forestal. Registro Crítica Diagrama 4: act. 1 a 3 · ROP RHF 2026 num. 8.1.1.2; 8.1.3; 8.1.7 b); 10.1 c)"
+ },
+ "RHF-DRF-02": {
+  "programa": "RHF",
+  "rol": "DRF",
+  "nombre_corto": "Firma del contrato",
+  "texto": "Mecanismo de soporte para la firma del contrato: recibe el Contrato de Adhesión firmado por la persona beneficiaria dentro de los 10 días hábiles posteriores a la notificación, verifica las firmas (y el sello, en núcleos agrarios), lo registra y remite a la Dirección el oficio de solicitud de pago; en casos excepcionales pide el pago con cheque, con visto bueno del titular de la Dirección. Formalización Crítica Diagrama 4: act. 9 y 10; flujo alterno C (C4) · ROP RHF 2026 num. 7.1; 8.1.9 b) (causa 5); 10.1 k) y l)"
+ },
+ "RHF-DRF-03": {
+  "programa": "RHF",
+  "rol": "DRF",
+  "nombre_corto": "Entrega del Vale de Planta",
+  "texto": "Mecanismo de soporte para la entrega del Vale de Planta: genera el Vale de Planta de cada persona beneficiaria (no aplica en Restauración Forestal Integral Modalidad uno) y registra su entrega; si se pide antes de firmar el contrato, registra la carta compromiso. Registro Alta Diagrama 4: act. 13 · ROP RHF 2026 num. 8.1.7 d) y e); 10.1 i)"
+ },
+ "RHF-DRF-04": {
+  "programa": "RHF",
+  "rol": "DRF",
+  "nombre_corto": "Verificación en campo e incidencias",
+  "texto": "Mecanismo de soporte para la verificación en campo: registra la visita a los predios, en la que comprueba que las obras y la reforestación estén dentro de los polígonos dictaminados y con las densidades del ecosistema (ajuste mínimo del 70% de la superficie), y verifica los avisos de caso fortuito y los incumplimientos detectados; con el resultado, requisita el formato de verificación con el oficio de solicitud de pago, o el documento que avala la incidencia, y remite ese documento al área responsable del programa, dentro de los 10 días hábiles posteriores a la conclusión. Verificación Crítica Diagrama 4: act. 18 y 19; flujos alternos D (D2) y E (E1) · ROP RHF 2026 num. 8.1.7 i); 10.1 n), o), t) y u)"
+ },
+ "RHF-VIV-01": {
+  "programa": "RHF",
+  "rol": "VIV",
+  "nombre_corto": "Salida de planta del vivero",
+  "texto": "Mecanismo de soporte para la entrega de planta: valida el Vale de Planta y registra la salida de la planta nativa (especie y cantidad asignadas), que la persona beneficiaria recoge dentro de los 15 días hábiles siguientes a la entrega del vale; vencido el vale, la planta vuelve a estar disponible en el vivero. Registro Crítica Diagrama 4: act. 14 y 15 · ROP RHF 2026 num. 8.1.7 d) y e); 10.1 s)"
+ },
+ "RHF-ARP-01": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; si falta documentación o información, notifica a la persona solicitante, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Crítica Diagrama 4: act. 2 y 4; flujo alterno A (A1 y A2) · ROP RHF 2026 num. 10.1 d) y e)"
+ },
+ "RHF-ARP-02": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Dictaminación técnica",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada predio, determina si es técnicamente factible y lo cruza con el dictamen jurídico; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite al Comité. Dictaminación Crítica Diagrama 4: act. 4 y 5; flujo alterno B (B1) · ROP RHF 2026 num. 10.1 f) y g)"
+ },
+ "RHF-ARP-03": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Publicación de resultados",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del Comité, publica los listados de solicitudes aprobadas y no aprobadas en las Delegaciones y en la página de PROBOSQUE, en la fecha que fije la convocatoria. Publicación Crítica Diagrama 4: act. 7; flujos alternos B (B3) y C (C2) · ROP RHF 2026 num. 9.4.3 b); 10.1 h)"
+ },
+ "RHF-ARP-04": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Elaboración de contratos",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión y, en su caso, su adenda con los datos de la solicitud que aprobó el Comité, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma. Formalización Crítica Diagrama 4: act. 8 · ROP RHF 2026 num. 10.1 j) y k)"
+ },
+ "RHF-ARP-05": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que existan el Contrato de Adhesión firmado y el oficio de la Delegación y, para la segunda ministración, elabora el listado de personas beneficiarias que concluyeron actividades con los ajustes que resulten de la verificación; con ello genera la solicitud de cada ministración (70%, y 30% o la parte proporcional), que remite a Administración y Finanzas. Pago Crítica Diagrama 4: act. 11 y 20 · ROP RHF 2026 num. 10.1 l) y o)"
+ },
+ "RHF-ARP-06": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Lista de espera y sustituciones",
+  "texto": "Mecanismo de soporte para la lista de espera y las sustituciones: identifica el recurso liberado por desistimientos, cancelaciones o disminución de superficie, propone su reasignación a solicitudes factibles sin recurso, analiza las sustituciones de personas beneficiarias y los casos de predios con sobrevivencia menor por causas no imputables o afectados por caso fortuito, y remite las propuestas al Comité. Seguimiento Media Diagrama 4: flujos alternos C (C3), D (D3) y F · ROP RHF 2026 num. 9.4.3 c) y d); 10.2"
+ },
+ "RHF-ARP-07": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Seguimiento de incumplimientos",
+  "texto": "Mecanismo de soporte para el seguimiento de incumplimientos: analiza el incumplimiento que reporta la Delegación, notifica a la persona beneficiaria, durante la suspensión temporal, las omisiones que debe subsanar y comprueba si las subsana; si no lo hace, remite al Comité la propuesta de cancelación y baja, y registra la inscripción en el Listado de Personas Beneficiarias Incumplidas. Seguimiento Alta Diagrama 4: flujo alterno E (E2 y E5) · ROP RHF 2026 num. 8.1.9 a) y b)"
+ },
+ "RHF-ARP-08": {
+  "programa": "RHF",
+  "rol": "ARP",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida las verificaciones, los ajustes y los pagos del ejercicio en los listados de resultados finales y el informe anual, que remite al Comité, y mantiene integrado, actualizado y publicado el padrón de personas beneficiarias conforme a la Ley de Transparencia. Cierre Alta Diagrama 4: act. 22 y 23 · ROP RHF 2026 num. 8.1.5; 10.1 p) y w); 15"
+ },
+ "RHF-UJ-01": {
+  "programa": "RHF",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa la documentación legal de cada solicitud o predio, la coteja con el Listado de Personas Beneficiarias Incumplidas y con los predios que tienen procedimiento o sanción administrativa, determina su procedencia o no procedencia y remite el dictamen a la Dirección de Restauración y Fomento Forestal. Dictaminación Crítica Diagrama 4: act. 4 · ROP RHF 2026 num. 10.1 b) y f)"
+ },
+ "RHF-UJ-02": {
+  "programa": "RHF",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión y, en su caso, su adenda y remite el modelo validado a la Dirección de Restauración y Fomento Forestal. Formalización Crítica Diagrama 4: act. 8 · ROP RHF 2026 num. 10.1 j)"
+ },
+ "RHF-UJ-03": {
+  "programa": "RHF",
+  "rol": "UJ",
+  "nombre_corto": "Gestión de la devolución",
+  "texto": "Mecanismo de soporte para la gestión de la devolución: con el acuerdo e instrucción del Comité, genera el requerimiento de devolución de las ministraciones o del valor de la planta no establecida, lo notifica a la persona beneficiaria con la cuenta que proporciona Administración y Finanzas y comprueba que el depósito se realice. Reintegro Alta Diagrama 4: flujo alterno E (E3 y E4) · ROP RHF 2026 num. 8.1.9 c); 9.4.3 e); 10.1 b)"
+ },
+ "RHF-COM-01": {
+  "programa": "RHF",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del Comité: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban las solicitudes aprobadas y no aprobadas y autorizan su publicación. Aprobación Crítica Diagrama 4: act. 5 y 6; flujos alternos B (B2) y C (C1) · ROP RHF 2026 num. 9.4.3 b); 10.1 g)"
+ },
+ "RHF-COM-02": {
+  "programa": "RHF",
+  "rol": "COM",
+  "nombre_corto": "Sesiones de seguimiento",
+  "texto": "Mecanismo de soporte para las sesiones de seguimiento del Comité: pone a disposición de sus integrantes las propuestas y los avisos y registra en acta los acuerdos de reasignación del recurso liberado, sustitución (fuera de temporada solo en Modalidad uno y con causa justificada), apoyo con sobrevivencia menor, suspensión, cancelación y devolución, previa garantía de audiencia. Seguimiento Alta Diagrama 4: flujos alternos C (C3), D (D3), E (E3) y F · ROP RHF 2026 num. 8.1.9; 9.4.3 c), d) y e); 10.2"
+ },
+ "RHF-AF-01": {
+  "programa": "RHF",
+  "rol": "AF",
+  "nombre_corto": "Pago",
+  "texto": "Mecanismo de soporte para el pago: comprueba que la solicitud de la Dirección esté soportada con el Contrato de Adhesión firmado, realiza cada pago por transferencia electrónica (con cheque solo en casos excepcionales) y lo registra. Pago Crítica Diagrama 4: act. 12 y 21 · ROP RHF 2026 num. 7.1; 10.1 a) y m)"
+ },
+ "RHF-AF-02": {
+  "programa": "RHF",
+  "rol": "AF",
+  "nombre_corto": "Cuenta para reintegros",
+  "texto": "Mecanismo de soporte para el reintegro: proporciona la cuenta bancaria de PROBOSQUE en la que se depositan los recursos no aplicados, el valor de la planta no establecida o lo depositado de más, una vez notificado el reintegro. Reintegro Media Diagrama 4: flujo alterno E (E4) · ROP RHF 2026 num. 8.1.7 j) y q); 8.1.9 c) PSAHEM (FIPASAHEM) 7 roles y 24 necesidades. El Comité Técnico del FIPASAHEM sustituye al Comité de Admisión y la fiduciaria paga con cheque por conducto de las Delegaciones. En estas reglas el numeral 10.1 usa fracciones romanas. Contenido del expediente (bosquejo) Cada expediente varía según el tipo de persona, el predio y la modalidad; esto es lo que normalmente reúne: Solicitud Única, Registro de Información (FO-PB-502), identificación oficial (INE; si no trae domicilio, comprobante de domicilio) y CURP de la persona titular y, en su caso, de la segunda persona beneficiaria. Título de propiedad: en núcleos agrarios, Carpeta Básica, PHINA o ADDATE/ADDATBC; en particulares, escritura, inmatriculación, sentencia, contrato, certificado parcelario o constancia de posesión (usufructo o arrendamiento de hasta 5 años). Plano o croquis del predio con al menos una coordenada y, si la superficie no aparece en el documento de propiedad, constancia de superficie. Representación: en núcleos agrarios, acta de elección del órgano de representación inscrita en el RAN y acta de asamblea que aprueba la incorporación al programa; en personas jurídicas colectivas, acta constitutiva y poder notarial o carta poder. Propio del programa: ubicación en zona de recarga y, si lo tiene, certificado FSC; los predios del mecanismo local de CONAFOR (MLPSA-FC) participan bajo la convocatoria de PROBOSQUE. Se agrega durante el proceso: polígono levantado en campo, dictámenes técnico y jurídico, acuerdo del Comité Técnico, Contrato de Adhesión o Convenio de Concertación firmado, documento bancario con CLABE (en núcleos agrarios, contrato de cuenta mancomunada), formato FO-PB-520 A, Informe final, minuta de verificación, formatos de verificación y comprobantes de pago. Refrendo (fondos concurrentes): basta Solicitud, Registro de Información y CURP si la documentación legal ya está en el expediente y sigue vigente (hasta 3 años)."
+ },
+ "PSA-BEN-01": {
+  "programa": "PSA",
+  "rol": "BEN",
+  "nombre_corto": "Entrega del informe final",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite a la persona beneficiaria entregar a la Delegación el informe final de actividades, con la comprobación de gastos que corresponda, a más tardar el último día de vigencia del contrato (en fondos concurrentes, en los plazos del Convenio de Concertación). Entrega Crítica Diagrama 5: act. 15 · ROP PSAHEM 2026 num. 7.2; 8.1.7, fr. XVII"
+ },
+ "PSA-BEN-02": {
+  "programa": "PSA",
+  "rol": "BEN",
+  "nombre_corto": "Aviso de caso fortuito",
+  "texto": "Mecanismo de soporte para los avisos de caso fortuito: permite a la persona beneficiaria dar aviso por escrito, en un máximo de 15 días hábiles, de conflictos o siniestros que impidan las actividades, con la documentación que lo sustente; el aviso llega al Comité Técnico por conducto de la Delegación o de la Dirección de Restauración y Fomento Forestal. Entrega Media Diagrama 5: flujo alterno D (D1) · ROP PSAHEM 2026 num. 8.1.7, fr. VII"
+ },
+ "PSA-BEN-03": {
+  "programa": "PSA",
+  "rol": "BEN",
+  "nombre_corto": "Sustitución o desistimiento",
+  "texto": "Mecanismo de soporte para la sustitución o la baja de la persona beneficiaria: permite a la segunda persona beneficiaria notificar su interés de continuar en un máximo de 30 días hábiles tras el fallecimiento del titular y a la persona beneficiaria presentar su desistimiento por escrito dirigido a la Instancia Normativa. Entrega Media Diagrama 5: flujos alternos F (F1) y E · ROP PSAHEM 2026 num. 8.1.9.2, fr. X y XI; 10.2"
+ },
+ "PSA-DRF-01": {
+  "programa": "PSA",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente y polígono",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud a nombre del predio, revisa que estén completos y legibles los requisitos (Solicitud Única, Registro de Información, identificación oficial, CURP, título de propiedad, plano o croquis), comprueba que el predio esté en un municipio que atiende la Delegación, levanta en la visita de campo el polígono y los datos técnicos, y remite el expediente integrado a la Dirección de Restauración y Fomento Forestal. Registro Crítica Diagrama 5: act. 1 a 3 · ROP PSAHEM 2026 num. 8.1.1.2; 8.1.3; 10.1, fr. I"
+ },
+ "PSA-DRF-02": {
+  "programa": "PSA",
+  "rol": "DRF",
+  "nombre_corto": "Firma del contrato o convenio",
+  "texto": "Mecanismo de soporte para la firma del contrato: recibe el Contrato de Adhesión o Convenio de Concertación firmado por la persona beneficiaria dentro del plazo que fije la convocatoria, verifica las firmas (y el sello, en núcleos agrarios) y lo registra; sin contrato firmado no se puede solicitar el pago. Formalización Crítica Diagrama 5: act. 9; flujo alterno C (C4) · ROP PSAHEM 2026 num. 10.1, fr. VI y IX"
+ },
+ "PSA-DRF-03": {
+  "programa": "PSA",
+  "rol": "DRF",
+  "nombre_corto": "Entrega del pago con cheque",
+  "texto": "Mecanismo de soporte para la entrega del pago: notifica a la persona beneficiaria que su pago está listo (por teléfono, medios electrónicos o visita domiciliaria) y registra la entrega de cada cheque, que debe cobrarse en un máximo de 3 meses; solo se reexpide con causa plenamente justificada. Pago Crítica Diagrama 5: act. 13 y 21 · ROP PSAHEM 2026 num. 8.1.7, fr. XVI; 10.1, fr. X"
+ },
+ "PSA-DRF-04": {
+  "programa": "PSA",
+  "rol": "DRF",
+  "nombre_corto": "Verificación en campo",
+  "texto": "Mecanismo de soporte para la verificación en campo: registra la visita a los predios, en la que comprueba las actividades del informe final y verifica los avisos de caso fortuito y los incumplimientos detectados; con el resultado, levanta la minuta de verificación, firmada por la persona beneficiaria y el técnico de PROBOSQUE, o el documento que avala la incidencia, y remite ese documento al área responsable del programa. Verificación Crítica Diagrama 5: act. 16 y 17; flujos alternos D (D2) y E (E1) · ROP PSAHEM 2026 num. 7.2; 8.1.7, fr. VII; 10.1, fr. XI"
+ },
+ "PSA-ARP-01": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; en refrendos de los tres años anteriores lo valida con la visita en campo y, en su caso, con la actualización de la documentación legal; si falta documentación o información, notifica a la persona solicitante, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Crítica Diagrama 5: act. 2 y 4; flujo alterno A (A1 y A2) · ROP PSAHEM 2026 num. 10.1, fr. II y III"
+ },
+ "PSA-ARP-02": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Dictaminación técnica",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada predio con el análisis cartográfico y el Índice de Presión Económica a la Deforestación del INECC, determina si es técnicamente factible y lo cruza con el dictamen jurídico; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite a la Comisión de Verificación Técnica y al Comité Técnico. Dictaminación Crítica Diagrama 5: act. 4 y 5; flujo alterno B (B1) · ROP PSAHEM 2026 num. 8.1.1.1; 8.1.2; 10.1, fr. IV y V"
+ },
+ "PSA-ARP-03": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Publicación de resultados",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del Comité Técnico, publica la lista de solicitudes factibles en las Delegaciones y en la página de PROBOSQUE, en la fecha que fije la convocatoria; las personas solicitantes no aprobadas reciben la notificación por medio de la Secretaría Técnica del Comité Técnico. Publicación Crítica Diagrama 5: act. 7; flujos alternos B (B3) y C (C2) · ROP PSAHEM 2026 num. 9.4.3, fr. III; 10.1, fr. VI"
+ },
+ "PSA-ARP-04": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Elaboración de contratos",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión o Convenio de Concertación y, en su caso, su adendum con los datos de la solicitud que aprobó el Comité Técnico, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma. Formalización Crítica Diagrama 5: act. 8 · ROP PSAHEM 2026 num. 10.1, fr. VI y VII"
+ },
+ "PSA-ARP-05": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que exista el contrato o convenio firmado y, para la segunda ministración, el documento de verificación, y la soporta con oficio, solicitud de cheque por persona beneficiaria, identificación y dictamen; con ello genera la solicitud de cada ministración (70% y 30%), que remite al Comité Técnico, para que instruya a la Fiduciaria, y a Administración y Finanzas. Pago Crítica Diagrama 5: act. 10 y 18 · ROP PSAHEM 2026 num. 7.2; 10.1, fr. VIII, IX y XII"
+ },
+ "PSA-ARP-06": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Lista de espera y sustituciones",
+  "texto": "Mecanismo de soporte para la lista de espera y las sustituciones: identifica el recurso liberado por desistimientos, cancelaciones o disminución de superficie, propone su reasignación a solicitudes factibles sin recurso, analiza las sustituciones de personas beneficiarias y los casos de predios afectados por caso fortuito, y remite las propuestas al Comité Técnico. Seguimiento Media Diagrama 5: flujos alternos C (C3), D (D3) y F · ROP PSAHEM 2026 num. 8.1.7, fr. VII; 8.1.9.3, fr. IV; 10.2"
+ },
+ "PSA-ARP-07": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Seguimiento de incumplimientos",
+  "texto": "Mecanismo de soporte para el seguimiento de incumplimientos: analiza el incumplimiento que reporta la Delegación, notifica a la persona beneficiaria, durante la suspensión temporal, las omisiones que debe subsanar y comprueba si las subsana; si no lo hace, remite al Comité Técnico la propuesta de cancelación y baja, y registra la inscripción en el Listado de Personas Beneficiarias Incumplidas. Seguimiento Alta Diagrama 5: flujo alterno E (E2 y E5) · ROP PSAHEM 2026 num. 8.1.9.1; 8.1.9.2; 10.1, fr. XII"
+ },
+ "PSA-ARP-08": {
+  "programa": "PSA",
+  "rol": "ARP",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida las verificaciones, los ajustes y los pagos del ejercicio en los listados de resultados finales y el informe anual, que remite al Comité Técnico, y mantiene integrado, actualizado y publicado el padrón de personas beneficiarias conforme a la Ley de Transparencia. Cierre Alta Diagrama 5: act. 22 y 23 · ROP PSAHEM 2026 num. 8.1.5; 10.1, fr. XIII; 15"
+ },
+ "PSA-UJ-01": {
+  "programa": "PSA",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa la documentación legal de cada solicitud o predio, la coteja con el Listado de Personas Beneficiarias Incumplidas y con los predios que tienen procedimiento o sanción administrativa, determina su procedencia o no procedencia y remite el dictamen a la Dirección de Restauración y Fomento Forestal. Dictaminación Crítica Diagrama 5: act. 4 · ROP PSAHEM 2026 num. 10.1, fr. IV y XV"
+ },
+ "PSA-UJ-02": {
+  "programa": "PSA",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión o Convenio de Concertación y, en su caso, su adendum y remite el modelo validado a la Dirección de Restauración y Fomento Forestal. Formalización Crítica Diagrama 5: act. 8 · ROP PSAHEM 2026 num. 10.1, fr. VII"
+ },
+ "PSA-UJ-03": {
+  "programa": "PSA",
+  "rol": "UJ",
+  "nombre_corto": "Gestión de la devolución",
+  "texto": "Mecanismo de soporte para la gestión de la devolución: con el acuerdo e instrucción del Comité Técnico, genera el requerimiento de devolución de los recursos no ejercidos, lo notifica a la persona beneficiaria con la cuenta que proporciona Administración y Finanzas y comprueba que el depósito se realice. Reintegro Alta Diagrama 5: flujo alterno E (E3 y E4) · ROP PSAHEM 2026 num. 8.1.9.3; 10.1, fr. XV"
+ },
+ "PSA-COM-01": {
+  "programa": "PSA",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del Comité Técnico: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban el listado de solicitudes factibles y no factibles (con el rechazo fundado y motivado) y autorizan su publicación. Aprobación Crítica Diagrama 5: act. 5 y 6; flujos alternos B (B2) y C (C1) · ROP PSAHEM 2026 num. 9.4.3, fr. I y III; 10.1, fr. VI"
+ },
+ "PSA-COM-02": {
+  "programa": "PSA",
+  "rol": "COM",
+  "nombre_corto": "Instrucción de pago a la Fiduciaria",
+  "texto": "Mecanismo de soporte para la instrucción de pago: registra la instrucción a la Fiduciaria de cada ministración aprobada, que la Secretaría Técnica tramita en un máximo de 5 días hábiles. Pago Crítica Diagrama 5: act. 11 y 19 · ROP PSAHEM 2026 num. 9.4.3, fr. II; 10.1, fr. VIII y X"
+ },
+ "PSA-COM-03": {
+  "programa": "PSA",
+  "rol": "COM",
+  "nombre_corto": "Sesiones de seguimiento",
+  "texto": "Mecanismo de soporte para las sesiones de seguimiento del Comité Técnico: pone a disposición de sus integrantes las propuestas y los avisos y registra en acta los acuerdos de suspensión, cancelación, reintegro y reasignación de apoyos, incluido el reintegro de cheques no reclamados. Seguimiento Alta Diagrama 5: flujos alternos C (C3), D (D3), E (E3) y F · ROP PSAHEM 2026 num. 9.4.3, fr. II y V; 10.2"
+ },
+ "PSA-AF-01": {
+  "programa": "PSA",
+  "rol": "AF",
+  "nombre_corto": "Remisión del pago a la Fiduciaria",
+  "texto": "Mecanismo de soporte para el pago: comprueba la solicitud de pago de la Dirección y la remite a la Fiduciaria para que emita cada pago. Pago Crítica Diagrama 5: act. 10 y 18 · ROP PSAHEM 2026 num. 10.1, fr. XIV"
+ },
+ "PSA-AF-02": {
+  "programa": "PSA",
+  "rol": "AF",
+  "nombre_corto": "Cuenta para reintegros",
+  "texto": "Mecanismo de soporte para el reintegro: proporciona la cuenta bancaria de la Fiduciaria en la que se depositan los recursos no aplicados o depositados de más, una vez notificado el reintegro. Reintegro Media Diagrama 5: flujo alterno E (E4) · ROP PSAHEM 2026 num. 8.1.7, fr. XIV y XXIII; 8.1.9.3, fr. V"
+ },
+ "PSA-FID-01": {
+  "programa": "PSA",
+  "rol": "FID",
+  "nombre_corto": "Emisión de cheques",
+  "texto": "Mecanismo de soporte para la emisión de cheques: con la instrucción del Comité Técnico, emite los cheques de 70% y 30%, los registra y los remite a las Delegaciones para su entrega. Pago Crítica Diagrama 5: act. 12 y 20 · ROP PSAHEM 2026 num. 10.1, fr. VIII y X Programa Estatal de Guardabosques 6 roles y 17 necesidades. Cada ministración exige reportes mensuales y su validación por el CASPEG. Los numerales de estas reglas no se pudieron verificar, por eso el origen cita las reglas completas. Contenido del expediente (bosquejo) Cada expediente varía según el tipo de persona, el predio y la modalidad; esto es lo que normalmente reúne: Solicitud Única y registro de información del núcleo agrario. Acta de asamblea que designa al Guardabosque y documentos de representación del núcleo agrario. Identificación oficial y CURP del Guardabosque. Se agrega durante el proceso: dictámenes técnico y jurídico, acuerdo del CASPEG, Contrato de Adhesión, credencial, reportes mensuales, evaluaciones y acuses de depósito. Contenido pendiente de verificar contra los numerales de las ROP PEG 2026."
+ },
+ "PEG-BEN-01": {
+  "programa": "PEG",
+  "rol": "BEN",
+  "nombre_corto": "Entrega del reporte mensual",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: permite al Guardabosque entregar a la Delegación el reporte mensual de actividades; sin reportes no hay ministración y no entregarlos es causal de baja. Entrega Crítica Diagrama 6: act. 10 · ROP PEG 2026"
+ },
+ "PEG-BEN-02": {
+  "programa": "PEG",
+  "rol": "BEN",
+  "nombre_corto": "Entrega del acuse de depósito",
+  "texto": "Mecanismo de soporte para la comprobación del pago: permite al Guardabosque entregar a la Delegación el acuse de recibo firmado de cada depósito. Entrega Alta Diagrama 6: act. 17 · ROP PEG 2026"
+ },
+ "PEG-DRF-01": {
+  "programa": "PEG",
+  "rol": "DRF",
+  "nombre_corto": "Recepción del expediente",
+  "texto": "Mecanismo de soporte para la recepción e integración del expediente: registra en ventanilla la solicitud del núcleo agrario a nombre del predio, revisa que estén completos los requisitos (Solicitud Única, registro de información y acta de asamblea que designa al Guardabosque) y remite el expediente integrado a la Dirección de Protección Forestal. Registro Crítica Diagrama 6: act. 1 y 2 · ROP PEG 2026"
+ },
+ "PEG-DRF-02": {
+  "programa": "PEG",
+  "rol": "DRF",
+  "nombre_corto": "Firma del contrato y credencial",
+  "texto": "Mecanismo de soporte para la firma del contrato: recibe el Contrato de Adhesión firmado por el Guardabosque dentro de los 10 días hábiles posteriores a la notificación, verifica las firmas, lo registra y entrega la credencial gratuita al Guardabosque. Formalización Crítica Diagrama 6: act. 8 · ROP PEG 2026"
+ },
+ "PEG-DRF-03": {
+  "programa": "PEG",
+  "rol": "DRF",
+  "nombre_corto": "Revisión de reportes y acuses",
+  "texto": "Mecanismo de soporte para la comprobación de actividades: revisa que los reportes mensuales de cada Guardabosque y los acuses de depósito estén completos y firmados, y los remite a la Dirección de Protección Forestal. Verificación Crítica Diagrama 6: act. 11 y 18 · ROP PEG 2026"
+ },
+ "PEG-DPF-01": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Revisión del expediente",
+  "texto": "Mecanismo de soporte para la revisión del expediente: revisa que el expediente que remitió la Delegación cumpla los requisitos de las reglas, lo registra, valida y digitaliza; si falta documentación o información, notifica al núcleo agrario, por conducto de la Delegación, que la complete dentro del plazo de evaluación. Revisión Alta Diagrama 6: flujo alterno A · ROP PEG 2026"
+ },
+ "PEG-DPF-02": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Dictaminación",
+  "texto": "Mecanismo de soporte para la dictaminación: evalúa cada solicitud, determina si es técnicamente factible y la cruza con el dictamen jurídico en un máximo de 45 días hábiles; con ello arma el listado preliminar de solicitudes factibles y no factibles, que remite al CASPEG. Dictaminación Crítica Diagrama 6: act. 3 y 4; flujo alterno B · ROP PEG 2026"
+ },
+ "PEG-DPF-03": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Publicación del padrón",
+  "texto": "Mecanismo de soporte para la publicación de resultados: con los acuerdos del CASPEG, publica el padrón de Guardabosques aprobado en la página de PROBOSQUE. Publicación Crítica Diagrama 6: act. 6 · ROP PEG 2026"
+ },
+ "PEG-DPF-04": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Contratos y credenciales",
+  "texto": "Mecanismo de soporte para la elaboración de contratos: genera cada Contrato de Adhesión con los datos de la solicitud que aprobó el CASPEG, sobre el modelo que validó la Unidad Jurídica, y lo remite a la Delegación para su firma, junto con la credencial de cada Guardabosque. Formalización Crítica Diagrama 6: act. 7 · ROP PEG 2026"
+ },
+ "PEG-DPF-05": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Evaluación de reportes",
+  "texto": "Mecanismo de soporte para la evaluación de reportes: evalúa los reportes mensuales de participación de cada Guardabosque antes de cada ministración, registra el resultado y lo remite al CASPEG para su validación. Evaluación Crítica Diagrama 6: act. 12 y 13 · ROP PEG 2026"
+ },
+ "PEG-DPF-06": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Solicitud de pago",
+  "texto": "Mecanismo de soporte para la solicitud de pago: comprueba que la evaluación de reportes esté validada por el CASPEG; con ello genera la solicitud de cada ministración (hasta cuatro al año), que remite a Administración y Finanzas junto con los acuses de depósito. Pago Crítica Diagrama 6: act. 15 y 19 · ROP PEG 2026"
+ },
+ "PEG-DPF-07": {
+  "programa": "PEG",
+  "rol": "DPF",
+  "nombre_corto": "Cierre del ejercicio",
+  "texto": "Mecanismo de soporte para el cierre del ejercicio: consolida los reportes, las evaluaciones y las ministraciones del ejercicio en los resultados finales, que remite al CASPEG, y mantiene actualizado el padrón de Guardabosques (altas, bajas y sustituciones). Cierre Alta Diagrama 6: act. 20 y 21 · ROP PEG 2026"
+ },
+ "PEG-UJ-01": {
+  "programa": "PEG",
+  "rol": "UJ",
+  "nombre_corto": "Dictamen jurídico",
+  "texto": "Mecanismo de soporte para el dictamen jurídico: revisa el acta de asamblea y la representación del núcleo agrario de cada solicitud, determina su procedencia y remite el dictamen a la Dirección de Protección Forestal. Dictaminación Crítica Diagrama 6: act. 3 · ROP PEG 2026; Ley Agraria"
+ },
+ "PEG-UJ-02": {
+  "programa": "PEG",
+  "rol": "UJ",
+  "nombre_corto": "Validación del contrato",
+  "texto": "Mecanismo de soporte para la validación del contrato: revisa la fundamentación legal del modelo de Contrato de Adhesión y remite el modelo validado a la Dirección de Protección Forestal. Formalización Crítica Diagrama 6: act. 7 · ROP PEG 2026"
+ },
+ "PEG-COM-01": {
+  "programa": "PEG",
+  "rol": "COM",
+  "nombre_corto": "Sesión de aprobación del CASPEG",
+  "texto": "Mecanismo de soporte para la sesión de aprobación del CASPEG: pone a disposición de sus integrantes los dictámenes y el listado preliminar y registra en acta los acuerdos que aprueban el padrón de Guardabosques con sus altas, bajas y sustituciones y autorizan su publicación. Aprobación Crítica Diagrama 6: act. 5 · ROP PEG 2026"
+ },
+ "PEG-COM-02": {
+  "programa": "PEG",
+  "rol": "COM",
+  "nombre_corto": "Validación de reportes",
+  "texto": "Mecanismo de soporte para la validación de reportes: pone a disposición del CASPEG la evaluación de reportes de la Dirección de Protección Forestal y registra su validación antes de cada ministración. Validación Alta Diagrama 6: act. 14 · ROP PEG 2026"
+ },
+ "PEG-AF-01": {
+  "programa": "PEG",
+  "rol": "AF",
+  "nombre_corto": "Depósito de ministraciones",
+  "texto": "Mecanismo de soporte para el pago: comprueba la solicitud de recurso de la Dirección de Protección Forestal, deposita cada ministración al Guardabosque ($25,550 anuales en hasta cuatro ministraciones) y la registra. Pago Crítica Diagrama 6: act. 16 · ROP PEG 2026 Propuesta: Calculadora forestal 1 rol y 5 necesidades. Propuesta sin regla de operación, a cargo de un solo rol: el equipo desarrollador. Las necesidades dicen qué hace falta conocer, no cómo se resuelve. En el origen dice si el prototipo ya cumple cada necesidad. Alcance de la propuesta Qué mide: la masa forestal como superficie con cobertura arbórea, en hectáreas. No mide biomasa ni carbono. Dónde y con qué detalle: los 125 municipios del Estado de México y el total estatal; se calcula con imágenes Sentinel-2 de 10 m y el mapa se dibuja en celdas de 90 m. Cuándo: balances anuales con imágenes de noviembre-diciembre (sin lluvias y antes de la temporada de incendios) de 2023, 2024 y 2025. 2026 entra a la serie cuando haya imágenes de noviembre-diciembre; hasta entonces solo tiene una comparación preliminar de septiembre-octubre. Cómo cambia la masa forestal: bosque final = bosque inicial − pérdida por incendio − otras pérdidas + ganancia. En el prototipo, el Estado pasa de 459,262 ha de bosque en 2023 a 454,634 ha en 2025 (−4,628 ha), con el umbral provisional. Lo que todavía no puede decir: la causa de las pérdidas que no son incendios, a qué uso del suelo pasó el terreno y qué especies hay en cada zona de bosque. Datos que faltan: los polígonos de incendios de 2025 (CONAFOR aún no los publica), datos de uso del suelo de 2023 en adelante (pueden no existir todavía) y los datos de especie del inventario forestal de CONAFOR."
+ },
+ "CF-DEV-01": {
+  "programa": "CF",
+  "rol": "DEV",
+  "nombre_corto": null,
+  "texto": "Mecanismo de soporte para la cuantificación de la masa forestal: conocer cuánta superficie de masa forestal hay cada año en cada municipio y en el Estado, y cómo evoluciona de un año a otro. Cálculo Crítica Etapa C, cálculo · Cumplida en parte en el prototipo (calcula la superficie de cada año; falta mostrar su evolución año con año)"
+ },
+ "CF-DEV-02": {
+  "programa": "CF",
+  "rol": "DEV",
+  "nombre_corto": null,
+  "texto": "Mecanismo de soporte para el balance entre dos años: conocer cuánta masa forestal se perdió y cuánta se ganó entre un año inicial y un año final que elija quien consulta, en el Estado y en cada municipio, presentado en un histograma. Consulta Alta Etapa D, consulta · Pendiente: comentario del profesor (el prototipo ya da las cifras entre dos años, pero no el histograma)"
+ },
+ "CF-DEV-03": {
+  "programa": "CF",
+  "rol": "DEV",
+  "nombre_corto": null,
+  "texto": "Mecanismo de soporte para la ubicación de incendios: conocer dónde y cuándo hubo incendios forestales y cuánta masa forestal se perdió por ellos. Registro Alta Etapa A, registro de incendios · Cumplida en el prototipo (falta 2025, que CONAFOR aún no publica)"
+ },
+ "CF-DEV-04": {
+  "programa": "CF",
+  "rol": "DEV",
+  "nombre_corto": null,
+  "texto": "Mecanismo de soporte para el cambio de uso del suelo: conocer a qué uso del suelo pasó el terreno donde se perdió masa forestal (agrícola, urbano u otro), con los datos de uso del suelo que existan para los años analizados, los cuales pueden o no estar disponibles para los años más recientes. Registro Alta Etapa B, integración de datos base · Pendiente: comentario del profesor (la serie más reciente de uso del suelo del INEGI es la VII, publicada en 2021, y la VIII no se ha publicado; para 2023 a 2026 solo hay coberturas globales como Dynamic World, que no son uso del suelo oficial)"
+ },
+ "CF-DEV-05": {
+  "programa": "CF",
+  "rol": "DEV",
+  "nombre_corto": null,
+  "texto": "Mecanismo de soporte para la identificación de especies: conocer qué especies forestales hay en el bosque de cada municipio. Registro Alta Etapa B, integración de datos base · Pendiente: comentario del profesor (las imágenes satelitales no distinguen especies; el inventario forestal de CONAFOR con especies que encontramos publicado es de 2015 a 2020)"
+ }
+}
