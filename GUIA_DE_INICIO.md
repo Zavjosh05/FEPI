@@ -147,7 +147,7 @@ la base se crea: si la cambias después, borra la base con `docker compose down 
 
 ### 1.8 Pruebas automáticas (opcional)
 
-Desde `sistema/`, la corrida completa de esta versión (128 pruebas, unos 2 minutos, con Chromium para los
+Desde `sistema/`, la corrida completa de esta versión (129 pruebas, unos 3 minutos, con Chromium para los
 recorridos):
 
 ```bash

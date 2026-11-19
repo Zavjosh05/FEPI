@@ -12,13 +12,31 @@ pytestmark = pytest.mark.django_db
 
 def test_hu_1_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-1.1")
-    assert len(hu["criterios"]) == 2
+    assert hu["criterios"] == ["Se genera un folio único para la solicitud."]
     assert "CC-DRF-01" in modelo["necesidad_a_funciones"] and "M1.1" in modelo["necesidad_a_funciones"]["CC-DRF-01"]
     assert "municipio que atiende la Delegación" in necesidades["CC-DRF-01"]["texto"]
 
 
+def test_hu_1_1_genera_folio_unico(nueva_solicitud):
+    """Criterio: se genera un folio único para la solicitud (programa, ejercicio, Delegación y consecutivo)."""
+    from django.db import IntegrityError, transaction
+
+    exps = [nueva_solicitud(nombre=f"Predio {i}") for i in range(3)]
+    exps.append(nueva_solicitud(usuario="del_toluca", municipio="Toluca", nombre="Predio de Toluca"))
+    folios = [e.folio for e in exps]
+    assert len(set(folios)) == len(folios)
+    assert all(f.startswith("CC-2026-AME-") for f in folios[:3]) and folios[3].startswith("CC-2026-TOL-")
+    # El consecutivo es del programa y ejercicio: no se repite aunque cambie la Delegación.
+    numeros = [int(f.rsplit("-", 1)[1]) for f in folios]
+    assert numeros == sorted(numeros) and len(set(numeros)) == len(numeros)
+    # La base de datos tampoco admite dos expedientes con el mismo folio.
+    exps[1].folio = exps[0].folio
+    with pytest.raises(IntegrityError), transaction.atomic():
+        exps[1].save(update_fields=["folio"])
+
+
 def test_hu_1_1_existe_solicitud_asociada_al_predio_con_acuse(nueva_solicitud, usuarios):
-    """Criterio 1: existe una solicitud asociada al predio y se genera su acuse con fecha y hora de recepción."""
+    """Regla del registro: la solicitud queda asociada al predio y se emite su acuse con fecha y hora de recepción."""
     exp = nueva_solicitud(nombre="Predio El Pino")
     assert exp.predio.nombre == "Predio El Pino" and exp.predio.folio.startswith("PRED-")
     assert exp.estado.clave == "recibida"
@@ -41,7 +59,7 @@ def test_hu_1_1_acuse_pdf_lleva_folio_fecha_y_hora(nueva_solicitud):
 
 
 def test_hu_1_1_predio_en_municipio_que_atiende_la_delegacion(nueva_solicitud):
-    """Criterio 2: el predio está en un municipio que atiende la Delegación."""
+    """Regla del registro (ROP CC 8.1.3): el predio está en un municipio que atiende la Delegación."""
     exp = nueva_solicitud(municipio="Tlalmanalco")
     assert exp.predio.municipio.delegacion == exp.delegacion
 

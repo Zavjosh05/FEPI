@@ -423,13 +423,11 @@
    "funcion": "M1.1",
    "titulo": "Registro de la solicitud",
    "rol": "personal de la Delegación",
-   "desea": "que cada solicitud quede asociada a su predio",
-   "hace": "registro la solicitud que entrega la persona solicitante",
-   "meta": "iniciar el trámite",
-   "texto": "Como personal de la Delegación, quiero que cada solicitud quede asociada a su predio, por lo que registro la solicitud que entrega la persona solicitante, para iniciar el trámite.",
+   "desea": "registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa",
+   "meta": "iniciar su trámite",
+   "texto": "Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite.",
    "criterios": [
-    "Existe una solicitud asociada al predio y se genera su acuse con la fecha y la hora de recepción.",
-    "El predio está en un municipio que atiende la Delegación."
+    "Se genera un folio único para la solicitud."
    ],
    "puntos": 3,
    "sprint": 1
@@ -439,10 +437,9 @@
    "funcion": "M1.2",
    "titulo": "Revisión del expediente",
    "rol": "personal de la Delegación",
-   "desea": "recibir el expediente completo",
-   "hace": "reviso los requisitos y envío el expediente digitalizado a la Dirección",
+   "desea": "revisar los requisitos del expediente y enviarlo digitalizado a la Dirección",
    "meta": "que la solicitud no se detenga por falta de documentos",
-   "texto": "Como personal de la Delegación, quiero recibir el expediente completo, por lo que reviso los requisitos y envío el expediente digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.",
+   "texto": "Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.",
    "criterios": [
     "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante.",
     "El expediente digital está en la Dirección, con la fecha y la hora del envío."
@@ -455,10 +452,9 @@
    "funcion": "M1.3",
    "titulo": "Ubicación del predio",
    "rol": "personal de la Delegación",
-   "desea": "conocer la ubicación y la superficie real del predio",
-   "hace": "registro el polígono levantado en campo",
-   "meta": "que la solicitud se dictamine y se verifique con datos de campo",
-   "texto": "Como personal de la Delegación, quiero conocer la ubicación y la superficie real del predio, por lo que registro el polígono levantado en campo, para que la solicitud se dictamine y se verifique con datos de campo.",
+   "desea": "registrar el polígono del predio levantado en campo",
+   "meta": "conocer su ubicación y su superficie real al dictaminar y verificar",
+   "texto": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar.",
    "criterios": [
     "Existe un polígono asociado al expediente del predio.",
     "Si el polígono cambia de lugar, existen el anterior y el nuevo."
@@ -471,10 +467,9 @@
    "funcion": "M1.4",
    "titulo": "Validación del expediente",
    "rol": "personal del área responsable del programa",
-   "desea": "saber si el expediente cumple las reglas",
-   "hace": "lo valido y aviso los faltantes",
+   "desea": "validar el expediente contra las reglas del programa y avisar los faltantes",
    "meta": "que la solicitud pase a dictamen o se corrija a tiempo",
-   "texto": "Como personal del área responsable del programa, quiero saber si el expediente cumple las reglas, por lo que lo valido y aviso los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo.",
+   "texto": "Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo.",
    "criterios": [
     "El expediente está validado o tiene un aviso de faltantes con fecha límite.",
     "En un refrendo, la documentación legal vigente de hasta 3 años es válida."
@@ -487,10 +482,9 @@
    "funcion": "M2.1",
    "titulo": "Dictamen técnico",
    "rol": "personal del área responsable del programa",
-   "desea": "saber qué solicitudes son técnicamente factibles",
-   "hace": "elaboro el dictamen técnico y el listado preliminar",
+   "desea": "elaborar el dictamen técnico de cada solicitud y el listado preliminar",
    "meta": "proponer al Comité qué solicitudes apoyar",
-   "texto": "Como personal del área responsable del programa, quiero saber qué solicitudes son técnicamente factibles, por lo que elaboro el dictamen técnico y el listado preliminar, para proponer al Comité qué solicitudes apoyar.",
+   "texto": "Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, para proponer al Comité qué solicitudes apoyar.",
    "criterios": [
     "Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo.",
     "Existe un listado preliminar con el resultado técnico y jurídico de cada solicitud.",
@@ -504,10 +498,9 @@
    "funcion": "M2.2",
    "titulo": "Dictamen jurídico",
    "rol": "personal de la Unidad Jurídica",
-   "desea": "confirmar que quien solicita puede recibir el apoyo",
-   "hace": "dictamino su documentación legal y reviso si tiene incumplimientos",
+   "desea": "dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas",
    "meta": "que solo se aprueben solicitudes procedentes",
-   "texto": "Como personal de la Unidad Jurídica, quiero confirmar que quien solicita puede recibir el apoyo, por lo que dictamino su documentación legal y reviso si tiene incumplimientos, para que solo se aprueben solicitudes procedentes.",
+   "texto": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes.",
    "criterios": [
     "Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo.",
     "Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente."
@@ -520,10 +513,9 @@
    "funcion": "M2.3",
    "titulo": "Sesión de aprobación",
    "rol": "integrante del Comité",
-   "desea": "aprobar los resultados de la convocatoria con la información completa",
-   "hace": "reviso los documentos de la sesión y apruebo los listados",
+   "desea": "aprobar en sesión los listados de la convocatoria",
    "meta": "que se puedan publicar",
-   "texto": "Como integrante del Comité, quiero aprobar los resultados de la convocatoria con la información completa, por lo que reviso los documentos de la sesión y apruebo los listados, para que se puedan publicar.",
+   "texto": "Como integrante del Comité, quiero aprobar en sesión los listados de la convocatoria, para que se puedan publicar.",
    "criterios": [
     "Existe la convocatoria con orden del día y documentos, y la fecha y la hora de su envío.",
     "Existe un acta con los listados aprobados y la autorización de publicación."
@@ -536,10 +528,9 @@
    "funcion": "M2.4",
    "titulo": "Sesiones de seguimiento",
    "rol": "integrante del Comité",
-   "desea": "resolver los casos que surgen durante el ejercicio",
-   "hace": "sesiono y tomo los acuerdos que corresponden",
-   "meta": "que cada área los lleve a cabo",
-   "texto": "Como integrante del Comité, quiero resolver los casos que surgen durante el ejercicio, por lo que sesiono y tomo los acuerdos que corresponden, para que cada área los lleve a cabo.",
+   "desea": "tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo",
+   "meta": "atender los casos que surgen durante el ejercicio",
+   "texto": "Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio.",
    "criterios": [
     "Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo.",
     "En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes."
@@ -552,10 +543,9 @@
    "funcion": "M3.1",
    "titulo": "Publicación y notificaciones",
    "rol": "personal del área responsable del programa",
-   "desea": "que cada persona conozca su resultado y lo que debe hacer",
-   "hace": "publico los listados y envío los avisos por conducto de la Delegación",
+   "desea": "publicar los listados aprobados y avisar a cada persona su resultado por conducto de la Delegación",
    "meta": "que los plazos corran desde una notificación comprobable",
-   "texto": "Como personal del área responsable del programa, quiero que cada persona conozca su resultado y lo que debe hacer, por lo que publico los listados y envío los avisos por conducto de la Delegación, para que los plazos corran desde una notificación comprobable.",
+   "texto": "Como personal del área responsable del programa, quiero publicar los listados aprobados y avisar a cada persona su resultado por conducto de la Delegación, para que los plazos corran desde una notificación comprobable.",
    "criterios": [
     "Los listados autorizados por el Comité están publicados en la fecha de la convocatoria.",
     "Cada aviso tiene su acuse y la fecha y la hora de envío y de notificación."
@@ -568,10 +558,9 @@
    "funcion": "M3.2",
    "titulo": "Elaboración del contrato",
    "rol": "personal del área responsable del programa",
-   "desea": "contar con el contrato de cada solicitud aprobada",
-   "hace": "lo elaboro sobre el modelo validado por la Unidad Jurídica y lo envío a la Delegación",
+   "desea": "elaborar el contrato de cada solicitud aprobada sobre el modelo validado y enviarlo a la Delegación",
    "meta": "que se firme",
-   "texto": "Como personal del área responsable del programa, quiero contar con el contrato de cada solicitud aprobada, por lo que lo elaboro sobre el modelo validado por la Unidad Jurídica y lo envío a la Delegación, para que se firme.",
+   "texto": "Como personal del área responsable del programa, quiero elaborar el contrato de cada solicitud aprobada sobre el modelo validado y enviarlo a la Delegación, para que se firme.",
    "criterios": [
     "Existe un contrato por solicitud aprobada, elaborado sobre un modelo validado.",
     "Existe la fecha y la hora del envío a la Delegación."
@@ -584,10 +573,9 @@
    "funcion": "M3.3",
    "titulo": "Firma del contrato",
    "rol": "personal de la Delegación",
-   "desea": "que cada persona beneficiaria firme su contrato dentro del plazo",
-   "hace": "la cito, recabo su firma y verifico las firmas y el sello",
+   "desea": "recabar la firma del contrato dentro del plazo y verificar las firmas y el sello",
    "meta": "formalizar el apoyo",
-   "texto": "Como personal de la Delegación, quiero que cada persona beneficiaria firme su contrato dentro del plazo, por lo que la cito, recabo su firma y verifico las firmas y el sello, para formalizar el apoyo.",
+   "texto": "Como personal de la Delegación, quiero recabar la firma del contrato dentro del plazo y verificar las firmas y el sello, para formalizar el apoyo.",
    "criterios": [
     "Existe el contrato firmado, con la fecha y la hora de la firma, dentro del plazo.",
     "En MFS existe el contrato de servicios técnicos con el RFN y la carta compromiso; en PEG, la credencial entregada.",
@@ -601,10 +589,9 @@
    "funcion": "M3.4",
    "titulo": "Entrega de planta",
    "rol": "personal del vivero",
-   "desea": "entregar solo la planta autorizada",
-   "hace": "valido el Vale de Planta antes de entregar la planta por especie y cantidad",
-   "meta": "que lo entregado coincida con lo autorizado",
-   "texto": "Como personal del vivero, quiero entregar solo la planta autorizada, por lo que valido el Vale de Planta antes de entregar la planta por especie y cantidad, para que lo entregado coincida con lo autorizado.",
+   "desea": "validar el Vale de Planta y registrar la salida de planta por especie y cantidad",
+   "meta": "entregar solo la planta autorizada",
+   "texto": "Como personal del vivero, quiero validar el Vale de Planta y registrar la salida de planta por especie y cantidad, para entregar solo la planta autorizada.",
    "criterios": [
     "Existe un Vale de Planta vigente por la especie y la cantidad entregadas.",
     "La salida de planta tiene especie, cantidad y fecha.",
@@ -618,10 +605,9 @@
    "funcion": "M4.1",
    "titulo": "Envío de comprobaciones",
    "rol": "persona beneficiaria",
-   "desea": "que quede constancia de mis entregas",
-   "hace": "envío mis avisos, informes y reportes a la Delegación",
+   "desea": "enviar mis avisos, informes y reportes a la Delegación",
    "meta": "comprobar mis actividades dentro del plazo",
-   "texto": "Como persona beneficiaria, quiero que quede constancia de mis entregas, por lo que envío mis avisos, informes y reportes a la Delegación, para comprobar mis actividades dentro del plazo.",
+   "texto": "Como persona beneficiaria, quiero enviar mis avisos, informes y reportes a la Delegación, para comprobar mis actividades dentro del plazo.",
    "criterios": [
     "Cada envío tiene su acuse con la fecha y la hora.",
     "Una entrega en persona en la Delegación tiene el mismo registro."
@@ -634,10 +620,9 @@
    "funcion": "M4.2",
    "titulo": "Verificación en campo",
    "rol": "personal de la Delegación",
-   "desea": "comprobar en campo que se cumplió lo comprometido",
-   "hace": "hago la visita de verificación y documento las incidencias",
+   "desea": "registrar el resultado de la verificación en campo y sus incidencias",
    "meta": "determinar el pago o el trámite que corresponde",
-   "texto": "Como personal de la Delegación, quiero comprobar en campo que se cumplió lo comprometido, por lo que hago la visita de verificación y documento las incidencias, para determinar el pago o el trámite que corresponde.",
+   "texto": "Como personal de la Delegación, quiero registrar el resultado de la verificación en campo y sus incidencias, para determinar el pago o el trámite que corresponde.",
    "criterios": [
     "Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del plazo del programa.",
     "Cada incidencia tiene su tipo y el documento que la avala."
@@ -650,10 +635,9 @@
    "funcion": "M4.3",
    "titulo": "Evaluación de reportes",
    "rol": "personal del área responsable del programa",
-   "desea": "saber si cada Guardabosque cumplió en el periodo",
-   "hace": "evalúo los reportes mensuales que revisó la Delegación",
+   "desea": "evaluar por periodo los reportes mensuales de cada Guardabosque",
    "meta": "que el CASPEG valide la evaluación antes de cada pago",
-   "texto": "Como personal del área responsable del programa, quiero saber si cada Guardabosque cumplió en el periodo, por lo que evalúo los reportes mensuales que revisó la Delegación, para que el CASPEG valide la evaluación antes de cada pago.",
+   "texto": "Como personal del área responsable del programa, quiero evaluar por periodo los reportes mensuales de cada Guardabosque, para que el CASPEG valide la evaluación antes de cada pago.",
    "criterios": [
     "Existe la evaluación por Guardabosque y por periodo.",
     "Queda identificado quién no entregó su reporte."
@@ -666,10 +650,9 @@
    "funcion": "M5.1",
    "titulo": "Solicitud de pago",
    "rol": "personal del área responsable del programa",
-   "desea": "que cada ministración se solicite con sus soportes completos",
-   "hace": "envío la solicitud con el contrato, el oficio y la verificación o la evaluación",
+   "desea": "solicitar el pago de cada ministración con todos sus soportes",
    "meta": "que se pague sin pedir nada más",
-   "texto": "Como personal del área responsable del programa, quiero que cada ministración se solicite con sus soportes completos, por lo que envío la solicitud con el contrato, el oficio y la verificación o la evaluación, para que se pague sin pedir nada más.",
+   "texto": "Como personal del área responsable del programa, quiero solicitar el pago de cada ministración con todos sus soportes, para que se pague sin pedir nada más.",
    "criterios": [
     "La solicitud tiene todos sus soportes.",
     "Existe la fecha y la hora del envío a Administración y Finanzas."
@@ -682,10 +665,9 @@
    "funcion": "M5.2",
    "titulo": "Pago de la ministración",
    "rol": "personal de Administración y Finanzas",
-   "desea": "pagar solo lo que está comprobado",
-   "hace": "reviso la solicitud y realizo el pago o lo remito a la Fiduciaria",
+   "desea": "revisar la solicitud de pago y pagar la ministración o remitirla a la Fiduciaria",
    "meta": "que la persona beneficiaria reciba su apoyo",
-   "texto": "Como personal de Administración y Finanzas, quiero pagar solo lo que está comprobado, por lo que reviso la solicitud y realizo el pago o lo remito a la Fiduciaria, para que la persona beneficiaria reciba su apoyo.",
+   "texto": "Como personal de Administración y Finanzas, quiero revisar la solicitud de pago y pagar la ministración o remitirla a la Fiduciaria, para que la persona beneficiaria reciba su apoyo.",
    "criterios": [
     "Cada pago está asociado a su solicitud, con la fecha del pago.",
     "En PSAHEM existe la fecha de remisión a la Fiduciaria."
@@ -698,10 +680,9 @@
    "funcion": "M5.3",
    "titulo": "Entrega de cheques",
    "rol": "personal de la Fiduciaria",
-   "desea": "pagar a las personas beneficiarias de PSAHEM",
-   "hace": "emito los cheques y los envío a las Delegaciones",
-   "meta": "que se entreguen a cada persona",
-   "texto": "Como personal de la Fiduciaria, quiero pagar a las personas beneficiarias de PSAHEM, por lo que emito los cheques y los envío a las Delegaciones, para que se entreguen a cada persona.",
+   "desea": "emitir los cheques de PSAHEM y enviarlos a las Delegaciones",
+   "meta": "que se entreguen a cada persona beneficiaria",
+   "texto": "Como personal de la Fiduciaria, quiero emitir los cheques de PSAHEM y enviarlos a las Delegaciones, para que se entreguen a cada persona beneficiaria.",
    "criterios": [
     "Cada cheque está asociado a su persona beneficiaria y a su ministración, con la fecha y la hora del envío.",
     "Existe la fecha de entrega de cada cheque."
@@ -714,10 +695,9 @@
    "funcion": "M6.1",
    "titulo": "Lista de espera y sustituciones",
    "rol": "personal del área responsable del programa",
-   "desea": "aprovechar todo el presupuesto",
-   "hace": "propongo al Comité las reasignaciones, las sustituciones y la atención de los casos especiales",
-   "meta": "que el apoyo continúe o se libere según el caso",
-   "texto": "Como personal del área responsable del programa, quiero aprovechar todo el presupuesto, por lo que propongo al Comité las reasignaciones, las sustituciones y la atención de los casos especiales, para que el apoyo continúe o se libere según el caso.",
+   "desea": "proponer al Comité la reasignación del recurso liberado, las sustituciones y la atención de los casos especiales",
+   "meta": "aprovechar todo el presupuesto",
+   "texto": "Como personal del área responsable del programa, quiero proponer al Comité la reasignación del recurso liberado, las sustituciones y la atención de los casos especiales, para aprovechar todo el presupuesto.",
    "criterios": [
     "Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera.",
     "Cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora."
@@ -730,10 +710,9 @@
    "funcion": "M6.2",
    "titulo": "Incumplimientos y reintegros",
    "rol": "personal del área responsable del programa",
-   "desea": "que los incumplimientos se corrijan o se sancionen",
-   "hace": "doy seguimiento a la suspensión, a la cancelación y a la devolución del recurso",
-   "meta": "proteger el recurso público",
-   "texto": "Como personal del área responsable del programa, quiero que los incumplimientos se corrijan o se sancionen, por lo que doy seguimiento a la suspensión, a la cancelación y a la devolución del recurso, para proteger el recurso público.",
+   "desea": "dar seguimiento a las omisiones, la suspensión, la cancelación y la devolución del recurso",
+   "meta": "que los incumplimientos se corrijan o se sancionen",
+   "texto": "Como personal del área responsable del programa, quiero dar seguimiento a las omisiones, la suspensión, la cancelación y la devolución del recurso, para que los incumplimientos se corrijan o se sancionen.",
    "criterios": [
     "Cada omisión tiene su plazo para corregirse.",
     "Un apoyo cancelado tiene su requerimiento de devolución con el monto y la cuenta para el depósito.",
@@ -747,10 +726,9 @@
    "funcion": "M6.3",
    "titulo": "Cierre del ejercicio",
    "rol": "personal del área responsable del programa",
-   "desea": "conocer e informar los resultados del ejercicio",
-   "hace": "integro los resultados finales, el informe anual y el padrón",
+   "desea": "integrar los resultados finales, el padrón y el informe anual del ejercicio",
    "meta": "cerrar el ejercicio y cumplir con la Ley de Transparencia",
-   "texto": "Como personal del área responsable del programa, quiero conocer e informar los resultados del ejercicio, por lo que integro los resultados finales, el informe anual y el padrón, para cerrar el ejercicio y cumplir con la Ley de Transparencia.",
+   "texto": "Como personal del área responsable del programa, quiero integrar los resultados finales, el padrón y el informe anual del ejercicio, para cerrar el ejercicio y cumplir con la Ley de Transparencia.",
    "criterios": [
     "Los resultados finales coinciden con las verificaciones y los pagos.",
     "El padrón está publicado y actualizado.",
@@ -764,10 +742,9 @@
    "funcion": "M7.1",
    "titulo": "Masa forestal por año",
    "rol": "integrante del equipo desarrollador",
-   "desea": "conocer cuánta masa forestal hay cada año y cómo evoluciona",
-   "hace": "calculo la superficie con masa forestal de cada año disponible",
-   "meta": "que PROBOSQUE conozca la cifra del Estado y de cada municipio",
-   "texto": "Como integrante del equipo desarrollador, quiero conocer cuánta masa forestal hay cada año y cómo evoluciona, por lo que calculo la superficie con masa forestal de cada año disponible, para que PROBOSQUE conozca la cifra del Estado y de cada municipio.",
+   "desea": "calcular la superficie con masa forestal de cada año disponible",
+   "meta": "que PROBOSQUE conozca la cifra del Estado y de cada municipio y cómo evoluciona",
+   "texto": "Como integrante del equipo desarrollador, quiero calcular la superficie con masa forestal de cada año disponible, para que PROBOSQUE conozca la cifra del Estado y de cada municipio y cómo evoluciona.",
    "criterios": [
     "Existe la superficie en hectáreas de cada año disponible, por municipio y para el Estado.",
     "Existe la evolución año con año."
@@ -780,10 +757,9 @@
    "funcion": "M7.2",
    "titulo": "Balance entre dos años",
    "rol": "integrante del equipo desarrollador",
-   "desea": "saber cuánta masa forestal se perdió y cuánta se ganó en un periodo",
-   "hace": "calculo el balance entre el año inicial y el año final que se elijan",
-   "meta": "presentarlo en un histograma",
-   "texto": "Como integrante del equipo desarrollador, quiero saber cuánta masa forestal se perdió y cuánta se ganó en un periodo, por lo que calculo el balance entre el año inicial y el año final que se elijan, para presentarlo en un histograma.",
+   "desea": "calcular el balance de masa forestal entre el año inicial y el año final que se elijan",
+   "meta": "presentar en un histograma cuánto se perdió y cuánto se ganó",
+   "texto": "Como integrante del equipo desarrollador, quiero calcular el balance de masa forestal entre el año inicial y el año final que se elijan, para presentar en un histograma cuánto se perdió y cuánto se ganó.",
    "criterios": [
     "Existe la pérdida, la ganancia y el cambio neto en hectáreas, para el Estado y cada municipio.",
     "Existe el histograma del periodo elegido."
@@ -796,10 +772,9 @@
    "funcion": "M7.3",
    "titulo": "Pérdida por incendios",
    "rol": "integrante del equipo desarrollador",
-   "desea": "saber dónde y cuándo hubo incendios y cuánta masa forestal se perdió por ellos",
-   "hace": "integro los incendios que publica CONAFOR",
+   "desea": "integrar los incendios que publica CONAFOR y la masa forestal que se perdió por ellos",
    "meta": "ubicar las zonas más dañadas",
-   "texto": "Como integrante del equipo desarrollador, quiero saber dónde y cuándo hubo incendios y cuánta masa forestal se perdió por ellos, por lo que integro los incendios que publica CONAFOR, para ubicar las zonas más dañadas.",
+   "texto": "Como integrante del equipo desarrollador, quiero integrar los incendios que publica CONAFOR y la masa forestal que se perdió por ellos, para ubicar las zonas más dañadas.",
    "criterios": [
     "Cada incendio tiene su ubicación y su fecha.",
     "Existe la pérdida por incendio en hectáreas, por año y por municipio.",
@@ -813,10 +788,9 @@
    "funcion": "M7.4",
    "titulo": "Cambio de uso del suelo",
    "rol": "integrante del equipo desarrollador",
-   "desea": "saber a qué uso pasó el terreno donde se perdió masa forestal",
-   "hace": "integro los datos de uso del suelo que existan para cada año",
+   "desea": "clasificar el uso del suelo al que pasó el terreno donde se perdió masa forestal",
    "meta": "conocer las causas del cambio",
-   "texto": "Como integrante del equipo desarrollador, quiero saber a qué uso pasó el terreno donde se perdió masa forestal, por lo que integro los datos de uso del suelo que existan para cada año, para conocer las causas del cambio.",
+   "texto": "Como integrante del equipo desarrollador, quiero clasificar el uso del suelo al que pasó el terreno donde se perdió masa forestal, para conocer las causas del cambio.",
    "criterios": [
     "La pérdida está clasificada como agrícola, urbana u otra, con el año y la fuente de los datos.",
     "Un año sin datos de uso del suelo queda señalado."
@@ -829,10 +803,9 @@
    "funcion": "M7.5",
    "titulo": "Especies por municipio",
    "rol": "integrante del equipo desarrollador",
-   "desea": "saber qué especies forestales hay en el bosque de cada municipio",
-   "hace": "integro los datos de especie del inventario forestal de CONAFOR",
+   "desea": "integrar las especies que registra el inventario forestal de CONAFOR en cada municipio",
    "meta": "conocer la composición del bosque",
-   "texto": "Como integrante del equipo desarrollador, quiero saber qué especies forestales hay en el bosque de cada municipio, por lo que integro los datos de especie del inventario forestal de CONAFOR, para conocer la composición del bosque.",
+   "texto": "Como integrante del equipo desarrollador, quiero integrar las especies que registra el inventario forestal de CONAFOR en cada municipio, para conocer la composición del bosque.",
    "criterios": [
     "Cada municipio tiene su lista de especies registradas, con el periodo del inventario.",
     "Un municipio sin registros queda señalado."

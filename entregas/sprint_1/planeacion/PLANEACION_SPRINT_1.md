@@ -32,7 +32,7 @@ muestre la masa forestal de cada año por municipio y su evolución.
 
 | Historia | Título | Puntos | Criterios de aceptación |
 | --- | --- | ---: | --- |
-| HU-1.1 | Registro de la solicitud | 3 | Solicitud asociada al predio con acuse de fecha y hora; el predio está en un municipio que atiende la Delegación |
+| HU-1.1 | Registro de la solicitud | 3 | Se genera un folio único para la solicitud |
 | HU-1.2 | Revisión del expediente | 3 | Cada requisito del programa, tipo de persona y modalidad revisado; expediente digital en la Dirección con fecha y hora del envío |
 | HU-1.3 | Ubicación del predio | 5 | Polígono asociado al expediente; si cambia de lugar, se conservan el anterior y el nuevo |
 | HU-1.4 | Validación del expediente | 3 | Expediente validado o con aviso de faltantes con fecha límite; en refrendo vale la documentación legal de hasta 3 años |
@@ -41,7 +41,21 @@ muestre la masa forestal de cada año por municipio y su evolución.
 | HU-2.3 | Sesión de aprobación | 3 | Convocatoria con orden del día, documentos, fecha y hora; acta con los listados aprobados y la autorización de publicación |
 | HU-2.4 | Sesiones de seguimiento | 3 | Cada acuerdo dice a qué expedientes aplica y qué área lo cumple; instrucción de pago por ministración (PSAHEM) y validación de reportes por periodo (PEG) |
 | HU-7.1 | Masa forestal por año | 8 | Superficie en hectáreas de cada año disponible, por municipio; evolución año con año |
-| | **Total de historias** | **36** | 19 criterios |
+| | **Total de historias** | **36** | 18 criterios |
+
+**Historias de usuario** (formato «Como [rol], quiero [acción], para [beneficio]»):
+
+| Historia | Redacción |
+| --- | --- |
+| HU-1.1 | Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite. |
+| HU-1.2 | Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos. |
+| HU-1.3 | Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar. |
+| HU-1.4 | Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo. |
+| HU-2.1 | Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, para proponer al Comité qué solicitudes apoyar. |
+| HU-2.2 | Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes. |
+| HU-2.3 | Como integrante del Comité, quiero aprobar en sesión los listados de la convocatoria, para que se puedan publicar. |
+| HU-2.4 | Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio. |
+| HU-7.1 | Como integrante del equipo desarrollador, quiero calcular la superficie con masa forestal de cada año disponible, para que PROBOSQUE conozca la cifra del Estado y de cada municipio y cómo evoluciona. |
 
 **Fuera del alcance:** publicación de resultados, contrato, pagos, ejecución y cierre (sprints 2 y 3), y las reglas
 de los otros cinco programas.
@@ -171,7 +185,7 @@ al cerrar cada historia.
 ## 10. Resultado al cierre
 
 - **Historias:** las 9 construidas, 36 puntos.
-- **Pruebas del sistema:** 128 en verde: 119 sin navegador y 9 recorridos con el navegador.
+- **Pruebas del sistema:** 128 en verde al cierre (119 sin navegador y 9 recorridos con el navegador); 129 desde que la HU-1.1 tiene el criterio de folio único.
 - **Pruebas de la Calculadora:** 15 en verde.
 - **Capturas:** 60, en `entregas/sprint_1/capturas/`.
 - **Resumen:** `entregas/sprint_1/Resumen_sprint_1.pdf`.

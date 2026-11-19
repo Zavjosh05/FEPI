@@ -179,13 +179,21 @@ navegador (`e2e/test_recorrido_hu_2_3.py`) con capturas `hu_2_3_*`.
 
 ### T04 · Registro de la solicitud (HU-1.1, 3 puntos)
 
-**Objetivo.** Criterios de aceptación:
+**Historia.** Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona
+solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite.
 
-1. Existe una solicitud asociada al predio y su acuse con la fecha y la hora.
-2. El predio está en un municipio que atiende la Delegación.
+**Criterio de aceptación:** se genera un folio único para la solicitud.
 
 **Cómo se diseñó.**
 
+- **Tres grupos de datos,** que son las secciones del formulario:
+  - Datos específicos del programa: programa y ejercicio, tipo de persona, modalidad, refrendo, representante legal y
+    observaciones. Va primero porque los tipos de persona y las modalidades dependen del programa.
+  - Datos del predio: folio de predio ya registrado, municipio, nombre, superficie y localidad.
+  - Datos generales de la persona solicitante: nombre o razón social, CURP, RFC, teléfono, correo y representante.
+- **Folio único.** Tiene la forma `CC-2026-AME-0001`: programa, ejercicio, Delegación y un consecutivo del programa y
+  ejercicio. El consecutivo se toma con bloqueo de fila (`Consecutivo.siguiente`), así que dos registros simultáneos
+  no reciben el mismo número. Además, la base de datos no admite folios repetidos (restricción `unique`).
 - Solo la Delegación registra.
 - **Validación del municipio.** Si el municipio del predio lo atiende otra Delegación, se rechaza y el mensaje dice
   cuál (ROP CC 8.1.3). El formulario lo avisa con HTMX al elegir el municipio, antes de enviar.
@@ -201,8 +209,11 @@ navegador (`e2e/test_recorrido_hu_2_3.py`) con capturas `hu_2_3_*`.
 - Plantillas `registrar.html` y `_delegacion_municipio.html` (aviso con HTMX).
 - La pestaña Solicitud del expediente.
 
-**Cómo se comprobó.** 9 pruebas en `test_hu_1_1.py` y el recorrido con navegador (capturas `hu_1_1_*`, incluida la
-bandeja en un teléfono).
+**Cómo se comprobó.** 10 pruebas en `test_hu_1_1.py`. El criterio lo comprueba
+`test_hu_1_1_genera_folio_unico`: cuatro solicitudes de dos Delegaciones reciben folios distintos con consecutivo
+creciente, y la base de datos rechaza un folio repetido. Las demás pruebas cubren las reglas del registro: acuse,
+municipio de la Delegación, solo la Delegación registra y predio ya registrado. Además, el recorrido con navegador
+(capturas `hu_1_1_*`, incluida la bandeja en un teléfono).
 
 **Commit:** `6ee4927`.
 
@@ -516,7 +527,7 @@ base de datos.
 - `herramientas/diagrama_er.py`, que genera `docs/modelo_datos.md` (diagramas por área) y `docs/modelo_datos.mmd`
   (completo).
 
-**Cómo se comprobó.** Los dos recorridos en verde dentro de la batería completa (128 pruebas). El de la interfaz se
+**Cómo se comprobó.** Los dos recorridos en verde dentro de la batería completa (128 pruebas al cierre; 129 con la prueba del folio único). El de la interfaz se
 agregó tras la revisión con el cliente, cuando se pidió confirmar el funcionamiento por pantallas además de por
 servicios.
 
@@ -529,7 +540,7 @@ servicios.
 | Persona | Commits | Pruebas propias | Capturas |
 | --- | --- | ---: | --- |
 | Joshua | `6f6a11f` (con Cin), `40ac657`, `9b4a013`, `045feb7`, `ecb61db`, `faef4b1` | 34 del núcleo + 11 de HU-2.3 + su recorrido | `hu_2_3_*` |
-| Omar | `6ee4927`, `2c92b2c`, `15e7511`, `26bb9b7` | 41 (HU-1.1 a 1.4) + sus recorridos | `hu_1_1_*` a `hu_1_4_*` |
+| Omar | `6ee4927`, `2c92b2c`, `15e7511`, `26bb9b7` | 42 (HU-1.1 a 1.4) + sus recorridos | `hu_1_1_*` a `hu_1_4_*` |
 | Cin | `6f6a11f` (reglas), `50269bf`, `3417f37`, `160ae8b` | 9 de reglas + 23 (HU-2.1 y 2.2) + sus recorridos | `hu_2_1_*`, `hu_2_2_*` |
 | Angel | `d8b71ff`, `a27e107`, `68dc445`, `450a5ac` | 15 de la Calculadora + 9 de HU-2.4 + los dos recorridos completos | `hu_7_1_*`, `hu_2_4_*`, `recorrido_sprint_1_*` |
 

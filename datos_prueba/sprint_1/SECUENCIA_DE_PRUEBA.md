@@ -9,7 +9,7 @@ hallazgo.
 | Fuente | Qué trae | Para qué sirve |
 | --- | --- | --- |
 | **Demostración** (`cargar_demo`, se carga sola al levantar el sistema) | Usuarios de cada unidad; doce solicitudes de Capturando Carbono 2026 detenidas en cada paso del trámite; una sesión de aprobación con acta; una sesión de seguimiento con tres acuerdos; una persona en el Listado de Incumplidas | Ver cada pantalla con datos y continuar trámites a medias sin capturar desde cero |
-| **Pruebas automáticas** (`sistema/pruebas/`) | 128 pruebas que crean sus propios datos, entre ellas un recorrido completo por servicios y nueve recorridos con el navegador | Comprobar el sistema sin intervención (Guía de inicio, sección 1.8) |
+| **Pruebas automáticas** (`sistema/pruebas/`) | 129 pruebas que crean sus propios datos, entre ellas un recorrido completo por servicios y nueve recorridos con el navegador | Comprobar el sistema sin intervención (Guía de inicio, sección 1.8) |
 | **Esta carpeta** (`datos_prueba/sprint_1/`) | Polígonos para subir, documentos PDF de ejemplo y fichas de solicitudes | Probar a mano lo que la demostración no permite: subir archivos y capturar solicitudes nuevas con resultados conocidos |
 
 Antes de esta carpeta, el proyecto no tenía archivos para que una persona probara la carga de polígonos y documentos:

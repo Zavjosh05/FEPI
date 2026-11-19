@@ -1,6 +1,6 @@
 {
   "cifras": {
-    "pruebas_sistema": "128",
+    "pruebas_sistema": "129",
     "pruebas_calculadora": "15",
     "capturas": "60",
     "tablas": "33"
@@ -17,7 +17,7 @@
   "historias": {
     "HU-1.1": {
       "commit": "6ee4927",
-      "como": "Ventanilla de la Delegación: la solicitud se registra a nombre del predio, que recibe un folio propio y lo conserva entre programas. Se genera el acuse en PDF con fecha y hora de recepción. El servicio rechaza un predio cuyo municipio no atiende esa Delegación y dice cuál le corresponde."
+      "como": "Ventanilla de la Delegación: el formulario agrupa los datos generales de la persona solicitante, los del predio y los específicos del programa. Al registrar se genera el folio único de la solicitud (programa, ejercicio, Delegación y consecutivo; la base de datos no admite folios repetidos). Además, el predio recibe su propio folio, se emite el acuse en PDF con fecha y hora, y se rechaza un predio cuyo municipio no atiende esa Delegación."
     },
     "HU-1.2": {
       "commit": "2c92b2c",

@@ -113,14 +113,17 @@ Usuario de ejemplo: `del_amecameca`.
 
 En la bandeja, pulsa **Registrar solicitud** y llena:
 
-- **Programa y solicitud**: programa y ejercicio, tipo de persona, modalidad (tipo de superficie), si es refrendo, si
-  se solicita por medio de representante legal y observaciones de la ventanilla.
-- **Predio**: folio de predio ya registrado (si ya tuvo expediente en PROBOSQUE), municipio, nombre del predio,
-  superficie solicitada en hectáreas y localidad o paraje.
-- **Persona solicitante**: nombre o razón social, CURP, RFC, teléfono, correo y representante legal o comisariado.
+- **Datos específicos del programa**: programa y ejercicio, tipo de persona, modalidad (tipo de superficie), si es
+  refrendo, si se solicita por medio de representante legal y observaciones de la ventanilla.
+- **Datos del predio**: folio de predio ya registrado (si ya tuvo expediente en PROBOSQUE), municipio, nombre del
+  predio, superficie solicitada en hectáreas y localidad o paraje.
+- **Datos generales de la persona solicitante**: nombre o razón social, CURP, RFC, teléfono, correo y representante
+  legal o comisariado.
 
-Pulsa **Registrar y generar acuse**. El expediente queda en «Solicitud recibida» y se genera el **acuse de
-recepción** en PDF, con el folio, la fecha, la hora y el plazo de 5 días hábiles para completar la documentación.
+Pulsa **Registrar y generar acuse**. Se genera el **folio único** de la solicitud (por ejemplo `CC-2026-AME-0001`:
+programa, ejercicio, Delegación y un consecutivo que no se repite en el programa y ejercicio). El expediente queda en
+«Solicitud recibida» y se emite el **acuse de recepción** en PDF, con el folio, la fecha, la hora y el plazo de 5 días
+hábiles para completar la documentación.
 
 ![Solicitud registrada con su acuse](entregas/sprint_1/capturas/hu_1_1_05_solicitud_registrada_con_acuse.png)
 
