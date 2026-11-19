@@ -103,12 +103,12 @@ Recibe la solicitud en la Delegación, integra el expediente digital del predio 
 **M1.2 · HU-1.2 · Revisión del expediente** — 3 puntos · sprint 1
 - Función: Revisión de los requisitos según el programa, el tipo de persona y la modalidad; digitalización del expediente (incluido el PTRFI en RHF) y su envío a la Dirección, con la fecha y la hora del envío.
 - Historia: Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.
-- Criterios: (1) Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante. (2) El expediente digital está en la Dirección, con la fecha y la hora del envío.
+- Criterios: (1) Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica. (2) El expediente digital está en la Dirección, con la fecha y la hora del envío.
 - Necesidades: CC-DRF-01, MFS-DRF-01, PS-DRF-01, RHF-PSF-01, RHF-DRF-01, PSA-DRF-01, PEG-DRF-01
 
 **M1.3 · HU-1.3 · Ubicación del predio** — 5 puntos · sprint 1
 - Función: Ubicación del predio: polígono levantado en campo por la Delegación o por el prestador de servicios forestales, Diagnóstico Técnico (RHF) y cambio de lugar del polígono antes de plantar (PS).
-- Historia: Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar.
+- Historia: Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales, para conocer su ubicación y su superficie real al dictaminar y verificar.
 - Criterios: (1) Existe un polígono asociado al expediente del predio. (2) Si el polígono cambia de lugar, existen el anterior y el nuevo.
 - Necesidades: CC-DRF-01, MFS-PSF-01, MFS-DRF-01, PS-BEN-01, PS-DRF-01, PS-DRF-05, RHF-DRF-01, PSA-DRF-01
 
@@ -130,8 +130,8 @@ Determina si cada solicitud procede y lleva al Comité lo que debe aprobar o aco
 
 **M2.2 · HU-2.2 · Dictamen jurídico** — 3 puntos · sprint 1
 - Función: Dictamen jurídico de la documentación legal, con el cotejo del Listado de Personas Beneficiarias Incumplidas y de los predios con procedimiento o sanción (en PEG, acta de asamblea y representación del núcleo agrario).
-- Historia: Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes.
-- Criterios: (1) Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo. (2) Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente.
+- Historia: Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes.
+- Criterios: (1) Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo. (2) Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente.
 - Necesidades: CC-UJ-01, MFS-UJ-01, PS-UJ-01, RHF-UJ-01, PSA-UJ-01, PEG-UJ-01
 
 **M2.3 · HU-2.3 · Sesión de aprobación** — 3 puntos · sprint 1

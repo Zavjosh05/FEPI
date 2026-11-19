@@ -441,7 +441,7 @@
    "meta": "que la solicitud no se detenga por falta de documentos",
    "texto": "Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.",
    "criterios": [
-    "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante.",
+    "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica.",
     "El expediente digital está en la Dirección, con la fecha y la hora del envío."
    ],
    "puntos": 3,
@@ -452,9 +452,9 @@
    "funcion": "M1.3",
    "titulo": "Ubicación del predio",
    "rol": "personal de la Delegación",
-   "desea": "registrar el polígono del predio levantado en campo",
+   "desea": "registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales",
    "meta": "conocer su ubicación y su superficie real al dictaminar y verificar",
-   "texto": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar.",
+   "texto": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales, para conocer su ubicación y su superficie real al dictaminar y verificar.",
    "criterios": [
     "Existe un polígono asociado al expediente del predio.",
     "Si el polígono cambia de lugar, existen el anterior y el nuevo."
@@ -498,12 +498,12 @@
    "funcion": "M2.2",
    "titulo": "Dictamen jurídico",
    "rol": "personal de la Unidad Jurídica",
-   "desea": "dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas",
+   "desea": "dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción",
    "meta": "que solo se aprueben solicitudes procedentes",
-   "texto": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes.",
+   "texto": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes.",
    "criterios": [
     "Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo.",
-    "Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente."
+    "Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente."
    ],
    "puntos": 3,
    "sprint": 1

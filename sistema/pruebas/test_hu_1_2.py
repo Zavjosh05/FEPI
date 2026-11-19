@@ -33,7 +33,7 @@ def test_hu_1_2_requisitos_segun_programa_tipo_de_persona_y_modalidad(nueva_soli
 
 
 def test_hu_1_2_cada_requisito_queda_entregado_o_faltante(nueva_solicitud, usuarios, pdf):
-    """Criterio 1: cada requisito está revisado como entregado o faltante (o no aplica si es condicional)."""
+    """Criterio 1: cada requisito está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica."""
     exp = nueva_solicitud()
     assert exp.revisiones.filter(estado=EstadoRevision.PENDIENTE).count() == exp.revisiones.count()
     completar_requisitos(usuarios["del_amecameca"], exp, faltar=("CC-REQ-08",))

@@ -14,6 +14,22 @@ original (12-13 de noviembre de 2026).
   - las páginas de historias del PDF de la propuesta (11 a 15 y 21 a 22), con el mismo estilo y la misma
     numeración. Las demás páginas se conservan tal cual.
 
+## 19 de noviembre de 2026 · HU-1.2, HU-1.3 y HU-2.2 dicen lo que ya hace su función
+
+**Motivo.** Revisión de las historias contra su función y las pantallas (documento «Historias de usuario e
+interfaces»). Tres historias decían menos que su función o mezclaban los dos catálogos del dictamen jurídico. El
+sistema ya hacía lo que dicen ahora, así que el código no cambió.
+
+| Historia | Antes | Ahora |
+| --- | --- | --- |
+| HU-1.2, criterio 1 | Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante. | Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica. |
+| HU-1.3, historia | Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar. | Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales, para conocer su ubicación y su superficie real al dictaminar y verificar. |
+| HU-2.2, historia | Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes. | Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes. |
+| HU-2.2, criterio 2 | Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente. | Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente. |
+
+Títulos, roles, puntos, sprints, funciones y número de criterios, iguales. Se actualizaron `datos/modelo.json`,
+`CONTEXTO.md`, la matriz y las páginas de historias del PDF de la propuesta.
+
 ## 18 de noviembre de 2026 · La propuesta entra al repositorio
 
 La carpeta de la propuesta se versiona como `propuesta/`. Cambios al incorporarla:
