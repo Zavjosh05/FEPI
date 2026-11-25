@@ -169,4 +169,4 @@ M5) se unió a `prototipos`, que tiene el sprint 3. Decisiones en la bitácora (
 | I-4 | Trazabilidad en M4 y M6 (historial, pestaña y una prueba por historia) | Hecho | `9f5fd39` |
 | I-5 | Historias de M1 a M6 en `modelo.json` (redacción de las observaciones y criterio de trazabilidad) y en la propuesta | Hecho | `a0c0d78` |
 | I-6 | Manual de usuario, README del sistema y modelo de datos | Hecho | `4451923` |
-| I-7 | Batería completa (también con PDF reales) y Calculadora | En curso | — |
+| I-7 | Batería completa (también con PDF reales) y Calculadora | Hecho | 614 rápidas + 40 de navegador; con PDF reales 613 + 40 (1 omitida a propósito); Calculadora 77 |
