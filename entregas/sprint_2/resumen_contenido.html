@@ -5,9 +5,9 @@
   encontró en las Reglas de Operación y qué falta.</p>
   <table>
     <tr><td class="gris">Prototipo</td><td>Contrato y pagos (módulos M3 y M5); balance e incendios (M7.2 y M7.3)</td></tr>
-    <tr><td class="gris">Construcción</td><td>14 al 16 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Construcción</td><td>14 al 16 de noviembre de 2026; ajustes por las observaciones del profesor, 24 y 25 de noviembre</td></tr>
     <tr><td class="gris">Historias</td><td>9 de 26 (37 de 112 puntos); con el sprint 1, 18 de 26</td></tr>
-    <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>prototipos</code></td></tr>
+    <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>sprint-2</code> (el sprint 2 con los ajustes del 23 de noviembre; la rama <code>prototipos</code> trae el sistema completo)</td></tr>
     <tr><td class="gris">Autor</td><td>Joshua Zavaleta</td></tr>
     <tr><td class="gris">Antecedente</td><td>Resumen del sprint 1 (<code>entregas/sprint_1/Resumen_sprint_1.pdf</code>)</td></tr>
   </table>
@@ -192,7 +192,7 @@ con folio y código como respaldo.</p>
 <table>
   <thead><tr><th style="width:36%">Comprobación</th><th>Resultado al cierre del sprint</th></tr></thead>
   <tbody>
-    <tr><td>Pruebas automáticas del sistema</td><td>{{pruebas_sistema}} en verde, corridas también con todos los documentos PDF reales</td></tr>
+    <tr><td>Pruebas automáticas del sistema</td><td>{{pruebas_sistema}} en verde; al cierre del 16 de noviembre, las 432 de entonces también con todos los documentos PDF reales</td></tr>
     <tr><td>Pruebas de la Calculadora</td><td>{{pruebas_calculadora}} en verde</td></tr>
     <tr><td>Recorrido completo por servicios</td><td>Una solicitud por programa (Capturando Carbono, PS, RHF y PSAHEM), de aprobada a la primera ministración pagada, comprobando en cada relevo estado, bandeja, acuse, bitácora y fechas</td></tr>
     <tr><td>Recorrido completo por la interfaz</td><td>Con clics y cambio de usuario en cada relevo: PS, de aprobada al pago, con vale y planta; y PSAHEM, de contrato firmado al cheque entregado</td></tr>
@@ -207,7 +207,25 @@ con folio y código como respaldo.</p>
 nueve en este (por ejemplo, un folio que llevaba a una pantalla desde la que no se podía registrar la entrega del
 aviso, o un menú que ya no cabía en la pantalla). Todos están en la bitácora y se corrigieron dentro del sprint.</p>
 
-<h2>8. Cómo se trabajó</h2>
+<h2>8. Ajustes por las observaciones del profesor (23 de noviembre)</h2>
+<p>En la revisión del 23 de noviembre el profesor hizo seis observaciones al sprint 1. Se atendieron primero en la rama del
+sprint 1 y el 24 de noviembre se integraron en esta rama, extendiéndolas a la publicación, el contrato y los pagos, porque la
+baja, la lista de espera y el historial ya no terminan en el acta del Comité. Nada cambió el alcance de las nueve historias
+de este sprint ni sus puntos.</p>
+<table>
+  <tr><th>Observación</th><th>Qué se hizo</th></tr>
+  <tr><td>Cada observación de la validación debe hacerse correctamente (HU-1.4)</td><td>Cada requisito faltante lleva la observación de la Dirección, obligatoria; el aviso de faltantes, la notificación y la pestaña Requisitos la muestran.</td></tr>
+  <tr><td>Falta el documento que expide el dictamen técnico y el jurídico (HU-2.1 y HU-2.2)</td><td>Cada dictamen expide su documento en PDF, con folio DT- o DJ-, firmas y huella, adjunto al expediente.</td></tr>
+  <tr><td>Recordar la parte jurídica sobre la propiedad (HU-2.2)</td><td>El dictamen jurídico revisa la acreditación de la propiedad o legal posesión del predio; sin ella no puede ser procedente.</td></tr>
+  <tr><td>El criterio de HU-2.4 está mal; título de reasignaciones o manejo de incidentes</td><td><strong>HU-2.4, «Reasignaciones e incidentes»:</strong> cada incidente tiene su acuerdo, causa, expedientes y área; la persona que sale queda dada de baja y entra la siguiente de la lista de espera, en su orden, sin rebasar el recurso liberado. Con el sprint 2, la baja procede en cualquier etapa anterior a la primera ministración solicitada: dada de baja, la persona ya no firma, no recibe contrato ni vale y no cobra; el recurso liberado por no firmar en plazo se reasigna igual; la reasignación se publica con el acta de la sesión de seguimiento.</td></tr>
+  <tr><td>Lista de candidatos en una vista distinta de la de beneficiarios (HU-2.3)</td><td>Menú «Listados» con Candidatos y Beneficiarios; Beneficiarios sigue a la persona en la publicación, el contrato y el pago y muestra las bajas.</td></tr>
+  <tr><td>Registros para la trazabilidad en la base de datos (todas las historias)</td><td>Criterio de trazabilidad en las siete historias de M3 y M5 (y en las de M1 y M2); el historial de cada tabla de <code>contrato</code> y <code>pagos</code> registra siempre al usuario y se ve en la pestaña «Trazabilidad» del expediente.</td></tr>
+</table>
+<p>Con esto el sistema pasó a 59 tablas y la batería de pruebas, de 432 a 473 en verde (442 sin navegador y 31 recorridos con el
+navegador), con los recorridos completos del sprint 2 sin cambios. El detalle, con las historias antes y ahora, está en
+<code>Registro_de_cambios_observaciones_23_nov.pdf</code> y en el renglón D-30 de <code>entregas/BITACORA.md</code>.</p>
+
+<h2>9. Cómo se trabajó</h2>
 <ul>
   <li><b>Una historia, un commit.</b> Desde este sprint cada historia tiene su archivo de código, sus tablas con su
   propia migración y sus pruebas, y se registra por separado en cuanto pasa sus pruebas.</li>
@@ -228,7 +246,7 @@ aviso, o un menú que ya no cabía en la pantalla). Todos están en la bitácora
   hallazgo y decisión con su estado; <code>entregas/AVANCE.md</code>, cada tarea con su commit.</li>
 </ul>
 
-<h2>9. Límites y lo que sigue</h2>
+<h2>10. Límites y lo que sigue</h2>
 <ul>
   <li><b>Dos programas sin reglas.</b> MFS y Guardabosques se cargan al inicio del sprint 3.</li>
   <li><b>Segunda ministración.</b> Queda bloqueada hasta que exista la verificación en campo.</li>

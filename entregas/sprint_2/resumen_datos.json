@@ -1,11 +1,11 @@
 {
   "cifras": {
-    "pruebas_sistema": "432",
+    "pruebas_sistema": "473 (442 sin navegador y 31 recorridos con el navegador; 432 al cierre del 16 de noviembre)",
     "pruebas_calculadora": "43",
     "capturas": "120",
-    "tablas": "56",
-    "tiempo_rapidas": "3 minutos",
-    "tiempo_completa": "5 minutos, y 8 con todos los PDF reales"
+    "tablas": "59",
+    "tiempo_rapidas": "3 min 23 s",
+    "tiempo_completa": "unos 6 minutos (442 rápidas y 31 recorridos con el navegador)"
   },
   "situacion_programa": {
     "CC": "Con reglas; recorrido completo hasta el primer pago",
