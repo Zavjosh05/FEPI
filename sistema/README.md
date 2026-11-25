@@ -136,7 +136,7 @@ notificada y por elaborar. En HU-3.3 cada uno de PS y RHF tiene un segundo lote 
 sesión y publicación: en PS, dos contratos firmados en plazo (Mirador de los Pinos, Ladera Verde) y uno sin firma al
 vencer el plazo, señalado y por liberar (Cañada Seca); en RHF, tres firmados (Arroyo Claro, Cerro Gordo y Peña Blanca, esta
 de RFI Modalidad uno, que no recibe planta). Cañada Seca venció su plazo de firma por el calendario (publicada el 24-sep). Plantación Los Pinos queda por firmar en
-la Delegación. La página pública de resultados está en
+la Delegación, a un día hábil de vencer el día de la carga (D-32). La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
 programas si faltan.
 
@@ -716,7 +716,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   vez por situación, de los entregados sin cobro **por vencer** (5 días hábiles o menos) o **vencidos**, y hay un panel en las bandejas.
   Solo es aviso: la baja por cheque vencido (8.1.9, fr. VII) es del sprint 3.
 - **Demostración.** En PSAHEM, cheque emitido (Paraje Las Ánimas), enviado (Monte Alto), entregado (Cerro del Venado) y entregado hace
-  el 21-ago, por vencer sin cobro en la fecha de corte (Loma Verde); Bosque Los Cedros espera su cheque.
+  casi tres meses, por vencer sin cobro en la fecha de corte (Loma Verde: vence a dos días hábiles de ella;
+  `demo_calendario.entrega_cheque_por_vencer`); Bosque Los Cedros espera su cheque.
 
 ### Tropiezos de interfaz del sprint 2 (P-23 a P-31)
 
@@ -751,13 +752,22 @@ La carga de demostración (`nucleo/demo.py`, `dictamen/demo.py`, `contrato/demo.
 calendario de la Convocatoria 2026 (`nucleo/demo_calendario.py`): solicitudes entre el 3-feb y el 24-mar (recepción del 28-ene al
 27-mar), dictámenes de abril a junio (límite 30-jun en CC y PSAHEM; 30-abr en PS y RHF), sesión de aprobación de CC el 14-jul y de
 PSAHEM el 15-jul (aprobación del 1 al 31-jul), y, donde las reglas no dan fecha límite de aprobación (PS y RHF), sesiones en agosto,
-septiembre y noviembre para que los plazos de firma estén vigentes o vencidos según el caso. Casos fuera de plazo a propósito:
+septiembre y pocos días antes de la fecha de corte para que los plazos de firma estén vigentes o vencidos según el caso. Casos fuera de plazo a propósito:
 Los Ocotes (revisión sin terminar, plazo de la ventanilla vencido), El Tecolote (desechada), El Ocotal (dictamen vencido), Potrero
 Viejo (dictaminado el 15-jul, fuera de plazo), Cañada Seca (sin firma en plazo), Ladera Verde y Cerro Gordo (vales vencidos) y
-Loma Verde (cheque entregado el 21-ago, por vencer). **Fecha de corte:** el «hoy» de la demostración es el 19-nov-2026
-(`DEMO_FECHA_CORTE=AAAA-MM-DD` la cambia): con ella se señalan lo sin firma y lo por vencer, y lo vigente (vales, firmas por vencer) se
-arma hacia atrás desde ella. La carga da lo mismo el día que se corra (se prueba corriéndola con un reloj de 2031) y es idempotente.
-Una vez cargada, el sistema usa el reloj real, así que un sitio de demostración viejo muestra sus plazos vencidos, como cualquier
+Loma Verde (cheque por vencer). **Fecha de corte (D-32):** el «hoy» de la demostración es **el día en que se corre la carga**,
+sin bajar del 19-nov-2026 ni pasar del 31-dic-2026 (en 2027 la demostración queda como al cierre del ejercicio 2026);
+`DEMO_FECHA_CORTE=AAAA-MM-DD` fija otra dentro de ese rango (`docker-compose.yml` la pasa al contenedor; las pruebas la fijan en el
+19-nov en `pruebas/conftest.py`). Se calcula una vez al empezar (`demo_calendario.carga()`; cada `cargar_demo` lleva `@con_corte`).
+Lo que sirve por estar cerca de «hoy» (primer lote de PS y RHF con sesión, publicación, notificaciones y contratos; vales y sus
+salidas; solicitudes de pago, revisiones, remisiones y cheques de octubre y noviembre; sesiones de seguimiento de CC y PSAHEM) está
+escrito en el calendario de referencia (corte el 19-nov) y `demo_calendario.reciente` lo traslada a la fecha de corte conservando
+los días hábiles que lo separan de ella; si la fecha de corte es inhábil, se cuenta desde el siguiente día hábil (`ancla`) y nada
+queda después de hoy. El cheque de Loma Verde se arma desde su entrega, que `entrega_cheque_por_vencer` elige para que su plazo de
+3 meses venza a dos días hábiles. Con el corte de referencia, la carga es idéntica a la anterior; con otro, cada caso queda en el
+mismo punto (`test_demo_fecha_de_corte_es_hoy_y_los_casos_quedan_en_su_punto`, con un martes de diciembre, un sábado y 2027). El
+resto (recepción, dictamen, sesiones de julio, segundo lote de septiembre) no depende del día de la carga, que es idempotente. Una
+vez cargada, el sistema usa el reloj real, así que una demostración cargada hace días muestra sus plazos vencidos, como cualquier
 expediente real.
 
 **Bordes de los plazos (G-03).** `pruebas/test_nucleo_plazos_bordes.py` fija, con el reloj simulado, el último momento válido y el

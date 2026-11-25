@@ -1,12 +1,14 @@
 """Datos de demostración del módulo M5 (idempotente): un lote de solicitudes aprobadas, publicadas, contratadas y con su oficio
 en CC, PS, RHF y PSAHEM, con la solicitud de la primera ministración en cada punto del camino. Todo con los servicios de M1, M2,
 M3 y M5, igual que la interfaz, y en las fechas del calendario de 2026 (reloj simulado, ``nucleo/reloj.py``; ver
-``nucleo/demo_calendario.py`` para la fecha de corte, 19-nov-2026 por omisión).
+``nucleo/demo_calendario.py`` para la fecha de corte, por omisión el día de la carga).
 
 **Calendario del lote** (``CALENDARIO``): registro en marzo (recepción hasta el 27-mar), dictámenes en abril a junio, sesión de
 aprobación del Comité en julio (CC y PSAHEM; aprobación del 1 al 31-jul) o en agosto (PS y RHF, sin fecha límite), publicación dos
 días hábiles después, notificación, contrato elaborado y enviado, y firma dentro de los 10 días hábiles; el oficio de la Delegación
-y la solicitud de pago siguen después, cada destino en su fecha (``FECHAS_DESTINO``).
+y la solicitud de pago siguen después, cada destino en su fecha (``FECHAS_DESTINO``). Las fechas de octubre y noviembre son del
+calendario de referencia (corte el 19-nov-2026) y se trasladan a la fecha de corte de la carga en días hábiles (``reciente``,
+D-32); las de Loma Verde, a partir de su entrega (``entrega_cheque_por_vencer``), para que su cheque quede siempre por vencer.
 
 HU-5.1: CC (pago único de 4 ha, 70 % de 6 a 9 ha), PS, RHF y PSAHEM con su oficio de la Delegación y su comprobante de cuenta
 donde las reglas lo piden: solicitudes enviadas a Administración y Finanzas, una por enviar con todos sus soportes y un contrato
@@ -19,8 +21,9 @@ Fiduciaria) y, en PSAHEM, la Secretaría Técnica solicita a la Fiduciaria el pa
 dentro de sus 5 días hábiles.
 
 HU-5.3: la Fiduciaria emite el cheque de las solicitudes remitidas; uno queda emitido (Paraje Las Ánimas), otro enviado a la
-Delegación (Monte Alto), otro entregado a la persona (Cerro del Venado) y otro entregado el 21-ago, que vence el 23-nov y está por
-vencer sin cobro en la fecha de corte (Loma Verde). ``revisar_cobros`` deja el aviso en la bitácora.
+Delegación (Monte Alto), otro entregado a la persona (Cerro del Venado) y otro entregado hace casi tres meses (el 21-ago con el
+corte de referencia), que vence a dos días hábiles de la fecha de corte y está por vencer sin cobro (Loma Verde).
+``revisar_cobros`` deja el aviso en la bitácora.
 
 Cada solicitud lleva su ``destino``: lo que las historias HU-5.2 y HU-5.3 hacen después con ella (devolver, pagar, remitir a la
 Fiduciaria, emitir y entregar el cheque); cada historia agrega su paso al final de ``cargar_demo``.
@@ -35,7 +38,8 @@ from dictamen import seguimiento, sesiones
 from dictamen.demo import paso, sesion_aprobacion
 from dictamen.models import TipoSesion
 from nucleo.demo import _pdf_demo, archivo_demo
-from nucleo.demo_calendario import cuando, fecha_corte, habil, habil_antes
+from nucleo.demo_calendario import (con_corte, cuando, entrega_cheque_por_vencer, fecha_corte, habil, habil_antes, reciente,
+                                    trasladar)
 from nucleo.models import Ejercicio, Expediente, Unidad, Usuario
 
 from . import cheques, pagos, solicitudes
@@ -98,9 +102,21 @@ FECHAS_DESTINO = {
                               envio="2026-08-19", entrega="2026-08-21"),
 }
 # Instrucciones de pago del Comité Técnico de PSAHEM (sesión de seguimiento): las de noviembre y la de agosto (Loma Verde).
+# Fechas del calendario de referencia: «pagada» se queda en septiembre; lo demás se traslada (``_fecha``).
+ENTREGA_POR_VENCER = "2026-08-21"   # entrega del cheque de Loma Verde en la referencia: todo su trámite se cuenta desde ella
 SESIONES_INSTRUCCION = (("2026-11-04", ("Rancho El Pedregal", "Ejido La Joya", "Bosque Los Cedros", "Paraje Las Ánimas",
                                         "Monte Alto", "Cerro del Venado")),
                         ("2026-08-12", ("Loma Verde",)))
+
+
+def _fecha(fecha, destino):
+    """Fecha de un paso de ``destino`` llevada a la fecha de corte: la de «pagada» (septiembre) queda fija; las de Loma Verde se
+    cuentan desde su entrega por vencer; las demás desde la fecha de corte (``reciente``)."""
+    if destino == "pagada":
+        return fecha
+    if destino == "cheque_por_vencer":
+        return trasladar(fecha, ENTREGA_POR_VENCER, entrega_cheque_por_vencer())
+    return reciente(fecha)
 
 
 def _ejercicio(clave):
@@ -172,10 +188,10 @@ def _tramitar(u, exp, destino, clave):
     deleg, drff = _delegacion(u, exp), u["dir_drff"]
     if destino in SIN_COMPROBANTE:
         return
-    f = FECHAS_DESTINO.get(destino, {})
+    f = {k: _fecha(v, destino) for k, v in FECHAS_DESTINO.get(destino, {}).items()}
     oficio = CALENDARIO[clave]["oficio"]
     if destino == "cheque_por_vencer":
-        oficio = "2026-08-10"
+        oficio = _fecha("2026-08-10", destino)
     with paso(oficio, 10):
         solicitudes.emitir_oficio(deleg, exp)
         if any(s["clave"] == "comprobante_cuenta" for s in solicitudes.soportes_requeridos(exp, 1)):
@@ -196,7 +212,7 @@ def _revisiones(u):
     for sol in SolicitudPago.objects.filter(estado=EstadoSolicitud.ENVIADA, ministracion=1).select_related(
             "expediente__predio", "expediente__ejercicio__programa"):
         destino = DESTINOS.get(sol.expediente.predio.nombre)
-        f = FECHAS_DESTINO.get(destino, {})
+        f = {k: _fecha(v, destino) for k, v in FECHAS_DESTINO.get(destino, {}).items()}
         if destino == "devuelta":
             with paso(f["revision"], 10):
                 pagos.revisar_solicitud(af, sol, "devuelta", "El comprobante de la cuenta bancaria no es legible; la Delegación debe "
@@ -231,7 +247,7 @@ def _cheques(u):
         destino = DESTINOS.get(sol.expediente.predio.nombre)
         if destino not in ("cheque_emitido", "cheque_enviado", "cheque_entregado", "cheque_por_vencer"):
             continue
-        f = FECHAS_DESTINO[destino]
+        f = {k: _fecha(v, destino) for k, v in FECHAS_DESTINO[destino].items()}
         with paso(f["emision"], 10):
             cheque = cheques.emitir_cheque(fid, sol, f"FIPASAHEM-{sol.pk:06d}")
         if destino != "cheque_emitido":
@@ -241,12 +257,14 @@ def _cheques(u):
             with paso(f["entrega"], 12):
                 cheque = cheques.registrar_entrega(_delegacion(u, sol.expediente), cheque, sol.expediente.solicitante.nombre)
         hechas += 1
-    # Loma Verde se entregó el 21-ago: en la fecha de corte le quedan 2 días hábiles para cobrarlo.
+    # Loma Verde se entregó hace casi tres meses: en la fecha de corte le quedan 2 días hábiles (contados desde el ancla) para
+    # cobrarlo.
     with paso(fecha_corte(), 9):
         cheques.revisar_cobros(fecha_corte())
     return hechas
 
 
+@con_corte
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -259,7 +277,8 @@ def cargar_demo():
         if clave == "PSA":
             por_nombre = {e.predio.nombre: e for e, _ in exps}
             for fecha, nombres in SESIONES_INSTRUCCION:
-                _instruccion_de_pago(u, ejercicio, [por_nombre[n] for n in nombres], fecha)
+                destino = DESTINOS[nombres[0]]
+                _instruccion_de_pago(u, ejercicio, [por_nombre[n] for n in nombres], _fecha(fecha, destino))
         for exp, destino in exps:
             if clave == "PS" and destino != "sin_oficio":
                 _planta_completa(u, exp, CALENDARIO["PS"]["planta"])

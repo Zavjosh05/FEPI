@@ -21,6 +21,7 @@ x-entorno: &entorno
   USAR_X_ACCEL: "1"
   MAPA_TESELAS_URL: ${MAPA_TESELAS_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
   CARGAR_DEMO: ${CARGAR_DEMO:-1}
+  DEMO_FECHA_CORTE: ${DEMO_FECHA_CORTE:-}   # vacía: la demostración toma el día de la carga (D-32)
 
 services:
   bd:

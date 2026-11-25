@@ -5,9 +5,10 @@ que la interfaz. Las de CC aprobadas las deja ``dictamen/demo.py``.
 **Calendario.** La carga corre con el reloj simulado (``nucleo/reloj.py``) y cada paso ocurre en su fecha del calendario de 2026
 (``nucleo/demo_calendario.py``): registro en febrero (recepción del 28-ene al 27-mar), dictámenes en abril y mayo (PS y RHF
 hasta el 30-abr; PSAHEM hasta el 30-jun), y la sesión del Comité de PSAHEM el 15-jul (aprobación del 1 al 31-jul). PS y RHF no
-tienen fecha límite de aprobación («hasta agotar el recurso»): su primer lote se aprueba en noviembre, para que sus plazos de
-firma sigan corriendo en la fecha de corte, y el segundo en septiembre. La fecha de corte (19-nov-2026 por omisión) es el «hoy» de
-la demostración: lo vencido se vence por el calendario y lo vigente se arma hacia atrás desde ella.
+tienen fecha límite de aprobación («hasta agotar el recurso»): su segundo lote se aprueba en septiembre y el primero pocos días
+antes de la fecha de corte, para que sus plazos de firma sigan corriendo. La fecha de corte (por omisión, el día de la carga; D-32)
+es el «hoy» de la demostración: lo vencido se vence por el calendario y lo reciente se arma hacia atrás desde ella, en días
+hábiles (``reciente``). Las fechas que se citan abajo son las del calendario de referencia (corte el 19-nov-2026).
 
 HU-3.1: PS y RHF ya publicaron sus resultados (a distintas horas); en PS la Delegación notificó el resultado
 y la cita de la primera solicitud, y en RHF solo el resultado; lo demás queda por notificar. PSAHEM y CC
@@ -34,7 +35,7 @@ from contrato.models import Contrato, Especie, ModeloContrato, TipoModelo, ValeP
 from dictamen import juridico, tecnico
 from dictamen.demo import _validada, paso, propiedad_en_regla, sesion_aprobacion
 from dictamen.models import SesionComite, TipoSesion
-from nucleo.demo_calendario import cuando, fecha_corte, habil
+from nucleo.demo_calendario import con_corte, cuando, fecha_corte, habil, reciente
 from nucleo.models import Ejercicio, Expediente, Usuario
 
 # programa: [(usuario de la Delegación, municipio, predio, persona, modalidad, hectáreas, fecha de registro)]
@@ -46,7 +47,8 @@ SOLICITUDES = {
     "PSA": [("del_toluca", "Ocoyoacac", "Bosque El Zarco", "Felipe Hernández Ramos", "cuenca_alta", 30, "2026-02-23"),
             ("del_valle", "Villa Victoria", "Monte La Loma", "Josefina Colín Becerril", "cuenca_media_baja", 25, "2026-02-24")],
 }
-# programa: (fecha de la sesión de aprobación, primer día de dictamen técnico, primer día de dictamen jurídico)
+# programa: (fecha de la sesión de aprobación, primer día de dictamen técnico, primer día de dictamen jurídico). Las sesiones de
+# PS y RHF están en el calendario de referencia (corte el 19-nov) y se trasladan a la fecha de corte de la carga (``reciente``).
 PRIMER_LOTE = {"PS": ("2026-11-03", "2026-04-08", "2026-04-14"), "RHF": ("2026-11-04", "2026-04-09", "2026-04-15"),
                "PSA": ("2026-07-15", "2026-05-12", "2026-05-19")}
 
@@ -68,6 +70,7 @@ def dictaminar_lote(u, ejercicio, filas, tecnico_desde, juridico_desde):
     return exps
 
 
+@con_corte
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -78,6 +81,8 @@ def cargar_demo():
         if ejercicio is None or SesionComite.objects.filter(ejercicio=ejercicio).exists():
             continue
         fecha_sesion, tecnico_desde, juridico_desde = PRIMER_LOTE[clave]
+        if clave in ("PS", "RHF"):
+            fecha_sesion = reciente(fecha_sesion)
         creadas += len(dictaminar_lote(u, ejercicio, solicitudes, tecnico_desde, juridico_desde))
         sesion_aprobacion(st, ejercicio, fecha_sesion, ["Listado preliminar"])
     creadas += _publicaciones(u)
@@ -87,7 +92,7 @@ def cargar_demo():
     return creadas
 
 
-# programa: (publicación, [(fecha de la entrega, medio) de cada aviso de la primera solicitud])
+# programa: (publicación, [(fecha de la entrega, medio) de cada aviso de la primera solicitud]); calendario de referencia.
 PUBLICAR = {"PS": ("2026-11-05", [("2026-11-06", "personal"), ("2026-11-09", "telefono")]),
             "RHF": ("2026-11-06", [("2026-11-09", "personal")])}
 
@@ -102,12 +107,12 @@ def _publicaciones(u):
                   .order_by("-fecha_hora").first())
         if sesion is None:
             continue
-        with paso(fecha, 10, 30):
+        with paso(reciente(fecha), 10, 30):
             pub = publicacion.publicar(drff, sesion)
         primera = pub.renglones.order_by("folio").first().expediente
         for (dia, medio), tipo in zip(entregas, ("resultados", "cita_firma")):
             n = primera.notificaciones.get(tipo=tipo)
-            with paso(dia, 11):
+            with paso(reciente(dia), 11):
                 publicacion.registrar_entrega(_delegacion(u, primera), n, medio, observaciones="Entregado (demostración).")
         hechas += 1
     return hechas
@@ -151,10 +156,10 @@ def _contratos(u):
         if exp is None or Contrato.objects.filter(expediente=exp).exists() or exp.estado.clave != "notificada":
             continue
         modelo = contratos.modelos_elegibles(exp)[0]
-        with paso(elaborado, 10):
+        with paso(reciente(elaborado), 10):
             contrato = contratos.elaborar_contrato(drff, exp, modelo)
         if enviar:
-            with paso(enviado, 11):
+            with paso(reciente(enviado), 11):
                 contratos.enviar_a_delegacion(drff, contrato)
         hechos += 1
     # Ojo de Agua (RHF): la Delegación ya notificó el resultado y falta elaborar su contrato.
@@ -162,7 +167,7 @@ def _contratos(u):
                                     estado__clave="publicada").first()
     if ojo is not None:
         n = ojo.notificaciones.get(tipo="resultados")
-        with paso("2026-11-10", 12):
+        with paso(reciente("2026-11-10"), 12):
             publicacion.registrar_entrega(_delegacion(u, ojo), n, "correo",
                                           observaciones="Notificado por correo electrónico (demostración).")
         hechos += 1
@@ -234,9 +239,10 @@ def _firmas(u):
 
 
 # ----------------------------------------------------------------------------- HU-3.4
-# predio: (fecha de entrega del vale, [(especie, cantidad, fecha de la salida)])
 def _vales(u):
-    """HU-3.4: catálogos y vales (vigentes, vencido, con salidas parciales y una reposición); idempotente."""
+    """HU-3.4: catálogos y vales (vigentes, vencido, con salidas parciales y una reposición); idempotente. Las fechas de los
+    vales y sus salidas son del calendario de referencia (corte el 19-nov) y se trasladan a la fecha de corte (``reciente``):
+    los comentarios dicen cómo quedan con la de referencia."""
     with paso("2026-09-01", 10):
         planta.cargar_catalogo()
     if ValePlanta.objects.exists():
@@ -254,12 +260,12 @@ def _vales(u):
         exp = exp_de(predio)
         if exp is None:
             return None
-        with paso(fecha, 10):
+        with paso(reciente(fecha), 10):
             return planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp[n], c) for n, c in renglones],
                                       motivo_ajuste="Ajuste de demostración a la disponibilidad del vivero.", **kw)
 
     def salida(v, especie, cantidad, fecha, **kw):
-        with paso(fecha, 12):
+        with paso(reciente(fecha), 12):
             planta.registrar_salida(usuario_vivero, v, esp[especie], cantidad, **kw)
 
     hechos = 0
@@ -279,7 +285,7 @@ def _vales(u):
     if v:
         salida(v, "Pino moctezuma", 600, "2026-10-14")
         exp = v.expediente
-        with paso("2026-11-17", 10):
+        with paso(reciente("2026-11-17"), 10):
             planta.emitir_vale(_delegacion(u, exp), exp, vivero, [(esp["Pino moctezuma"], 1200)], planta_disponible=True)
         hechos += 1
     return hechos
