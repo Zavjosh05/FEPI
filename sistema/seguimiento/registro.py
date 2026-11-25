@@ -19,8 +19,8 @@ HISTORIAS = [
 ]
 HISTORIAS_CONSTRUIDAS = {"HU-6.1", "HU-6.2", "HU-6.3"}
 USOS_DE_PLAZO = ['aviso_caso_fortuito', 'interes_segunda_beneficiaria', 'subsanar_omisiones']
-TIPOS_ACUERDO_M6 = ("reasignacion", "sustitucion", "liberacion_recurso", "caso_fortuito", "caso_especial", "cancelacion",
-                    "suspension", "baja")
+TIPOS_ACUERDO_M6 = ("reasignacion", "sustitucion", "sustitucion_titular", "liberacion_recurso", "caso_fortuito",
+                    "caso_especial", "cancelacion", "suspension", "baja")
 
 
 def historias_pendientes():
@@ -225,7 +225,8 @@ def registrar():
                                     "baja_reportes": incumplimientos._ejecutar_cancelacion,
                                     "suspension": incumplimientos._ejecutar_suspension,
                                     "levantar_suspension": incumplimientos._ejecutar_suspension})
-    extensiones.AL_LIBERAR_RECURSO.append(reasignacion.al_liberar_recurso)
+    if reasignacion.comprometido not in dictamen_seguimiento.COMPROMETIDO:
+        dictamen_seguimiento.COMPROMETIDO.append(reasignacion.comprometido)
     extensiones.AL_NOTIFICAR.append(reasignacion.al_notificar)
     extensiones.SECCIONES_PORTAL.append(seccion_portal)
     for tipo in TIPOS_ACUERDO_M6:

@@ -192,7 +192,7 @@ def contexto_reasignacion_exp(request, exp):
         "tipos_solicitud": tipos, "puede_solicitar": puede_solicitar,
         "form_solicitud": SolicitudForm(tipos=tipos, puntos=reasignacion.puntos_firma(exp)) if puede_solicitar else None,
         "propuestas_exp": list(exp.propuestas_seguimiento.select_related("acuse", "acuerdo__sesion")),
-        "recursos_exp": list(exp.recursos_liberados.all()),
+        "recursos_exp": list(exp.movimientos_listado.filter(movimiento__in=("sale", "libera"), monto__gt=0)),
         "form_propuesta": PropuestaForm(tipos=tipos_prop, resoluciones=resoluciones,
                                         bases=reasignacion.datos_seguimiento()["incumplimientos"]["reintegro"]["bases"])
         if tipos_prop else None,

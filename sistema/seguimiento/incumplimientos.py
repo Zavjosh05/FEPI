@@ -31,6 +31,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from dictamen import juridico
+from dictamen import seguimiento as dictamen_seguimiento
 from dictamen.comun import exigir_acceso, exigir_unidad
 from nucleo import notificaciones, plazos
 from nucleo.acuses import emitir_acuse
@@ -410,10 +411,12 @@ def _ejecutar_cancelacion(propuesta, acuerdo, usuario):
     exp.refresh_from_db()
     motivo = reasignacion._motivo(acuerdo) + " " + propuesta.descripcion
     libera = reasignacion.por_ministrar(exp)
-    exp.cambiar_estado("cancelada", usuario, motivo=motivo[:2000], tipo_evento="cancelacion",
-                       descripcion=f"{propuesta.nombre_tipo} (acuerdo {acuerdo.numero}).", datos={"acuerdo": acuerdo.pk})
+    # Sale de la Lista de Personas Beneficiarias con lo no ministrado, en el registro único de los listados (HU-2.4).
+    dictamen_seguimiento.registrar_salida(usuario, exp, "baja" if propuesta.tipo.startswith("baja") else "cancelacion", libera,
+                                          acuerdo, estado_nuevo="cancelada", referencia=f"Acuerdo {acuerdo.numero}",
+                                          motivo=motivo[:2000], tipo_evento="cancelacion",
+                                          descripcion=f"{propuesta.nombre_tipo} (acuerdo {acuerdo.numero}).")
     inscribir_en_listado(usuario, exp, acuerdo, propuesta.descripcion)
-    reasignacion.registrar_recurso(exp, "cancelacion", libera, usuario, f"Acuerdo {acuerdo.numero}", propuesta.nombre_tipo)
     preparar_requerimiento(exp, propuesta.nombre_tipo, propuesta, acuerdo, propuesta.datos.get("base", "ministrado"))
     notificaciones.emitir_notificacion(exp, "otro", f"Cancelación del apoyo y baja del programa ({exp.folio})", usuario,
                                        destinatario=exp.beneficiaria,

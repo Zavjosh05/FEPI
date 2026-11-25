@@ -1,4 +1,4 @@
-"""HU-6.1 · Lista de espera y sustituciones: el recurso liberado (de qué expediente y por qué), las solicitudes de la persona
+"""HU-6.1 · Lista de espera y sustituciones: las solicitudes de la persona
 (sustitución, desistimiento, aviso de fallecimiento) con su acuse, y las propuestas del área responsable al Comité con el
 acuerdo que las resuelve. ``Propuesta`` es común a las propuestas de M6 (HU-6.2 suma las suyas por tipo)."""
 from django.conf import settings
@@ -51,38 +51,6 @@ class Propuesta(models.Model):
         from ..reasignacion import datos_seguimiento
 
         return datos_seguimiento()["propuestas"]["tipos"].get(self.tipo, {}).get("nombre", self.tipo)
-
-
-class RecursoLiberado(models.Model):
-    """Recurso que queda libre (contrato sin firma, desistimiento, fallecimiento sin sustitución, ajuste de superficie,
-    cancelación, reintegro…) y que el Comité puede reasignar a la lista de espera del mismo ejercicio."""
-
-    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.PROTECT, related_name="recursos_liberados")
-    expediente = models.ForeignKey(Expediente, null=True, blank=True, on_delete=models.PROTECT, related_name="recursos_liberados",
-                                   help_text="De qué expediente sale (vacío en el saldo de una reasignación anterior).")
-    origen = models.CharField(max_length=30, help_text="Clave de datos/seguimiento.json (reasignacion.origenes).")
-    monto = models.DecimalField(max_digits=14, decimal_places=2)
-    descripcion = models.CharField(max_length=300, blank=True)
-    referencia = models.CharField(max_length=120, blank=True, help_text="Acuse o acuerdo que lo libera.")
-    liberado_en = models.DateTimeField(default=timezone.now)
-    registrado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
-    propuesta = models.ForeignKey(Propuesta, null=True, blank=True, on_delete=models.SET_NULL, related_name="recursos",
-                                  help_text="Propuesta de reasignación que lo usa.")
-    reasignado_en = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        ordering = ["liberado_en", "id"]
-        verbose_name = "recurso liberado"
-        verbose_name_plural = "recursos liberados"
-
-    def __str__(self):
-        return f"{self.expediente.folio if self.expediente_id else 'Saldo'} · {self.nombre_origen} · {self.monto}"
-
-    @property
-    def nombre_origen(self):
-        from ..reasignacion import datos_seguimiento
-
-        return datos_seguimiento()["reasignacion"]["origenes"].get(self.origen, self.origen)
 
 
 class MedioSolicitud(models.TextChoices):

@@ -27,7 +27,8 @@ from nucleo.demo import archivo_demo
 from pagos import cheques, pagos, solicitudes
 from pagos.models import EstadoSolicitud
 from seguimiento import cierre, incumplimientos, reasignacion
-from seguimiento.models import RecursoLiberado, Senalamiento
+from dictamen.models import MovimientoListado
+from seguimiento.models import Senalamiento
 
 from .fixtures_m2 import *  # noqa: F401,F403
 from .fixtures_m3 import *  # noqa: F401,F403
@@ -329,7 +330,7 @@ def test_sprint_3_recorrido_completo_incumplimiento_cancelacion_reintegro_y_cier
     with reloj.en("2026-09-28 10:00"):
         incumplimientos.comprobar_deposito(finanzas, req, timezone.localdate(), req.monto_total, "DEP-INC-01", _doc("deposito.pdf"))
     r.relevo("reintegrada", finanzas, None, {area.username}, u)
-    assert RecursoLiberado.objects.filter(expediente=exp, origen="reintegro").exists()
+    assert MovimientoListado.objects.filter(expediente=exp, origen="reintegro", movimiento="libera").exists()
     html, fila = cerrar_publicar_e_informar(u, exp, area, client, r, "2026-11-25")
     assert exp.cierre.tipo == "reintegrada" and fila["reintegrado"] == fila["pagado"] == Decimal("8400.00")
     assert 'data-situacion="cancelada"' in html and "Baja por cancelación del apoyo" in html
@@ -354,7 +355,7 @@ def test_sprint_3_recorrido_completo_reasignacion_a_la_lista_de_espera_hasta_el_
         baja = reasignacion.proponer(area, uno, "desistimiento")
         _acordar_y_cumplir(u, baja)
         uno.refresh_from_db()
-        assert uno.estado.clave == "recurso_liberado"
+        assert uno.estado.clave == "baja"
         propuesta = reasignacion.proponer_reasignacion(area, ej, "Recurso del desistimiento.")
         assert list(propuesta.expedientes.all()) == [dos] and propuesta.monto_liberado == Decimal("12000.00")
     r = Rastro(dos)

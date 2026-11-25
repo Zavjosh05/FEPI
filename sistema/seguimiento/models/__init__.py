@@ -1,6 +1,6 @@
 """Modelos del módulo M6 (Seguimiento y cierre), **un módulo por historia** para que cada historia traiga su propia migración:
 
-- ``reasignacion.py``  HU-6.1 Lista de espera y sustituciones (``Propuesta``, ``RecursoLiberado``, ``SolicitudPersona``,
+- ``reasignacion.py``  HU-6.1 Lista de espera y sustituciones (``Propuesta``, ``SolicitudPersona``,
   ``Prorroga``)
 - ``incumplimientos.py``  HU-6.2 Incumplimientos y reintegros (``AvisoOmision``, ``Senalamiento``, ``CuentaReintegro``,
   ``Requerimiento``)
@@ -24,7 +24,7 @@ Ganchos que ya existen y que estas historias llenan (no hay que tocar el núcleo
 - Notificaciones de omisión y devolución: ``nucleo.notificaciones`` (tipos ``omision`` y ``devolucion``).
 - Listado de Personas Beneficiarias Incumplidas: el catálogo de HU-2.2 (``dictamen``).
 """
-from .reasignacion import (EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga, RecursoLiberado,  # noqa: E402,F401
+from .reasignacion import (EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga,  # noqa: E402,F401
                            SolicitudPersona)
 from .incumplimientos import (AvisoOmision, CuentaReintegro, EstadoRequerimiento, Requerimiento,  # noqa: E402,F401
                               Senalamiento)

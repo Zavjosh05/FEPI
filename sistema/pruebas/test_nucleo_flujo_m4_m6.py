@@ -117,7 +117,7 @@ def test_nucleo_omisiones_por_subsanar_y_sustitucion(en_estado, usuarios):
     _pasar(exp, "en_ejecucion", u["dir_drff"])
     _pasar(exp, "sustitucion", u["del_amecameca"])
     assert _atienden(exp, u) == {"dir_drff", "comite"}
-    _pasar(exp, "recurso_liberado", u["comite"], motivo="Desistimiento: el recurso pasa a la lista de espera")
+    _pasar(exp, "baja", u["comite"], motivo="Desistimiento: el recurso pasa a la lista de espera")
     assert exp.estado.final
 
 

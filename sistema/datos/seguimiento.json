@@ -4,16 +4,6 @@
   "reasignacion": {
     "saltar_si_no_alcanza": false,
     "regla_orden": "La propuesta recorre la lista de espera en su orden (lugar del acta del Comité) y se detiene en la primera solicitud a la que ya no le alcanza el recurso liberado; el saldo queda para una propuesta posterior. Decisión propia: las reglas solo dicen «con base en la Lista de espera» (Convocatoria base sexta, línea 909). Con «saltar_si_no_alcanza» en true se pasa a la siguiente que sí alcance.",
-    "origenes": {
-      "sin_firma": "Contrato sin firma en plazo",
-      "desistimiento": "Desistimiento de la persona beneficiaria",
-      "fallecimiento": "Fallecimiento sin sustitución",
-      "caso_fortuito": "Caso fortuito o fuerza mayor",
-      "ajuste_superficie": "Ajuste de superficie (verificación)",
-      "cancelacion": "Cancelación del apoyo",
-      "reintegro": "Reintegro depositado",
-      "saldo": "Saldo de una reasignación anterior"
-    },
     "programas": {
       "CC": {"fundamento": "Convocatoria base sexta (línea 909); CC 8.1.9 c, último párrafo (línea 4744); CC 10.2 (línea 4908)"},
       "MFS": {"fundamento": "Convocatoria base sexta (línea 909); MFS 8.1.9.3, último párrafo (línea 7916); MFS 10.2 b (línea 8111)"},
@@ -58,7 +48,7 @@
   "propuestas": {
     "tipos": {
       "reasignacion": {"nombre": "Reasignación del recurso liberado a la lista de espera", "acuerdo": "reasignacion"},
-      "sustitucion": {"nombre": "Sustitución de la persona beneficiaria", "acuerdo": "sustitucion"},
+      "sustitucion": {"nombre": "Sustitución de la persona beneficiaria", "acuerdo": "sustitucion_titular"},
       "desistimiento": {"nombre": "Baja por desistimiento y liberación del recurso", "acuerdo": "liberacion_recurso"},
       "fallecimiento": {"nombre": "Baja por fallecimiento sin sustitución y liberación del recurso", "acuerdo": "liberacion_recurso"},
       "caso_fortuito": {"nombre": "Atención del caso fortuito o fuerza mayor", "acuerdo": "caso_fortuito"},

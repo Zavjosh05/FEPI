@@ -24,8 +24,9 @@ from django.db.models import Q, Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from dictamen import seguimiento as dictamen_seguimiento
 from dictamen.comun import exigir_programa, exigir_unidad
-from dictamen.models import DocumentoSesion, EstadoSesion, SesionComite
+from dictamen.models import DocumentoSesion, EstadoSesion, SesionComite, TipoMovimiento
 from ejecucion import verificacion
 from nucleo import acuses, montos
 from nucleo.acuses import emitir_acuse
@@ -87,7 +88,9 @@ def reintegrado(expediente):
 
 
 def liberado(expediente):
-    return expediente.recursos_liberados.aggregate(t=Sum("monto"))["t"] or CERO
+    """Lo que el expediente liberó para la lista de espera (salida de la lista o recurso liberado; HU-2.4 y HU-6.1)."""
+    return (expediente.movimientos_listado.filter(movimiento__in=(TipoMovimiento.SALE, TipoMovimiento.LIBERA))
+            .aggregate(t=Sum("monto"))["t"] or CERO)
 
 
 def aprobado(expediente):
@@ -146,7 +149,7 @@ def comprobar_expediente(expediente, pagado_=None, aprobado_=None, reintegrado_=
         difs.append(_diferencia("reintegrado_mayor_pagado", f"Reintegrado {formato_moneda(reintegrado_)}; pagado {formato_moneda(pagado_)}"
                                 + (f" más {formato_moneda(planta)} de planta no establecida." if planta else ".")))
     v = verificacion.vigente(expediente)
-    en_curso = (clave_estado in EN_PROCESO_DE_PAGO or clave_estado in SIN_RESOLVER or clave_estado == "recurso_liberado"
+    en_curso = (clave_estado in EN_PROCESO_DE_PAGO or clave_estado in SIN_RESOLVER or clave_estado in ("recurso_liberado", "baja")
                 or (cierre is not None and cierre.tipo != "con_resultados"))
     if v is not None and not en_curso and (v.resultado != "incumplimiento" or (v.datos or {}).get("aprobada_por_comite")):
         faltan = verificacion.ministraciones_pendientes(expediente)
@@ -192,9 +195,9 @@ def resultado_expediente(expediente):
 def resultados_ejercicio(ejercicio):
     filas = [resultado_expediente(e) for e in expedientes_de(ejercicio)]
     total = {k: sum((f[k] for f in filas), CERO) for k in ("aprobado", "ajustado", "pagado", "reintegrado", "liberado")}
-    liberado_total = ejercicio.recursos_liberados.aggregate(t=Sum("monto"))["t"] or CERO
-    total["reasignado"] = ejercicio.recursos_liberados.filter(reasignado_en__isnull=False).aggregate(t=Sum("monto"))["t"] or CERO
-    total["por_reasignar"] = max(CERO, liberado_total - total["reasignado"])
+    recurso = dictamen_seguimiento.totales_recurso(ejercicio)
+    total["reasignado"] = recurso["reasignado"]
+    total["por_reasignar"] = max(CERO, recurso["liberado"] - recurso["reasignado"])
     total["cerrados"] = sum(1 for f in filas if f["cierre"] is not None)
     total["expedientes"] = len(filas)
     total["con_diferencias"] = sum(1 for f in filas if f["diferencias"])
@@ -299,8 +302,9 @@ def situacion_en_padron(expediente):
     cierre = getattr(expediente, "cierre", None)
     if clave in SIN_RESOLVER or (cierre is not None and cierre.tipo in ("reintegrada", "sin_recurso")):
         return "cancelada", "Baja por cancelación del apoyo"
-    if clave == "recurso_liberado":
-        return "baja", "Baja por desistimiento o fallecimiento"
+    if clave in ("recurso_liberado", "baja"):
+        return "baja", ("Baja por contrato sin firma en plazo" if clave == "recurso_liberado"
+                        else "Baja de la Lista de Personas Beneficiarias (desistimiento, fallecimiento o caso fortuito)")
     if clave == "suspendida":
         return "suspendida", "Apoyo suspendido temporalmente"
     return "vigente", "Vigente"

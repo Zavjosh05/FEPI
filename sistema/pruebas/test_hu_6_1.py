@@ -11,12 +11,12 @@ from django.utils import timezone
 from contrato import firma
 from dictamen import seguimiento as dictamen_seguimiento
 from dictamen import sesiones
-from dictamen.models import TipoSesion
+from dictamen.models import MovimientoListado, TipoSesion
 from ejecucion import comprobaciones, verificacion
 from nucleo import extensiones, plazos, reloj
 from nucleo.models import Expediente, Hito, Notificacion, Persona
 from seguimiento import reasignacion
-from seguimiento.models import Propuesta, RecursoLiberado
+from seguimiento.models import Propuesta
 
 from .conftest import historia
 from .fixtures_m2 import *  # noqa: F401,F403
@@ -88,9 +88,10 @@ def test_hu_6_1_la_propuesta_indica_el_recurso_liberado_y_sigue_el_orden_de_la_l
         assert baja.monto_liberado == Decimal("12000.00") and "liberar $12,000.00" in baja.descripcion
         _acordar_y_cumplir(usuarios, baja)
         uno.refresh_from_db()
-        assert uno.estado.clave == "recurso_liberado"
-        recurso = RecursoLiberado.objects.get(expediente=uno)
-        assert recurso.origen == "desistimiento" and recurso.monto == Decimal("12000.00")
+        assert uno.estado.clave == "baja"                              # sale de la Lista de Personas Beneficiarias (HU-2.4)
+        recurso = MovimientoListado.objects.get(expediente=uno)          # registro único de los listados
+        assert (recurso.movimiento, recurso.origen, recurso.monto) == ("sale", "desistimiento", Decimal("12000.00"))
+        assert recurso.acuerdo == baja.acuerdo
         calculo = reasignacion.calcular(cc)
         assert calculo["total"] == Decimal("12000.00")
         assert [(r["expediente"], r["lugar"], r["alcanza"]) for r in calculo["renglones"]] == [(dos, 1, True), (tres, 2, False)]
@@ -98,7 +99,7 @@ def test_hu_6_1_la_propuesta_indica_el_recurso_liberado_y_sigue_el_orden_de_la_l
             reasignacion.proponer_reasignacion(usuarios["del_amecameca"], cc)
         p = reasignacion.proponer_reasignacion(usuarios["dir_drff"], cc, "Recurso del desistimiento.")
     assert p.monto_liberado == Decimal("12000.00") and p.monto_asignado == Decimal("12000.00") and p.saldo == 0
-    assert list(p.expedientes.all()) == [dos] and list(p.recursos.all()) == [recurso]
+    assert list(p.expedientes.all()) == [dos] and [r["id"] for r in p.datos["recursos"]] == [recurso.pk]
     assert [(r["folio"], r["lugar"], r["alcanza"]) for r in p.datos["renglones"]] == [(dos.folio, 1, True), (tres.folio, 2, False)]
     renglones = dict(p.acuse.contenido["renglones"])
     assert renglones["Recurso liberado"].startswith("$12,000.00") and "lista de espera" in renglones["Orden"]
@@ -113,8 +114,9 @@ def test_hu_6_1_la_propuesta_indica_el_recurso_liberado_y_sigue_el_orden_de_la_l
         tres.refresh_from_db()
         assert dos.estado.clave == "aprobada" and tres.estado.clave == "lista_espera" and plazos.es_reasignada(dos)
         assert Hito.objects.filter(expediente=dos, clave="aprobacion_comite").exists()
-        recurso.refresh_from_db()
-        assert recurso.reasignado_en is not None
+        entra = MovimientoListado.objects.get(expediente=dos)
+        assert (entra.movimiento, entra.acuerdo, entra.lugar_lista_espera, entra.monto) == ("entra", acuerdo, 1, Decimal("12000.00"))
+        assert reasignacion.calcular(cc)["total"] == 0
         aviso = dos.notificaciones.filter(tipo="resultados").order_by("-enviada_en").first()
         assert "reasignación" in aviso.asunto and aviso.datos["acuerdo"] == acuerdo.pk
         notificada = reasignacion_notificar(usuarios, dos, aviso)
@@ -141,9 +143,10 @@ def test_hu_6_1_sin_firma_en_plazo_libera_el_recurso_y_un_recurso_menor_no_alcan
     vencer(uno)
     firma.revisar_firmas(timezone.localdate())
     firma.liberar_recurso(usuarios["dir_drff"], uno, "No acudió a firmar en el plazo de las reglas.")
-    assert reasignacion.al_liberar_recurso in extensiones.AL_LIBERAR_RECURSO
-    r = RecursoLiberado.objects.get(expediente=uno)
-    assert r.origen == "sin_firma" and r.monto == Decimal("12000.00") and r.referencia.startswith("AC-")
+    assert extensiones.AL_LIBERAR_RECURSO == [dictamen_seguimiento.al_liberar_recurso]   # un solo registro (M2, HU-2.4)
+    r = MovimientoListado.objects.get(expediente=uno)
+    assert (r.movimiento, r.origen, r.monto, r.acuerdo) == ("sale", "sin_firma", Decimal("12000.00"), None)
+    assert r.referencia.startswith("AC-")
     r.monto = Decimal("5000")
     r.save()
     with pytest.raises(ValidationError, match="no alcanza para la primera"):
@@ -226,7 +229,7 @@ def test_hu_6_1_el_desistimiento_tiene_su_acuse_y_libera_el_recurso_en_los_seis_
     assert p.monto_liberado == total and total > 0
     _acordar_y_cumplir(usuarios, p)
     exp.refresh_from_db()
-    assert exp.estado.clave == "recurso_liberado" and RecursoLiberado.objects.get(expediente=exp).monto == total
+    assert exp.estado.clave == "baja" and MovimientoListado.objects.get(expediente=exp, movimiento="sale").monto == total
 
 
 def test_hu_6_1_el_desistimiento_por_el_portal_tiene_el_mismo_acuse(contratadas, cuenta_portal, usuarios, client):
@@ -256,7 +259,7 @@ def test_hu_6_1_con_ministraciones_pagadas_la_baja_cancela_y_libera_solo_lo_no_m
     assert p.monto_liberado == Decimal("3600.00") and "se debe reintegrar" in p.descripcion
     _acordar_y_cumplir(usuarios, p)
     exp.refresh_from_db()
-    assert exp.estado.clave == "cancelada" and RecursoLiberado.objects.get(expediente=exp).monto == Decimal("3600.00")
+    assert exp.estado.clave == "cancelada" and MovimientoListado.objects.get(expediente=exp, movimiento="sale").monto == Decimal("3600.00")
 
 
 def test_hu_6_1_peg_no_tiene_segunda_persona_y_la_defuncion_libera_el_lugar(peg_contratado, usuarios):
@@ -271,7 +274,7 @@ def test_hu_6_1_peg_no_tiene_segunda_persona_y_la_defuncion_libera_el_lugar(peg_
     assert "8.1.9.2 g" in p.fundamento
     _acordar_y_cumplir(usuarios, p)
     exp.refresh_from_db()
-    assert exp.estado.clave in ("recurso_liberado", "cancelada")
+    assert exp.estado.clave in ("baja", "cancelada")
 
 
 # ----------------------------------------------------------------------------- casos especiales
@@ -299,7 +302,7 @@ def test_hu_6_1_el_caso_fortuito_puede_terminar_sin_sancion_y_liberar_lo_no_mini
     assert p.monto_liberado == reasignacion.por_ministrar(exp) > 0
     _acordar_y_cumplir(usuarios, p)
     exp.refresh_from_db()
-    assert exp.estado.clave == "recurso_liberado" and RecursoLiberado.objects.get(expediente=exp).origen == "caso_fortuito"
+    assert exp.estado.clave == "baja" and MovimientoListado.objects.get(expediente=exp, movimiento="sale").origen == "caso_fortuito"
 
 
 def test_hu_6_1_sobrevivencia_menor_por_causas_no_imputables_la_aprueba_el_comite(pagada, usuarios):
@@ -337,6 +340,47 @@ def test_hu_6_1_mfs_prorroga_por_causa_externa_con_adendum(pagada, usuarios, pdf
     otro = pagada("PS")
     with pytest.raises(ValidationError, match="no prevé prórroga"):
         reasignacion.solicitar_prorroga(delegado_de(usuarios, otro), otro, "x")
+
+
+# ----------------------------------------------------------------------------- conciliación con HU-2.4
+def test_hu_6_1_y_hu_2_4_comparten_el_registro_de_bajas_y_reasignaciones(notificadas, usuarios):
+    """Un solo registro (``MovimientoListado``) para lo que sale y entra en los listados, por cualquiera de los dos caminos:
+    la baja que el Comité acuerda directamente (HU-2.4) libera recurso que el área puede proponer reasignar (HU-6.1), y lo que
+    una propuesta en trámite reasigna queda comprometido: el Comité no lo vuelve a reasignar con un acuerdo directo."""
+    _, (uno, dos, tres) = notificadas("CC", cuantas=3, presupuesto=12000)
+    cc = uno.ejercicio
+    s = _sesion(usuarios, cc)
+    baja = dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "desistimiento", "Se acepta el desistimiento.", [uno],
+                                                  causa="Escrito de desistimiento")
+    uno.refresh_from_db()
+    assert uno.estado.clave == "baja" and baja.monto_liberado == Decimal("12000.00")
+    salida = MovimientoListado.objects.get(expediente=uno)
+    assert (salida.movimiento, salida.origen, salida.acuerdo) == ("sale", "desistimiento", baja)
+    calculo = reasignacion.calcular(cc)                                  # M6 ve el mismo recurso liberado
+    assert calculo["total"] == Decimal("12000.00") and [r["id"] for r in calculo["recursos"]] == [salida.pk]
+    p = reasignacion.proponer_reasignacion(usuarios["dir_drff"], cc)
+    assert dictamen_seguimiento.recurso_liberado(cc) == 0                # comprometido en la propuesta
+    with pytest.raises(ValidationError, match="no alcanza"):
+        dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "reasignacion", "Reasignar", [dos])
+    _acordar_y_cumplir(usuarios, p)
+    dos.refresh_from_db()
+    assert dos.estado.clave == "aprobada"
+    assert list(MovimientoListado.objects.filter(expediente__ejercicio=cc).values_list("movimiento", "expediente")) == [
+        ("sale", uno.pk), ("entra", dos.pk)]
+    assert dictamen_seguimiento.recurso_liberado(cc) == 0 and reasignacion.calcular(cc)["total"] == 0
+
+
+def test_hu_6_1_si_el_comite_no_aprueba_la_reasignacion_el_recurso_vuelve_a_estar_libre_para_hu_2_4(notificadas, usuarios):
+    _, (uno, dos, _) = notificadas("CC", cuantas=3, presupuesto=12000)
+    cc = uno.ejercicio
+    s = _sesion(usuarios, cc)
+    dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "desistimiento", "Desiste.", [uno], causa="Escrito")
+    p = reasignacion.proponer_reasignacion(usuarios["dir_drff"], cc)
+    _acordar_y_cumplir(usuarios, p, aprueba=False)
+    assert dictamen_seguimiento.recurso_liberado(cc) == Decimal("12000.00")
+    dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "reasignacion", "Reasignar al lugar 1.", [dos])
+    dos.refresh_from_db()
+    assert dos.estado.clave == "aprobada" and dictamen_seguimiento.recurso_liberado(cc) == 0
 
 
 # ----------------------------------------------------------------------------- ganchos y pantallas

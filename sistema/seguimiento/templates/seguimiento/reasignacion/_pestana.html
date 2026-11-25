@@ -68,7 +68,7 @@
 
 {% if recursos_exp %}
 <div class="small mb-2" data-prueba="recursos-expediente">Recurso liberado de este expediente:
-  {% for r in recursos_exp %}{{ r.monto|moneda }} ({{ r.nombre_origen|lower }}{% if r.reasignado_en %}, reasignado el {{ r.reasignado_en|date:"d/m/Y" }}{% endif %}){% if not forloop.last %}; {% endif %}{% endfor %}.</div>
+  {% for r in recursos_exp %}{{ r.monto|moneda }} ({{ r.nombre_origen|lower }}, {{ r.fecha_hora|date:"d/m/Y" }}){% if not forloop.last %}; {% endif %}{% endfor %}.</div>
 {% endif %}
 
 {% if prorroga %}

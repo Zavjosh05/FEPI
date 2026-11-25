@@ -16,7 +16,8 @@ from ejecucion import comprobaciones, verificacion
 from nucleo import extensiones, plazos, reloj
 from nucleo.models import Evento, Hito, Programa
 from seguimiento import incumplimientos, reasignacion
-from seguimiento.models import RecursoLiberado, Senalamiento
+from dictamen.models import MovimientoListado
+from seguimiento.models import Senalamiento
 
 from .conftest import historia
 from .fixtures_m2 import *  # noqa: F401,F403
@@ -123,7 +124,7 @@ def test_hu_6_2_cancelacion_con_requerimiento_monto_cuenta_listado_y_reintegro(p
     inscrita = PersonaIncumplida.objects.get(persona=exp.beneficiaria)
     assert inscrita.activa and acuerdo.numero in inscrita.acuerdo and inscrita.registrado_por == usuarios["juridica"]
     assert exp.eventos.filter(tipo="inscripcion_incumplidas").exists()
-    assert RecursoLiberado.objects.get(expediente=exp, origen="cancelacion").monto == Decimal("3600.00")
+    assert MovimientoListado.objects.get(expediente=exp, origen="cancelacion", movimiento="sale").monto == Decimal("3600.00")
     req = exp.requerimientos.get()
     assert req.estado == "por_emitir" and req.monto_total == Decimal("8400.00") and req.acuerdo == acuerdo
     with pytest.raises(ValidationError, match="cuenta para los reintegros"):
@@ -148,7 +149,7 @@ def test_hu_6_2_cancelacion_con_requerimiento_monto_cuenta_listado_y_reintegro(p
     exp.refresh_from_db()
     req.refresh_from_db()
     assert exp.estado.clave == "reintegrada" and req.estado == "depositado" and req.acuse_deposito
-    assert RecursoLiberado.objects.get(expediente=exp, origen="reintegro").monto == Decimal("8400.00")
+    assert MovimientoListado.objects.get(expediente=exp, origen="reintegro", movimiento="libera").monto == Decimal("8400.00")
 
 
 def test_hu_6_2_el_requerimiento_suma_el_valor_de_la_planta_no_establecida_en_ps(pagada, usuarios):
@@ -246,7 +247,7 @@ def test_hu_6_2_guardabosque_que_no_entrega_suspension_y_baja(peg_contratado, us
     _cumplir(usuarios, baja.propuesta)
     exp.refresh_from_db()
     assert exp.estado.clave == "cancelada" and PersonaIncumplida.objects.get(persona=exp.beneficiaria).nombre == "Margarito Sánchez Ruiz"
-    assert RecursoLiberado.objects.filter(expediente=exp, origen="cancelacion").exists()   # su lugar queda para la lista de espera
+    assert MovimientoListado.objects.filter(expediente=exp, movimiento="sale").exists()   # su lugar queda para la lista de espera
 
 
 def test_hu_6_2_levantar_la_suspension_regresa_al_estado_previo(pagada, usuarios):

@@ -1,9 +1,12 @@
 """HU-6.1 · Lista de espera y sustituciones.
 
-- **Recurso liberado** (``RecursoLiberado``): lo registra el sistema cuando el área responsable confirma la liberación de un
-  contrato sin firma en plazo (``extensiones.AL_LIBERAR_RECURSO``), cuando el Comité da de baja por desistimiento, por
-  fallecimiento sin sustitución o por caso fortuito, y cuando la verificación ajusta la superficie (lo que ya no se pagará).
-  HU-6.2 suma la cancelación y el reintegro depositado.
+- **Recurso liberado**: se lleva en el registro único de los listados, ``dictamen.MovimientoListado`` (HU-2.4): sale la
+  persona beneficiaria cuando el Comité da de baja por desistimiento, por fallecimiento sin sustitución o por caso fortuito
+  (y HU-6.2 por cancelación), o cuando el área responsable confirma la liberación de un contrato sin firma en plazo (gancho
+  de M2 en ``extensiones.AL_LIBERAR_RECURSO``); se libera recurso sin salida cuando la verificación ajusta la superficie (lo
+  que ya no se pagará) y con el reintegro depositado (HU-6.2). El recurso por reasignar es el mismo para las propuestas del
+  área y para los acuerdos que el Comité toma directamente (HU-2.4): lo que una propuesta en trámite reasigna queda
+  comprometido (``comprometido``, en ``dictamen.seguimiento.COMPROMETIDO``).
 - **Propuesta de reasignación** (``proponer_reasignacion``): el área responsable del programa reúne el recurso liberado del
   ejercicio y recorre la **lista de espera en su orden** (lugar del acta del Comité): cuánto se liberó, de qué expedientes y a
   quiénes alcanza (``datos/seguimiento.json`` → ``reasignacion``: por omisión se detiene en la primera a la que ya no le alcanza,
@@ -20,7 +23,8 @@
   (aprobada o no) con el tipo de acuerdo de HU-2.4; el área responsable del programa lo cumple y entonces se ejecuta
   (``ejecutar_acuerdo``, registrado en ``dictamen.seguimiento.RECEPTORES``): las reasignadas pasan a «aprobada» y la Delegación
   les notifica el resultado (firman con la fecha límite propia de las reasignadas); la persona sustituta queda como persona
-  beneficiaria (con historial); la baja libera el recurso. Un acuerdo que no viene de una propuesta solo deja constancia.
+  beneficiaria (con historial); la baja libera el recurso. Un acuerdo que no viene de una propuesta lo ejecuta M2 al
+  registrarse (HU-2.4: baja, reasignación o sustitución por la lista de espera) o solo deja constancia.
 - **Prórroga por causa externa (MFS, flujo G)**: ``solicitar_prorroga`` y ``resolver_prorroga`` (adendum); quién la pide y quién
   la autoriza son parámetros (supuesto, R-17).
 """
@@ -37,7 +41,7 @@ from django.utils import timezone
 
 from dictamen import seguimiento as dictamen_seguimiento
 from dictamen.comun import exigir_acceso, exigir_programa, exigir_unidad
-from dictamen.models import EstadoSesion, ResolucionSesion, ResultadoListado, TipoSesion
+from dictamen.models import EstadoSesion, MovimientoListado, ResolucionSesion, ResultadoListado, TipoMovimiento, TipoSesion
 from nucleo import montos, notificaciones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import leer_json
@@ -45,7 +49,7 @@ from nucleo.models import Evento, Expediente, Persona, TipoUnidad, Unidad
 from nucleo.templatetags.moneda import formato_moneda
 from portal import cuentas
 
-from .models import EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga, RecursoLiberado, SolicitudPersona
+from .models import EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga, SolicitudPersona
 
 CERO = Decimal("0")
 CENTAVO = Decimal("0.01")
@@ -108,32 +112,26 @@ def por_ministrar(expediente):
 
 
 # ----------------------------------------------------------------------------- recurso liberado
-def registrar_recurso(expediente, origen, monto, usuario=None, referencia="", descripcion="", momento=None, ejercicio=None):
-    """Recurso que queda libre para reasignarse (idempotente por expediente, origen y referencia)."""
-    monto = Decimal(monto or 0).quantize(CENTAVO)
-    if monto <= 0:
-        return None
-    ejercicio = ejercicio or expediente.ejercicio
-    existente = RecursoLiberado.objects.filter(ejercicio=ejercicio, expediente=expediente, origen=origen,
-                                               referencia=referencia[:120]).first() if expediente is not None else None
-    if existente is not None:
-        return existente
-    r = RecursoLiberado.objects.create(
-        ejercicio=ejercicio, expediente=expediente, origen=origen, monto=monto, referencia=referencia[:120],
-        descripcion=descripcion[:300], liberado_en=momento or timezone.now(), registrado_por=usuario)
-    if expediente is not None:
-        Evento.registrar(expediente, usuario, "recurso_liberado_registrado",
-                         f"Recurso liberado para la lista de espera: {formato_moneda(monto)} ({r.nombre_origen.lower()}).",
-                         datos={"recurso": r.pk})
-    return r
+# El contrato sin firma en plazo lo registra M2 (``dictamen.seguimiento.al_liberar_recurso``, gancho AL_LIBERAR_RECURSO).
+def registrar_recurso(expediente, origen, monto, usuario=None, referencia="", descripcion="", momento=None):
+    """Recurso que se libera sin que la persona salga de la lista (ajuste de superficie, reintegro depositado)."""
+    return dictamen_seguimiento.registrar_liberacion(expediente, origen, monto, usuario, referencia, descripcion, momento)
 
 
-def al_liberar_recurso(expediente, usuario):
-    """``extensiones.AL_LIBERAR_RECURSO`` (HU-3.3): el recurso del contrato sin firma queda para la lista de espera."""
-    senal = getattr(expediente, "sin_firma", None)
-    referencia = senal.acuse_liberacion.folio if senal is not None and senal.acuse_liberacion_id else "sin firma"
-    registrar_recurso(expediente, "sin_firma", por_ministrar(expediente), usuario, referencia,
-                      "Contrato sin firma en plazo: recurso liberado por el área responsable.")
+def dar_de_baja(usuario, expediente, origen, monto, acuerdo, estado, descripcion, propuesta=None):
+    """La persona sale de la Lista de Personas Beneficiarias con lo que libera (lo no ministrado), en el registro único."""
+    return dictamen_seguimiento.registrar_salida(
+        usuario, expediente, origen, monto, acuerdo, estado_nuevo=estado, referencia=f"Acuerdo {acuerdo.numero}",
+        motivo=_motivo(acuerdo), descripcion=descripcion, tipo_evento="baja_por_acuerdo",
+        datos={"propuesta": propuesta.pk} if propuesta is not None else None)
+
+
+def comprometido(ejercicio):
+    """``dictamen.seguimiento.COMPROMETIDO``: recurso que reasignan las propuestas en trámite (enviadas o acordadas sin
+    cumplirse, salvo las que el Comité no aprobó)."""
+    return (Propuesta.objects.filter(ejercicio=ejercicio, tipo="reasignacion",
+                                     estado__in=(EstadoPropuesta.ENVIADA, EstadoPropuesta.EN_SESION))
+            .exclude(aprobada=False).aggregate(t=Sum("monto_asignado"))["t"] or CERO)
 
 
 def materializar_ajustes(ejercicio):
@@ -158,9 +156,9 @@ def materializar_ajustes(ejercicio):
 
 
 def recursos_disponibles(ejercicio):
+    """Recurso por reasignar del ejercicio, por el movimiento de donde viene (``dictamen.seguimiento.recursos_por_reasignar``)."""
     materializar_ajustes(ejercicio)
-    return (RecursoLiberado.objects.filter(ejercicio=ejercicio, propuesta__isnull=True, reasignado_en__isnull=True)
-            .select_related("expediente").order_by("liberado_en", "id"))
+    return dictamen_seguimiento.recursos_por_reasignar(ejercicio)
 
 
 def lista_de_espera(ejercicio):
@@ -184,7 +182,7 @@ def calcular(ejercicio, recursos=None):
     """La propuesta de reasignación antes de enviarla: recurso liberado, lista de espera en orden y a quiénes alcanza."""
     cfg = datos_seguimiento()["reasignacion"]
     recursos = list(recursos_disponibles(ejercicio) if recursos is None else recursos)
-    total = sum((r.monto for r in recursos), CERO)
+    total = sum((r["monto"] for r in recursos), CERO)
     disponible, renglones, detenida = total, [], False
     for i, x in enumerate(lista_de_espera(ejercicio), 1):
         alcanza = not detenida and x["monto"] <= disponible
@@ -221,16 +219,15 @@ def proponer_reasignacion(usuario, ejercicio, observaciones="", momento=None):
             monto_liberado=calculo["total"], monto_asignado=calculo["asignado"], saldo=calculo["saldo"], creada_por=usuario,
             unidad=usuario.unidad, creada_en=ahora,
             datos={"observaciones": (observaciones or "").strip(), "regla": calculo["regla"],
-                   "recursos": [{"id": r.pk, "folio": r.expediente.folio if r.expediente_id else "", "origen": r.nombre_origen,
-                                 "monto": str(r.monto), "referencia": r.referencia} for r in calculo["recursos"]],
+                   "recursos": [{"id": r["id"], "folio": r["expediente"].folio, "origen": r["nombre_origen"],
+                                 "monto": str(r["monto"]), "referencia": r["referencia"]} for r in calculo["recursos"]],
                    "renglones": [{"expediente": r["expediente"].pk, "folio": r["expediente"].folio, "lugar": r["lugar"],
                                   "posicion": r["posicion"], "persona": r["expediente"].solicitante.nombre,
                                   "monto": str(r["monto"]), "alcanza": r["alcanza"],
                                   "saldo": str(r["saldo"]) if r["saldo"] is not None else None} for r in calculo["renglones"]]})
-        p.expedientes.set(alcanzadas)
-        RecursoLiberado.objects.filter(pk__in=[r.pk for r in calculo["recursos"]]).update(propuesta=p)
-        detalle = ([{"clave": "Liberado", "texto": f"{r.expediente.folio if r.expediente_id else 'Saldo'} · {r.nombre_origen} · "
-                     f"{r.referencia}"[:200], "estado": formato_moneda(r.monto)} for r in calculo["recursos"]]
+        p.expedientes.set(alcanzadas)       # lo que reasigna queda comprometido mientras la propuesta esté en trámite
+        detalle = ([{"clave": "Liberado", "texto": f"{r['expediente'].folio} · {r['nombre_origen']} · "
+                     f"{r['referencia']}"[:200], "estado": formato_moneda(r["monto"])} for r in calculo["recursos"]]
                    + [{"clave": f"Lugar {r['lugar']}", "texto": f"{r['expediente'].folio} · {r['expediente'].solicitante.nombre} · "
                        f"{formato_moneda(r['monto'])}"[:200], "estado": "Alcanza" if r["alcanza"] else "No alcanza"}
                       for r in calculo["renglones"]])
@@ -625,8 +622,7 @@ def _volver(exp, usuario, acuerdo, previo, texto):
 def _ejecutar_reasignacion(propuesta, acuerdo, usuario):
     ahora = timezone.now()
     if not propuesta.aprobada:
-        propuesta.recursos.update(propuesta=None)
-        return
+        return  # el recurso deja de estar comprometido: la propuesta ya no está en trámite
     for r in propuesta.datos.get("renglones", []):
         if not r["alcanza"]:
             continue
@@ -636,6 +632,7 @@ def _ejecutar_reasignacion(propuesta, acuerdo, usuario):
         exp.cambiar_estado("aprobada", usuario, motivo=_motivo(acuerdo), tipo_evento="reasignacion",
                            descripcion=f"Aprobada por reasignación del recurso liberado (lugar {r['lugar']} de la lista de "
                                        f"espera; acuerdo {acuerdo.numero}).", datos={"propuesta": propuesta.pk, "acuerdo": acuerdo.pk})
+        dictamen_seguimiento.registrar_entrada(usuario, exp, acuerdo, r["lugar"], Decimal(r["monto"]))
         plazos.registrar_hito(exp, "aprobacion_comite", usuario, ahora, referencia=f"Acuerdo {acuerdo.numero}",
                               datos={"acuerdo": acuerdo.pk, "reasignacion": propuesta.pk})
         firma = plazos.vencimiento(exp, "firma_liberacion")
@@ -646,10 +643,7 @@ def _ejecutar_reasignacion(propuesta, acuerdo, usuario):
                        ("Monto asignado", formato_moneda(Decimal(r["monto"]))),
                        ("Firma del contrato", "corre desde esta notificación" + (f"; {firma.config.get('nota', '')}" if firma else ""))],
             datos={"reasignacion": propuesta.pk, "acuerdo": acuerdo.pk})
-    propuesta.recursos.update(reasignado_en=ahora)
-    if propuesta.saldo and propuesta.saldo > 0:
-        registrar_recurso(None, "saldo", propuesta.saldo, usuario, f"Propuesta {propuesta.pk}",
-                          f"Saldo de la reasignación del acuerdo {acuerdo.numero}.", ejercicio=propuesta.ejercicio)
+    # El saldo (lo liberado que no alcanzó para la siguiente) sigue por reasignar en el registro único.
 
 
 def _ejecutar_sustitucion(propuesta, acuerdo, usuario):
@@ -679,13 +673,11 @@ def _ejecutar_baja(propuesta, acuerdo, usuario):
         return
     exp.refresh_from_db()
     pagado = ministrado(exp)
-    destino = "cancelada" if pagado > 0 else "recurso_liberado"
-    exp.cambiar_estado(destino, usuario, motivo=_motivo(acuerdo), tipo_evento="baja_por_acuerdo",
-                       descripcion=f"{propuesta.nombre_tipo} (acuerdo {acuerdo.numero})"
-                       + (f"; lo ministrado ({formato_moneda(pagado)}) se debe reintegrar." if pagado else "."),
-                       datos={"acuerdo": acuerdo.pk, "propuesta": propuesta.pk})
-    registrar_recurso(exp, propuesta.tipo if propuesta.tipo in ("desistimiento", "fallecimiento") else "caso_fortuito",
-                      max(CERO, total_aprobado(exp) - pagado), usuario, f"Acuerdo {acuerdo.numero}", propuesta.nombre_tipo)
+    destino = "cancelada" if pagado > 0 else "baja"
+    dar_de_baja(usuario, exp, propuesta.tipo if propuesta.tipo in ("desistimiento", "fallecimiento") else "caso_fortuito",
+                max(CERO, total_aprobado(exp) - pagado), acuerdo, destino,
+                f"{propuesta.nombre_tipo} (acuerdo {acuerdo.numero})"
+                + (f"; lo ministrado ({formato_moneda(pagado)}) se debe reintegrar." if pagado else "."), propuesta)
     if destino == "cancelada":  # HU-6.2: lo ministrado se requiere a la persona (sin inscripción en el Listado)
         from . import incumplimientos
 
@@ -696,10 +688,8 @@ def _ejecutar_caso_fortuito(propuesta, acuerdo, usuario):
     exp = propuesta.expedientes.get()
     if propuesta.aprobada and propuesta.datos.get("resolucion") == "liberar":
         exp.refresh_from_db()
-        exp.cambiar_estado("recurso_liberado", usuario, motivo=_motivo(acuerdo), tipo_evento="baja_por_acuerdo",
-                           descripcion=f"Caso fortuito: apoyo terminado sin sanción (acuerdo {acuerdo.numero}).",
-                           datos={"acuerdo": acuerdo.pk})
-        registrar_recurso(exp, "caso_fortuito", por_ministrar(exp), usuario, f"Acuerdo {acuerdo.numero}", "Caso fortuito")
+        dar_de_baja(usuario, exp, "caso_fortuito", por_ministrar(exp), acuerdo, "baja",
+                    f"Caso fortuito: apoyo terminado sin sanción (acuerdo {acuerdo.numero}).", propuesta)
         return
     texto = (f"Reanuda con la meta ajustada (acuerdo {acuerdo.numero})." if propuesta.aprobada else
              f"El Comité no aprobó la propuesta del caso fortuito (acuerdo {acuerdo.numero}); se reanuda.")

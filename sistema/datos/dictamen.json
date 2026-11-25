@@ -118,6 +118,14 @@
       "incidente": false
     },
     {
+      "clave": "sustitucion_titular",
+      "nombre": "Sustitución de la persona titular por la segunda persona beneficiaria (el apoyo continúa)",
+      "unidad": "DRFF",
+      "fundamento": "CC 8.1.9 b fr. VIII; 10.2",
+      "efecto": "registro",
+      "incidente": true
+    },
+    {
       "clave": "liberacion_recurso",
       "nombre": "Baja por desistimiento o por fallecimiento sin sustitución y liberación del recurso",
       "unidad": "DRFF",
@@ -236,7 +244,23 @@
     }
   },
   "reasignacion": {
-    "nota": "HU-2.4: la reasignación sigue el orden de la lista de espera del acta (lugar) y no rebasa el recurso liberado por las bajas del ejercicio que aún no se reasigna (Convocatoria base sexta; CC 10.2). Efectos de los tipos de acuerdo: «baja» saca a la persona beneficiaria de la lista y libera su monto; «reasignacion» pasa a «aprobada» las siguientes de la lista de espera; «sustitucion» hace las dos cosas en un solo acuerdo; «registro» solo deja la constancia.",
+    "nota": "HU-2.4 y HU-6.1: la reasignación sigue el orden de la lista de espera del acta (lugar) y no rebasa el recurso liberado del ejercicio que aún no se reasigna (Convocatoria base sexta; CC 10.2). Efectos de los tipos de acuerdo que el Comité toma directamente: «baja» saca a la persona beneficiaria de la lista y libera su monto; «reasignacion» pasa a «aprobada» las siguientes de la lista de espera; «sustitucion» hace las dos cosas en un solo acuerdo; «registro» solo deja la constancia. Un acuerdo que resuelve una propuesta del área responsable (M6) aplica su efecto al cumplirse. Todo lo que sale, entra o se libera queda en MovimientoListado (movimientos.origenes).",
     "estado_baja": "baja"
+  },
+  "movimientos": {
+    "nota": "Origen de cada movimiento de los listados (MovimientoListado.origen): sale = la persona beneficiaria deja la Lista de Personas Beneficiarias y libera lo no ministrado; libera = recurso que se libera sin que la persona salga; entra = reasignación desde la lista de espera.",
+    "origenes": {
+      "desistimiento": "Desistimiento de la persona beneficiaria",
+      "fallecimiento": "Fallecimiento sin sustitución",
+      "cancelacion": "Cancelación del apoyo",
+      "baja": "Baja del programa",
+      "sustitucion": "Sustitución por la siguiente de la lista de espera",
+      "caso_fortuito": "Caso fortuito o fuerza mayor",
+      "sin_firma": "Contrato sin firma en plazo",
+      "ajuste_superficie": "Ajuste de superficie (verificación)",
+      "reintegro": "Reintegro depositado",
+      "reasignacion": "Reasignación desde la lista de espera",
+      "otro": "Otro acuerdo"
+    }
   }
 }

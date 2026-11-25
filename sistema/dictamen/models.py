@@ -309,25 +309,35 @@ class Acuerdo(models.Model):
 class TipoMovimiento(models.TextChoices):
     SALE = "sale", "Sale de la Lista de Personas Beneficiarias"
     ENTRA = "entra", "Entra desde la Lista de espera"
+    LIBERA = "libera", "Libera recurso sin salir de la lista"
 
 
 class MovimientoListado(models.Model):
-    """HU-2.4 · Cambio de listado por un acuerdo de seguimiento: la persona beneficiaria que sale (desistimiento,
-    cancelación, baja o sustitución) y la solicitud de la lista de espera que entra en su lugar (reasignación).
+    """HU-2.4 y HU-6.1 · Registro único de lo que sale, entra o se libera en los listados del ejercicio.
 
-    Sin acuerdo: el recurso que el área responsable liberó por un contrato sin firma en plazo (HU-3.3); queda como
-    recurso liberado para que el Comité lo reasigne."""
+    - ``sale``: la persona beneficiaria deja la Lista de Personas Beneficiarias (desistimiento, fallecimiento, cancelación,
+      baja, sustitución por la lista de espera, caso fortuito) y libera lo no ministrado;
+    - ``entra``: la solicitud de la lista de espera que pasa a la lista por reasignación (con el monto que usa);
+    - ``libera``: recurso que se libera sin que la persona salga (ajuste de superficie de la verificación, reintegro
+      depositado).
+    Lo hace un acuerdo de seguimiento (tomado directamente por el Comité o al cumplirse la propuesta del área de M6). Sin
+    acuerdo: el contrato sin firma en plazo que el área responsable liberó (HU-3.3), el ajuste de superficie y el reintegro.
+    El recurso por reasignar del ejercicio es lo que salió o se liberó menos lo que entró (``seguimiento.recurso_liberado``)."""
 
     acuerdo = models.ForeignKey(Acuerdo, null=True, blank=True, on_delete=models.PROTECT, related_name="movimientos",
                                 help_text="Vacío cuando el recurso se liberó por falta de firma del contrato en plazo (HU-3.3).")
     motivo = models.CharField(max_length=300, blank=True, help_text="Origen del movimiento cuando no viene de un acuerdo.")
+    origen = models.CharField(max_length=30, blank=True,
+                              help_text="Clave de datos/dictamen.json (movimientos.origenes): desistimiento, sin_firma, reintegro…")
+    referencia = models.CharField(max_length=120, blank=True, help_text="Acuse o acuerdo que lo origina.")
     expediente = models.ForeignKey(Expediente, on_delete=models.PROTECT, related_name="movimientos_listado")
     movimiento = models.CharField(max_length=10, choices=TipoMovimiento.choices)
     estado_anterior = models.CharField(max_length=40)
     estado_nuevo = models.CharField(max_length=40)
     lugar_lista_espera = models.PositiveIntegerField(null=True, blank=True, help_text="Lugar que tenía en la lista de espera.")
     monto = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+",
+                                help_text="Vacío cuando lo registra el sistema (ajuste de superficie de la verificación).")
     fecha_hora = models.DateTimeField(default=timezone.now)
     history = HistoricalRecords()
 
@@ -337,5 +347,11 @@ class MovimientoListado(models.Model):
         verbose_name_plural = "movimientos de listado"
 
     def __str__(self):
-        origen = self.acuerdo.numero if self.acuerdo_id else "Sin firma en plazo"
+        origen = self.acuerdo.numero if self.acuerdo_id else self.nombre_origen
         return f"{origen} · {self.expediente.folio}: {self.get_movimiento_display()}"
+
+    @property
+    def nombre_origen(self):
+        from .comun import datos_dictamen
+
+        return datos_dictamen().get("movimientos", {}).get("origenes", {}).get(self.origen, self.origen or "Acuerdo del Comité")
