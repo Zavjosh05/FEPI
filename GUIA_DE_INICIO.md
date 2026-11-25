@@ -125,10 +125,25 @@ orden de un trámite de Capturando Carbono, de la firma al padrón público, con
 `entregas/sprint_N/Resumen_sprint_N.pdf` están las pantallas de cada parte. Para saber qué hace cada unidad y cada botón, el
 [Manual de usuario](MANUAL_DE_USUARIO.md).
 
-**Sobre las fechas de la demostración.** Los datos de ejemplo están fechados en el calendario 2026 de cada
-convocatoria, hasta el 19 de noviembre de 2026. El sistema usa la fecha real, así que en días posteriores verás más
-plazos vencidos: es lo esperado. Para levantar el sistema sin datos de ejemplo, arráncalo con `CARGAR_DEMO=0` en el
-archivo `.env` (sección 1.6) sobre una base vacía.
+**Sobre las fechas de la demostración.** Los datos de ejemplo se cargan con un calendario simulado de la Convocatoria
+2026: cada paso ocurre en la fecha que le toca. La recepción, los dictámenes, las sesiones del Comité de julio y la
+verificación en campo (ligada a las fechas límite de conclusión de cada programa) van en sus fechas; lo que sirve por estar
+cerca de «hoy» (contratos por firmar, vales de planta, solicitudes de pago y cheques recientes, sesiones de seguimiento,
+sustituciones, reasignaciones, omisiones y reintegros) se arma hacia atrás, en días hábiles, desde la **fecha de corte**, que
+es **el día en que se carga la demostración**; el cierre de Loma del Aire y los padrones ocurren ese mismo día. Así, recién
+levantado el sistema, *Plantación Los Pinos* está por firmar a un día hábil de vencer, *Paraje El Rocío* (reasignada desde
+la lista de espera) por firmar en plazo, el vale de *Mirador de los Pinos* vigente, el cheque de *Loma Verde* por vencer, y el
+Guardabosque de *Ejido San Juan* tiene entregados sus reportes hasta el último mes terminado, con ése por revisar.
+
+- Si la carga es en sábado, domingo o día inhábil, los pasos se cuentan desde el siguiente día hábil.
+- La fecha de corte no baja del 19-nov-2026 ni pasa del 31-dic-2026 (el ejercicio sigue siendo 2026): cargada en 2027, la
+  demostración queda como al cierre de 2026 y sus plazos se ven vencidos.
+- Para fijar otra fecha (entre esas dos), define `DEMO_FECHA_CORTE=AAAA-MM-DD` antes de levantar con una base nueva, por
+  ejemplo `DEMO_FECHA_CORTE=2026-12-15 docker compose up --build` (o en `.env`).
+
+Una vez cargada, los plazos se miden con el reloj real: si pruebas días después, algunos aparecerán vencidos, como en
+cualquier expediente real. Para volver a tenerla fresca, borra la base y levántala de nuevo (sección 1.5). Para levantar el
+sistema sin datos de ejemplo, arráncalo con `CARGAR_DEMO=0` en el archivo `.env` (sección 1.6) sobre una base vacía.
 
 ### 1.5 Detener, volver a empezar y borrar
 

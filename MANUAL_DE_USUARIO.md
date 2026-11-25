@@ -1029,7 +1029,7 @@ usuarios es `Probosque2026`. Los nombres de predios son los de los datos de demo
 | Notificar el resultado y la cita a firma | `del_amecameca` | Plantación Los Pinos (PS) |
 | Modelo de contrato por validar o validado | `juridica` | Modelos de PS y RHF validados; CC, PS y PSAHEM con plantilla base por validar |
 | Elaborar y enviar el contrato | `dir_drff` | Barranca Honda (RHF), Ojo de Agua (RHF) |
-| Registrar la firma | `del_amecameca` | Plantación Los Pinos (PS, por firmar) |
+| Registrar la firma | `del_amecameca` | Plantación Los Pinos (PS, por firmar, a un día hábil de vencer el día de la carga) |
 | Contrato sin firma en plazo y liberar el recurso | `dir_drff` | Cañada Seca (PS) |
 | Vale de planta: emitir, vencido, reposición; salida parcial | `del_amecameca`, `vivero` | Mirador de los Pinos (vigente, dos salidas), Ladera Verde (vencido), Cerro Gordo (reposición) |
 | Cheques de PSAHEM: emitido, enviado, entregado, por vencer | `fiduciaria`, `del_amecameca` | Paraje Las Ánimas, Monte Alto, Cerro del Venado, Loma Verde; Bosque Los Cedros espera su cheque |
@@ -1046,9 +1046,12 @@ usuarios es `Probosque2026`. Los nombres de predios son los de los datos de demo
 | Portal: primer acceso o consulta sin cuenta | `/portal/primer-acceso/`, `/portal/consulta/` | El código de primer acceso y el de consulta de cada Guardabosque están en el acuse «Acceso al portal» de su expediente (pestaña **Documentos y acuses**); Margarito Sánchez Ruiz ya tiene cuenta activa |
 | Páginas públicas | sin cuenta | `/contrato/resultados/` y `/padron/` |
 
-Los datos de ejemplo están fechados en el calendario 2026 de cada convocatoria, hasta el 19 de noviembre de 2026. El
-sistema usa la fecha real, así que en días posteriores verás más plazos vencidos: es lo esperado. Para empezar de cero
-con los mismos datos: `docker compose down -v` y `docker compose up --build` (Guía de inicio, sección 1.5).
+Los datos de ejemplo están fechados en el calendario 2026 de cada convocatoria. Su fecha de corte es **el día en que se
+cargan** (Guía de inicio, sección 1.4): lo reciente (contratos por firmar, vales, cheques, sustituciones, reasignaciones,
+omisiones y reintegros, reportes mensuales del PEG) queda en su punto ese día, y el cierre de Loma del Aire y los padrones
+ocurren ese mismo día. Después, el sistema usa la fecha real, así que en días posteriores verás más plazos vencidos: es lo
+esperado. Para empezar de cero con los mismos datos y la fecha de corte de hoy: `docker compose down -v` y
+`docker compose up --build` (Guía de inicio, sección 1.5).
 
 El orden de un trámite completo de Capturando Carbono, de la firma al padrón, con el usuario de cada paso, está en
 «Recorrer el sistema completo» de [`sistema/README.md`](sistema/README.md) y en la captura siguiente.
