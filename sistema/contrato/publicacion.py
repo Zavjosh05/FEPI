@@ -29,6 +29,7 @@ from nucleo.models import (
 )
 
 from .models import Publicacion, ResultadoPublicado
+from nucleo.trazabilidad import registra_usuario
 
 LUGARES_POR_OMISION = ("Página de PROBOSQUE (https://probosque.edomex.gob.mx), Oficinas Centrales y "
                        "Delegaciones Regionales Forestales")
@@ -166,6 +167,7 @@ def vencimiento_de(notificacion):
 
 
 # ----------------------------------------------------------------------------- publicar
+@registra_usuario
 def publicar(usuario, sesion, momento=None, lugares=""):
     """Publica los listados de la sesión de aprobación (``Publicacion``). Ver el módulo."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
@@ -272,6 +274,7 @@ def _avisos_de_resultado(usuario, pub, resolucion, ahora):
 
 
 # ----------------------------------------------------------------------------- avisos y entrega
+@registra_usuario
 def enviar_aviso(usuario, expediente, tipo, asunto, observaciones="", renglones=(), datos=None):
     """Aviso a la persona por conducto de la Delegación (cita a firma, omisiones por subsanar, devolución…)."""
     if usuario.tipo_unidad == TipoUnidad.DELEGACION:
@@ -282,6 +285,7 @@ def enviar_aviso(usuario, expediente, tipo, asunto, observaciones="", renglones=
                                               observaciones=observaciones, datos=datos)
 
 
+@registra_usuario
 def registrar_entrega(usuario, notificacion, medio=MedioNotificacion.PERSONAL, fecha_hora=None, observaciones=""):
     """La Delegación registra que notificó a la persona (fecha, hora, medio) y se emite su acuse."""
     return notificaciones.registrar_notificacion(usuario, notificacion, medio, fecha_hora=fecha_hora,

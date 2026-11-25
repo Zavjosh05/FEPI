@@ -19,6 +19,8 @@ pytestmark = pytest.mark.django_db
 def test_hu_3_2_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-3.2")
     assert "modelo validado" in hu["criterios"][0] and "fecha y la hora del envío" in hu["criterios"][1]
+    assert len(hu["criterios"]) == 3
+    assert "trazabilidad" in hu["criterios"][-1]
 
 
 # ----------------------------------------------------------------------------- modelos de contrato
@@ -294,3 +296,25 @@ def test_hu_3_2_ya_no_figura_como_pendiente_en_la_pestana(notificadas, usuarios,
     client.login(username="dir_drff", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
     assert 'data-prueba="por-construir"' not in html  # ya no queda ninguna historia de M3 por construir
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_3_2_trazabilidad_del_modelo_y_del_contrato(en_delegacion, usuarios):
+    """Criterio 3: la validación del modelo (Unidad Jurídica) y la elaboración y el envío del contrato (Dirección) quedan en
+    el historial con su usuario y los valores anteriores y nuevos."""
+    _, (exp,) = en_delegacion("PS")
+    contrato = Contrato.objects.get(expediente=exp)
+    assert contrato.history.get(history_type="+").history_user == usuarios["dir_drff"]
+    envio = contrato.history.filter(history_type="~").latest("history_date")
+    assert envio.history_user == usuarios["dir_drff"] and envio.enviado_en is not None
+    version = contrato.version_modelo
+    assert version.history.filter(estado="validada", history_user=usuarios["juridica"]).exists()
+    filas = _filas_de(exp, "Contrato")
+    assert filas and all(f["usuario"] == usuarios["dir_drff"] for f in filas)
+    assert any(f["registro"] == "Versión del modelo de contrato" and f["usuario"] == usuarios["juridica"]
+               for f in _filas_de(exp, "Versión del modelo de contrato"))

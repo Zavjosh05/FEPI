@@ -3,6 +3,7 @@ depósito) y, en PSAHEM, la remisión a la Fiduciaria."""
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente, Notificacion
 
@@ -25,6 +26,8 @@ class RevisionSolicitud(models.Model):
     revisada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     revisada_en = models.DateTimeField(default=timezone.now)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-revisada_en", "-id"]
@@ -58,6 +61,8 @@ class Pago(models.Model):
     aviso = models.ForeignKey(Notificacion, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
                               help_text="Aviso de pago a la persona beneficiaria por conducto de la Delegación.")
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["-fecha_pago", "-id"]
         verbose_name = "pago de ministración"
@@ -82,6 +87,8 @@ class RemisionFiduciaria(models.Model):
     oficio = models.CharField(max_length=120, blank=True, help_text="Oficio o referencia de la remisión.")
     observaciones = models.TextField(blank=True)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-remitida_en", "-id"]

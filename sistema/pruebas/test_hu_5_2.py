@@ -30,7 +30,9 @@ def pagar(usuarios, sol, **kw):
 def test_hu_5_2_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-5.2")
     assert hu["criterios"] == ["Cada pago está asociado a su solicitud, con la fecha del pago.",
-                               "En PSAHEM existe la fecha de remisión a la Fiduciaria."]
+                               "En PSAHEM existe la fecha de remisión a la Fiduciaria.",
+                               hu["criterios"][2]]
+    assert "trazabilidad" in hu["criterios"][-1]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M5.2")
     assert {"CC-AF-01", "PSA-AF-01", "PEG-AF-01"} <= set(funcion["necesidades"])
     assert "10.1, fr. XIV" in necesidades["PSA-AF-01"]["texto"]
@@ -324,3 +326,20 @@ def test_hu_5_2_la_delegacion_y_la_direccion_ven_el_pago_en_la_pestana(client, a
         assert 'data-prueba="pago-m1"' in html and "SPEI-99" in html, usuario
     client.login(username=delegado_de(usuarios, exp).username, password=contrasena)
     assert "Notificar el pago a la persona beneficiaria" in client.get(f"/recepcion/expediente/{exp.folio}/").content.decode()
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_5_2_trazabilidad_de_la_revision_y_del_pago(aceptada, usuarios):
+    """Criterio 3: la revisión y el pago (Administración y Finanzas) quedan en el historial con su usuario."""
+    exp, sol = aceptada("CC")
+    assert RevisionSolicitud.objects.get(solicitud=sol).history.get().history_user == usuarios["finanzas"]
+    pago = pagos.registrar_pago(usuarios["finanzas"], sol, "TR-0001", timezone.localdate())
+    assert pago.history.get(history_type="+").history_user == usuarios["finanzas"]
+    assert sol.history.filter(estado=EstadoSolicitud.PAGADA, history_user=usuarios["finanzas"]).exists()
+    assert any(f["usuario"] == usuarios["finanzas"] for f in _filas_de(exp, "Pago"))
+    assert any(f["usuario"] == usuarios["finanzas"] for f in _filas_de(exp, "Revisión de la solicitud de pago"))

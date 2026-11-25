@@ -32,6 +32,7 @@ from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad
 
 from .firma import datos_contrato
 from .models import Especie, RenglonVale, SalidaPlanta, ValePlanta, Vivero
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_ANTICIPADOS = ("notificada", "contrato_elaborado", "contrato_en_delegacion")
 ESTADOS_CON_CONTRATO = ("contratada", "vale_entregado")
@@ -162,6 +163,7 @@ def _validar_carta(carta):
         raise ValidationError("La carta compromiso debe ser PDF, JPG o PNG.")
 
 
+@registra_usuario
 def emitir_vale(usuario, expediente, vivero, renglones, carta=None, motivo_ajuste="", planta_disponible=True,
                 momento=None):
     """La Delegación emite el Vale de Planta. ``renglones``: lista de ``(especie, cantidad)``."""
@@ -277,6 +279,7 @@ def _contexto_pdf(vale, vigencia):
 
 
 # ----------------------------------------------------------------------------- salida del vivero
+@registra_usuario
 def validar_vale(usuario, vale, hoy=None):
     """Valida el vale antes de entregar planta. Devuelve su situación; lanza ``ValidationError`` si no es válido."""
     exigir_unidad(usuario, TipoUnidad.VIVERO)
@@ -299,6 +302,7 @@ def validar_vale(usuario, vale, hoy=None):
     return estado
 
 
+@registra_usuario
 def registrar_salida(usuario, vale, especie, cantidad, salido_en=None, observaciones="", momento=None):
     """El personal del vivero registra una salida de planta contra un vale vigente (especie, cantidad, fecha y hora)."""
     exigir_unidad(usuario, TipoUnidad.VIVERO)

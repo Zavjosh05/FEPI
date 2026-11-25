@@ -3,6 +3,7 @@ en MFS y PEG, la formalización propia del programa) y el señalamiento de lo qu
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente
 
@@ -39,6 +40,8 @@ class FirmaContrato(models.Model):
     registrada_en = models.DateTimeField(default=timezone.now)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["-firmado_en"]
         verbose_name = "firma del contrato"
@@ -64,6 +67,8 @@ class ElementoFormalizacion(models.Model):
     dato = models.CharField(max_length=120, blank=True, help_text="RFN del prestador, folio de la credencial…")
     archivo = models.FileField(upload_to=ruta_firma, max_length=300)
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["id"]
         unique_together = [("firma", "clave")]
@@ -85,6 +90,8 @@ class SinFirma(models.Model):
     liberado_en = models.DateTimeField(null=True, blank=True)
     motivo_liberacion = models.TextField(blank=True)
     acuse_liberacion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-senalado_en"]

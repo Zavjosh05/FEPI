@@ -24,7 +24,9 @@ pytestmark = pytest.mark.django_db
 def test_hu_5_1_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-5.1")
     assert hu["criterios"] == ["La solicitud tiene todos sus soportes.",
-                               "Existe la fecha y la hora del envío a Administración y Finanzas."]
+                               "Existe la fecha y la hora del envío a Administración y Finanzas.",
+                               hu["criterios"][2]]
+    assert "trazabilidad" in hu["criterios"][-1]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M5.1")
     assert {"CC-ARP-05", "PS-ARP-05", "RHF-ARP-05", "PSA-ARP-05", "PEG-DPF-06"} <= set(funcion["necesidades"])
 
@@ -255,3 +257,21 @@ def test_hu_5_1_siguiente_paso_y_menu_de_pagos(client, contratadas, usuarios, co
     html = client.get(f"/recepcion/expediente/{exp.folio}/").content.decode()
     assert "Emitir el oficio de solicitud de pago" in html and "/pagos/solicitudes/" in html
     assert any(m["url"] == "pagos:solicitudes" for m in extensiones.MENU)
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_5_1_trazabilidad_del_oficio_y_de_la_solicitud(solicitada, usuarios):
+    """Criterio 3: el oficio (Delegación) y la solicitud de pago con su envío (área responsable) quedan en el historial."""
+    exp = solicitada("CC")
+    oficio = OficioPago.objects.get(expediente=exp)
+    assert oficio.history.get(history_type="+").history_user == delegado_de(usuarios, exp)
+    sol = SolicitudPago.objects.get(expediente=exp, ministracion=1)
+    assert sol.history.filter(history_user=usuarios["dir_drff"]).exists()
+    assert sol.history.filter(estado=EstadoSolicitud.ENVIADA, history_user=usuarios["dir_drff"]).exists()
+    filas = _filas_de(exp, "Solicitud de pago")
+    assert filas and all(f["usuario"] == usuarios["dir_drff"] for f in filas)

@@ -3,6 +3,7 @@ especie y la salida de planta del vivero."""
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente, Unidad
 
@@ -13,6 +14,8 @@ class Especie(models.Model):
     nombre = models.CharField(max_length=120, unique=True, help_text="Nombre común.")
     nombre_cientifico = models.CharField(max_length=160, blank=True)
     activa = models.BooleanField(default=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["nombre"]
@@ -32,6 +35,8 @@ class Vivero(models.Model):
                                   help_text="Unidad (tipo vivero) cuyo personal registra las salidas de planta.")
     municipio = models.CharField(max_length=120, blank=True)
     activo = models.BooleanField(default=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["nombre"]
@@ -66,6 +71,8 @@ class ValePlanta(models.Model):
     archivo = models.FileField(upload_to=ruta_vale, max_length=300, blank=True, help_text="PDF del vale con su vigencia.")
     huella = models.CharField(max_length=64, blank=True)
     completado_en = models.DateTimeField(null=True, blank=True, help_text="Fecha y hora de la última salida que lo completó.")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-entregado_en", "-id"]
@@ -119,6 +126,8 @@ class RenglonVale(models.Model):
     especie = models.ForeignKey(Especie, on_delete=models.PROTECT, related_name="+")
     cantidad = models.PositiveIntegerField(help_text="Piezas autorizadas.")
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["id"]
         unique_together = [("vale", "especie")]
@@ -146,6 +155,8 @@ class SalidaPlanta(models.Model):
     registrada_en = models.DateTimeField(default=timezone.now)
     observaciones = models.TextField(blank=True)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["salido_en", "id"]

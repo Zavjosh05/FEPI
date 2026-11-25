@@ -27,6 +27,7 @@ from nucleo.catalogos import leer_json
 from nucleo.models import Expediente, TipoUnidad, expedientes_visibles
 
 from .models import ElementoFormalizacion, FirmaContrato, Firmante, SinFirma
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_SIN_FIRMA = ("publicada", "notificada", "contrato_elaborado", "contrato_en_delegacion")
 EXTENSIONES = (".pdf", ".jpg", ".jpeg", ".png")
@@ -110,6 +111,7 @@ def _nombre(archivo, base):
     return f"{base}{extension}"
 
 
+@registra_usuario
 def registrar_firma(usuario, expediente, firmado_en, firmante, firmante_nombre, archivo, verificacion,
                     elementos=None, observaciones="", momento=None):
     """La Delegación registra el contrato firmado.
@@ -250,6 +252,7 @@ def revisar_firmas(hoy):
     return senalados
 
 
+@registra_usuario
 def liberar_recurso(usuario, expediente, motivo, momento=None):
     """El área responsable confirma la liberación del recurso de un contrato sin firma en plazo (con un motivo)."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)

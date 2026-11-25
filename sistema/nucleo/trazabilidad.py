@@ -134,12 +134,13 @@ def historial_expediente(expediente):
 
 
 def fuentes_nucleo(expediente):
-    """Registros del núcleo: el expediente, su predio, la persona solicitante y los documentos."""
-    from .models import Documento, Expediente, Persona, Predio
+    """Registros del núcleo: el expediente, su predio, la persona solicitante, los documentos y las notificaciones."""
+    from .models import Documento, Expediente, Notificacion, Persona, Predio
 
     return [
         ("Expediente", Expediente.history.filter(id=expediente.pk)),
         ("Predio", Predio.history.filter(id=expediente.predio_id)),
         ("Persona solicitante", Persona.history.filter(id=expediente.solicitante_id)),
         ("Documento", Documento.history.filter(expediente_id=expediente.pk)),
+        ("Notificación", Notificacion.history.filter(expediente_id=expediente.pk)),
     ]

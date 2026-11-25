@@ -30,6 +30,7 @@ from nucleo.catalogos import leer_json
 from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad, expedientes_visibles
 
 from .models import ComprobanteCuenta, EstadoSolicitud, OficioPago, SolicitudPago
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_PARA_SOLICITAR = ("contratada", "planta_entregada", "pagada", "cheque_entregado")
 EN_CURSO = (EstadoSolicitud.ENVIADA, EstadoSolicitud.ACEPTADA, EstadoSolicitud.REMITIDA, EstadoSolicitud.PAGADA)
@@ -238,6 +239,7 @@ def plazo_remision(solicitud):
 
 
 # ----------------------------------------------------------------------------- oficio de la Delegación
+@registra_usuario
 def emitir_oficio(usuario, expediente, momento=None):
     """La Delegación del expediente emite el oficio de solicitud de pago (una vez, con el contrato firmado)."""
     exigir_unidad(usuario, TipoUnidad.DELEGACION)
@@ -284,6 +286,7 @@ def emitir_oficio(usuario, expediente, momento=None):
 
 
 # ----------------------------------------------------------------------------- comprobante de la cuenta
+@registra_usuario
 def adjuntar_comprobante(usuario, expediente, archivo, descripcion="", momento=None):
     """La Delegación (que recibe el documento al firmar) o el área responsable guarda el comprobante de la cuenta bancaria."""
     exigir_unidad(usuario, TipoUnidad.DELEGACION, TipoUnidad.DIRECCION)
@@ -331,6 +334,7 @@ def _preparar(usuario, expediente, numero, momento=None):
     return sol, m
 
 
+@registra_usuario
 def preparar_solicitud(usuario, expediente, numero, momento=None):
     """El área responsable abre la solicitud de la ministración (queda «por enviar» con la lista de soportes)."""
     with transaction.atomic():
@@ -338,6 +342,7 @@ def preparar_solicitud(usuario, expediente, numero, momento=None):
     return sol
 
 
+@registra_usuario
 def enviar_solicitud(usuario, expediente, numero, observaciones="", momento=None):
     """Envía la solicitud a Administración y Finanzas con fecha, hora y acuse. No se envía si falta un soporte."""
     with transaction.atomic():

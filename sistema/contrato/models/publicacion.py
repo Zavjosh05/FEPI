@@ -7,6 +7,7 @@ Comité autorizó en su acta y el renglón publicado de cada solicitud (la copia
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from dictamen.models import ResultadoListado, SesionComite
 from nucleo.models import Acuse, Ejercicio, Expediente
@@ -27,6 +28,8 @@ class Publicacion(models.Model):
     dentro_de_fecha = models.BooleanField(null=True, blank=True,
                                           help_text="Vacío cuando las reglas no traen fecha para publicar.")
     fundamento_fecha = models.CharField(max_length=300, blank=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-publicada_en"]
@@ -58,6 +61,8 @@ class ResultadoPublicado(models.Model):
     predio = models.CharField(max_length=250)
     municipio = models.CharField(max_length=120)
     persona = models.CharField(max_length=250, blank=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         unique_together = [("publicacion", "expediente")]
