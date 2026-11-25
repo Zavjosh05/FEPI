@@ -1,11 +1,10 @@
 erDiagram
+  Acuerdo |o--o{ MovimientoListado : acuerdo
   Acuerdo }o--o{ Expediente : expedientes
   Acuse |o--o{ Cheque : acuse_emision
   Acuse |o--o{ Cheque : acuse_entrega
   Acuse |o--o{ Cheque : acuse_envio
   Acuse |o--o{ Contrato : acuse_envio
-  Acuse |o--o{ DictamenJuridico : acuse
-  Acuse |o--o{ DictamenTecnico : acuse
   Acuse |o--o{ Evento : acuse
   Acuse |o--o{ FirmaContrato : acuse
   Acuse |o--o{ Notificacion : acuse_envio
@@ -24,6 +23,9 @@ erDiagram
   Acuse |o--o{ Validacion : acuse
   Contrato ||--o{ Adendum : contrato
   Contrato ||--o| FirmaContrato : contrato
+  DictamenJuridico ||--o| RevisionPropiedad : dictamen
+  Documento |o--o{ DictamenJuridico : documento
+  Documento |o--o{ DictamenTecnico : documento
   Documento |o--o{ RevisionRequisito : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Formato : ejercicio
@@ -48,6 +50,7 @@ erDiagram
   Expediente ||--o{ Documento : expediente
   Expediente ||--o{ Evento : expediente
   Expediente ||--o{ Hito : expediente
+  Expediente ||--o{ MovimientoListado : expediente
   Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Pago : expediente
   Expediente ||--o{ Poligono : expediente
@@ -91,6 +94,7 @@ erDiagram
   Requisito ||--o{ RevisionRequisito : requisito
   Requisito }o--o{ Modalidad : modalidades
   Requisito }o--o{ TipoPersona : tipos_persona
+  RevisionRequisito ||--o{ ObservacionValidacion : revision
   SesionComite ||--o{ Acuerdo : sesion
   SesionComite ||--o{ DocumentoSesion : sesion
   SesionComite ||--o{ ResolucionSesion : sesion
@@ -115,6 +119,7 @@ erDiagram
   ValePlanta |o--o{ ValePlanta : repone
   ValePlanta ||--o{ RenglonVale : vale
   ValePlanta ||--o{ SalidaPlanta : vale
+  Validacion ||--o{ ObservacionValidacion : validacion
   Validacion }o--o{ RevisionRequisito : faltantes
   VersionModelo |o--o{ Adendum : version_modelo
   VersionModelo ||--o{ Contrato : version_modelo
@@ -296,6 +301,9 @@ erDiagram
     int cumplido_por_id FK
     texto observaciones_cumplimiento
     fecha_hora registrado
+    texto causa
+    decimal monto_liberado
+    decimal monto_reasignado
   }
   DictamenJuridico {
     int id PK
@@ -303,9 +311,12 @@ erDiagram
     texto resultado
     texto motivo
     json cotejo
+    json documentacion
     int usuario_id FK
     fecha_hora fecha_hora
-    int acuse_id FK
+    texto folio UK
+    int documento_id FK
+    texto huella
   }
   DictamenTecnico {
     int id PK
@@ -319,7 +330,9 @@ erDiagram
     bool dentro_de_plazo
     int usuario_id FK
     fecha_hora fecha_hora
-    int acuse_id FK
+    texto folio UK
+    int documento_id FK
+    texto huella
   }
   DocumentoSesion {
     int id PK
@@ -328,6 +341,19 @@ erDiagram
     archivo archivo
     fecha_hora fecha_hora
     int registrado_por_id FK
+  }
+  MovimientoListado {
+    int id PK
+    int acuerdo_id FK
+    texto motivo
+    int expediente_id FK
+    texto movimiento
+    texto estado_anterior
+    texto estado_nuevo
+    int lugar_lista_espera
+    decimal monto
+    int usuario_id FK
+    fecha_hora fecha_hora
   }
   PersonaIncumplida {
     int id PK
@@ -366,6 +392,25 @@ erDiagram
     decimal monto
     json criterios
     texto motivo_ajuste
+  }
+  RevisionPropiedad {
+    int id PK
+    int dictamen_id FK
+    texto tipo_documento
+    texto nombre_documento
+    texto numero_documento
+    fecha fecha_documento
+    texto titular_documento
+    bool titular_coincide
+    decimal superficie_documento_ha
+    decimal superficie_predio_ha
+    bool superficie_suficiente
+    fecha vigente_hasta
+    bool vigente
+    bool sin_conflicto
+    texto observaciones
+    bool acreditada
+    json motivos
   }
   SesionComite {
     int id PK
@@ -747,6 +792,14 @@ erDiagram
     int acuse_envio_id FK
     json soportes
     texto observaciones
+  }
+  ObservacionValidacion {
+    int id PK
+    int validacion_id FK
+    int revision_id FK
+    bool faltante
+    texto origen
+    texto observacion
   }
   Poligono {
     int id PK

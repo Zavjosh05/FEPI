@@ -215,7 +215,9 @@ stateDiagram-v2
     notificada --> sin_firma_en_plazo
     contrato_elaborado --> sin_firma_en_plazo
     contrato_en_delegacion --> sin_firma_en_plazo
-    sin_firma_en_plazo --> recurso_liberado: Secretaría Técnica, acuerdo del Comité (D)
+    sin_firma_en_plazo --> recurso_liberado: Dirección confirma la liberación; el monto queda para reasignar (HU-3.3, D)
+    contratada --> baja: acuerdo del Comité, sin ministración solicitada (HU-2.4)
+    sin_firma_en_plazo --> baja: acuerdo del Comité (HU-2.4)
     contratada --> vale_entregado: Delegación, PS y RHF (HU-3.4)
     contratada --> planta_entregada: Delegación, si el vivero ya surtió el vale (HU-3.4)
     vale_entregado --> planta_entregada: vivero (HU-3.4)
@@ -230,7 +232,13 @@ stateDiagram-v2
     cheque_enviado --> cheque_entregado: Delegación entrega (HU-5.3)
     cheque_entregado --> ministracion_solicitada: siguiente ministración
     recurso_liberado --> [*]
+    baja --> [*]
 ```
+
+La baja por acuerdo del Comité (HU-2.4) sale de cualquier estado de la persona beneficiaria anterior a la primera
+ministración solicitada: `aprobada`, `publicada`, `notificada`, `contrato_elaborado`, `contrato_en_delegacion`,
+`sin_firma_en_plazo`, `contratada`, `vale_entregado` y `planta_entregada` (en el diagrama solo se dibujan dos). Con una
+ministración en curso o pagada procede el reintegro, no la baja.
 
 | Estado | Bandeja (quién lo atiende) | También lo consultan |
 | --- | --- | --- |
@@ -240,11 +248,11 @@ stateDiagram-v2
 | `dictaminada` | Secretaría Técnica del Comité | Unidad Jurídica |
 | `aprobada` | Dirección (publica, M3) | Unidad Jurídica, Secretaría Técnica |
 | `lista_espera`, `no_factible` | — | Unidad Jurídica, Secretaría Técnica |
-| `publicada`, `contrato_en_delegacion` | Delegación (notifica y cita; recaba la firma) | Unidad Jurídica |
-| `notificada`, `contrato_elaborado` | Dirección (elabora y envía el contrato) | Unidad Jurídica |
+| `publicada`, `contrato_en_delegacion` | Delegación (notifica y cita; recaba la firma) | Unidad Jurídica, Secretaría Técnica |
+| `notificada`, `contrato_elaborado` | Dirección (elabora y envía el contrato) | Unidad Jurídica, Secretaría Técnica |
 | `sin_firma_en_plazo` | Dirección y Secretaría Técnica (recurso por liberar) | Unidad Jurídica |
-| `contratada`, `planta_entregada`, `pagada`, `cheque_entregado` | Dirección (solicita la ministración) | Administración y Finanzas, Jurídica, vivero, Fiduciaria según el estado |
-| `vale_entregado` | Vivero (PS y RHF) | — |
+| `contratada`, `planta_entregada`, `pagada`, `cheque_entregado` | Dirección (solicita la ministración) | Administración y Finanzas, Jurídica, vivero, Fiduciaria según el estado; la Secretaría Técnica en `contratada` y `planta_entregada` (puede acordar la baja) |
+| `vale_entregado` | Vivero (PS y RHF) | Secretaría Técnica |
 | `ministracion_solicitada` | Administración y Finanzas (en PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica) | Unidad Jurídica, Secretaría Técnica (PSAHEM) |
 | `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
 | `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
@@ -311,7 +319,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Acuses.** Cada envío o entrega (recepción, envío a la Dirección, validación, aviso de faltantes,
   notificación) genera un `Acuse` con folio `AC-AAAA-NNNNNN`, fecha y hora, PDF (WeasyPrint) y su huella
   SHA-256, y un evento en la bitácora.
-- **Trazabilidad.** Los modelos del trámite llevan `django-simple-history`: cada alta, cambio o baja deja
+- **Trazabilidad.** Los modelos del trámite (también los de `contrato` y `pagos` desde la integración D-30, migraciones
+  `contrato 0005_historial_m3` y `pagos 0004_historial_m5`) llevan `django-simple-history`: cada alta, cambio o baja deja
   un renglón con los valores, el usuario, la fecha y la hora y el motivo. `nucleo/trazabilidad.py`
   (`registra_usuario`, `con_usuario`) registra al usuario de cada servicio aunque no haya petición web
   (pruebas, demostración, comandos), y los cambios en lote se hacen con `save()` para que queden en el
@@ -389,8 +398,10 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   `lista_espera` o `no_factible`.
 - **Candidatos y beneficiarios** (HU-2.3). `dictamen/listados.py` arma dos vistas separadas (menú
   «Listados»): candidatos (validadas en dictamen, dictaminadas por aprobar y lista de espera en su orden) y
-  beneficiarios (aprobadas con su monto y cómo entraron: acta o reasignación; aparte, las que salieron),
-  con exportación a CSV. Usan `expedientes_visibles`: la Delegación ve solo las suyas.
+  beneficiarios (vigentes en cualquier etapa, de `aprobada` al pago, con su monto, cómo entraron —acta o
+  reasignación—, su situación en el trámite y la fecha en que se publicó su resultado, HU-3.1; aparte, las que
+  salieron por acuerdo del Comité o porque la Dirección liberó su recurso al no firmarse el contrato), con
+  exportación a CSV. Usan `expedientes_visibles`: la Delegación ve solo las suyas.
 - **HU-2.4 · Reasignaciones e incidentes.** Los tipos de acuerdo, el área que los atiende por omisión y su
   efecto están en `datos/dictamen.json` (desistimiento, cancelación y baja → `baja`; reasignación →
   `reasignacion`; sustitución → `sustitucion`; caso fortuito, suspensión, reintegro, instrucción de pago
@@ -400,8 +411,18 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   lista de espera, en su orden (lugar del acta), y no rebasa el recurso liberado sin reasignar; la
   sustitución hace las dos cosas. Cada salida y entrada queda en `MovimientoListado`. Cada acuerdo lleva
   sus expedientes y su unidad responsable, que lo ve en su bandeja y lo marca como cumplido. `ministraciones_sin_instruccion` y `periodos_sin_validacion` dicen qué falta.
-  Los acuerdos todavía no ejecutan nada en otros módulos: `dictamen.seguimiento.RECEPTORES` es el punto
-  de conexión (tipo de acuerdo → funciones) para pagos (M5) y seguimiento (M6).
+  `dictamen.seguimiento.RECEPTORES` es el punto de conexión (tipo de acuerdo → funciones) para que otros módulos
+  ejecuten un acuerdo al cumplirse.
+- **HU-2.4 junto con M3 y M5 (D-30).** La baja aplica a la persona beneficiaria en cualquier etapa anterior a la primera
+  ministración solicitada (`seguimiento.ESTADOS_CON_BAJA`); con una ministración en curso o pagada el sistema la rechaza y
+  pide el acuerdo de reintegro. Dada de baja ya no firma, no se le elabora contrato, no recibe ni surte Vale de Planta, no
+  se emite su oficio de pago ni se solicita su ministración (`seguimiento.exigir_vigente` en `contrato` y `pagos`). El
+  recurso que la Dirección libera por un contrato sin firma en plazo (HU-3.3) entra como recurso liberado con un
+  `MovimientoListado` sin acuerdo (gancho `AL_LIBERAR_RECURSO` → `seguimiento.al_liberar_recurso`) y el Comité lo
+  reasigna igual que el de una baja. Si el Comité da de baja a una persona `sin_firma_en_plazo`, el señalamiento deja de
+  estar «por liberar». La transición `sin_firma_en_plazo → recurso_liberado` de la Secretaría Técnica se quitó: el
+  Comité ahora da de baja por acuerdo y la Dirección confirma la liberación. La Secretaría Técnica consulta los
+  expedientes de M3 previos al pago (para poder acordar la baja).
 
 ### Base de M3 (Publicación y contrato) y M5 (Pagos)
 
@@ -498,9 +519,13 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pantallas.** «Publicación de resultados» (Dirección; Secretaría Técnica y Jurídica consultan), «Notificaciones»
   (Delegación entrega; Dirección ve el estado), paneles en las bandejas, siguiente paso en el expediente y la
   pestaña «Contrato».
-- **Pendientes.** Los resultados de quienes pasan de la lista de espera a beneficiarias por acuerdo del Comité
-  (reasignación) se publicarán con HU-3.3 (flujo alterno D); la publicación en la Gaceta (PSAHEM) no se modela: el
-  lugar de publicación es un texto.
+- **Bajas y reasignaciones (HU-2.4, D-30).** `publicacion.filas_por_publicar(sesion)` arma lo que se publica: quien
+  salió por un acuerdo de seguimiento antes de publicar ya no aparece y quien entró desde la lista de espera se publica
+  como persona beneficiaria («Reasignación» en la pantalla). Si la reasignación llega después de publicar el acta de
+  aprobación, al cerrar la sesión de seguimiento con reasignaciones su acta queda autorizada para publicar
+  (`seguimiento.cerrar_sesion`) y la Dirección la publica en la misma pantalla: la persona pasa a `publicada`, recibe su
+  hito y su aviso, y corren sus plazos de firma. La página pública muestra de cada solicitud su publicación más reciente.
+- **Pendientes.** La publicación en la Gaceta (PSAHEM) no se modela: el lugar de publicación es un texto.
 
 ### M3 · HU-3.2 Elaboración del contrato
 
@@ -563,8 +588,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   bandeja de la Dirección (panel «Sin firma en plazo»). Para esto `Expediente.cambiar_estado` acepta `por_sistema=True` sin
   usuario (solo si la transición existe). **Liberar el recurso no es automático:** una persona de la Dirección del programa
   lo confirma con un motivo (`firma.liberar_recurso`; estado `recurso_liberado` y acuse). Una firma que llegue cuando ya está
-  señalado se rechaza con un mensaje claro. La reasignación a la lista de espera es del sprint 3: queda el gancho
-  `extensiones.AL_LIBERAR_RECURSO`. Se agregó la transición `sin_firma_en_plazo → recurso_liberado` para la Dirección (el
+  señalado se rechaza con un mensaje claro. Al liberar, el monto queda como recurso liberado para que el Comité lo reasigne
+  a la lista de espera (HU-2.4; gancho `extensiones.AL_LIBERAR_RECURSO`, D-30). Se agregó la transición `sin_firma_en_plazo → recurso_liberado` para la Dirección (el
   flujo la traía solo para la Secretaría Técnica) y `extensiones.AL_FIRMAR` para que HU-3.4 reaccione a la firma.
 - **Pantallas.** «Firmas» (menú de la Delegación y de la Dirección): por firmar con las dos fechas y los días, firmados y
   sin firma con la acción de liberar; «Registrar la firma» (formulario con la verificación y los elementos del programa);

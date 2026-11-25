@@ -95,6 +95,7 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 
 Pruebas: 155 del sistema en verde (146 sin navegador y 9 recorridos por la interfaz). Capturas de los recorridos
 regeneradas en `sprint_1/capturas/` (71) y de la interfaz en `interfaces/capturas/`.
+En la rama `sprint-2` estas correcciones quedaron integradas con contrato y pagos (D-30, 24-nov).
 
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — terminado el 16-nov
 
