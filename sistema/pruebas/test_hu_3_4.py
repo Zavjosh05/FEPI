@@ -117,7 +117,9 @@ def test_hu_3_4_vigencia_ps_30_dias_naturales_y_rhf_15_dias_habiles(contratadas,
     v_ps = emitir(usuarios, ps, vivero, [(esp["Pino patula"], 4400)], momento=ahora)
     v_rhf = emitir(usuarios, rhf, vivero, [(esp["Oyamel"], 1800)], momento=ahora)
     hoy = timezone.localdate()
-    assert v_ps.vence_el == hoy + timedelta(days=30) and "30" in v_ps.vigencia_texto
+    # 30 días naturales; si el último cae en día inhábil, vence el siguiente hábil (regla de días hábiles)
+    assert v_ps.vence_el == dias_habiles.siguiente_habil(hoy + timedelta(days=30)) and "30" in v_ps.vigencia_texto
+    assert v_ps.vence_el == dias_habiles.calcular_vencimiento(ahora, 30, "dias_naturales")
     assert v_rhf.vence_el == dias_habiles.calcular_vencimiento(ahora, 15, "dias_habiles")
     assert "15" in v_rhf.vigencia_texto and v_rhf.vence_el > hoy + timedelta(days=14)
 
