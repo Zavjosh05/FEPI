@@ -47,12 +47,12 @@ Calculadora, con las cifras que se citan. Lo que no coincidía con la primera re
 ## 2. Antes de empezar
 
 1. Levanta el sistema como dice la [Guía de inicio](../../GUIA_DE_INICIO.md). Si conviven varias ramas, usa su nombre de
-   proyecto: `docker compose -p probosque_s2 up --build` desde `sistema/`. Para partir de la demostración limpia:
-   `docker compose -p probosque_s2 down -v` y de nuevo `up --build`.
+   proyecto: `docker compose up --build` desde `sistema/`. Para partir de la demostración limpia:
+   `docker compose down -v` y de nuevo `up --build`.
 2. Con el sistema ya levantado y la demostración cargada, **corre una sola vez** el script de esta carpeta, desde `sistema/`:
 
    ```bash
-   docker compose -p probosque_s2 exec -T web python manage.py shell < ../datos_prueba/sprint_2/preparar_casos_ps.py
+   docker compose exec -T web python manage.py shell < ../datos_prueba/sprint_2/preparar_casos_ps.py
    ```
 
    Debe terminar con «Listo. Caso 1: … Plantación Cumbres …; Caso 2: … Vereda Alta …, … Cañada Honda …». Si lo corres otra vez
@@ -189,5 +189,5 @@ Abre la página como dice la Guía de inicio, sección 2, en modo **Comparar añ
 ## 4. Si algo no sale como dice la tabla
 
 Anota el escenario y el paso, el usuario, el folio y lo que viste. Revisa la pestaña **Bitácora** del expediente y, si hubo un
-error de la página, `docker compose -p probosque_s2 logs web`. Para volver a empezar: `docker compose -p probosque_s2 down -v`,
-`docker compose -p probosque_s2 up --build` y de nuevo el script de la sección 2.
+error de la página, `docker compose logs web`. Para volver a empezar: `docker compose down -v`,
+`docker compose up --build` y de nuevo el script de la sección 2.

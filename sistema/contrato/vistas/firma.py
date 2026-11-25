@@ -86,7 +86,7 @@ def liberar(request, folio):
                 messages.error(request, m)
         else:
             messages.success(request, f"Recurso liberado ({exp.folio}). La reasignación a la lista de espera "
-                                      "es por acuerdo del Comité (sprint 3).")
+                                      "la acuerda el Comité en una sesión de seguimiento.")
     else:
         messages.error(request, "Indique el motivo de la liberación del recurso.")
     destino = request.POST.get("volver", "")

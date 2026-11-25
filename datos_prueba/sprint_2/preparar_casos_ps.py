@@ -15,7 +15,7 @@ servicios que usa la interfaz y **con la fecha y la hora de hoy**, lo que la sec
 
 Se corre una vez, con el sistema levantado y la demostración cargada, desde la carpeta `sistema/`:
 
-    docker compose -p probosque_s2 exec -T web python manage.py shell < ../datos_prueba/sprint_2/preparar_casos_ps.py
+    docker compose exec -T web python manage.py shell < ../datos_prueba/sprint_2/preparar_casos_ps.py
 
 Es idempotente: si *Plantación Cumbres* ya existe, no hace nada. Todos los nombres son inventados.
 """

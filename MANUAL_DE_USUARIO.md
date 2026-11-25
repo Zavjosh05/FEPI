@@ -724,7 +724,7 @@ calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de 
 
 Los contratos que la demostración dejó por firmar el 19-nov (Plantación Los Pinos, Rancho La Huerta, Barranca Honda y, más adelante, Ojo de Agua) tienen plazo de 10 días hábiles: pasada la fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para probar la firma con datos de hoy, `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS (Guía de inicio y secuencia de prueba).
 
-Para empezar de cero con los mismos datos: `docker compose -p probosque_s2 down -v` y `docker compose -p probosque_s2 up
+Para empezar de cero con los mismos datos: `docker compose down -v` y `docker compose up
 --build` (Guía de inicio, sección 1.5). Los plazos que corren desde la fecha de corte se miden con el reloj real: según el
 día en que pruebes, un vale o un cheque aparecerá vencido.
 

@@ -4,7 +4,7 @@
 #   ... run --rm pruebas pytest -m "not navegador"      -> solo las rápidas;  ... -e CAPTURAS=1 pruebas -> con capturas
 # Las variables se leen de .env (copiar .env.ejemplo); sin .env se usan los valores de desarrollo de abajo.
 
-name: probosque
+name: probosque_s2
 
 x-entorno: &entorno
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-desarrollo-no-usar-en-produccion}
@@ -42,7 +42,7 @@ services:
     build:
       context: .
       target: produccion
-    image: probosque-sistema:0.1
+    image: probosque-sistema:sprint-2
     environment:
       <<: *entorno
       PREPARAR_SITIO: "1"   # migraciones, estáticos, reglas y datos de demostración al arrancar
@@ -75,7 +75,7 @@ services:
 
   # Revisión diaria de plazos (sin cron ni Celery: un bucle que corre el comando cada 24 h).
   plazos:
-    image: probosque-sistema:0.1
+    image: probosque-sistema:sprint-2
     pull_policy: never   # usa la imagen que construye el servicio web
     init: true           # para que el bucle termine limpio con docker compose down
     environment:
@@ -94,7 +94,7 @@ services:
     build:
       context: .
       target: pruebas
-    image: probosque-sistema-pruebas:0.1
+    image: probosque-sistema-pruebas:sprint-2
     # Sin argumentos: rápidas en paralelo y luego los recorridos de navegador (ver docker/pruebas.sh). Con argumentos, pytest tal cual.
     command: ["sh", "/app/docker/pruebas.sh"]
     environment:

@@ -1,6 +1,6 @@
 {% load moneda %}
 {% if historias %}<div class="alert alert-info small" data-prueba="por-construir">
-  <strong>{{ titulo }}.</strong> Esta pestaña la llenarán las historias del sprint 2:
+  <strong>{{ titulo }}.</strong> Esta pestaña se completa con las historias:
   <ul class="mb-0 mt-1">{% for clave, nombre, que in historias %}<li><strong>{{ clave }} {{ nombre }}</strong>: {{ que }}.</li>{% endfor %}</ul>
 </div>{% endif %}
 <div class="row g-3">

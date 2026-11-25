@@ -146,22 +146,7 @@ secuencia).
 tenías el sistema levantado con datos, usa `docker compose down -v` y `docker compose up --build` para que los dictámenes
 de ejemplo tengan su documento en PDF, la revisión de la propiedad y la reasignación.
 
-**Si en el mismo equipo conviven varias ramas** (por ejemplo, `sprint-2` desplegada en su propia carpeta junto a
-`main` o `sprint-1`): el archivo `docker-compose.yml` fija el nombre de proyecto `probosque`, así que todas usarían los
-mismos contenedores y los mismos volúmenes, y chocarían. Para separarlas, da a cada rama su propio nombre de proyecto
-con `-p` en **todos** los comandos de Compose:
-
-```bash
-cd sistema
-docker compose -p probosque_s2 up --build          # levantar
-docker compose -p probosque_s2 logs -f web         # ver lo que pasa
-docker compose -p probosque_s2 down                # detener (con -v borra también la base y los archivos)
-```
-
-Con `-p` los volúmenes y la red se llaman `probosque_s2_…` y no se mezclan con los de otra rama. Lo que `-p` **no**
-separa es el puerto: todas publican el 8080, así que solo una puede estar levantada a la vez (o cambia el puerto como
-dice la sección 1.7). Las imágenes tampoco se separan (`probosque-sistema:0.1` y `probosque-sistema-pruebas:0.1`): al
-cambiar de rama, levanta con `--build`.
+**Si en el mismo equipo conviven varias ramas** (por ejemplo, esta en su propia carpeta junto a `main`): esta versión usa su propio nombre de proyecto de Compose (`probosque_s2`) y sus propias imágenes (`probosque-sistema:sprint-2` y `probosque-sistema-pruebas:sprint-2`), así que sus contenedores, su base de datos y sus archivos no se mezclan con los de otra rama. Lo único que comparten es el puerto 8080: solo una puede estar levantada a la vez (detén la otra con `docker compose down`, o cambia el puerto como dice la sección 1.7).
 
 ### 1.6 Configuración (opcional)
 
@@ -187,14 +172,14 @@ Desde `sistema/`, la corrida completa de esta versión (473 pruebas, con Chromiu
 6 minutos: 442 rápidas y 31 recorridos de navegador):
 
 ```bash
-docker compose -p probosque_s2 --profile pruebas run --rm pruebas
+docker compose --profile pruebas run --rm pruebas
 ```
 
 Si una corrida anterior se interrumpió, puede quedar una base de pruebas a medias y la siguiente falla con «database
-… already exists»: corre `docker compose -p probosque_s2 down`, o agrega `--create-db` a `pytest`. Corre un solo comando
+… already exists»: corre `docker compose down`, o agrega `--create-db` a `pytest`. Corre un solo comando
 de Docker a la vez: dos corridas simultáneas chocan en los nombres de las bases de prueba.
 
-Al terminar, `docker compose -p probosque_s2 down`. Las variantes están en [`sistema/README.md`](sistema/README.md), sección «Cómo
+Al terminar, `docker compose down`. Las variantes están en [`sistema/README.md`](sistema/README.md), sección «Cómo
 probar».
 
 ---
