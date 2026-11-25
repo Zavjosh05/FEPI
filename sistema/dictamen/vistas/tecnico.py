@@ -38,7 +38,8 @@ def dictaminar(request, folio):
             for m in mensajes_error(e):
                 messages.error(request, m)
         else:
-            messages.success(request, f"Dictamen técnico {d.get_resultado_display().lower()} registrado (acuse {d.acuse.folio}).")
+            messages.success(request, f"Dictamen técnico {d.get_resultado_display().lower()} registrado; se expidió el documento "
+                                      f"{d.folio} y quedó adjunto al expediente.")
             return redirect(destino)
     analisis = tecnico.analisis_cartografico(exp)
     return render(request, "dictamen/tecnico/dictaminar.html", {

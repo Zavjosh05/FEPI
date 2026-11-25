@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ folio }}</title>
+<style>
+  @page { size: letter; margin: 2cm 2.1cm 2.4cm 2.1cm;
+    @top-right { content: "{{ folio }}"; font-family: "DejaVu Sans", sans-serif; font-size: 7.5pt; color: #666; }
+    @bottom-center { content: "{{ conf.titulo }} {{ folio }} · página " counter(page) " de " counter(pages); font-family: "DejaVu Sans", sans-serif; font-size: 7.5pt; color: #555; } }
+  body { font-family: "DejaVu Sans", sans-serif; font-size: 9.6pt; color: #1d1d1d; line-height: 1.38; }
+  .encabezado { border-bottom: 2.5px solid #1f5130; padding-bottom: 6px; margin-bottom: 12px; }
+  .encabezado .org { font-size: 8.6pt; color: #1f5130; font-weight: bold; letter-spacing: .4px; }
+  .encabezado .area { font-size: 8.6pt; color: #333; }
+  .encabezado h1 { font-size: 17pt; margin: 6px 0 0 0; letter-spacing: .5px; }
+  .folio { float: right; text-align: right; font-size: 8.6pt; }
+  .folio strong { font-size: 12pt; display: block; color: #1f5130; }
+  h2 { font-size: 10.6pt; color: #1f5130; border-bottom: 1px solid #c8d5cb; padding-bottom: 2px; margin: 16px 0 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  .datos th, .datos td { text-align: left; vertical-align: top; padding: 3px 6px; border-bottom: 1px solid #e2e2e2; }
+  .datos th { width: 32%; color: #444; font-weight: normal; }
+  .tabla th, .tabla td { font-size: 8.4pt; text-align: left; vertical-align: top; padding: 3px 5px; border: 1px solid #d3d9d4; }
+  .tabla thead th { background: #eef3ef; font-weight: bold; }
+  .resultado { margin: 10px 0; padding: 10px 12px; border: 2px solid #1f5130; background: #f3f8f4; }
+  .resultado.negativo { border-color: #8b1e1e; background: #fbf1f1; }
+  .resultado .r { font-size: 14pt; font-weight: bold; letter-spacing: .6px; }
+  .ok { color: #1f6b35; font-weight: bold; } .no { color: #8b1e1e; font-weight: bold; } .gris { color: #666; }
+  .nota { font-size: 8.2pt; color: #555; }
+  .firmas { margin-top: 42px; width: 100%; page-break-inside: avoid; }
+  .firmas td { border: none; width: 50%; text-align: center; padding-top: 40px; vertical-align: top; font-size: 8.4pt; }
+  .firmas span { border-top: 1px solid #333; display: inline-block; width: 82%; padding-top: 3px; }
+  .huella { margin-top: 16px; font-size: 6.8pt; color: #777; border-top: 1px solid #ddd; padding-top: 4px; }
+  .croquis { float: right; width: 5.2cm; margin: 0 0 6px 10px; border: 1px solid #c8d5cb; }
+</style>
+</head>
+<body>
+  <div class="encabezado">
+    <div class="folio">Folio del dictamen<strong>{{ folio }}</strong>{{ fecha_local|date:"d/m/Y H:i" }} h</div>
+    <div class="org">PROTECTORA DE BOSQUES DEL ESTADO DE MÉXICO · PROBOSQUE</div>
+    <div class="area">{{ conf.area }}{% if unidad and unidad.nombre != conf.area %} · {{ unidad.nombre }}{% endif %}</div>
+    <h1>{{ conf.titulo|upper }}</h1>
+  </div>
+  <table class="datos">
+    <tr><th>Programa y ejercicio</th><td>{{ exp.ejercicio.programa.nombre }} {{ exp.ejercicio.anio }}{% if exp.modalidad %} · {{ exp.modalidad.nombre }}{% endif %}</td></tr>
+    <tr><th>Folio de la solicitud</th><td>{{ exp.folio }}{% if exp.es_refrendo %} (refrendo){% endif %}</td></tr>
+    <tr><th>Persona solicitante</th><td>{{ exp.solicitante.nombre }} · {{ exp.tipo_persona.nombre }}{% if exp.solicitante.curp %} · CURP {{ exp.solicitante.curp }}{% endif %}</td></tr>
+    <tr><th>Predio</th><td>{{ exp.predio.folio }} · {{ exp.predio.nombre }}{% if exp.predio.localidad %}, {{ exp.predio.localidad }}{% endif %}, {{ exp.predio.municipio.nombre }}</td></tr>
+    <tr><th>Delegación Regional Forestal</th><td>{{ exp.delegacion.nombre }}</td></tr>
+    <tr><th>Recepción · validación</th><td>{{ exp.fecha_recepcion|date:"d/m/Y H:i" }} h · {% if validacion %}validado el {{ validacion.fecha_hora|date:"d/m/Y H:i" }} h por {{ validacion.usuario }}{% else %}—{% endif %}</td></tr>
+  </table>
+  {% block cuerpo %}{% endblock %}
+  <table class="firmas"><tr>
+    <td><span>Elaboró<br><strong>{{ dictamen.usuario.get_full_name|default:dictamen.usuario.username }}</strong><br>{{ dictamen.usuario.cargo|default:"" }}{% if unidad %}<br>{{ unidad.nombre }}{% endif %}</span></td>
+    <td><span>Vo. Bo.<br><strong>{{ conf.firma_titular }}</strong></span></td>
+  </tr></table>
+  <div class="huella">Documento emitido por el Sistema de programas de PROBOSQUE (prototipo) el {{ fecha_local|date:"d/m/Y" }} a las {{ fecha_local|date:"H:i:s" }} h y adjunto al expediente {{ exp.folio }}. Su folio, su huella SHA-256 y quién lo emitió quedan registrados en la base de datos y en la bitácora del expediente.</div>
+</body>
+</html>

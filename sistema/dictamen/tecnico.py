@@ -6,11 +6,12 @@ from django.db import transaction
 from django.utils import timezone
 
 from nucleo import dias_habiles
-from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
+from nucleo.trazabilidad import registra_usuario
 from recepcion import geometria
 from recepcion.models import Poligono
 
+from . import documentos
 from .comun import completar_si_ya_hay_dos, datos_dictamen, exigir_acceso, exigir_programa, exigir_unidad, resultado_combinado
 from .models import DictamenTecnico, ResultadoTecnico
 
@@ -23,7 +24,7 @@ def lista_verificacion(ejercicio):
     datos = ejercicio.datos or {}
     items = []
     sup = datos.get("superficie")
-    if sup:
+    if sup and sup.get("minima_ha") is not None and sup.get("maxima_ha") is not None:
         items.append({"clave": "superficie", "grupo": "Superficie",
                       "texto": f"Superficie de {sup.get('minima_ha')} a {sup.get('maxima_ha')} ha"
                                + (f"; edad mínima {sup['edad_minima_anios']} años" if sup.get("edad_minima_anios") else ""),
@@ -119,9 +120,11 @@ TEXTO_SITUACION = {
 
 
 # ----------------------------------------------------------------------------- dictamen
+@registra_usuario
 def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superficie_factible_ha=None,
                exigir_revision=False):
-    """La Dirección (área responsable del programa) emite el dictamen técnico con su motivo.
+    """La Dirección (área responsable del programa) emite el dictamen técnico con su motivo y expide su documento en PDF,
+    que queda adjunto al expediente (``documentos.emitir_tecnico``).
 
     Con `exigir_revision` (el dictamen llega de la pantalla) todo criterio revisable debe quedar marcado."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
@@ -159,25 +162,11 @@ def dictaminar(usuario, expediente, resultado, motivo, verificacion=None, superf
             verificacion=items, analisis=analisis, fecha_limite=limite, dentro_de_plazo=dentro, usuario=usuario,
             fecha_hora=ahora,
         )
-        renglones = [
-            ("Resultado", dictamen.get_resultado_display()), ("Motivo", dictamen.motivo),
-            ("Superficie factible", f"{superficie_factible_ha} ha" if superficie_factible_ha else "—"),
-            ("Polígono vigente", f"{analisis['superficie_ha']:.4f} ha · {analisis.get('ubicacion_municipio', '')}"
-             if analisis.get("tiene_poligono") else "Sin polígono"),
-            ("Traslapes con otros expedientes", ", ".join(f"{t['folio']} ({t['superficie_ha']:.2f} ha)"
-                                                          for t in analisis["traslapes"]) or "Ninguno"),
-            ("Plazo de dictaminación", f"{plazo.texto_plazo} ({plazo.fundamento}); límite {limite:%d/%m/%Y}"
-             f" · {'dentro' if dentro else 'fuera'} de plazo" if limite else "Sin plazo en las reglas"),
-        ]
-        detalle = [{"clave": i["numeral"][:30], "texto": i["texto"][:150], "estado": RESPUESTAS.get(i["respuesta"], "—")}
-                   for i in items if not i.get("informativo")]
-        acuse = emitir_acuse(expediente, "dictamen_tecnico", "Dictamen técnico", usuario, renglones,
-                             detalle=detalle, encabezado_detalle=["Numeral", "Criterio", "Revisión"])
-        dictamen.acuse = acuse
-        dictamen.save(update_fields=["acuse"])
+        documento = documentos.emitir_tecnico(dictamen, plazo)
         Evento.registrar(expediente, usuario, "dictamen_tecnico",
-                         f"Dictamen técnico {dictamen.get_resultado_display().lower()}: {dictamen.motivo}", acuse=acuse,
-                         datos={"resultado": resultado, "dentro_de_plazo": dentro})
+                         f"Dictamen técnico {dictamen.folio} {dictamen.get_resultado_display().lower()}: {dictamen.motivo}",
+                         datos={"resultado": resultado, "dentro_de_plazo": dentro, "documento": documento.pk,
+                                "folio": dictamen.folio})
         completar_si_ya_hay_dos(expediente, usuario)
     return dictamen
 

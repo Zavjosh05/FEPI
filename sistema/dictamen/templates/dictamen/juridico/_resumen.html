@@ -13,8 +13,10 @@
   {% endif %}
   {% if juridico %}
   <div class="small"><strong>Motivo:</strong> {{ juridico.motivo }}</div>
-  <div class="small">{{ juridico.usuario }} · {{ juridico.fecha_hora|date:"d/m/Y H:i" }}
-    {% if juridico.acuse %}· <a href="{% url 'nucleo:acuse' juridico.acuse.folio %}" target="_blank">{{ juridico.acuse.folio }}</a>{% endif %}</div>
+  {% with p=juridico.propiedad %}{% if p %}<div class="small" data-prueba="resumen-propiedad">Propiedad o posesión: {{ p.nombre_documento|truncatechars:60 }} a nombre de {{ p.titular_documento }} ·
+    {% if p.acreditada %}<span class="text-success fw-semibold">acreditada</span>{% else %}<span class="text-danger fw-semibold">no acreditada</span> ({{ p.motivos|join:"; " }}){% endif %}</div>{% endif %}{% endwith %}
+  <div class="small">{{ juridico.usuario }} · {{ juridico.fecha_hora|date:"d/m/Y H:i" }}</div>
+  {% if juridico.documento %}<a class="btn btn-outline-primary btn-sm mt-2" data-prueba="documento-juridico" href="{% url 'nucleo:documento' juridico.documento.pk %}" target="_blank">Documento del dictamen jurídico {{ juridico.folio }} (PDF)</a>{% endif %}
   {% elif puede_dictaminar_juridico %}
   <a class="btn btn-primary btn-sm mt-2" href="{% url 'dictamen:juridico' exp.folio %}">Elaborar dictamen jurídico</a>
   {% else %}

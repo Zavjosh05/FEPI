@@ -24,19 +24,34 @@ def dictaminar(request, folio):
         messages.info(request, "No hay dictamen jurídico pendiente para este expediente.")
         return redirect(destino)
     cotejo = juridico.cotejar(exp)
-    form = DictamenJuridicoForm(request.POST or None, initial={"resultado": "no_procedente" if cotejo else "procedente"})
+    legales = juridico.documentos_legales(exp)
+    form = DictamenJuridicoForm(request.POST or None, tipos_documento=juridico.tipos_documento_propiedad(exp), initial={
+        "resultado": "no_procedente" if cotejo else "procedente", "titular_documento": exp.solicitante.nombre,
+        "titular_coincide": "si", "sin_conflicto": "si"})
+    marcas = {}
+    if request.method == "POST":
+        for r in legales:
+            valor = request.POST.get(f"doc_{r.requisito.clave}")
+            marcas[r.requisito.clave] = {"valido": None if valor not in ("si", "no") else valor == "si",
+                                         "observacion": request.POST.get(f"obs_{r.requisito.clave}", "")}
     if request.method == "POST" and form.is_valid():
         try:
-            d = juridico.dictaminar(request.user, exp, form.cleaned_data["resultado"], form.cleaned_data["motivo"])
+            d = juridico.dictaminar(request.user, exp, form.cleaned_data["resultado"], form.cleaned_data["motivo"],
+                                    propiedad=form.propiedad(), documentacion=marcas, exigir_revision=True)
         except (ValidationError, PermissionDenied) as e:
             for m in mensajes_error(e):
                 messages.error(request, m)
         else:
-            messages.success(request, f"Dictamen jurídico {d.get_resultado_display().lower()} registrado (acuse {d.acuse.folio}).")
+            messages.success(request, f"Dictamen jurídico {d.get_resultado_display().lower()} registrado; se expidió el "
+                                      f"documento {d.folio} y quedó adjunto al expediente.")
             return redirect(destino)
-    documentos_legales = exp.revisiones.filter(requisito__es_documento_legal=True).select_related("requisito", "documento")
-    return render(request, "dictamen/juridico/dictaminar.html",
-                  {"exp": exp, "form": form, "cotejo": cotejo, "documentos_legales": documentos_legales})
+    filas = [{"r": r, "marca": marcas.get(r.requisito.clave, {})} for r in legales]
+    return render(request, "dictamen/juridico/dictaminar.html", {
+        "exp": exp, "form": form, "cotejo": cotejo, "filas_legales": filas,
+        "superficie_a_acreditar": juridico.superficie_a_acreditar(exp),
+        "tipos_documento": juridico.tipos_documento_propiedad(exp),
+        "requisitos_propiedad": set(juridico.datos_dictamen()["propiedad"]["requisitos"].get(exp.programa.clave, [])),
+    })
 
 
 @login_required

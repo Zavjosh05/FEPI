@@ -175,7 +175,8 @@ def test_sprint_1_una_solicitud_recorre_todo_por_la_interfaz(datos_e2e, page, li
     page.click("a:has-text('Validar expediente')")
     page.wait_for_url("**/validar/")
     page.check("input[aria-label='Faltante CC-REQ-13']")
-    page.fill("#observaciones", "El plano no trae coordenadas")
+    page.fill("input[aria-label='Observación CC-REQ-13']", "El plano no trae coordenadas")
+    page.fill("#observaciones", "Un requisito por corregir")
     page.click("button:has-text('Emitir aviso de faltantes')")
     page.wait_for_url("**pestana=validacion")
     expect(page.locator("[data-prueba=fecha-limite]")).to_be_visible()
@@ -240,11 +241,20 @@ def test_sprint_1_una_solicitud_recorre_todo_por_la_interfaz(datos_e2e, page, li
     page.click("a:has-text('Elaborar dictamen jurídico')")
     page.wait_for_url("**/dictamen/juridico/**")
     expect(page.locator("[data-prueba=cotejo]")).to_contain_text("Sin coincidencias")
+    for radio in page.locator("input[type=radio][name^=doc_][value=si]").all():
+        radio.check(force=True)
+    page.select_option("#id_tipo_documento", "escritura")
+    page.fill("#id_numero_documento", "Escritura 4521")
+    page.fill("#id_superficie_documento_ha", "8")
+    page.check("#id_titular_coincide_0")
+    page.check("#id_sin_conflicto_0")
     page.check("#id_resultado_0")
     page.fill("#id_motivo", "Documentación legal vigente")
     page.click("button:has-text('Registrar dictamen jurídico')")
     page.wait_for_url("**pestana=dictamenes")
     expect(page.locator("[data-prueba=resumen-juridico]")).to_contain_text("Procedente")
+    expect(page.locator("[data-prueba=resumen-propiedad]")).to_contain_text("acreditada")
+    expect(page.locator("[data-prueba=documento-juridico]")).to_be_visible()
     estado_exp("Dictaminada")
     captura("recorrido_sprint_1_07_dictamen_juridico")
     fuera_de_bandeja(folio)
@@ -308,7 +318,14 @@ def test_sprint_1_una_solicitud_recorre_todo_por_la_interfaz(datos_e2e, page, li
     assert acuses.count() >= 5
     respuesta = page.context.request.get(base + acuses.first.get_attribute("href"))
     assert respuesta.status == 200 and respuesta.body()[:4] == b"%PDF"
+    expect(page.locator("[data-prueba=documento-dictamen]")).to_have_count(2)       # dictámenes técnico y jurídico
     captura("recorrido_sprint_1_11_acuses")
+    pestana("trazabilidad")
+    page.select_option("select[name=registro]", "Expediente")      # el historial del expediente: un renglón por relevo
+    page.wait_for_url("**registro=Expediente**")
+    for usuario in ("del_amecameca", "dir_drff", "juridica", "comite"):
+        expect(page.locator("#tabla-trazabilidad")).to_contain_text(unidades[usuario])
+    captura("recorrido_sprint_1_12_trazabilidad")
 
     exp = Expediente.objects.get(folio=folio)
     assert exp.estado.clave == "aprobada"

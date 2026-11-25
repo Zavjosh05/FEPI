@@ -30,46 +30,68 @@
   },
   "tipos_acuerdo": [
     {
+      "clave": "desistimiento",
+      "nombre": "Desistimiento de la persona beneficiaria (libera el recurso)",
+      "unidad": "DRFF",
+      "efecto": "baja",
+      "incidente": true,
+      "fundamento": "CC 10.1 fr. III; 10.2; Convocatoria base sexta"
+    },
+    {
       "clave": "reasignacion",
       "nombre": "Reasignación del recurso liberado a la lista de espera",
       "unidad": "DRFF",
-      "fundamento": "CC 10.2; Convocatoria base sexta"
+      "fundamento": "CC 10.2; Convocatoria base sexta",
+      "efecto": "reasignacion",
+      "incidente": false
     },
     {
       "clave": "sustitucion",
-      "nombre": "Sustitución de la persona beneficiaria",
+      "nombre": "Sustitución de la persona beneficiaria por la siguiente de la lista de espera",
       "unidad": "DRFF",
-      "fundamento": "CC 10.2"
+      "fundamento": "CC 10.2",
+      "efecto": "sustitucion",
+      "incidente": true
     },
     {
       "clave": "caso_fortuito",
       "nombre": "Atención de caso fortuito o fuerza mayor",
       "unidad": "DRFF",
-      "fundamento": "CC 8.1.7 fr. VI"
+      "fundamento": "CC 8.1.7 fr. VI",
+      "efecto": "registro",
+      "incidente": true
     },
     {
       "clave": "suspension",
       "nombre": "Suspensión temporal del apoyo",
       "unidad": "DRFF",
-      "fundamento": "CC 8.1.9 a)"
+      "fundamento": "CC 8.1.9 a)",
+      "efecto": "registro",
+      "incidente": true
     },
     {
       "clave": "cancelacion",
-      "nombre": "Cancelación del apoyo",
+      "nombre": "Cancelación del apoyo (libera el recurso)",
       "unidad": "UJ",
-      "fundamento": "CC 8.1.9 b)"
+      "fundamento": "CC 8.1.9 b)",
+      "efecto": "baja",
+      "incidente": true
     },
     {
       "clave": "baja",
       "nombre": "Baja del programa e inscripción en el Listado de Personas Beneficiarias Incumplidas",
       "unidad": "UJ",
-      "fundamento": "CC 8.1.9 b); 9.4.3 fr. V"
+      "fundamento": "CC 8.1.9 b); 9.4.3 fr. V",
+      "efecto": "baja",
+      "incidente": true
     },
     {
       "clave": "reintegro",
       "nombre": "Reintegro de recursos",
       "unidad": "UJ",
-      "fundamento": "CC 8.1.9 c); 10.1 fr. II"
+      "fundamento": "CC 8.1.9 c); 10.1 fr. II",
+      "efecto": "registro",
+      "incidente": true
     },
     {
       "clave": "instruccion_pago",
@@ -79,7 +101,9 @@
         "PSA"
       ],
       "pide": "ministracion",
-      "fundamento": "PSAHEM 10.1 fr. VIII y X (líneas 2281-2292)"
+      "fundamento": "PSAHEM 10.1 fr. VIII y X (líneas 2281-2292)",
+      "efecto": "registro",
+      "incidente": false
     },
     {
       "clave": "validacion_reportes",
@@ -89,13 +113,114 @@
         "PEG"
       ],
       "pide": "periodo",
-      "fundamento": "Convocatoria PEG base cuarta (línea 9505)"
+      "fundamento": "Convocatoria PEG base cuarta (línea 9505)",
+      "efecto": "registro",
+      "incidente": false
     },
     {
       "clave": "otro",
       "nombre": "Otro acuerdo",
       "unidad": "DRFF",
-      "fundamento": "9.4.3 fr. VIII"
+      "fundamento": "9.4.3 fr. VIII",
+      "efecto": "registro",
+      "incidente": false
     }
-  ]
+  ],
+  "documentos": {
+    "nota": "Documento formal de cada dictamen (PDF) que se adjunta al expediente como Documento de tipo «dictamen». Lo firman quien elabora y la persona titular del área.",
+    "tecnico": {
+      "prefijo": "DT",
+      "titulo": "Dictamen técnico",
+      "area": "Área responsable del programa (Instancia Ejecutora)",
+      "definicion": "Opinión emitida por el área responsable del programa sobre el análisis de las condiciones del predio, con la información recabada por la Delegación Regional Forestal, donde se determina la factibilidad del terreno para obtener el apoyo, utilizando el Sistema de Información Geográfica de PROBOSQUE y verificada en campo (ROP, glosario).",
+      "firma_titular": "Titular del área responsable del programa"
+    },
+    "juridico": {
+      "prefijo": "DJ",
+      "titulo": "Dictamen jurídico",
+      "area": "Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia",
+      "definicion": "Documento legal emitido por la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia de PROBOSQUE, en el que se evalúa el cumplimiento de los requisitos establecidos y la validez de la documentación presentada, con el objetivo de determinar la procedencia o no de la solicitud (ROP, glosario).",
+      "firma_titular": "Titular de la Unidad Jurídica, de Igualdad de Género y Erradicación de la Violencia"
+    }
+  },
+  "propiedad": {
+    "nota": "Revisión de la acreditación de la propiedad o legal posesión del predio en el dictamen jurídico (HU-2.2). Tipos de documento que admiten las ROP (CC 8.1.1.2 fr. VII, líneas 4292-4310). «requiere_vigencia»: se registra la fecha hasta la que es válido y debe cubrir el día del dictamen. «vigencia_maxima_anios»: plazo máximo del contrato (Código Civil del Estado de México).",
+    "fundamento": "ROP CC 8.1.1.2 fr. VII (acreditar la legal propiedad o posesión); 8.1.1.1 inelegibles fr. VII (conflictos de propiedad, posesión o representación)",
+    "tipos_documento": [
+      {
+        "clave": "carpeta_basica",
+        "nombre": "Carpeta Básica o PHINA del núcleo agrario (Resolución Presidencial, Acta de Posesión y Deslinde, Plano definitivo)",
+        "personas": [
+          "nucleo_agrario"
+        ]
+      },
+      {
+        "clave": "addate",
+        "nombre": "ADDATE o ADDATBC (núcleo agrario certificado por el PROCEDE)",
+        "personas": [
+          "nucleo_agrario"
+        ]
+      },
+      {
+        "clave": "resolucion_agraria",
+        "nombre": "Resolución ejecutoriada de la autoridad agraria competente",
+        "personas": [
+          "nucleo_agrario"
+        ]
+      },
+      {
+        "clave": "escritura",
+        "nombre": "Escritura pública"
+      },
+      {
+        "clave": "inmatriculacion",
+        "nombre": "Inmatriculación administrativa"
+      },
+      {
+        "clave": "sentencia",
+        "nombre": "Sentencia ejecutoriada (usucapión, sucesión ad perpetuam u otra)"
+      },
+      {
+        "clave": "traslado_dominio",
+        "nombre": "Traslado de dominio"
+      },
+      {
+        "clave": "compraventa",
+        "nombre": "Contrato privado de compraventa"
+      },
+      {
+        "clave": "certificado_parcelario",
+        "nombre": "Certificado parcelario"
+      },
+      {
+        "clave": "cesion_derechos",
+        "nombre": "Cesión de derechos agrarios o parcelarios"
+      },
+      {
+        "clave": "constancia_posesion",
+        "nombre": "Constancia de posesión (Órgano de representación del núcleo agrario o Secretaría del Ayuntamiento)",
+        "requiere_vigencia": true
+      },
+      {
+        "clave": "usufructo",
+        "nombre": "Contrato de usufructo o arrendamiento, con el documento que acredita la propiedad",
+        "requiere_vigencia": true,
+        "vigencia_maxima_anios": 5
+      }
+    ],
+    "requisitos": {
+      "CC": [
+        "CC-REQ-09",
+        "CC-REQ-10",
+        "CC-REQ-11",
+        "CC-REQ-12",
+        "CC-REQ-14",
+        "CC-REQ-20"
+      ]
+    }
+  },
+  "reasignacion": {
+    "nota": "HU-2.4: la reasignación sigue el orden de la lista de espera del acta (lugar) y no rebasa el recurso liberado por las bajas del ejercicio que aún no se reasigna (Convocatoria base sexta; CC 10.2). Efectos de los tipos de acuerdo: «baja» saca a la persona beneficiaria de la lista y libera su monto; «reasignacion» pasa a «aprobada» las siguientes de la lista de espera; «sustitucion» hace las dos cosas en un solo acuerdo; «registro» solo deja la constancia.",
+    "estado_baja": "baja"
+  }
 }

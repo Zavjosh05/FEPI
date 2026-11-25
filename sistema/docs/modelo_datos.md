@@ -2,7 +2,7 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-33 tablas propias en tres apps (`nucleo`, `recepcion`, `dictamen`) sobre PostgreSQL + PostGIS. El diagrama
+36 tablas propias en tres apps (`nucleo`, `recepcion`, `dictamen`) sobre PostgreSQL + PostGIS. El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
 Para leerlo: `||--o{` es «uno a muchos» obligatorio, `|o--o{` «uno a muchos» opcional, `||--o|` «uno a uno»
@@ -160,7 +160,10 @@ erDiagram
 ## 2. Expediente y recepción (M1)
 
 El expediente único por predio: la solicitud, la revisión de cada requisito con su documento, los
-polígonos (el vigente y los anteriores), la validación con su aviso de faltantes, los acuses y la bitácora.
+polígonos (el vigente y los anteriores), la validación con su aviso de faltantes y la observación de la Dirección
+sobre cada requisito (`ObservacionValidacion`), los acuses y la bitácora. Las tablas de historial
+(`Historical…`) guardan cada alta, cambio o baja con el usuario, la fecha y la hora: es la trazabilidad que muestra
+la pestaña «Trazabilidad» del expediente.
 
 ```mermaid
 erDiagram
@@ -187,11 +190,13 @@ erDiagram
   Predio ||--o{ Expediente : predio
   Requisito |o--o{ Documento : requisito
   Requisito ||--o{ RevisionRequisito : requisito
+  RevisionRequisito ||--o{ ObservacionValidacion : revision
   Unidad |o--o{ Acuse : unidad
   Unidad |o--o{ Documento : unidad
   Unidad |o--o{ Evento : unidad
   Unidad |o--o{ Municipio : delegacion
   Unidad ||--o{ Expediente : delegacion
+  Validacion ||--o{ ObservacionValidacion : validacion
   Validacion }o--o{ RevisionRequisito : faltantes
   Acuse {
     int id PK
@@ -293,6 +298,14 @@ erDiagram
     texto sede
     texto domicilio
   }
+  ObservacionValidacion {
+    int id PK
+    int validacion_id FK
+    int revision_id FK
+    bool faltante
+    texto origen
+    texto observacion
+  }
   Poligono {
     int id PK
     int expediente_id FK
@@ -327,15 +340,25 @@ erDiagram
 
 ## 3. Dictamen y Comité (M2)
 
-Un dictamen técnico y uno jurídico por expediente, el Listado de Personas Beneficiarias Incumplidas y los
-predios sancionados, las sesiones del Comité con sus documentos, la resolución de cada expediente en la
-sesión de aprobación y los acuerdos de seguimiento con su área responsable.
+Un dictamen técnico y uno jurídico por expediente, cada uno con su documento en PDF (`Documento` de tipo
+«dictamen»); la revisión de la propiedad o legal posesión del predio (`RevisionPropiedad`, una por dictamen
+jurídico); el Listado de Personas Beneficiarias Incumplidas y los predios sancionados; las sesiones del Comité
+con sus documentos; la resolución de cada expediente en la sesión de aprobación; los acuerdos de seguimiento
+(incidentes y reasignaciones, con su causa, su área responsable y el recurso que liberan o reasignan) y los
+movimientos de listado que producen (`MovimientoListado`: quién sale de la Lista de Personas Beneficiarias y
+quién entra desde la lista de espera).
 
 ```mermaid
 erDiagram
+  Acuerdo ||--o{ MovimientoListado : acuerdo
   Acuerdo }o--o{ Expediente : expedientes
+  DictamenJuridico ||--o| RevisionPropiedad : dictamen
+  Documento |o--o{ DictamenJuridico : documento
+  Documento |o--o{ DictamenTecnico : documento
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ SesionComite : ejercicio
+  Expediente ||--o{ Documento : expediente
+  Expediente ||--o{ MovimientoListado : expediente
   Expediente ||--o{ ResolucionSesion : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
@@ -347,6 +370,7 @@ erDiagram
   SesionComite ||--o{ Acuerdo : sesion
   SesionComite ||--o{ DocumentoSesion : sesion
   SesionComite ||--o{ ResolucionSesion : sesion
+  Unidad |o--o{ Documento : unidad
   Unidad ||--o{ Acuerdo : unidad_responsable
   Unidad ||--o{ Expediente : delegacion
   Acuerdo {
@@ -364,7 +388,9 @@ erDiagram
     texto resultado
     texto motivo
     json cotejo
-    fecha_hora fecha_hora
+    json documentacion
+    texto folio UK
+    int documento_id FK
   }
   DictamenTecnico {
     int id PK
@@ -373,6 +399,8 @@ erDiagram
     texto motivo
     decimal superficie_factible_ha
     json verificacion
+    texto folio UK
+    int documento_id FK
   }
   DocumentoSesion {
     int id PK
@@ -380,6 +408,15 @@ erDiagram
     texto nombre
     archivo archivo
     fecha_hora fecha_hora
+  }
+  MovimientoListado {
+    int id PK
+    int acuerdo_id FK
+    int expediente_id FK
+    texto movimiento
+    texto estado_anterior
+    texto estado_nuevo
+    int lugar_lista_espera
   }
   PersonaIncumplida {
     int id PK
@@ -406,6 +443,14 @@ erDiagram
     int orden
     int orden_propuesto
   }
+  RevisionPropiedad {
+    int id PK
+    int dictamen_id FK
+    texto tipo_documento
+    texto nombre_documento
+    texto numero_documento
+    fecha fecha_documento
+  }
   SesionComite {
     int id PK
     int ejercicio_id FK
@@ -413,6 +458,15 @@ erDiagram
     texto caracter
     texto numero
     fecha_hora fecha_hora
+  }
+  Documento {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    archivo archivo
+    fecha_hora fecha_entrega
+    int unidad_id FK
   }
   Ejercicio {
     int id PK

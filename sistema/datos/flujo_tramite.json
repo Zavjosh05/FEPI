@@ -8,6 +8,7 @@
     {"clave": "dictaminada", "nombre": "Dictaminada", "descripcion": "Tiene dictamen técnico y jurídico; la Secretaría Técnica la lleva a la sesión de aprobación del Comité.", "tipo_unidad_bandeja": "secretaria_comite", "visible_para": "juridica", "color": "info", "orden": 40},
     {"clave": "aprobada", "nombre": "Aprobada (persona beneficiaria)", "descripcion": "El Comité la aprobó en la Lista de Personas Beneficiarias; sigue publicación y contrato (módulo M3).", "visible_para": "juridica,secretaria_comite", "color": "success", "orden": 50},
     {"clave": "lista_espera", "nombre": "Lista de espera", "descripcion": "Factible sin recurso asignado; espera reasignación por acuerdo del Comité (flujo alterno C).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "C", "color": "secondary", "orden": 55},
+    {"clave": "baja", "nombre": "Baja · recurso liberado", "descripcion": "El Comité acordó en sesión de seguimiento el desistimiento, la cancelación, la baja o la sustitución de la persona beneficiaria; su recurso queda para la lista de espera (HU-2.4).", "visible_para": "direccion,juridica,secretaria_comite", "flujo_alterno": "C", "final": true, "color": "dark", "orden": 85},
     {"clave": "no_factible", "nombre": "No factible", "descripcion": "El Comité aprobó la Lista de solicitudes No factibles (dictamen técnico no factible o jurídico no procedente; flujo alterno B).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "B", "final": true, "color": "danger", "orden": 90},
     {"clave": "desechada", "nombre": "Solicitud desechada", "descripcion": "No se complementó la documentación faltante en el plazo (ROP CC 8.1.1.2 fr. XIV; flujo alterno A).", "tipo_unidad_bandeja": "", "flujo_alterno": "A", "final": true, "color": "dark", "orden": 95}
   ],
@@ -23,6 +24,7 @@
     {"origen": "dictaminada", "destino": "aprobada", "tipo_unidad": "secretaria_comite", "accion": "Aprobada por el Comité (Lista de Personas Beneficiarias)"},
     {"origen": "dictaminada", "destino": "lista_espera", "tipo_unidad": "secretaria_comite", "accion": "Lista de espera aprobada por el Comité"},
     {"origen": "dictaminada", "destino": "no_factible", "tipo_unidad": "secretaria_comite", "accion": "Lista de solicitudes No factibles aprobada por el Comité"},
-    {"origen": "lista_espera", "destino": "aprobada", "tipo_unidad": "secretaria_comite", "accion": "Reasignación del recurso por acuerdo del Comité"}
+    {"origen": "lista_espera", "destino": "aprobada", "tipo_unidad": "secretaria_comite", "accion": "Reasignación del recurso por acuerdo del Comité"},
+    {"origen": "aprobada", "destino": "baja", "tipo_unidad": "secretaria_comite", "accion": "Baja de la persona beneficiaria por acuerdo del Comité (desistimiento, cancelación, baja o sustitución)", "requiere_motivo": true}
   ]
 }

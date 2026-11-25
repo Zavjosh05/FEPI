@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .vistas import aprobacion, juridico, seguimiento, sesiones, tecnico
+from .vistas import aprobacion, juridico, listados, seguimiento, sesiones, tecnico
 
 app_name = "dictamen"
 
@@ -9,6 +9,9 @@ urlpatterns = [
     path("tecnico/<str:folio>/", tecnico.dictaminar, name="tecnico"),
     path("tecnico/<str:folio>/mapa.json", tecnico.mapa, name="tecnico_mapa"),
     path("listado/", tecnico.listado, name="listado"),
+    # Candidatos y beneficiarios (dos vistas)
+    path("candidatos/", listados.candidatos, name="candidatos"),
+    path("beneficiarios/", listados.beneficiarios, name="beneficiarios"),
     # HU-2.2
     path("juridico/<str:folio>/", juridico.dictaminar, name="juridico"),
     path("incumplidas/", juridico.incumplidas, name="incumplidas"),
@@ -24,7 +27,7 @@ urlpatterns = [
     path("sesiones/<int:pk>/proponer/", aprobacion.proponer, name="sesion_proponer"),
     path("sesiones/<int:pk>/ajustar/<int:resolucion>/", aprobacion.ajustar, name="sesion_ajustar"),
     path("sesiones/<int:pk>/acta/", aprobacion.acta, name="sesion_acta"),
-    # HU-2.4
+    # HU-2.4 · Reasignaciones e incidentes
     path("sesiones/<int:pk>/acuerdo/", seguimiento.acuerdo, name="sesion_acuerdo"),
     path("sesiones/<int:pk>/cerrar/", seguimiento.cerrar, name="sesion_cerrar"),
     path("acuerdos/<int:pk>/cumplir/", seguimiento.cumplir, name="acuerdo_cumplir"),

@@ -6,7 +6,7 @@
   <table>
     <tr><td class="gris">Prototipo</td><td>Recepción y dictamen (módulos M1 y M2) y masa forestal por año (M7.1)</td></tr>
     <tr><td class="gris">Construcción</td><td>13 de noviembre de 2026</td></tr>
-    <tr><td class="gris">Revisión y ajustes</td><td>14 de noviembre de 2026</td></tr>
+    <tr><td class="gris">Revisión y ajustes</td><td>14 de noviembre de 2026; observaciones del profesor, 23 de noviembre</td></tr>
     <tr><td class="gris">Historias</td><td>9 de 26 (36 de 112 puntos)</td></tr>
     <tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama <code>prototipos</code></td></tr>
     <tr><td class="gris">Autor</td><td>Joshua Zavaleta</td></tr>
@@ -125,10 +125,10 @@ flujos alternos de las Reglas de Operación (A expediente incompleto, B no facti
     <tr><td>Registro de la solicitud</td><td>Delegación</td><td>Expediente con folio y acuse de recepción</td></tr>
     <tr><td>Requisitos y polígono</td><td>Delegación</td><td>Cada requisito revisado con su archivo; polígono con superficie</td></tr>
     <tr><td>Envío a la Dirección</td><td>Delegación</td><td>Acuse del envío; el expediente cambia de bandeja</td></tr>
-    <tr><td>Validación o aviso de faltantes</td><td>Dirección (Instancia Ejecutora)</td><td>Validación, o aviso con fecha límite notificado por la Delegación</td></tr>
-    <tr><td>Dictamen técnico y jurídico</td><td>Dirección y Unidad Jurídica, en paralelo</td><td>Dos dictámenes con motivo; listado preliminar</td></tr>
+    <tr><td>Validación o aviso de faltantes</td><td>Dirección (Instancia Ejecutora)</td><td>Validación, o aviso con fecha límite y la observación de cada faltante, notificado por la Delegación</td></tr>
+    <tr><td>Dictamen técnico y jurídico</td><td>Dirección y Unidad Jurídica, en paralelo</td><td>Dos dictámenes con motivo, cada uno con su documento en PDF adjunto; revisión de la propiedad del predio; listado preliminar</td></tr>
     <tr><td>Sesión de aprobación</td><td>Secretaría Técnica y Comité</td><td>Convocatoria, listados y acta con autorización de publicación</td></tr>
-    <tr><td>Sesiones de seguimiento</td><td>Comité y área responsable</td><td>Acuerdos con su área responsable y su cumplimiento</td></tr>
+    <tr><td>Reasignaciones e incidentes</td><td>Comité y área responsable</td><td>Acuerdos con su causa y su área responsable; bajas que liberan recurso y reasignaciones en el orden de la lista de espera</td></tr>
   </tbody>
 </table>
 
@@ -167,20 +167,21 @@ Guardabosques llegan en el sprint 3. Las reglas propias de PSAHEM y de Guardabos
 <h2>5. Modelo de datos</h2>
 <p>El sistema tiene {{tablas}} tablas propias en PostgreSQL con PostGIS, en tres áreas. El diagrama entidad-relación se
 genera desde los modelos del código (<code>sistema/docs/modelo_datos.md</code>), así que siempre corresponde a lo
-construido.</p>
+construido. Cada tabla del trámite tiene su tabla de historial (django-simple-history) con el usuario, la fecha y la
+hora de cada alta, cambio o baja: es la trazabilidad que pide el último criterio de cada historia.</p>
 <table>
   <thead><tr><th style="width:24%">Área</th><th>Tablas principales</th><th style="width:34%">Qué resuelven</th></tr></thead>
   <tbody>
     <tr><td>Reglas y catálogos (núcleo)</td><td>Programa, Ejercicio, TipoPersona, Modalidad, Requisito, Plazo, Formato, MontoApoyo, Ministración, Estado, Transición, Unidad, Usuario, Municipio, DíaInhábil</td><td>Lo que cambia entre programas y años, guardado como datos</td></tr>
-    <tr><td>Expediente y recepción (M1)</td><td>Persona, Predio, Expediente, Documento, RevisiónRequisito, Polígono, Validación, Acuse, Evento</td><td>El expediente único y todo lo que cuelga de él</td></tr>
-    <tr><td>Dictamen y Comité (M2)</td><td>DictamenTécnico, DictamenJurídico, PersonaIncumplida, PredioSancionado, SesiónComité, DocumentoSesión, ResoluciónSesión, Acuerdo</td><td>Dictámenes, listados de incumplimiento, sesiones y acuerdos</td></tr>
+    <tr><td>Expediente y recepción (M1)</td><td>Persona, Predio, Expediente, Documento, RevisiónRequisito, Polígono, Validación, ObservaciónValidación, Acuse, Evento</td><td>El expediente único y todo lo que cuelga de él</td></tr>
+    <tr><td>Dictamen y Comité (M2)</td><td>DictamenTécnico, DictamenJurídico, RevisiónPropiedad, PersonaIncumplida, PredioSancionado, SesiónComité, DocumentoSesión, ResoluciónSesión, Acuerdo, MovimientoListado</td><td>Dictámenes con su documento, propiedad del predio, listados de incumplimiento, sesiones, acuerdos y movimientos de listado</td></tr>
   </tbody>
 </table>
 
 <p>Los tres diagramas muestran las tablas principales de cada área, sus primeros campos y cómo se relacionan (uno a
 muchos, uno a uno, muchos a muchos); el diagrama completo, con todas las tablas y campos, está en <code>sistema/docs/modelo_datos.md</code>.</p>
 <!--DIAGRAMA_ER:er_expediente|Expediente y recepción (M1): el expediente único del predio y lo que cuelga de él.-->
-<!--DIAGRAMA_ER:er_dictamen|Dictamen y Comité (M2): dictámenes, listados de incumplimiento, sesiones y acuerdos.-->
+<!--DIAGRAMA_ER:er_dictamen|Dictamen y Comité (M2): dictámenes con su documento, propiedad, listados de incumplimiento, sesiones, acuerdos y movimientos de listado.-->
 <!--DIAGRAMA_ER:er_reglas|Reglas por programa y catálogos (núcleo): lo que cambia entre programas y años.-->
 <h2 class="salto">6. Calculadora forestal: masa forestal por año</h2>
 <p>La Calculadora mide la superficie con cobertura arbórea (hectáreas) dentro de la zona forestal del INEGI, con
@@ -240,6 +241,19 @@ capturas antes de su commit. Hay un commit por historia, con su identificador.</
     <tr><td class="id">A-7</td><td>Se agregó el recorrido completo por la interfaz; pasó, con seis tropiezos menores de navegación que se corrigieron en el sprint 2</td></tr>
   </tbody>
 </table>
+<h3>Ajustes por las observaciones del profesor del 23 de noviembre</h3>
+<table>
+  <thead><tr><th style="width:8%">Ajuste</th><th>Qué cambió</th></tr></thead>
+  <tbody>
+    <tr><td class="id">O-1</td><td>HU-1.4: cada requisito faltante lleva la observación de la Dirección, en el aviso y en el requisito</td></tr>
+    <tr><td class="id">O-2</td><td>HU-2.1 y HU-2.2: cada dictamen se expide como documento en PDF con folio y queda adjunto al expediente</td></tr>
+    <tr><td class="id">O-3</td><td>HU-2.2: revisión de la propiedad o legal posesión del predio; sin ella acreditada no hay dictamen procedente</td></tr>
+    <tr><td class="id">O-4</td><td>HU-2.4 pasa a «Reasignaciones e incidentes»: incidentes con causa, bajas que liberan recurso y reasignación en el orden de la lista de espera</td></tr>
+    <tr><td class="id">O-5</td><td>Vistas separadas de Candidatos y de Beneficiarios</td></tr>
+    <tr><td class="id">O-6</td><td>Criterio de trazabilidad en todas las historias del sistema y pestaña «Trazabilidad» en el expediente</td></tr>
+  </tbody>
+</table>
+<p>El detalle está en <code>Registro_de_cambios_observaciones_23_nov.pdf</code>.</p>
 
 <h2>9. Límites y lo que sigue</h2>
 <ul>

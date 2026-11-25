@@ -9,6 +9,7 @@ from django.utils import timezone
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
 from nucleo.templatetags.moneda import formato_moneda
+from nucleo.trazabilidad import registra_usuario
 
 from .comun import datos_dictamen, exigir_unidad, resultado_combinado
 from .models import EstadoSesion, ResolucionSesion, ResultadoListado, TipoSesion
@@ -46,6 +47,7 @@ def candidatas(sesion):
             .select_related("predio__municipio", "solicitante", "modalidad", "dictamen_tecnico", "dictamen_juridico"))
 
 
+@registra_usuario
 def proponer_listados(usuario, sesion, presupuesto=None):
     """Arma la propuesta: factibles en orden de priorización hasta donde alcance el recurso (beneficiarias),
     el resto en lista de espera con su orden, y las no factibles (CC 8.1.2 último párrafo; 9.4.3 fr. I)."""
@@ -89,9 +91,12 @@ def proponer_listados(usuario, sesion, presupuesto=None):
 def _renumerar(sesion, resultado):
     for i, r in enumerate(sesion.resoluciones.filter(resultado=resultado).order_by("orden", "pk"), 1):
         if r.orden != i:
-            ResolucionSesion.objects.filter(pk=r.pk).update(orden=i)
+            r.orden = i
+            r._change_reason = "Se recorre de lugar por un ajuste del Comité"
+            r.save(update_fields=["orden"])
 
 
+@registra_usuario
 def ajustar(usuario, resolucion, resultado, orden, motivo):
     """El Comité cambia el listado o el orden propuesto; queda la constancia (motivo e historial)."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
@@ -116,10 +121,12 @@ def ajustar(usuario, resolucion, resultado, orden, motivo):
             otros.insert(posicion - 1, resolucion)
             for i, r in enumerate(otros, 1):
                 if r.pk != resolucion.pk and r.orden != i:
-                    ResolucionSesion.objects.filter(pk=r.pk).update(orden=i)
+                    r.orden = i
+                    r._change_reason = "Se recorre de lugar por un ajuste del Comité"
+                    r.save(update_fields=["orden"])
             resolucion.orden = posicion
         resolucion.motivo_ajuste = motivo.strip()
-        resolucion._change_reason = f"Ajuste del Comité: {motivo.strip()}"
+        resolucion._change_reason = f"Ajuste del Comité: {motivo.strip()}"[:100]
         resolucion.save()
         if anterior != resultado:
             _renumerar(sesion, anterior)
@@ -129,6 +136,7 @@ def ajustar(usuario, resolucion, resultado, orden, motivo):
     return resolucion
 
 
+@registra_usuario
 def registrar_acta(usuario, sesion, autoriza_publicacion, observaciones="", momento=None):
     """Acta con los listados aprobados y la autorización de publicación; mueve cada expediente a su estado.
 

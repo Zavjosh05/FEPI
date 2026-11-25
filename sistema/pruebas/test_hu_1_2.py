@@ -16,7 +16,8 @@ def _claves(exp):
 
 
 def test_hu_1_2_criterios_del_modelo(modelo):
-    assert len(historia(modelo, "HU-1.2")["criterios"]) == 2
+    criterios = historia(modelo, "HU-1.2")["criterios"]
+    assert len(criterios) == 3 and "trazabilidad" in criterios[2]
 
 
 def test_hu_1_2_requisitos_segun_programa_tipo_de_persona_y_modalidad(nueva_solicitud, cc):
@@ -33,7 +34,7 @@ def test_hu_1_2_requisitos_segun_programa_tipo_de_persona_y_modalidad(nueva_soli
 
 
 def test_hu_1_2_cada_requisito_queda_entregado_o_faltante(nueva_solicitud, usuarios, pdf):
-    """Criterio 1: cada requisito está revisado como entregado o faltante (o no aplica si es condicional)."""
+    """Criterio 1: cada requisito está revisado como entregado (con su archivo), faltante o, si es condicional, no aplica."""
     exp = nueva_solicitud()
     assert exp.revisiones.filter(estado=EstadoRevision.PENDIENTE).count() == exp.revisiones.count()
     completar_requisitos(usuarios["del_amecameca"], exp, faltar=("CC-REQ-08",))
@@ -111,3 +112,17 @@ def test_hu_1_2_requisito_que_no_es_documento_se_cumple_sin_archivo(nueva_solici
     completar_requisitos(usuarios["del_amecameca"], exp)
     assert servicios.problemas_para_enviar(exp) == []
     assert all(e.valida for e in servicios.evaluar_para_validacion(exp))
+
+
+def test_hu_1_2_trazabilidad(nueva_solicitud, usuarios, pdf):
+    """Criterio 3: cada revisión de requisito y cada cambio quedan en el historial con el usuario y el valor anterior."""
+    exp = nueva_solicitud()
+    curp = exp.revisiones.get(requisito__clave="CC-REQ-08")
+    servicios.revisar_requisito(usuarios["del_amecameca"], curp, EstadoRevision.FALTANTE, observaciones="No la trajo")
+    servicios.revisar_requisito(usuarios["del_amecameca"], curp, EstadoRevision.ENTREGADO, archivo=pdf("curp.pdf"))
+    estados = list(curp.history.order_by("history_date", "history_id").values_list("estado", "history_user__username"))
+    assert estados == [("pendiente", "del_amecameca"), ("faltante", "del_amecameca"), ("entregado", "del_amecameca")]
+    from nucleo.trazabilidad import historial_expediente
+    cambio = next(f for f in historial_expediente(exp) if f["registro"] == "Revisión de requisito"
+                  and any(c["antes"] == "Faltante" and c["despues"] == "Entregado" for c in f["cambios"]))
+    assert cambio["usuario"] == usuarios["del_amecameca"]

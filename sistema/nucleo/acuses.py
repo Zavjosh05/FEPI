@@ -29,8 +29,10 @@ def emitir_acuse(expediente, tipo, titulo, usuario, renglones, destinatario="", 
         contenido={"renglones": [[str(a), str(b)] for a, b in renglones], "detalle": detalle or [], "nota": nota},
     )
     acuse.save()  # asigna el folio
+    # En el PDF las claves (CC-REQ-06) no se parten en el guion: guion que no separa (U+2011).
+    detalle_pdf = [{**d, "clave": str(d.get("clave", "")).replace("-", "\u2011")} for d in (detalle or [])]
     html = render_to_string("nucleo/acuse_pdf.html", {
-        "acuse": acuse, "expediente": expediente, "renglones": renglones, "detalle": detalle or [],
+        "acuse": acuse, "expediente": expediente, "renglones": renglones, "detalle": detalle_pdf,
         "nota": nota, "fecha_local": timezone.localtime(ahora),
         "encabezado_detalle": encabezado_detalle or ["Clave", "Requisito o concepto", "Estado"],
     })

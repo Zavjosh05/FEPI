@@ -29,7 +29,8 @@ def sesion(cc, usuarios):
 
 def test_hu_2_3_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-2.3")
-    assert len(hu["criterios"]) == 2 and "autorización de publicación" in hu["criterios"][1]
+    assert len(hu["criterios"]) == 4 and "autorización de publicación" in hu["criterios"][1]
+    assert "dos vistas separadas" in hu["criterios"][2] and "trazabilidad" in hu["criterios"][3]
 
 
 def test_hu_2_3_existe_convocatoria_con_orden_del_dia_documentos_y_fecha_hora_de_envio(sesion, usuarios):
@@ -191,3 +192,56 @@ def test_hu_2_3_no_factible_solo_por_acuerdo_del_comite(validada, dictaminada, u
     d = dictaminada(tecnico_resultado="no_factible", municipio="Tlalmanalco")
     with pytest.raises(TransicionNoPermitida):
         d.cambiar_estado("no_factible", usuarios["dir_drff"], motivo="x")
+
+
+def _acta_con_listados(sesion, dictaminada, validada, usuarios):
+    a = dictaminada(nombre="Predio Reforestado", ha=5)
+    b = dictaminada(nombre="Predio Plantación", municipio="Tlalmanalco", modalidad="plantacion_maderable", ha=5)
+    c = dictaminada(nombre="Predio Tarde", municipio="Ozumba", ha=5)
+    en_dictamen = validada(nombre="Predio En Dictamen", municipio="Ayapango")
+    s = sesion()
+    sesiones.enviar_convocatoria(usuarios["comite"], s)
+    aprobacion.proponer_listados(usuarios["comite"], s, Decimal("20500"))
+    aprobacion.registrar_acta(usuarios["comite"], s, True, "Unanimidad", momento=despues_de(s))
+    return a, b, c, en_dictamen, s
+
+
+def test_hu_2_3_candidatos_y_beneficiarios_en_dos_vistas(sesion, dictaminada, validada, usuarios, client, contrasena, cc):
+    """Criterio 3: candidatos y personas beneficiarias se consultan en dos vistas separadas."""
+    from dictamen import listados
+    from nucleo.models import expedientes_visibles
+
+    a, b, c, en_dictamen, s = _acta_con_listados(sesion, dictaminada, validada, usuarios)
+    visibles = expedientes_visibles(usuarios["comite"])
+    candidatos = {f["folio"]: f for f in listados.candidatos(cc, visibles)}
+    assert set(candidatos) == {b.folio, en_dictamen.folio}
+    assert candidatos[b.folio]["situacion"] == "lista_espera" and candidatos[b.folio]["lugar"] == 1
+    assert candidatos[en_dictamen.folio]["situacion"] == "en_dictamen"
+    vigentes, bajas = listados.beneficiarios(cc, visibles)
+    assert {f["folio"] for f in vigentes} == {a.folio, c.folio} and bajas == []
+    assert all(f["via"].startswith(f"Acta de la sesión {s.numero}") for f in vigentes)
+    assert listados.totales(vigentes)["monto"] == Decimal("20000.00")
+    client.login(username="comite", password=contrasena)
+    html = client.get(f"/dictamen/candidatos/?ejercicio={cc.pk}").content.decode()
+    assert b.folio in html and en_dictamen.folio in html and a.folio not in html
+    html = client.get(f"/dictamen/candidatos/?ejercicio={cc.pk}&situacion=lista_espera").content.decode()
+    assert b.folio in html and en_dictamen.folio not in html
+    html = client.get(f"/dictamen/beneficiarios/?ejercicio={cc.pk}").content.decode()
+    assert a.folio in html and c.folio in html and b.folio not in html and "$20,000.00" in html
+    r = client.get(f"/dictamen/beneficiarios/?ejercicio={cc.pk}&formato=csv")
+    assert r["Content-Type"].startswith("text/csv") and a.folio in r.content.decode("utf-8-sig")
+    # La Delegación ve solo lo suyo; la Jurídica también consulta.
+    client.login(username="del_toluca", password=contrasena)
+    assert a.folio not in client.get(f"/dictamen/beneficiarios/?ejercicio={cc.pk}").content.decode()
+    client.login(username="juridica", password=contrasena)
+    assert client.get("/dictamen/candidatos/").status_code == 200
+
+
+def test_hu_2_3_trazabilidad(sesion, dictaminada, validada, usuarios):
+    """Criterio 4: los listados del acta y los ajustes quedan en el historial con su usuario."""
+    a, b, c, en_dictamen, s = _acta_con_listados(sesion, dictaminada, validada, usuarios)
+    r = s.resoluciones.get(expediente=a)
+    assert r.history.get(history_type="+").history_user == usuarios["comite"]
+    assert s.history.filter(estado="celebrada", history_user=usuarios["comite"]).exists()
+    a.refresh_from_db()
+    assert a.history.filter(estado__clave="aprobada", history_user=usuarios["comite"]).exists()

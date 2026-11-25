@@ -558,3 +558,19 @@ servicios.
    encuentra regresan a su responsable.
 6. **Revisión antes de aceptar:** Joshua revisa cada historia antes de aceptarla y registra en la bitácora las
    decisiones y las dudas para el cliente.
+
+## Ajustes por las observaciones del profesor (23-nov-2026)
+
+Las observaciones del 23-nov se atendieron en la rama `sprint-1` (detalle en la sección 11 de la planeación, en el
+renglón D-29 de `entregas/BITACORA.md` y en `Registro_de_cambios_observaciones_23_nov.pdf`). Cada ajuste cae en la
+parte de quien construyó la historia; los puntos de las historias no cambiaron.
+
+| Persona | Paquete | Qué entregar | Dónde |
+| --- | --- | --- | --- |
+| Omar | T16 · HU-1.4 | Observación de la Dirección en cada requisito faltante (obligatoria), en el aviso, la notificación y la pestaña Requisitos | `recepcion/models.py` (`ObservacionValidacion`), `recepcion/servicios.py`, `validar.html`, `pruebas/test_hu_1_4.py` |
+| Cin | T17 · HU-2.1 y HU-2.2 | Documento PDF de cada dictamen (folio DT-/DJ-, firmas, huella), adjunto al expediente | `dictamen/documentos.py`, `templates/dictamen/pdf/`, `pruebas/test_hu_2_1.py` y `test_hu_2_2.py` |
+| Cin | T18 · HU-2.2 | Revisión de la documentación legal y de la propiedad o legal posesión del predio; sin propiedad acreditada no hay procedente | `dictamen/juridico.py`, `RevisionPropiedad`, `datos/dictamen.json` (`propiedad`), `juridico/dictaminar.html` |
+| Angel | T19 · HU-2.4 | «Reasignaciones e incidentes»: causa, baja que libera recurso, reasignación en el orden de la lista de espera, sustitución, `MovimientoListado` | `dictamen/seguimiento.py`, `datos/dictamen.json` (`efecto`), `datos/flujo_tramite.json` (estado `baja`), `pruebas/test_hu_2_4.py` |
+| Joshua | T20 · HU-2.3 | Vistas de Candidatos y Beneficiarios (menú «Listados», CSV) | `dictamen/listados.py`, `vistas/listados.py`, `templates/dictamen/listados/` |
+| Joshua | T21 · todas | Trazabilidad: usuario en el historial, `save()` en lugar de `update()`, pestaña «Trazabilidad»; criterio en las 21 historias del sistema | `nucleo/trazabilidad.py`, `extensiones.TRAZABILIDAD`, `pestanas/trazabilidad.html`, `especificacion/modelo.json` |
+

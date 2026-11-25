@@ -14,7 +14,18 @@ def sistema(request):
         tipo = getattr(unidad, "tipo", None)
         for m in MENU:
             if m.get("tipos") is None or tipo in m["tipos"] or (usuario.is_superuser and unidad is None):
-                menu.append({"nombre": m["nombre"], "url": reverse(m["url"]), "nombre_url": m["url"].split(":")[-1]})
+                opcion = {"nombre": m["nombre"], "url": reverse(m["url"]), "nombre_url": m["url"].split(":")[-1]}
+                grupo = m.get("grupo")
+                if not grupo:
+                    menu.append(opcion)
+                    continue
+                # Las opciones con el mismo «grupo» se muestran juntas en un menú desplegable.
+                existente = next((x for x in menu if x.get("grupo") == grupo), None)
+                if existente is None:
+                    menu.append({"grupo": grupo, "opciones": [opcion], "nombres_url": [opcion["nombre_url"]]})
+                else:
+                    existente["opciones"].append(opcion)
+                    existente["nombres_url"].append(opcion["nombre_url"])
     return {
         "menu_extra": menu,
         "unidad_actual": unidad,

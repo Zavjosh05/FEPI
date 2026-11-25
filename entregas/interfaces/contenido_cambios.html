@@ -1,0 +1,104 @@
+<section class="portada">
+<p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+<h1>Registro de cambios:<br>historias e interfaces</h1>
+<p class="sub">Qué se agregó, qué se modificó, qué se notó y qué falta, en la revisión de las historias de usuario
+contra los 7 módulos, el código y las pantallas.</p>
+<table>
+<tr><td class="gris">Fecha</td><td>19 de noviembre de 2026</td></tr>
+<tr><td class="gris">Rama</td><td>sprint-1 (cambios sin commit)</td></tr>
+<tr><td class="gris">Bitácora</td><td>Renglón D-28 de <code>entregas/BITACORA.md</code></td></tr>
+<tr><td class="gris">Verificación</td><td>{{pruebas_sistema}} pruebas del sistema en verde, ya con los cambios</td></tr>
+</table>
+<div class="caja"><b>En resumen.</b> Se agregaron tres documentos y {{capturas_completa_nuevas}} capturas nuevas de
+pantalla. Se modificaron tres historias (HU-1.2, HU-1.3 y HU-2.2) solo en su redacción, para que digan lo que ya hacen su
+función y el sistema; el código no cambió. Se notaron dos detalles de pantalla y cuatro casos de historias de los sprints
+2 y 3 que conviene decidir al planearlas.</div>
+</section>
+
+<h2 class="salto">1. Qué se agregó</h2>
+<table>
+<thead><tr><th style="width:38%">Archivo</th><th>Qué es</th></tr></thead>
+<tbody>
+<tr><td><code>Historias_de_usuario_e_interfaces.pdf</code> (raíz)</td><td>Documento para exponer al profesor: los 7 módulos, las 26 historias, su relación con el código y la interfaz, sin las observaciones de problemas.</td></tr>
+<tr><td><code>Registro_de_cambios_historias_e_interfaces.pdf</code> (raíz)</td><td>Este documento.</td></tr>
+<tr><td><code>entregas/interfaces/Historias_e_interfaces.pdf</code></td><td>Documento de trabajo completo: cotejo, ajustes, historias, interfaz y lo que se notó en las pantallas ({{capturas_completa}} capturas).</td></tr>
+<tr><td><code>entregas/interfaces/capturas/</code></td><td>{{capturas_completa_nuevas}} capturas nuevas: bandejas de las 11 unidades, pestañas y estados del expediente, vista en teléfono, acuses en PDF, panel de catálogos y pantallas de cada programa. Se suman a las 60 del sprint 1 en <code>entregas/sprint_1/capturas/</code>.</td></tr>
+<tr><td><code>entregas/interfaces/cotejo.json</code></td><td>Resultado del cotejo de cada historia, los ajustes (antes y ahora) y qué capturas van en cada apartado.</td></tr>
+<tr><td><code>entregas/interfaces/capturas.json</code></td><td>Pie de cada captura nueva.</td></tr>
+<tr><td><code>entregas/interfaces/contenido*.html</code></td><td>Texto de los tres documentos (completo, para el profesor y este registro).</td></tr>
+<tr><td><code>entregas/generar_historias_interfaces.py</code></td><td>Genera los tres PDF con el estilo del resumen del sprint (<code>python entregas/generar_historias_interfaces.py</code>). Comprueba que cada función tenga una sola historia.</td></tr>
+</tbody></table>
+<p>Para las capturas por programa se cargaron, solo en el entorno de captura, las reglas mínimas que usan las pruebas
+para MFS, PS, RHF, PSAHEM y Guardabosques, y un expediente de cada programa. Nada de eso se agregó al repositorio ni a
+los datos de demostración.</p>
+
+<h2>2. Qué se modificó</h2>
+<table>
+<thead><tr><th style="width:38%">Archivo</th><th>Cambio</th></tr></thead>
+<tbody>
+<tr><td><code>sistema/especificacion/modelo.json</code></td><td>Redacción de HU-1.2 (criterio 1), HU-1.3 (historia) y HU-2.2 (historia y criterio 2). Títulos, roles, puntos, sprints, funciones y número de criterios, iguales.</td></tr>
+<tr><td><code>entregas/sprint_1/planeacion/PLANEACION_SPRINT_1.md</code> y <code>.pdf</code></td><td>La tabla de historias del sprint con la redacción nueva de HU-1.3 y HU-2.2; el PDF se rehízo con <code>md_a_pdf.py</code>.</td></tr>
+<tr><td><code>entregas/BITACORA.md</code></td><td>Renglón D-28 con la revisión, los ajustes y lo que se notó.</td></tr>
+<tr><td><code>sistema/pruebas/test_hu_1_2.py</code></td><td>Solo la descripción de una prueba, con el texto nuevo del criterio 1. La prueba no cambió.</td></tr>
+</tbody></table>
+
+<h3>Las historias, antes y ahora</h3>
+<!--TABLA_AJUSTES-->
+<div class="aviso"><b>HU-1.1 no se modificó.</b> Su función (M1.1) también menciona el acuse con la fecha y la hora de
+recepción, pero la historia quedó con un solo criterio, el folio único, por indicación del profesor el 18-nov. El sistema
+conserva el acuse y la validación del municipio como reglas del registro, con sus pruebas.</div>
+
+<h2 class="salto">3. Cotejo de cada historia</h2>
+<p><span class="ok">Empata</span>: la historia dice lo que hacen su función y el sistema. <span class="aj">Ajustada</span>:
+se cambió la redacción. <span class="pend">Sin código aún</span>: se cotejó solo contra su función.</p>
+<!--TABLA_COTEJO-->
+
+<h2 class="salto">4. Qué se notó</h2>
+<h3>En las pantallas</h3>
+<ul>
+<li><b>Acceso negado sin el diseño del sistema.</b> Si una unidad abre una dirección que no le toca (por ejemplo, una
+Delegación abre el listado preliminar), el sistema la niega bien, pero muestra la página «403 Forbidden» de Django, sin
+el encabezado ni el texto de PROBOSQUE. Propuesta: una plantilla <code>403.html</code> con el diseño del sistema.</li>
+<li><b>«None a None ha» en el dictamen técnico.</b> Cuando un programa no trae en sus reglas el rango de superficie, la
+pantalla escribe «None a None ha». Con las reglas completas de cada programa el dato existe, pero conviene que la
+pantalla diga «sin rango en las reglas». Por eso esas capturas (MFS, RHF y PSAHEM) no van en el documento para el
+profesor.</li>
+<li><b>Solo aparecen los programas con reglas.</b> En el sprint 1, el registro solo ofrece Capturando Carbono, porque es
+el único con reglas cargadas. Es lo esperado y la pantalla lo dice.</li>
+</ul>
+<h3>En las historias de los sprints 2 y 3</h3>
+<p>Empatan con su módulo, pero su función menciona un caso que sus criterios no dicen. No se cambiaron, porque agregar
+un criterio cambia el alcance y los puntos; conviene decidirlo al planear su sprint:</p>
+<ul>
+<li><b>HU-3.2</b>: la ampliación de plazo por causa externa en MFS (función M3.2).</li>
+<li><b>HU-5.1</b>: el oficio de solicitud de pago que envía la Delegación en cuanto se firma el contrato (función M5.1).</li>
+<li><b>HU-5.2</b>: el depósito al Guardabosque en PEG (función M5.2).</li>
+<li><b>HU-5.3</b>: el plazo máximo de 3 meses para cobrar los cheques de PSAHEM (función M5.3).</li>
+</ul>
+<h3>En las historias ya construidas, cuando lleguen las reglas de su programa</h3>
+<ul>
+<li><b>HU-1.3</b>: el Diagnóstico Técnico de RHF (sprint 2).</li>
+<li><b>HU-1.2</b>: el PTRFI de RHF como requisito (sprint 2).</li>
+<li><b>HU-2.2</b>: el acta de asamblea y la representación del núcleo agrario en PEG (sprint 3).</li>
+</ul>
+<h3>Sobre el material</h3>
+<ul>
+<li>Las capturas de la Calculadora (HU-7.1) son las del sprint 1: en el entorno de esta revisión la página no carga sus
+bibliotecas de internet, así que no se volvieron a tomar.</li>
+<li>Los mapas de las capturas nuevas salen sin mapa base porque en el entorno de captura no había servidor de teselas; el
+municipio y el polígono sí se dibujan.</li>
+</ul>
+
+<h2 class="salto">5. Pantallas que respaldan los cambios</h2>
+<!--INTERFAZ-->
+
+<h2>6. Qué falta</h2>
+<ul>
+<li>Revisar los cambios y hacer el commit en la rama <code>sprint-1</code>.</li>
+<li>Llevar los ajustes de las tres historias a la carpeta <code>propuesta/</code> de la rama <code>main</code> con
+<code>propuesta/herramientas/actualizar_propuesta.py</code> (actualiza su <code>modelo.json</code>, <code>CONTEXTO.md</code>,
+la matriz y las páginas de historias del PDF de la propuesta) y anotarlos en <code>propuesta/CAMBIOS_HU.md</code>.</li>
+<li>Decidir los cuatro casos de las historias de los sprints 2 y 3 al planearlos.</li>
+<li>Corregir los dos detalles de pantalla (plantilla 403 y rango sin datos).</li>
+<li>Borrar la carpeta temporal <code>.git/claude_tmp/</code>, que quedó de la revisión.</li>
+</ul>

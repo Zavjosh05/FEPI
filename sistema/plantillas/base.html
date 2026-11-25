@@ -25,7 +25,16 @@
         <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'registrar' %}active{% endif %}" href="{% url 'recepcion:registrar' %}">Registrar solicitud</a></li>
         {% endif %}
         {% for m in menu_extra %}
+        {% if m.grupo %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-nowrap {% if request.resolver_match.url_name in m.nombres_url %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ m.grupo }}</a>
+          <ul class="dropdown-menu">{% for o in m.opciones %}
+            <li><a class="dropdown-item {% if request.resolver_match.url_name == o.nombre_url %}active{% endif %}" href="{{ o.url }}">{{ o.nombre }}</a></li>
+          {% endfor %}</ul>
+        </li>
+        {% else %}
         <li class="nav-item"><a class="nav-link text-nowrap {% if request.resolver_match.url_name == m.nombre_url %}active{% endif %}" href="{{ m.url }}">{{ m.nombre }}</a></li>
+        {% endif %}
         {% endfor %}
         {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Catálogos</a></li>{% endif %}
       </ul>

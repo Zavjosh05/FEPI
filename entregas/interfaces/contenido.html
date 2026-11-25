@@ -1,0 +1,104 @@
+<section class="portada">
+<p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+<h1>Historias de usuario<br>e interfaces</h1>
+<p class="sub">Cotejo de las 26 historias con los 7 módulos, con el código y con las pantallas del sistema, y catálogo
+de las interfaces que hoy tiene cada módulo y cada programa.</p>
+<table>
+<tr><td class="gris">Alcance</td><td>7 módulos (M1 a M6 del Sistema de programas y M7 Calculadora forestal), {{funciones}} funciones y {{historias}} historias</td></tr>
+<tr><td class="gris">Código revisado</td><td>Sprint 1: recepción y dictamen (M1, M2) y masa forestal por año (M7.1)</td></tr>
+<tr><td class="gris">Fecha</td><td>23 de noviembre de 2026 (revisión del 19-nov con las observaciones del profesor del 23-nov)</td></tr>
+<tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama sprint-1</td></tr>
+<tr><td class="gris">Capturas</td><td>{{capturas}} ({{capturas_previas}} de los recorridos del sprint 1 y {{capturas_nuevas}} nuevas)</td></tr>
+</table>
+<div class="caja"><b>En una frase.</b> Las {{historias}} historias corresponden una a una con las {{funciones}} funciones de
+los 7 módulos; de las 9 que ya tienen código, {{empatan}} empatan con sus pantallas tal como están y {{ajustadas}} se
+ajustaron: HU-1.2, HU-1.3 y HU-2.2 en su redacción (19-nov) y HU-1.4, HU-2.1, HU-2.2, HU-2.3 y HU-2.4 con el sistema por
+las observaciones del profesor (23-nov: observación de cada faltante, documento de los dictámenes, propiedad del predio,
+candidatos y beneficiarios, reasignaciones e incidentes). Las 21 historias del Sistema de programas tienen ahora un
+criterio de trazabilidad en la base de datos. Las otras {{sin_codigo}} se construyen en los sprints 2 y 3.</div>
+</section>
+
+<h2 class="salto">1. Qué se revisó y cómo</h2>
+<p>Se tomaron tres fuentes y se compararon historia por historia:</p>
+<ul>
+<li><b>Los 7 módulos y sus funciones</b>, de la propuesta de solución (versión 13, 12-nov-2026) tal como están en
+<code>sistema/especificacion/modelo.json</code>, que es la fuente que usan el sistema y sus pruebas.</li>
+<li><b>El código</b> del Sistema de programas (<code>sistema/</code>) y de la Calculadora (<code>docs/calculadora/</code>), con
+sus pruebas: {{pruebas_sistema}} del sistema y {{pruebas_calculadora}} de la Calculadora, una o más por criterio de
+aceptación. Las {{pruebas_sistema}} del sistema se volvieron a correr para esta revisión, ya con los ajustes, y pasan todas.</li>
+<li><b>Las pantallas</b>: el sistema se levantó con sus datos de demostración y se recorrieron con Chromium las pantallas
+de las once cuentas (una por unidad), de cada pestaña del expediente, de cada estado del trámite y de cada programa.</li>
+</ul>
+<p>Para cada historia se respondieron dos preguntas: ¿dice lo mismo que su función del módulo? y ¿lo que piden su
+historia y sus criterios es lo que hacen el código y las pantallas? Cuando una historia decía menos o algo distinto que
+su función y que el sistema, se ajustó su redacción con el mismo formato («Como [rol], quiero [acción], para
+[beneficio]») y sin quitar información. Títulos, roles, puntos, sprints, funciones y número de criterios no cambiaron.</p>
+
+<h2>2. Los 7 módulos y sus historias</h2>
+<p>Cada módulo agrupa etapas del trámite; cada función tiene una sola historia, con el mismo número (la función M1.1 tiene
+la historia HU-1.1). El generador de este documento comprueba que la correspondencia sea de uno a uno: no hay funciones
+sin historia, historias sin función ni funciones con dos historias.</p>
+<!--TABLA_MODULOS-->
+
+<h2 class="salto">3. Resultado del cotejo</h2>
+<p><span class="ok">Empata</span>: la historia dice lo que hacen su función y el sistema. <span class="aj">Ajustada</span>:
+se cambió la redacción (sección 4). <span class="pend">Sin código aún</span>: se cotejó solo contra su función; el
+sistema todavía no la construye.</p>
+<!--TABLA_COTEJO-->
+
+<h3>Puntos a revisar cuando se construyan las historias de los sprints 2 y 3</h3>
+<p>Estas historias empatan con su módulo, pero su función menciona un caso que sus criterios no dicen. No se cambiaron,
+porque agregar un criterio cambia el alcance y los puntos de una historia que aún no se planea; se anotan para decidirlo
+al planear su sprint:</p>
+<ul>
+<li><b>HU-3.2</b>: la ampliación de plazo por causa externa en MFS (función M3.2).</li>
+<li><b>HU-5.1</b>: el oficio de solicitud de pago que envía la Delegación en cuanto se firma el contrato (función M5.1).</li>
+<li><b>HU-5.2</b>: el depósito al Guardabosque en PEG (función M5.2).</li>
+<li><b>HU-5.3</b>: el plazo máximo de 3 meses para cobrar los cheques de PSAHEM (función M5.3).</li>
+<li><b>HU-1.3 y HU-2.2</b>, ya construidas: el Diagnóstico Técnico de RHF y el acta de asamblea en PEG se agregan cuando
+se carguen las reglas de esos programas (sprints 2 y 3).</li>
+</ul>
+
+<h2 class="salto">4. Ajustes a las historias</h2>
+<p>19-nov: tres historias ya construidas decían menos que su función y que sus pantallas; se ajustó su redacción y el
+sistema no cambió. 23-nov: las observaciones del profesor cambiaron cinco historias, el criterio de trazabilidad de las
+21 historias del Sistema de programas, y el sistema (pantallas, documentos, base de datos y pruebas); el detalle está en
+<code>Registro_de_cambios_observaciones_23_nov.pdf</code>. Todo está en <code>sistema/especificacion/modelo.json</code> y en
+la planeación del sprint 1.</p>
+<!--TABLA_AJUSTES-->
+<div class="aviso"><b>HU-1.1.</b> Su función (M1.1) también menciona el acuse con la fecha y la hora de recepción, pero la
+historia quedó con el folio único como criterio de su acción, por indicación del profesor el 18-nov; el 23-nov se le sumó
+solo el criterio de trazabilidad, común a todas las historias del sistema. El sistema conserva el acuse y la validación
+del municipio como reglas del registro, con sus pruebas.</div>
+
+<h2>5. Historias de usuario</h2>
+<p>Las {{historias}} historias vigentes, por módulo, en el formato de la propuesta. Los criterios de aceptación son
+condiciones que deben cumplirse para dar por terminada la historia. Los puntos dan la complejidad en la escala Fibonacci
+(1, 2, 3, 5 y 8).</p>
+<!--TABLAS_HISTORIAS-->
+
+<h2 class="salto">6. Interfaz</h2>
+<p>Este apartado reúne todas las pantallas que hoy tiene el sistema: las {{capturas_previas}} que tomaron los recorridos
+automáticos del sprint 1 (<code>entregas/sprint_1/capturas/</code>) y {{capturas_nuevas}} nuevas que completan lo que
+faltaba ver: las bandejas de todas las unidades, cada pestaña y estado del expediente, la vista en teléfono, los acuses en
+PDF, el panel de catálogos y las pantallas de cada programa (<code>entregas/interfaces/capturas/</code>). Cada pie dice
+qué muestra la pantalla y en qué archivo está.</p>
+<p>Se tomaron con el sistema levantado con sus datos de demostración, en Chromium a 1366 × 900 (los teléfonos, a 390 ×
+844), de página completa. Los mapas aparecen sin mapa base porque en el entorno de captura no había servidor de teselas;
+el municipio y el polígono sí se dibujan.</p>
+<div class="aviso"><b>Lo que aún no tiene pantallas.</b> M3 (publicación y contrato) y M5 (pagos) se construyen en el
+sprint 2; M4 (ejecución y verificación) y M6 (seguimiento y cierre), en el sprint 3, junto con el portal de las personas
+beneficiarias; M7.2 a M7.5, en los sprints 2 y 3. Lo que ya existe de ellos son los puntos de entrada: las bandejas de
+Administración y Finanzas, del vivero y de la Fiduciaria, la instrucción de pago de PSAHEM que llega a la Fiduciaria y los
+acuerdos del Comité que esos módulos van a ejecutar.</div>
+<h3>Lo que se vio en las pantallas</h3>
+<ul>
+<li><b>Acceso negado sin el diseño del sistema</b> (corregido el 23-nov). La página «403 Forbidden» de Django se
+cambió por «Acceso no permitido», con el diseño de PROBOSQUE y el botón para volver a la bandeja.</li>
+<li><b>«None a None ha» en el dictamen técnico</b> (corregido el 23-nov). Cuando las reglas de un programa no traen el
+rango de superficie, la lista de verificación ya no muestra ese criterio. Las capturas de MFS, RHF y PSAHEM son del 19-nov
+y conservan el texto anterior.</li>
+<li><b>Solo aparecen los programas con reglas.</b> El selector del registro ofrece únicamente los programas cuyas reglas
+están cargadas; en el sprint 1, solo Capturando Carbono. Es lo esperado, y la pantalla lo dice.</li>
+</ul>
+<!--INTERFAZ-->

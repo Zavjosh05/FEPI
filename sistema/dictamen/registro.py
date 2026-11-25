@@ -31,6 +31,23 @@ def contexto_pestana(request, exp):
     return contexto_dictamenes(request, exp)
 
 
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M2 en la pestaña «Trazabilidad»."""
+    from .models import (Acuerdo, DictamenJuridico, DictamenTecnico, MovimientoListado, ResolucionSesion,
+                         RevisionPropiedad)
+
+    acuerdos = list(expediente.acuerdos_comite.values_list("pk", flat=True))
+    return [
+        ("Dictamen técnico", DictamenTecnico.history.filter(expediente_id=expediente.pk)),
+        ("Dictamen jurídico", DictamenJuridico.history.filter(expediente_id=expediente.pk)),
+        ("Propiedad o posesión", RevisionPropiedad.history.filter(
+            dictamen_id__in=list(DictamenJuridico.objects.filter(expediente=expediente).values_list("pk", flat=True)))),
+        ("Listados del Comité", ResolucionSesion.history.filter(expediente_id=expediente.pk)),
+        ("Acuerdo del Comité", Acuerdo.history.filter(id__in=acuerdos)),
+        ("Movimiento de listado", MovimientoListado.history.filter(expediente_id=expediente.pk)),
+    ]
+
+
 def revisar_plazos(hoy):
     from .tecnico import revisar_plazos_dictamen
 
@@ -42,11 +59,17 @@ def registrar():
         return
     extensiones.FILTROS_BANDEJA.append(filtro_bandeja)
     extensiones.PANELES_BANDEJA.append(panel_acuerdos)
+    extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "dictamenes", "nombre": "Dictámenes",
                                             "plantilla": "dictamen/pestana_dictamenes.html", "contexto": contexto_pestana})
     T = TipoUnidad
     extensiones.MENU.extend([
-        {"nombre": "Listado preliminar", "url": "dictamen:listado", "tipos": [T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE]},
+        {"nombre": "Listado preliminar", "url": "dictamen:listado", "tipos": [T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE],
+         "grupo": "Listados"},
+        {"nombre": "Candidatos", "url": "dictamen:candidatos",
+         "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE], "grupo": "Listados"},
+        {"nombre": "Beneficiarios", "url": "dictamen:beneficiarios",
+         "tipos": [T.DELEGACION, T.DIRECCION, T.JURIDICA, T.SECRETARIA_COMITE], "grupo": "Listados"},
         {"nombre": "Sesiones del Comité", "url": "dictamen:sesiones", "tipos": [T.SECRETARIA_COMITE, T.DIRECCION, T.JURIDICA]},
         {"nombre": "Incumplidas", "url": "dictamen:incumplidas", "tipos": [T.JURIDICA, T.DIRECCION, T.SECRETARIA_COMITE]},
     ])

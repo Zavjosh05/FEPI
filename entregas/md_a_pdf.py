@@ -10,6 +10,7 @@ Cada PDF queda junto a su Markdown, con el mismo nombre. Las rutas de imágenes 
 Markdown. Los bloques ```mermaid se dibujan con Mermaid en el navegador antes de imprimir.
 """
 import html
+import os
 import pathlib
 import re
 import sys
@@ -17,7 +18,8 @@ import sys
 import markdown
 from playwright.sync_api import sync_playwright
 
-MERMAID_JS = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
+# Sin internet, se puede apuntar a una copia local: MERMAID_JS=file:///ruta/mermaid.min.js
+MERMAID_JS = os.environ.get("MERMAID_JS", "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js")
 ESTILO = """
 @page { size: Letter; margin: 1.8cm 1.7cm 1.9cm 1.7cm; }
 html { font-family: "DejaVu Sans", "Noto Sans", sans-serif; font-size: 9.4pt; line-height: 1.45; color: #1c1c1c; }

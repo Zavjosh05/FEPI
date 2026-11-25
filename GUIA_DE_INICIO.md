@@ -123,6 +123,10 @@ algunos plazos que se arman hacia atrás para que haya casos vencidos.
 
 `down -v` borra la base de datos y los archivos subidos; al volver a levantar, la demostración se carga de nuevo.
 
+**Después de los ajustes del 23-nov** (observaciones del profesor) hay tablas nuevas y la demostración cambió: si ya
+tenías el sistema levantado con datos, usa `docker compose down -v` y `docker compose up --build` para que los dictámenes
+de ejemplo tengan su documento en PDF, la revisión de la propiedad y la reasignación.
+
 **Si en el mismo equipo usas también la versión de `main`:** las dos usan los mismos nombres de contenedores, de
 imágenes y de volúmenes. Al cambiar de una a otra, detén la que corre con `docker compose down -v` y levanta la otra
 con `--build`.
@@ -147,7 +151,7 @@ la base se crea: si la cambias después, borra la base con `docker compose down 
 
 ### 1.8 Pruebas automáticas (opcional)
 
-Desde `sistema/`, la corrida completa de esta versión (129 pruebas, unos 3 minutos, con Chromium para los
+Desde `sistema/`, la corrida completa de esta versión (155 pruebas, unos 3 minutos, con Chromium para los
 recorridos):
 
 ```bash

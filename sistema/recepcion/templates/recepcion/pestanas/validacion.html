@@ -17,7 +17,12 @@
     </form>
     {% endif %}
   </div>
-  <ul class="small mt-2 mb-0">{% for r in aviso.faltantes.all %}<li><strong>{{ r.requisito.clave }}</strong> {{ r.requisito.titulo }}</li>{% endfor %}</ul>
+  <table class="table table-sm small mt-2 mb-0" data-prueba="faltantes-con-observacion">
+    <thead><tr><th>Clave</th><th>Requisito</th><th>Observación de la Dirección</th></tr></thead>
+    <tbody>{% for o in aviso.observaciones_requisitos.all %}{% if o.faltante %}
+      <tr><td class="fw-semibold text-nowrap">{{ o.revision.requisito.clave }}</td><td>{{ o.revision.requisito.titulo }}</td><td class="text-danger">{{ o.observacion }}</td></tr>
+    {% endif %}{% empty %}{% for r in aviso.faltantes.all %}<tr><td class="fw-semibold">{{ r.requisito.clave }}</td><td>{{ r.requisito.titulo }}</td><td>—</td></tr>{% endfor %}{% endfor %}</tbody>
+  </table>
   {% if es_delegacion %}<div class="small text-secondary mt-2">Cuando reciba la documentación, márquela como entregada en la pestaña Requisitos y reenvíe el expediente.</div>{% endif %}
 </div>
 {% endif %}
@@ -30,14 +35,14 @@
 <div class="titulo-seccion">Historial de validaciones</div>
 <div class="table-responsive">
 <table class="table table-sm">
-  <thead class="table-light"><tr><th>Fecha y hora</th><th>Resultado</th><th>Fecha límite</th><th>Faltantes</th><th>Por</th><th>Acuse</th></tr></thead>
+  <thead class="table-light"><tr><th>Fecha y hora</th><th>Resultado</th><th>Fecha límite</th><th>Faltantes y su observación</th><th>Por</th><th>Acuse</th></tr></thead>
   <tbody>
   {% for v in validaciones %}
   <tr>
     <td>{{ v.fecha_hora|date:"d/m/Y H:i:s" }}</td>
     <td>{% if v.resultado == "validado" %}<span class="badge text-bg-success">Validado</span>{% else %}<span class="badge text-bg-warning">Aviso de faltantes</span>{% endif %}</td>
     <td>{{ v.fecha_limite|date:"d/m/Y"|default:"—" }}</td>
-    <td class="small">{% for r in v.faltantes.all %}{{ r.requisito.clave }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+    <td class="small">{% for o in v.observaciones_requisitos.all %}{% if o.faltante %}<div><strong>{{ o.revision.requisito.clave }}</strong>: {{ o.observacion }}</div>{% endif %}{% empty %}{% for r in v.faltantes.all %}{{ r.requisito.clave }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}{% endfor %}{% if v.resultado == "validado" %}—{% endif %}</td>
     <td>{{ v.usuario }}</td>
     <td>{% if v.acuse %}<a href="{% url 'nucleo:acuse' v.acuse.folio %}" target="_blank">{{ v.acuse.folio }}</a>{% endif %}</td>
   </tr>

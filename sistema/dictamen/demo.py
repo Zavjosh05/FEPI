@@ -1,5 +1,6 @@
-"""Datos de demostración del módulo M2 (idempotente): expedientes en dictamen y dictaminados, una persona en el
-Listado de Incumplidas, una sesión de aprobación con acta y una de seguimiento con acuerdos."""
+"""Datos de demostración del módulo M2 (idempotente): expedientes en dictamen y dictaminados (con sus documentos en
+PDF y la revisión de la propiedad), una persona en el Listado de Incumplidas, una sesión de aprobación con acta y una
+de seguimiento con incidentes y una reasignación a la lista de espera."""
 from datetime import datetime, time, timedelta
 from decimal import Decimal
 
@@ -25,6 +26,25 @@ def _validada(u_del, u_dir, ejercicio, municipio, predio, persona, modalidad, ha
     recepcion.validar_expediente(u_dir, exp)
     exp.refresh_from_db()
     return exp
+
+
+def propiedad_en_regla(expediente, **cambios):
+    """Revisión de la propiedad de demostración y de prueba: escritura pública a nombre del titular que ampara el predio."""
+    from .juridico import superficie_a_acreditar
+
+    superficie = superficie_a_acreditar(expediente) or Decimal("10")
+    datos = {"tipo_documento": "escritura", "numero_documento": f"Escritura {1000 + expediente.pk}",
+             "fecha_documento": timezone.localdate() - timedelta(days=3650), "titular_documento": expediente.solicitante.nombre,
+             "titular_coincide": True, "superficie_documento_ha": (Decimal(superficie) * Decimal("1.25")).quantize(Decimal("0.0001")),
+             "vigente_hasta": None, "sin_conflicto": True, "observaciones": ""}
+    datos.update(cambios)
+    return datos
+
+
+def verificacion_revisada(expediente, respuesta="si"):
+    """Lista de verificación de demostración con todos los criterios revisados (como la deja la pantalla)."""
+    return {i["clave"]: {"respuesta": respuesta} for i in tecnico.lista_verificacion(expediente.ejercicio)
+            if not i.get("informativo")}
 
 
 def _existe(ejercicio, nombre):
@@ -63,20 +83,34 @@ def cargar_demo():
     ocotal = _validada(d_tol, drff, ejercicio, "Ocoyoacac", "El Ocotal", "Gerardo Mejía Ortiz", "plantacion_maderable", 15)
     cruz = _validada(d_val, drff, ejercicio, "Villa de Allende", "Cerro de la Cruz", "Rogelio Bautista Núñez",
                      "reforestacion", 11, curp="BANR600101HMCTXG09")
-    trojes = _validada(d_val, drff, ejercicio, "Villa Victoria", "Las Trojes", "Martina Colín Reyes", "reforestacion", 20)
+    trojes = _validada(d_val, drff, ejercicio, "Villa Victoria", "Las Trojes", "Martina Colín Reyes", "reforestacion", 4.5)
     creadas += 5
 
-    tecnico.dictaminar(drff, encinos, "factible", "Reforestación de 6 años con densidad de 72 %; cumple los criterios de 8.1.1.1.")
+    tecnico.dictaminar(drff, encinos, "factible", "Reforestación de 6 años con densidad de 72 %; cumple los criterios de 8.1.1.1.",
+                       verificacion_revisada(encinos))
     for exp, motivo in [(joya, "Reforestación de 5 años; el traslape con Los Encinos del Monte se ajustó en campo."),
                         (cruz, "Reforestación de 7 años con densidad suficiente."),
                         (trojes, "Reforestación en zona alta de cuenca; densidad de 68 %.")]:
-        tecnico.dictaminar(drff, exp, "factible", motivo)
-    juridico.dictaminar(uj, joya, "procedente", "Documentación legal completa y vigente.")
-    juridico.dictaminar(uj, trojes, "procedente", "Escritura pública y CURP vigentes.")
-    juridico.dictaminar(uj, cruz, "no_procedente", "El titular está en el Listado de Personas Beneficiarias Incumplidas.")
+        tecnico.dictaminar(drff, exp, "factible", motivo, verificacion_revisada(exp))
+    juridico.dictaminar(uj, joya, "procedente", "Documentación legal completa y vigente; se acredita la propiedad.",
+                        propiedad=propiedad_en_regla(joya, tipo_documento="certificado_parcelario",
+                                                     numero_documento="Certificado parcelario 000123456"))
+    juridico.dictaminar(uj, trojes, "procedente", "Escritura pública y CURP vigentes; la escritura ampara el predio.",
+                        propiedad=propiedad_en_regla(trojes))
+    juridico.dictaminar(uj, cruz, "no_procedente", "El titular está en el Listado de Personas Beneficiarias Incumplidas.",
+                        propiedad=propiedad_en_regla(cruz))
+    # Propiedad no acreditada: la constancia de posesión venció (queda en dictamen para la Dirección).
+    juridico.dictaminar(uj, ocotal, "no_procedente",
+                        "No se acredita la legal posesión: la constancia de posesión venció y no ampara toda la superficie.",
+                        propiedad=propiedad_en_regla(ocotal, tipo_documento="constancia_posesion",
+                                                     numero_documento="Constancia 45/2024 del Comisariado Ejidal",
+                                                     superficie_documento_ha=Decimal("10"),
+                                                     vigente_hasta=timezone.localdate() - timedelta(days=40)))
     if agua_blanca is not None and agua_blanca.estado.clave == "validada":
-        tecnico.dictaminar(drff, agua_blanca, "factible", "Refrendo: concluyó las actividades del ejercicio anterior.")
-        juridico.dictaminar(uj, agua_blanca, "procedente", "Refrendo con documentación vigente; nuevo dictamen jurídico (10.1 fr. IV).")
+        tecnico.dictaminar(drff, agua_blanca, "factible", "Refrendo: concluyó las actividades del ejercicio anterior.",
+                           verificacion_revisada(agua_blanca))
+        juridico.dictaminar(uj, agua_blanca, "procedente", "Refrendo con documentación vigente; nuevo dictamen jurídico (10.1 fr. IV).",
+                            propiedad=propiedad_en_regla(agua_blanca))
 
     # Sesión de aprobación con acta
     # La sesión de aprobación ya se celebró (hace unas horas) y se convocó con 21 días naturales de anticipación;
@@ -94,13 +128,14 @@ def cargar_demo():
     sesiones.agregar_documento(st, sesion, ContentFile(_pdf_demo("Dictamenes tecnicos y juridicos"), name="dictamenes.pdf"),
                                "Dictámenes técnicos y jurídicos")
     sesiones.enviar_convocatoria(st, sesion, momento=fecha - timedelta(days=21))
-    aprobacion.proponer_listados(st, sesion, Decimal("57000"))
+    aprobacion.proponer_listados(st, sesion, Decimal("26000"))
     aprobacion.registrar_acta(st, sesion, True, "Se aprueban los listados por unanimidad.")
 
     # Expediente dictaminado después de la sesión (queda en la bandeja de la Secretaría Técnica)
     potrero = _validada(d_ame, drff, ejercicio, "Tenango del Aire", "Potrero Viejo", "Sergio Ayala Pineda", "reforestacion", 4)
-    tecnico.dictaminar(drff, potrero, "factible", "Reforestación de 4 años; cumple la densidad mínima.")
-    juridico.dictaminar(uj, potrero, "procedente", "Documentación legal vigente.")
+    tecnico.dictaminar(drff, potrero, "factible", "Reforestación de 4 años; cumple la densidad mínima.",
+                       verificacion_revisada(potrero))
+    juridico.dictaminar(uj, potrero, "procedente", "Documentación legal vigente.", propiedad=propiedad_en_regla(potrero))
     creadas += 1
 
     # Sesión de seguimiento con acuerdos
@@ -112,11 +147,20 @@ def cargar_demo():
     drff_unidad = Unidad.objects.get(clave="DRFF")
     if agua_blanca is not None:
         seguimiento.registrar_acuerdo(st, seg, "caso_fortuito", "Atender el aviso de incendio en la parte baja del predio "
-                                      "y ajustar la propuesta FO-PB-520-B con la Delegación.", [agua_blanca], drff_unidad)
-    reasignado = seguimiento.registrar_acuerdo(
-        st, seg, "reasignacion", "Reasignar el recurso liberado por desistimiento a la primera solicitud de la lista de espera.",
-        [trojes], drff_unidad)
-    seguimiento.cumplir(drff, reasignado, "Se notificó por conducto de la Delegación Amecameca.")
+                                      "y ajustar la propuesta FO-PB-520-B con la Delegación.", [agua_blanca], drff_unidad,
+                                      causa="Aviso de incendio de la Delegación Toluca del 12/11/2026.")
+    # Incidente: La Joya Alta desiste; su recurso se reasigna a la primera de la lista de espera (Las Trojes).
+    joya.refresh_from_db()
+    if joya.estado.clave == "aprobada":
+        baja = seguimiento.registrar_acuerdo(
+            st, seg, "desistimiento", f"Se acepta el desistimiento de {joya.solicitante.nombre} y se libera su recurso.",
+            [joya], drff_unidad, causa="Escrito de desistimiento presentado en la Delegación Amecameca el 10/11/2026.")
+        seguimiento.cumplir(drff, baja, "Se notificó la baja por conducto de la Delegación.")
+        lista = seguimiento.lista_de_espera(ejercicio)
+        if lista and (lista[0]["monto"] is None or lista[0]["monto"] <= seguimiento.recurso_liberado(ejercicio)):
+            seguimiento.registrar_acuerdo(
+                st, seg, "reasignacion", "Reasignar el recurso liberado por el desistimiento a la primera solicitud de la "
+                                         "lista de espera.", [lista[0]["expediente"]], drff_unidad)
     seguimiento.registrar_acuerdo(st, seg, "otro", "Revisar con la Unidad Jurídica la situación del titular del Cerro de la Cruz.",
                                   [cruz], Unidad.objects.get(clave="UJ"))
     return creadas

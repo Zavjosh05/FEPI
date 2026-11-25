@@ -1,0 +1,6 @@
+<form method="get" class="d-flex gap-2">
+  {% if situacion %}<input type="hidden" name="situacion" value="{{ situacion }}">{% endif %}
+  <select name="ejercicio" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Programa y ejercicio">
+    {% for e in ejercicios %}<option value="{{ e.pk }}" {% if e == ejercicio %}selected{% endif %}>{{ e.programa.clave }} {{ e.anio }}</option>{% endfor %}
+  </select>
+</form>

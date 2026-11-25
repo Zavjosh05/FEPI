@@ -1,0 +1,46 @@
+{% extends "dictamen/pdf/_base.html" %}
+{% block cuerpo %}
+<h2>I. Objeto</h2>
+<p>{{ conf.definicion }} {% if exp.es_refrendo %}Al tratarse de un refrendo, las reglas piden un nuevo dictamen jurídico aunque la documentación legal obre en PROBOSQUE (CC 10.1 fr. IV).{% endif %}</p>
+
+<h2>II. Revisión de la documentación legal</h2>
+<table class="tabla">
+  <thead><tr><th style="width:12%">Clave</th><th>Documento</th><th style="width:15%">Expediente</th><th style="width:30%">Revisión jurídica</th></tr></thead>
+  <tbody>
+  {% for d in documentacion %}
+  <tr><td>{{ d.clave }}</td><td>{{ d.texto }}</td><td>{{ d.estado }}</td>
+      <td>{% if d.aplica == False %}<span class="gris">No aplica</span>{% elif d.valido %}<span class="ok">Válido</span>{% else %}<span class="no">No válido</span>{% endif %}{% if d.observacion %}<div class="nota">{{ d.observacion }}</div>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="4" class="gris">El expediente no tiene documentos legales.</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+<h2>III. Acreditación de la propiedad o legal posesión del predio</h2>
+{% if propiedad %}
+<table class="datos">
+  <tr><th>Documento que acredita</th><td>{{ propiedad.nombre_documento }}{% if propiedad.numero_documento %} · núm. {{ propiedad.numero_documento }}{% endif %}{% if propiedad.fecha_documento %} · de fecha {{ propiedad.fecha_documento|date:"d/m/Y" }}{% endif %}</td></tr>
+  <tr><th>A nombre de</th><td>{{ propiedad.titular_documento }} · {% if propiedad.titular_coincide %}<span class="ok">coincide con el titular de la solicitud</span>{% else %}<span class="no">no coincide con el titular ({{ exp.solicitante.nombre }})</span>{% endif %}</td></tr>
+  <tr><th>Superficie que ampara</th><td>{% if propiedad.superficie_documento_ha %}{{ propiedad.superficie_documento_ha|floatformat:4 }} ha{% else %}No la indica{% endif %} · superficie del predio a apoyar: {{ propiedad.superficie_predio_ha|floatformat:4|default:"—" }} ha · {% if propiedad.superficie_suficiente %}<span class="ok">la ampara</span>{% else %}<span class="no">no la ampara</span>{% endif %}</td></tr>
+  <tr><th>Vigencia</th><td>{% if propiedad.vigente_hasta %}Hasta el {{ propiedad.vigente_hasta|date:"d/m/Y" }} · {% endif %}{% if propiedad.vigente %}<span class="ok">vigente</span>{% else %}<span class="no">no vigente</span>{% endif %}</td></tr>
+  <tr><th>Conflictos de propiedad, posesión o representación</th><td>{% if propiedad.sin_conflicto %}<span class="ok">Sin evidencia de conflicto</span>{% else %}<span class="no">Con evidencia de conflicto (inelegible, 8.1.1.1 fr. VII)</span>{% endif %}</td></tr>
+  {% if propiedad.observaciones %}<tr><th>Observaciones</th><td>{{ propiedad.observaciones }}</td></tr>{% endif %}
+  <tr><th>Resultado</th><td>{% if propiedad.acreditada %}<span class="ok">Se acredita la propiedad o legal posesión del predio.</span>{% else %}<span class="no">No se acredita: {{ propiedad.motivos|join:"; " }}.</span>{% endif %}</td></tr>
+</table>
+<p class="nota">{{ fundamento_propiedad }}</p>
+{% else %}<p class="gris">Sin revisión de la propiedad.</p>{% endif %}
+
+<h2>IV. Cotejo con el Listado de Personas Beneficiarias Incumplidas y con los predios con procedimiento o sanción</h2>
+{% if dictamen.cotejo %}
+<table class="tabla">
+  <thead><tr><th>Catálogo</th><th>Registro</th><th>Coincide por</th><th>Motivo</th><th>Fundamento</th></tr></thead>
+  <tbody>{% for c in dictamen.cotejo %}<tr><td>{{ c.catalogo }}</td><td>{{ c.nombre }}</td><td>{{ c.coincide_por }}</td><td>{{ c.motivo }}</td><td>{{ c.fundamento }}</td></tr>{% endfor %}</tbody>
+</table>
+{% else %}<p>Sin coincidencias del titular en el Listado de Personas Beneficiarias Incumplidas ni del predio en los predios con procedimiento o sanción.</p>{% endif %}
+
+<h2>V. Dictamen</h2>
+<div class="resultado {% if dictamen.resultado != 'procedente' %}negativo{% endif %}">
+  <div>Con base en la revisión anterior, la solicitud {{ exp.folio }} se dictamina jurídicamente:</div>
+  <div class="r">{{ dictamen.get_resultado_display|upper }}</div>
+  <div style="margin-top:4px"><strong>Motivo:</strong> {{ dictamen.motivo }}</div>
+</div>
+<p class="nota">Fundamento: Reglas de Operación {{ exp.ejercicio.anio }} del programa {{ exp.ejercicio.programa.nombre }} (glosario, «Dictamen Jurídico»; requisitos de la documentación legal; supuestos de inelegibilidad). El dictamen se integra al listado preliminar que se presenta al Comité junto con el dictamen técnico.</p>
+{% endblock %}

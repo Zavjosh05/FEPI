@@ -14,15 +14,16 @@
     </div>
   </div>
   <div class="col-12 col-lg-6">
-    <div class="titulo-seccion">Documentos digitalizados</div>
+    <div class="titulo-seccion">Documentos del expediente</div>
     <div class="table-responsive">
-    <table class="table table-sm">
-      <thead class="table-light"><tr><th>Documento</th><th>Entregado</th><th>Registró</th></tr></thead>
+    <table class="table table-sm" id="tabla-documentos">
+      <thead class="table-light"><tr><th>Documento</th><th>Tipo</th><th>Fecha</th><th>Registró</th></tr></thead>
       <tbody>
       {% for d in exp.documentos.all %}
-      <tr><td><a href="{% url 'nucleo:documento' d.pk %}" target="_blank">{{ d.nombre|truncatechars:60 }}</a></td>
-          <td class="text-nowrap">{{ d.fecha_entrega|date:"d/m/Y H:i" }}</td><td class="small">{{ d.registrado_por }}</td></tr>
-      {% empty %}<tr><td colspan="3" class="text-secondary">Sin documentos digitalizados.</td></tr>{% endfor %}
+      <tr{% if d.tipo == "dictamen" %} class="table-success" data-prueba="documento-dictamen"{% endif %}><td><a href="{% url 'nucleo:documento' d.pk %}" target="_blank">{{ d.nombre|truncatechars:70 }}</a></td>
+          <td class="small">{% if d.tipo == "dictamen" %}<strong>Dictamen</strong>{% else %}{{ d.get_tipo_display }}{% endif %}</td>
+          <td class="text-nowrap">{{ d.fecha_entrega|date:"d/m/Y H:i" }}</td><td class="small">{{ d.registrado_por }}<div class="text-secondary">{{ d.unidad|default:"" }}</div></td></tr>
+      {% empty %}<tr><td colspan="4" class="text-secondary">Sin documentos.</td></tr>{% endfor %}
       </tbody>
     </table>
     </div>

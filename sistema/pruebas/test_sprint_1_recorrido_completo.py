@@ -18,7 +18,7 @@ from nucleo.models import Municipio, TransicionNoPermitida, bandeja
 from recepcion import servicios as recepcion
 from recepcion.models import EstadoRevision
 
-from .fixtures_m2 import despues_de, documento_sesion, fecha_sesion
+from .fixtures_m2 import despues_de, documento_sesion, fecha_sesion, propiedad_en_regla
 
 pytestmark = pytest.mark.django_db
 
@@ -70,7 +70,9 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
 
     # --- M1.4 Flujo alterno A: aviso de faltantes, notificación y reenvío (HU-1.4) ----------------
     plano.refresh_from_db()
-    aviso = recepcion.validar_expediente(direccion, exp, [plano.pk], "El plano no trae coordenadas")
+    aviso = recepcion.validar_expediente(direccion, exp, [plano.pk], "Un faltante",
+                                         observaciones_requisitos={plano.pk: "El plano no trae coordenadas"})
+    assert aviso.observaciones_requisitos.get(revision=plano).observacion == "El plano no trae coordenadas"
     exp.refresh_from_db()
     assert exp.estado.clave == "faltantes" and aviso.fecha_limite
     assert en_bandeja_de(exp, usuarios) == {"del_amecameca"}        # regresa a la Delegación
@@ -86,11 +88,13 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
     assert en_bandeja_de(exp, usuarios) == {"dir_drff", "juridica"}
     with pytest.raises((PermissionDenied, TransicionNoPermitida)):
         exp.cambiar_estado("no_factible", direccion, "Sin pasar por el Comité")
-    tecnico.dictaminar(direccion, exp, "factible", "Reforestación con densidad suficiente")
+    dt = tecnico.dictaminar(direccion, exp, "factible", "Reforestación con densidad suficiente")
+    assert dt.documento.expediente == exp and dt.folio.startswith("DT-")       # documento del dictamen adjunto
     exp.refresh_from_db()
     assert exp.estado.clave == "validada"                           # falta el jurídico
     assert en_bandeja_de(exp, usuarios) == {"juridica"}            # la Dirección ya dictaminó
-    juridico.dictaminar(jur, exp, "procedente", "Documentación legal vigente")
+    dj = juridico.dictaminar(jur, exp, "procedente", "Documentación legal vigente", propiedad=propiedad_en_regla(exp))
+    assert dj.propiedad.acreditada and dj.documento.expediente == exp and dj.folio.startswith("DJ-")
     exp.refresh_from_db()
     assert exp.estado.clave == "dictaminada"
     assert en_bandeja_de(exp, usuarios) == {"comite"}              # relevo a la Secretaría Técnica
@@ -114,7 +118,8 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
                                 "Quórum\nCasos de seguimiento")
     sesiones.agregar_documento(comite, seg, documento_sesion("casos.pdf"), "Casos")
     sesiones.enviar_convocatoria(comite, seg)
-    acuerdo = seguimiento.registrar_acuerdo(comite, seg, "caso_fortuito", "Atender el aviso de siniestro", [exp])
+    acuerdo = seguimiento.registrar_acuerdo(comite, seg, "caso_fortuito", "Atender el aviso de siniestro", [exp],
+                                            causa="Aviso de siniestro de la Delegación")
     assert acuerdo in seguimiento.acuerdos_pendientes(acuerdo.unidad_responsable)
     responsable = next(u for u in usuarios.values() if u.unidad_id == acuerdo.unidad_responsable_id)
     seguimiento.cumplir(responsable, acuerdo, "Atendido")
@@ -127,3 +132,9 @@ def test_sprint_1_una_solicitud_recorre_recepcion_validacion_dictamenes_y_aproba
                        "enviada_direccion", "faltantes", "enviada_direccion", "validada", "dictaminada", "aprobada"]
     assert all(e.usuario_id and e.fecha_hora for e in exp.eventos.all())
     assert exp.acuses.count() >= 5 and all(a.archivo for a in exp.acuses.all())
+    assert exp.documentos.filter(tipo="dictamen").count() == 2
+
+    # --- Trazabilidad: cada unidad dejó su registro en el historial de la base de datos -----------
+    from nucleo.trazabilidad import historial_expediente
+    quienes = {f["usuario"].username for f in historial_expediente(exp) if f["usuario"]}
+    assert {"del_amecameca", "dir_drff", "juridica", "comite"} <= quienes

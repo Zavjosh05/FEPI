@@ -1,18 +1,40 @@
-"""HU-2.4 · Sesiones de seguimiento: acuerdos tipificados con los expedientes a los que aplican y el área
-que debe cumplirlos; instrucción de pago por ministración (PSAHEM) y validación de reportes por periodo (PEG).
+"""HU-2.4 · Reasignaciones e incidentes: en las sesiones de seguimiento el Comité acuerda la atención de cada
+incidente del ejercicio (desistimiento, cancelación, baja, sustitución, caso fortuito, suspensión, reintegro) y la
+reasignación del recurso liberado a la lista de espera. Cada acuerdo lleva su causa, los expedientes a los que aplica y el
+área que debe cumplirlo.
+
+Efectos (``datos/dictamen.json`` → ``tipos_acuerdo[].efecto``):
+- ``baja``: la persona beneficiaria sale de la Lista de Personas Beneficiarias (estado «baja») y su monto queda como
+  recurso liberado;
+- ``reasignacion``: entran a la Lista de Personas Beneficiarias las siguientes de la lista de espera, **en su orden**
+  (lugar del acta), sin rebasar el recurso liberado que aún no se reasigna;
+- ``sustitucion``: las dos cosas en un solo acuerdo (sale la persona beneficiaria y entra la siguiente de la lista);
+- ``registro``: solo deja la constancia (caso fortuito, suspensión, reintegro, otro; en PSAHEM la instrucción de pago a
+  la Fiduciaria por ministración y en PEG la validación de los reportes por periodo).
+Cada salida y cada entrada queda en ``MovimientoListado`` (con su historial) y en la bitácora del expediente.
 
 Punto de conexión con los módulos M3–M6: ``RECEPTORES`` (tipo de acuerdo -> funciones). Por ahora
 ningún módulo se registra, así que cumplir un acuerdo solo deja la constancia; cuando existan pagos
 (M5) o seguimiento (M6), sus apps agregan aquí la función que ejecuta el acuerdo.
 """
+from decimal import Decimal
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from nucleo.models import Evento, TipoUnidad, Unidad
+from nucleo.templatetags.moneda import formato_moneda
+from nucleo.trazabilidad import registra_usuario
 
 from .comun import datos_dictamen, exigir_unidad
-from .models import Acuerdo, EstadoAcuerdo, EstadoSesion, TipoSesion
+from .models import (
+    Acuerdo, EstadoAcuerdo, EstadoSesion, MovimientoListado, ResolucionSesion, ResultadoListado, TipoMovimiento,
+    TipoSesion,
+)
+
+CERO = Decimal("0")
 
 RECEPTORES = {}  # {"instruccion_pago": [funcion(acuerdo)], ...}
 
@@ -33,8 +55,70 @@ def unidad_sugerida(clave_tipo):
     return Unidad.objects.filter(clave=t.get("unidad")).first() if t else None
 
 
+def efecto(clave_tipo):
+    t = tipo_acuerdo(clave_tipo)
+    return (t or {}).get("efecto", "registro")
+
+
+# ----------------------------------------------------------------------------- listas y recurso
+def monto_aprobado(expediente):
+    """Monto con el que el expediente está (o estaría) en los listados del acta de aprobación."""
+    r = (ResolucionSesion.objects.filter(expediente=expediente, sesion__tipo=TipoSesion.APROBACION,
+                                         sesion__estado=EstadoSesion.CELEBRADA)
+         .order_by("-sesion__fecha_hora", "-pk").first())
+    return r.monto if r is not None else None
+
+
+def lista_de_espera(ejercicio):
+    """Solicitudes que siguen en lista de espera, en su orden: [{"expediente", "lugar", "monto", "sesion"}]."""
+    resoluciones = (ResolucionSesion.objects.filter(
+        sesion__ejercicio=ejercicio, sesion__tipo=TipoSesion.APROBACION, sesion__estado=EstadoSesion.CELEBRADA,
+        resultado=ResultadoListado.LISTA_ESPERA, expediente__estado__clave="lista_espera")
+        .select_related("sesion", "expediente__solicitante", "expediente__predio__municipio", "expediente__delegacion")
+        .order_by("sesion__fecha_hora", "orden", "pk"))
+    vistos, lista = set(), []
+    for r in resoluciones:
+        if r.expediente_id in vistos:
+            continue
+        vistos.add(r.expediente_id)
+        lista.append({"expediente": r.expediente, "lugar": r.orden, "monto": r.monto, "sesion": r.sesion})
+    return lista
+
+
+def recurso_liberado(ejercicio):
+    """Recurso liberado por las bajas del ejercicio que aún no se reasigna (puede ser 0)."""
+    movs = MovimientoListado.objects.filter(acuerdo__sesion__ejercicio=ejercicio)
+    salio = movs.filter(movimiento=TipoMovimiento.SALE).aggregate(t=Sum("monto"))["t"] or CERO
+    entro = movs.filter(movimiento=TipoMovimiento.ENTRA).aggregate(t=Sum("monto"))["t"] or CERO
+    return salio - entro
+
+
+def _revisar_entradas(ejercicio, entran, liberado_aqui):
+    """Las que entran deben ser las primeras de la lista de espera, en su orden, y caber en el recurso liberado."""
+    lista = lista_de_espera(ejercicio)
+    lugar = {x["expediente"].pk: x for x in lista}
+    fuera = [e.folio for e in entran if e.pk not in lugar]
+    if fuera:
+        raise ValidationError("Solo entran solicitudes que están en la lista de espera del acta: " + ", ".join(fuera) + ".")
+    siguientes = lista[:len(entran)]
+    if {x["expediente"].pk for x in siguientes} != {e.pk for e in entran}:
+        primeras = ", ".join(f"{x['expediente'].folio} (lugar {x['lugar']})" for x in siguientes)
+        raise ValidationError(f"La reasignación sigue el orden de la lista de espera: corresponden {primeras}.")
+    montos = [lugar[e.pk]["monto"] for e in entran]
+    disponible = recurso_liberado(ejercicio) + liberado_aqui
+    if all(m is not None for m in montos):
+        requerido = sum(montos, CERO)
+        if requerido > disponible:
+            raise ValidationError(f"El recurso liberado sin reasignar ({formato_moneda(disponible)}) no alcanza para "
+                                  f"{formato_moneda(requerido)}.")
+    return [(e, lugar[e.pk]) for e in entran]
+
+
+# ----------------------------------------------------------------------------- acuerdos
+@registra_usuario
 def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_responsable=None, ministracion=None,
-                      periodo=""):
+                      periodo="", causa=""):
+    """Registra el acuerdo y aplica su efecto en los listados (baja, reasignación o sustitución)."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
     if sesion.tipo != TipoSesion.SEGUIMIENTO:
         raise ValidationError("Los acuerdos de seguimiento se toman en una sesión de seguimiento.")
@@ -66,17 +150,62 @@ def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_re
         raise ValidationError("La validación de reportes se da por periodo: indique cuál.")
     if not (descripcion or "").strip():
         raise ValidationError("Escriba el texto del acuerdo.")
+    causa = (causa or "").strip()
+    if definicion.get("incidente") and not causa:
+        raise ValidationError("Indique la causa del incidente (escrito de desistimiento, dictamen, aviso de la Delegación…).")
+
+    accion = efecto(tipo)
+    salen, entran = [], []
+    if accion in ("baja", "sustitucion"):
+        salen = [e for e in expedientes if e.estado.clave == "aprobada"]
+    if accion in ("reasignacion", "sustitucion"):
+        entran = [e for e in expedientes if e.estado.clave == "lista_espera"]
+    if accion in ("baja", "reasignacion", "sustitucion"):
+        otros = [f"{e.folio} («{e.estado}»)" for e in expedientes if e not in salen and e not in entran]
+        if otros:
+            esperado = {"baja": "personas beneficiarias aprobadas",
+                        "reasignacion": "solicitudes de la lista de espera",
+                        "sustitucion": "la persona beneficiaria que sale y la solicitud de la lista de espera que entra"}[accion]
+            raise ValidationError(f"Este acuerdo aplica a {esperado}: " + ", ".join(otros) + ".")
+    if accion == "sustitucion" and (not salen or not entran):
+        raise ValidationError("En una sustitución sale al menos una persona beneficiaria y entra al menos una solicitud "
+                              "de la lista de espera.")
+    montos_salen = [monto_aprobado(e) for e in salen]
+    liberado = sum((m for m in montos_salen if m is not None), CERO) if salen else None
+    entradas = _revisar_entradas(sesion.ejercicio, entran, liberado or CERO) if entran else []
+    reasignado = sum((x["monto"] for _, x in entradas if x["monto"] is not None), CERO) if entradas else None
+
     with transaction.atomic():
         n = sesion.acuerdos.count() + 1
         acuerdo = Acuerdo.objects.create(
             sesion=sesion, numero=f"{sesion.numero}/{n:03d}", tipo=tipo, descripcion=descripcion.strip(),
             unidad_responsable=unidad_responsable, ministracion=ministracion or None, periodo=(periodo or "").strip(),
+            causa=causa, monto_liberado=liberado, monto_reasignado=reasignado,
         )
         acuerdo.expedientes.set(expedientes)
         for e in expedientes:
             Evento.registrar(e, usuario, "acuerdo_comite",
                              f"Acuerdo {acuerdo.numero} ({definicion['nombre']}): {acuerdo.descripcion}. "
-                             f"Debe cumplirlo: {unidad_responsable.nombre}.", datos={"acuerdo": acuerdo.pk})
+                             f"Debe cumplirlo: {unidad_responsable.nombre}." + (f" Causa: {causa}." if causa else ""),
+                             datos={"acuerdo": acuerdo.pk})
+        for e, monto in zip(salen, montos_salen):
+            anterior = e.estado.clave
+            e.cambiar_estado("baja", usuario, motivo=causa or descripcion, tipo_evento="baja_comite",
+                             descripcion=f"Acuerdo {acuerdo.numero}: sale de la Lista de Personas Beneficiarias "
+                                         f"({definicion['nombre'].split(' (')[0].lower()})"
+                                         + (f"; libera {formato_moneda(monto)}" if monto is not None else "") + ".",
+                             datos={"acuerdo": acuerdo.pk})
+            MovimientoListado.objects.create(acuerdo=acuerdo, expediente=e, movimiento=TipoMovimiento.SALE,
+                                             estado_anterior=anterior, estado_nuevo="baja", monto=monto, usuario=usuario)
+        for e, x in entradas:
+            e.cambiar_estado("aprobada", usuario, tipo_evento="reasignacion_comite",
+                             descripcion=f"Acuerdo {acuerdo.numero}: entra a la Lista de Personas Beneficiarias desde el "
+                                         f"lugar {x['lugar']} de la lista de espera"
+                                         + (f" con {formato_moneda(x['monto'])}" if x["monto"] is not None else "") + ".",
+                             datos={"acuerdo": acuerdo.pk, "lugar": x["lugar"]})
+            MovimientoListado.objects.create(acuerdo=acuerdo, expediente=e, movimiento=TipoMovimiento.ENTRA,
+                                             estado_anterior="lista_espera", estado_nuevo="aprobada",
+                                             lugar_lista_espera=x["lugar"], monto=x["monto"], usuario=usuario)
     return acuerdo
 
 
@@ -85,6 +214,7 @@ def acuerdos_pendientes(unidad):
             .select_related("sesion__ejercicio__programa").prefetch_related("expedientes"))
 
 
+@registra_usuario
 def cumplir(usuario, acuerdo, observaciones=""):
     """El área responsable marca el acuerdo como cumplido; se llama a los módulos registrados en RECEPTORES."""
     if usuario.unidad_id != acuerdo.unidad_responsable_id:
@@ -105,6 +235,7 @@ def cumplir(usuario, acuerdo, observaciones=""):
     return acuerdo
 
 
+@registra_usuario
 def cerrar_sesion(usuario, sesion, observaciones="", momento=None):
     """Cierra la sesión de seguimiento; no antes de su fecha y hora (`momento`: solo servicios, pruebas y demo)."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
@@ -121,7 +252,7 @@ def cerrar_sesion(usuario, sesion, observaciones="", momento=None):
     return sesion
 
 
-# ----------------------------------------------------------------------------- criterio 2
+# ----------------------------------------------------------------------------- PSAHEM y PEG
 def ministraciones_sin_instruccion(expediente):
     """PSAHEM: ministraciones del programa que aún no tienen instrucción de pago a la Fiduciaria."""
     numeros = sorted(set(expediente.ejercicio.ministraciones.values_list("numero", flat=True)))

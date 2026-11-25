@@ -8,8 +8,8 @@ hallazgo.
 
 | Fuente | Qué trae | Para qué sirve |
 | --- | --- | --- |
-| **Demostración** (`cargar_demo`, se carga sola al levantar el sistema) | Usuarios de cada unidad; doce solicitudes de Capturando Carbono 2026 detenidas en cada paso del trámite; una sesión de aprobación con acta; una sesión de seguimiento con tres acuerdos; una persona en el Listado de Incumplidas | Ver cada pantalla con datos y continuar trámites a medias sin capturar desde cero |
-| **Pruebas automáticas** (`sistema/pruebas/`) | 129 pruebas que crean sus propios datos, entre ellas un recorrido completo por servicios y nueve recorridos con el navegador | Comprobar el sistema sin intervención (Guía de inicio, sección 1.8) |
+| **Demostración** (`cargar_demo`, se carga sola al levantar el sistema) | Usuarios de cada unidad; doce solicitudes de Capturando Carbono 2026 detenidas en cada paso del trámite; una sesión de aprobación con acta; una sesión de seguimiento con cuatro acuerdos (un desistimiento y su reasignación); un dictamen jurídico con la propiedad no acreditada; una persona en el Listado de Incumplidas | Ver cada pantalla con datos y continuar trámites a medias sin capturar desde cero |
+| **Pruebas automáticas** (`sistema/pruebas/`) | 155 pruebas que crean sus propios datos, entre ellas un recorrido completo por servicios y nueve recorridos con el navegador | Comprobar el sistema sin intervención (Guía de inicio, sección 1.8) |
 | **Esta carpeta** (`datos_prueba/sprint_1/`) | Polígonos para subir, documentos PDF de ejemplo y fichas de solicitudes | Probar a mano lo que la demostración no permite: subir archivos y capturar solicitudes nuevas con resultados conocidos |
 
 Antes de esta carpeta, el proyecto no tenía archivos para que una persona probara la carga de polígonos y documentos:
@@ -46,6 +46,11 @@ pantallas:
 - La persona de la ficha G aparece en el cotejo.
 - Un PDF de esta carpeta se acepta como requisito entregado.
 
+**Actualizada el 23 de noviembre de 2026** con las observaciones del profesor (escenarios A6 a A10, B1 a B2, G2, I y
+K1b a K4): observación de cada faltante, documento de los dictámenes, propiedad o legal posesión, candidatos y
+beneficiarios, reasignaciones e incidentes, trazabilidad y página de acceso no permitido. Las pruebas automáticas y
+los recorridos con navegador del sistema cubren esos mismos pasos.
+
 ## 2. Antes de empezar
 
 1. Levanta el sistema como dice la [Guía de inicio](../../GUIA_DE_INICIO.md). Para partir de la demostración limpia:
@@ -72,10 +77,11 @@ Ficha **A** de `fichas_solicitudes.csv` (Teresa Aguilar Montes, Predio Las Palom
 | A3 | `del_amecameca` | Antes de terminar A2, intenta **Enviar expediente digital a la Dirección** | No deja: dice qué requisitos faltan por revisar |
 | A4 | `del_amecameca` | Pestaña **Ubicación**: sube `01_amecameca_12ha.geojson`, «Personal de la Delegación», tu nombre y la fecha. **Registrar polígono** | Polígono vigente de 12 ha, «Dentro del municipio», primer renglón del historial |
 | A5 | `del_amecameca` | Con todo revisado, **Enviar expediente digital a la Dirección** | Acuse de envío; el expediente sale de «Por atender» y queda «En revisión de la Dirección» |
-| A6 | `dir_drff` | Abre el expediente, pestaña **Validación**, **Abrir pantalla de validación**. No marques faltantes. **Validar expediente** | Estado «Validado · en dictamen» con constancia en PDF |
-| A7 | `dir_drff` | Pestaña **Dictámenes**, **Elaborar dictamen técnico**. Revisa el análisis cartográfico, marca **Cumple** en los criterios, **Factible**, superficie factible 12. **Registrar dictamen técnico** | El análisis dice 12 ha, dentro del rango de 1 a 200 ha y del municipio, sin traslapes. Queda el dictamen con su acuse |
-| A8 | `juridica` | Mismo expediente, **Elaborar dictamen jurídico**: el cotejo no encuentra coincidencias. **Procedente**, un motivo. **Registrar dictamen jurídico** | Con los dos dictámenes, el estado pasa a «Dictaminada» y el expediente aparece en la bandeja de `comite` |
-| A9 | `dir_drff` | Menú **Listado preliminar**; **Exportar CSV (Excel)** | La solicitud aparece como factible y procedente; el CSV abre en Excel con acentos |
+| A6 | `dir_drff` | Abre el expediente, pestaña **Validación**, **Abrir pantalla de validación**. No marques faltantes. **Validar expediente** | Estado «Validado · en dictamen» con constancia en PDF (con el resultado de cada requisito) |
+| A7 | `dir_drff` | Pestaña **Dictámenes**, **Elaborar dictamen técnico**. Revisa el análisis cartográfico, marca **Cumple** en los criterios, **Factible**, superficie factible 12. **Registrar dictamen técnico** | El análisis dice 12 ha, dentro del rango de 1 a 200 ha y del municipio, sin traslapes. Se expide el documento «Dictamen técnico» `DT-CC-2026-NNNN` en PDF: el botón de la pestaña **Dictámenes** lo abre y aparece en **Documentos y acuses** como «Dictamen» |
+| A8 | `juridica` | Mismo expediente, **Elaborar dictamen jurídico**: el cotejo no encuentra coincidencias. Marca **Válido** cada documento legal; en **Propiedad o legal posesión**: «Escritura pública», número, a nombre de Teresa Aguilar Montes (Sí coincide), superficie que ampara 15 ha, «No hay evidencia» de conflicto. **Procedente**, un motivo. **Registrar dictamen jurídico** | Se expide el documento «Dictamen jurídico» `DJ-CC-2026-NNNN` con la propiedad acreditada. Con los dos dictámenes, el estado pasa a «Dictaminada» y el expediente aparece en la bandeja de `comite` |
+| A9 | `dir_drff` | Menú **Listados › Listado preliminar**; **Exportar CSV (Excel)** | La solicitud aparece como factible y procedente; el CSV abre en Excel con acentos |
+| A10 | `dir_drff` | Menú **Listados › Candidatos** | La solicitud aparece en «Dictaminada · por llevar a la sesión de aprobación», con la propiedad «Acreditada» |
 
 La solicitud sigue en el escenario H (Comité).
 
@@ -86,8 +92,9 @@ revisión de la Dirección. Si prefieres una nueva, captura la ficha **B** y ll�
 
 | # | Entra como | Qué hace | Qué debe pasar |
 | --- | --- | --- | --- |
-| B1 | `dir_drff` | Pantalla de validación de La Cañada: marca un requisito como **Faltante** y escribe una observación. **Emitir aviso de faltantes** | Estado «Aviso de faltantes», con fecha límite a 5 días hábiles del aviso, sin contar fines de semana ni días inhábiles; el expediente regresa a la Delegación |
-| B2 | `del_amecameca` | Pestaña **Validación**: **Registrar notificación a la persona solicitante** | Fecha y hora de la notificación con su acuse |
+| B1 | `dir_drff` | Pantalla de validación de La Cañada: marca dos requisitos como **Faltante** y escribe la observación solo de uno. **Emitir aviso de faltantes** | No deja: la observación es obligatoria en cada faltante |
+| B1b | `dir_drff` | Escribe la observación del segundo (por ejemplo, «La identificación está vencida»). **Emitir aviso de faltantes** | Estado «Aviso de faltantes», con fecha límite a 5 días hábiles del aviso, sin contar fines de semana ni días inhábiles; el aviso en PDF y la pestaña **Validación** listan cada faltante con su observación; el expediente regresa a la Delegación |
+| B2 | `del_amecameca` | Pestaña **Validación**: **Registrar notificación a la persona solicitante** | Fecha y hora de la notificación con su acuse, que también lleva la observación de cada faltante. En **Requisitos**, cada faltante muestra «Observación de la Dirección» |
 | B3 | `del_amecameca` | Pestaña **Requisitos**: el requisito faltante, **Entregado** con un PDF de `documentos/`. Luego **Reenviar a la Dirección con los faltantes** | Regresa a «En revisión de la Dirección» |
 | B4 | `dir_drff` | Valida el expediente | «Validado · en dictamen» |
 
@@ -139,10 +146,22 @@ polígono vigente.
 | G1 | `juridica` | Menú **Incumplidas** | Rogelio Bautista Núñez (CURP `BANR600101HMCTXG09`) está en el Listado |
 | G2 | `del_valle` | Registra la ficha **G** (Villa de Allende), revisa los requisitos y envía | — |
 | G3 | `dir_drff` | Valida y registra el dictamen técnico **Factible** | — |
-| G4 | `juridica` | **Elaborar dictamen jurídico** | El cotejo automático encuentra a la persona en el Listado; **Procedente** no se puede registrar. Registra **No procedente** con su motivo |
+| G4 | `juridica` | **Elaborar dictamen jurídico** (marca los documentos y llena la propiedad como en A8) | El cotejo automático encuentra a la persona en el Listado; **Procedente** no se puede registrar. Registra **No procedente** con su motivo |
 | G5 | `juridica` | **Incumplidas**: inscribe a otra persona inventada con **Inscribir**; luego dala de **Baja** con un motivo | La baja no la borra: queda inactiva y con historial |
 
 La solicitud queda «Dictaminada» con el jurídico no procedente: el Comité la pondrá en la Lista de No factibles.
+
+### Escenario G2. Propiedad o legal posesión no acreditada
+
+Usa una solicitud que lleves hasta «Validado · en dictamen» (por ejemplo, la ficha **B**). La demostración trae otro
+caso: El Ocotal (`CC-2026-TOL-0009`), con la constancia de posesión vencida.
+
+| # | Entra como | Qué hace | Qué debe pasar |
+| --- | --- | --- | --- |
+| G2-1 | `juridica` | **Elaborar dictamen jurídico**: marca los documentos como válidos; en la propiedad, «Constancia de posesión», a nombre del titular, superficie que ampara **menor** que la del polígono y **Vigente hasta** una fecha pasada. **Procedente** | No deja: «no se acredita la propiedad…», con cada motivo (superficie y vigencia) |
+| G2-2 | `juridica` | Sin fecha de vigencia | Tampoco: la constancia de posesión pide su vigencia |
+| G2-3 | `juridica` | **No procedente** con su motivo | Se registra; en **Dictámenes** dice «Propiedad o posesión: … no acreditada» con los motivos, y el documento DJ-… lo explica en su sección III |
+| G2-4 | `juridica` | En otra solicitud, «Escritura pública» a nombre de **otra persona** («No» coincide) | No deja el dictamen procedente |
 
 ### Escenario H. Sesión de aprobación del Comité
 
@@ -157,13 +176,22 @@ Usa las solicitudes que dejaste «Dictaminadas» (A, y si los hiciste, E y G), m
 | H5 | `comite` | **Ajustar** una solicitud de lugar o de lista con un motivo | Se mueve y el motivo queda; una no factible no puede pasar a las listas de apoyo |
 | H6 | `comite` | **Registrar acta con los listados aprobados** | Acta en PDF con las tres listas y la autorización de publicación; cada expediente queda «Aprobada», «Lista de espera» o «No factible» |
 
-### Escenario I. Sesión de seguimiento y acuerdos
+### Escenario I. Reasignaciones e incidentes (sesión de seguimiento)
+
+Necesitas una sesión de aprobación con acta que deje solicitudes en la Lista de espera (escenario H4). La demostración
+ya trae el caso resuelto en la sesión SO-CC-2026-02: La Joya Alta desistió (baja, libera $10,000) y entró Las Trojes,
+primera de la lista de espera.
 
 | # | Entra como | Qué hace | Qué debe pasar |
 | --- | --- | --- | --- |
-| I1 | `comite` | **Nueva sesión de seguimiento** (con convocatoria, como en H3) y **Registrar acuerdo**: tipo «Otro», un texto, la solicitud del escenario A y el área «Dirección de Restauración y Fomento Forestal» | El acuerdo queda en la sesión |
-| I2 | `dir_drff` | Bandeja: el acuerdo aparece arriba. **Marcar cumplido** | Sale de su bandeja y queda «cumplido» en la sesión |
-| I3 | `dir_drff` y `juridica` | Bandeja | La demostración trae en la sesión SO-CC-2026-02 un acuerdo pendiente para cada una (caso fortuito y otro) y uno ya cumplido (reasignación) |
+| I1 | `comite` | **Nueva sesión de seguimiento** (con convocatoria, como en H3) | La sesión muestra la **lista de espera en su orden** y el **recurso liberado sin reasignar** ($0.00) |
+| I2 | `comite` | **Registrar acuerdo** tipo «Desistimiento», sin causa, con una persona beneficiaria | No deja: la causa del incidente es obligatoria |
+| I3 | `comite` | El mismo acuerdo con la causa «Escrito de desistimiento del …» | La persona sale de la lista (estado «Baja · recurso liberado»); el recurso liberado sube a su monto; aparece en **Movimientos** |
+| I4 | `comite` | Acuerdo «Reasignación» con la **segunda** de la lista de espera | No deja: la reasignación sigue el orden de la lista |
+| I5 | `comite` | Acuerdo «Reasignación» con la **primera** de la lista | Pasa a «Aprobada (persona beneficiaria)» si su monto cabe en el recurso liberado; si no cabe, el sistema lo dice |
+| I6 | cualquiera de la Dirección, la Unidad Jurídica o el Comité | Menú **Listados › Beneficiarios** | La reasignada aparece resaltada («Reasignación · acuerdo …») y la que desistió, en «Salieron de la lista» con su causa |
+| I7 | `dir_drff` | Bandeja: los acuerdos aparecen arriba. **Marcar cumplido** | Salen de su bandeja y quedan «cumplido» en la sesión |
+| I8 | `comite` | Acuerdo «Sustitución» con una persona beneficiaria y la siguiente de la lista | Las dos cosas en un solo acuerdo: una sale y la otra entra |
 
 La instrucción de pago a la Fiduciaria es de PSAHEM, que en esta versión no tiene reglas cargadas: no se puede
 simular en la demostración. La cubren las pruebas automáticas (`pruebas/test_hu_2_4.py` y su recorrido con
@@ -179,9 +207,11 @@ navegador).
 
 | # | Entra como | Qué hace | Qué debe pasar |
 | --- | --- | --- | --- |
-| K1 | cualquiera | Pestañas **Documentos y acuses** y **Bitácora** de la solicitud A | Cada paso de A1 a H6 aparece con fecha, hora y usuario; cada acuse abre su PDF |
+| K1 | cualquiera | Pestañas **Documentos y acuses** y **Bitácora** de la solicitud A | Cada paso de A1 a H6 aparece con fecha, hora y usuario; cada acuse abre su PDF; los dos dictámenes aparecen como «Dictamen» |
+| K1b | cualquiera | Pestaña **Trazabilidad** de la solicitud A; filtra por «Expediente» y por «Revisión de requisito» | Cada alta y cada cambio con el usuario y su unidad, fecha y hora, la tabla de historial y los campos que cambiaron (antes → después) |
 | K2 | `del_toluca` | Busca el folio de la solicitud A en la bandeja | No aparece: cada Delegación ve solo lo suyo |
 | K3 | `del_amecameca` | Abre una solicitud en «En revisión de la Dirección» | No ve los botones de validación: no le toca ese paso |
+| K4 | `del_amecameca` | Escribe en el navegador `/dictamen/listado/` | Página «Acceso no permitido» de PROBOSQUE, con el botón para volver a la bandeja |
 
 ### Escenario L. Calculadora forestal
 
