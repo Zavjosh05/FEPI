@@ -1,9 +1,19 @@
-# Guía de inicio (versión del sprint 1)
+# Guía de inicio (versión del sprint 2)
 
-Esta rama (`sprint-1`) guarda el proyecto tal como quedó al cerrar el **sprint 1** (14 de noviembre de 2026): la
-recepción de solicitudes, la validación, los dictámenes y las sesiones del Comité, con el programa Capturando
-Carbono, más la consulta de la masa forestal por año en la Calculadora. La versión completa, con las 26 historias,
-está en la rama `main`.
+Esta rama (`sprint-2`) guarda el proyecto tal como quedó al cerrar el **sprint 2** (16 de noviembre de 2026), con los
+ajustes por las observaciones del profesor del 23 de noviembre. Abarca:
+
+- **Lo del sprint 1:** la recepción de solicitudes, la validación, los dictámenes y las sesiones del Comité
+  (reasignaciones e incidentes incluidas).
+- **Publicación y contrato (módulo M3):** publicación de resultados con su página pública, modelos y elaboración del
+  contrato, firma, y Vale de Planta con la salida del vivero.
+- **Pagos (módulo M5):** solicitud de pago, pago de la ministración, remisión a la Fiduciaria y cheques de PSAHEM.
+- **Cuatro programas con reglas cargadas:** Capturando Carbono, Plantaciones Sustentables, Restauración
+  Hidrológico-Forestal y PSAHEM.
+- **Calculadora forestal:** la masa forestal por año, el balance entre dos años con su histograma y la capa de
+  incendios.
+
+Falta lo del sprint 3 (ejecución, seguimiento y cierre), que está en la rama `main` con las 26 historias.
 
 Lo que hace cada pantalla está en el [Manual de usuario](MANUAL_DE_USUARIO.md). Esta guía dice cómo ponerlo a
 funcionar:
@@ -61,7 +71,7 @@ Con Docker Desktop también funciona: los comandos de abajo se escriben igual en
 ```bash
 git clone https://github.com/Zavjosh05/FEPI.git
 cd FEPI
-git checkout sprint-1
+git checkout sprint-2
 ```
 
 En Windows con WSL, el repositorio puede quedar en una carpeta de Windows, por ejemplo
@@ -97,20 +107,29 @@ en un servidor real.
 
 | Usuario | Unidad | Qué hace en esta versión |
 | --- | --- | --- |
-| `del_amecameca` | Delegación Regional Forestal Amecameca | Registra solicitudes, revisa requisitos, levanta el polígono, envía a la Dirección y notifica |
-| `del_toluca`, `del_valle` | Delegaciones Toluca y Valle de Bravo | Lo mismo; cada Delegación ve solo lo suyo |
-| `dir_drff` | Dirección de Restauración y Fomento Forestal | Valida o avisa faltantes, dictamen técnico, listado preliminar y cumple acuerdos |
+| `del_amecameca`, `del_toluca`, `del_valle` | Delegaciones Regionales Forestales Amecameca, Toluca y Valle de Bravo | Registran solicitudes, revisan requisitos, levantan el polígono, notifican resultados y avisos de pago, recaban la firma del contrato, entregan el Vale de Planta, emiten el oficio de solicitud de pago y entregan los cheques; cada Delegación ve solo lo suyo |
+| `dir_drff` | Dirección de Restauración y Fomento Forestal | Valida o avisa faltantes, dictamen técnico, publica los listados, elabora y envía los contratos, solicita las ministraciones y cumple acuerdos (CC, MFS, PS, RHF y PSAHEM) |
 | `dir_dpf` | Dirección de Protección Forestal | Lo mismo para Guardabosques (sin reglas cargadas todavía) |
-| `juridica` | Unidad Jurídica | Dictamen jurídico y Listado de Personas Beneficiarias Incumplidas |
-| `comite` | Secretaría Técnica del Comité | Sesiones de aprobación y de seguimiento |
-| `fiduciaria` | Fiduciaria | Vería las instrucciones de pago que acuerda el Comité de PSAHEM; en esta versión PSAHEM no tiene reglas, así que la demostración no trae ninguna |
+| `juridica` | Unidad Jurídica | Dictamen jurídico, Listado de Personas Beneficiarias Incumplidas y validación de los modelos de contrato |
+| `comite` | Secretaría Técnica del Comité | Sesiones de aprobación y de seguimiento; en PSAHEM, solicita a la Fiduciaria el pago de las solicitudes aceptadas |
+| `finanzas` | Dirección de Administración, Finanzas y de Gestión Documental | Revisa las solicitudes de pago (acepta o devuelve) y registra los pagos |
+| `vivero` | Vivero (demostración) | Valida el Vale de Planta y registra la salida de planta |
+| `fiduciaria` | Fiduciaria | PSAHEM: emite el cheque de cada ministración y lo envía a la Delegación |
 | `admin` | Superusuario | Administración de catálogos en http://localhost:8080/admin/ |
 
-`finanzas` y `vivero` existen pero no tienen tareas en esta versión (llegan en el sprint 2). Para cambiar de unidad,
-sal con «Salir» y entra con otro usuario.
+Para cambiar de unidad, sal con «Salir» y entra con otro usuario. Cualquier persona, sin iniciar sesión, puede
+consultar los resultados publicados en http://localhost:8080/contrato/resultados/ (hay un enlace en la pantalla de
+entrada).
 
-**Fechas de la demostración.** En esta versión los datos de ejemplo se fechan el día en que se cargan, salvo
-algunos plazos que se arman hacia atrás para que haya casos vencidos.
+**Fechas de la demostración.** Los datos de ejemplo se cargan con un calendario simulado de la Convocatoria 2026:
+cada paso ocurre en la fecha que le toca (recepción en febrero, dictámenes en abril y mayo, sesiones del Comité,
+publicaciones y contratos hasta el **19 de noviembre de 2026**, la «fecha de corte»). Los plazos que corren desde
+entonces (firma del contrato, vigencia del Vale de Planta, cobro del cheque) se miden con el reloj real: según el día
+en que pruebes, algunos aparecerán vencidos, como en cualquier expediente real.
+Por eso los contratos que la demostración dejó por firmar el 19 de noviembre ya aparecen «Sin firma en plazo»: para probar una
+firma, una publicación de Plantaciones Sustentables o una reasignación con datos de hoy, la
+[secuencia de prueba del sprint 2](datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md) trae un script que los agrega (sección 2 de la
+secuencia).
 
 ### 1.5 Detener, volver a empezar y borrar
 
@@ -127,9 +146,22 @@ algunos plazos que se arman hacia atrás para que haya casos vencidos.
 tenías el sistema levantado con datos, usa `docker compose down -v` y `docker compose up --build` para que los dictámenes
 de ejemplo tengan su documento en PDF, la revisión de la propiedad y la reasignación.
 
-**Si en el mismo equipo usas también la versión de `main`:** las dos usan los mismos nombres de contenedores, de
-imágenes y de volúmenes. Al cambiar de una a otra, detén la que corre con `docker compose down -v` y levanta la otra
-con `--build`.
+**Si en el mismo equipo conviven varias ramas** (por ejemplo, `sprint-2` desplegada en su propia carpeta junto a
+`main` o `sprint-1`): el archivo `docker-compose.yml` fija el nombre de proyecto `probosque`, así que todas usarían los
+mismos contenedores y los mismos volúmenes, y chocarían. Para separarlas, da a cada rama su propio nombre de proyecto
+con `-p` en **todos** los comandos de Compose:
+
+```bash
+cd sistema
+docker compose -p probosque_s2 up --build          # levantar
+docker compose -p probosque_s2 logs -f web         # ver lo que pasa
+docker compose -p probosque_s2 down                # detener (con -v borra también la base y los archivos)
+```
+
+Con `-p` los volúmenes y la red se llaman `probosque_s2_…` y no se mezclan con los de otra rama. Lo que `-p` **no**
+separa es el puerto: todas publican el 8080, así que solo una puede estar levantada a la vez (o cambia el puerto como
+dice la sección 1.7). Las imágenes tampoco se separan (`probosque-sistema:0.1` y `probosque-sistema-pruebas:0.1`): al
+cambiar de rama, levanta con `--build`.
 
 ### 1.6 Configuración (opcional)
 
@@ -151,14 +183,18 @@ la base se crea: si la cambias después, borra la base con `docker compose down 
 
 ### 1.8 Pruebas automáticas (opcional)
 
-Desde `sistema/`, la corrida completa de esta versión (155 pruebas, unos 3 minutos, con Chromium para los
-recorridos):
+Desde `sistema/`, la corrida completa de esta versión (473 pruebas, con Chromium para los recorridos; unos
+6 minutos: 442 rápidas y 31 recorridos de navegador):
 
 ```bash
-docker compose --profile pruebas run --rm pruebas
+docker compose -p probosque_s2 --profile pruebas run --rm pruebas
 ```
 
-Al terminar, `docker compose down`. Las variantes están en [`sistema/README.md`](sistema/README.md), sección «Cómo
+Si una corrida anterior se interrumpió, puede quedar una base de pruebas a medias y la siguiente falla con «database
+… already exists»: corre `docker compose -p probosque_s2 down`, o agrega `--create-db` a `pytest`. Corre un solo comando
+de Docker a la vez: dos corridas simultáneas chocan en los nombres de las bases de prueba.
+
+Al terminar, `docker compose -p probosque_s2 down`. Las variantes están en [`sistema/README.md`](sistema/README.md), sección «Cómo
 probar».
 
 ---
@@ -170,8 +206,8 @@ La página ya está generada en el repositorio; no hace falta correr la calculad
 **Opción A, archivo único.** Abre [`docs/mapa_edomex.html`](docs/mapa_edomex.html) con doble clic. Trae todos los
 datos adentro y funciona sin servidor.
 
-**Opción B, sitio por partes** (`docs/calculadora/`, la versión de esta historia, que carga los datos conforme se
-consultan). Necesita servirse por HTTP. Con Python 3, desde la raíz del repositorio:
+**Opción B, sitio por partes** (`docs/calculadora/`, que carga los datos conforme se consultan; es la que trae el
+balance entre dos años con su histograma y la capa de incendios). Necesita servirse por HTTP. Con Python 3, desde la raíz del repositorio:
 
 ```bash
 python -m http.server 8766 --bind 127.0.0.1 --directory docs/calculadora
@@ -182,7 +218,7 @@ bibliotecas del mapa.
 
 **Volver a calcular** (opcional y pesado): requiere Python 3.13 y `pip install -r requirements.txt`; las
 instrucciones están en el [`README.md`](README.md), secciones «Instalación» y «Uso». Las pruebas de la página corren
-con `pytest pruebas/calculadora` (15 pruebas).
+con `pytest pruebas/calculadora` (43 pruebas: 15 de la masa por año, 13 del balance y 15 de los incendios).
 
 ---
 
@@ -191,11 +227,12 @@ con `pytest pruebas/calculadora` (15 pruebas).
 | Qué | Dónde |
 | --- | --- |
 | Manual de usuario de esta versión | [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md) |
-| Datos de prueba y secuencia para simular cada función | [`datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md`](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) |
-| Planeación del sprint 1 y tareas por persona | `entregas/sprint_1/planeacion/` |
-| Resumen del sprint 1 (PDF con diagramas y capturas) | `entregas/sprint_1/Resumen_sprint_1.pdf` |
-| Capturas de cada pantalla | `entregas/sprint_1/capturas/` |
+| Datos de prueba y secuencia para simular cada función del sprint 2 | [`datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md`](datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md) |
+| Los del sprint 1 (polígonos, documentos y fichas), que la secuencia del sprint 2 también usa | `datos_prueba/sprint_1/` |
+| Planeación del sprint 2 y tareas por persona | `entregas/sprint_2/planeacion/` |
+| Resumen del sprint 2 (PDF con diagramas y capturas) | `entregas/sprint_2/Resumen_sprint_2.pdf` |
+| Capturas de cada pantalla | `entregas/sprint_2/capturas/` (sprint 2) y `entregas/sprint_1/capturas/` (sprint 1) |
 | Detalle técnico, decisiones y pendientes con el cliente | [`sistema/README.md`](sistema/README.md) |
-| Reglas de Capturando Carbono, con numeral y línea de las Reglas de Operación | `sistema/reglas/CC.json` |
+| Reglas de cada programa, con numeral y línea de las Reglas de Operación | `sistema/reglas/CC.json`, `PS.json`, `RHF.json` y `PSA.json` |
 | Modelo de datos | `sistema/docs/modelo_datos.md` |
 | Avance y decisiones | `entregas/AVANCE.md`, `entregas/BITACORA.md` |

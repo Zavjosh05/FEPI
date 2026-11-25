@@ -1,25 +1,31 @@
-# Manual de usuario (versión del sprint 1)
+# Manual de usuario (versión del sprint 2)
 
-Este manual explica cómo usar el prototipo tal como quedó al cerrar el **sprint 1** (14 de noviembre de 2026), con los
+Este manual explica cómo usar el prototipo tal como quedó al cerrar el **sprint 2** (16 de noviembre de 2026), con los
 ajustes por las observaciones del profesor del 23 de noviembre (observación de cada faltante, documento de los
-dictámenes, propiedad del predio, candidatos y beneficiarios, reasignaciones e incidentes y trazabilidad). Para
-ponerlo a funcionar, sigue primero la [Guía de inicio](GUIA_DE_INICIO.md).
+dictámenes, propiedad del predio, candidatos y beneficiarios, reasignaciones e incidentes y trazabilidad), que también
+alcanzan a la publicación, el contrato y los pagos. Para ponerlo a funcionar, sigue primero la
+[Guía de inicio](GUIA_DE_INICIO.md).
 
 **Qué cubre esta versión**
 
-- **Sistema de programas**, para el programa **Capturando Carbono 2026**, el único con reglas cargadas en este
-  punto: desde que la persona solicitante entrega su solicitud en la Delegación hasta que el Comité aprueba los
-  listados y da seguimiento a sus acuerdos.
+- **Sistema de programas**, para cuatro programas con reglas cargadas: **Capturando Carbono** (CC), **Plantaciones
+  Sustentables** (PS), **Restauración Hidrológico-Forestal** (RHF) y **PSAHEM**; desde que la persona solicitante entrega su
+  solicitud en la Delegación hasta que recibe su pago.
   - Recepción (módulo M1): registro de la solicitud, revisión de requisitos, ubicación del predio y validación.
   - Dictamen y Comité (módulo M2): dictámenes técnico y jurídico (con su documento en PDF), listado preliminar,
     candidatos y beneficiarios, sesión de aprobación, y reasignaciones e incidentes en las sesiones de seguimiento.
-- **Calculadora forestal**: la masa forestal del Estado de México por año, de 2023 a 2025.
+  - Publicación y contrato (módulo M3): publicación de resultados y página pública, notificaciones por conducto de la
+    Delegación, modelos y elaboración del contrato, firma y Vale de Planta con la salida del vivero.
+  - Pagos (módulo M5): solicitud de pago con sus soportes, revisión y pago de la ministración, solicitud de pago a la
+    Fiduciaria y cheques (PSAHEM).
+- **Calculadora forestal**: la masa forestal del Estado de México por año (2023 a 2025), el balance entre dos años con su
+  histograma y la capa de incendios.
 
-Lo que sigue después de la aprobación (publicación, contrato, pagos, ejecución, verificación y cierre) llegó en los
-sprints 2 y 3 y está en la rama `main`.
+Lo que sigue después del pago (ejecución, verificación, seguimiento y cierre) llega en el sprint 3 y está en la rama
+`main`. Guardabosques (PEG) y Manejo Forestal Sustentable (MFS) todavía no tienen reglas cargadas.
 
 Las imágenes de este manual son capturas del propio sistema, tomadas por las pruebas automáticas
-(`entregas/sprint_1/capturas/`).
+(`entregas/sprint_1/capturas/` y `entregas/sprint_2/capturas/`).
 
 ---
 
@@ -54,13 +60,47 @@ stateDiagram-v2
     aprobada --> baja: desistimiento, cancelación, baja o sustitución
 ```
 
+Desde la aprobación, el trámite sigue así (sprint 2):
+
+```mermaid
+stateDiagram-v2
+    aprobada --> publicada: Dirección publica
+    publicada --> notificada: Delegación notifica
+    notificada --> contrato_elaborado: Dirección elabora
+    contrato_elaborado --> contrato_en_delegacion: Dirección envía
+    contrato_en_delegacion --> contratada: Delegación registra la firma
+    publicada --> sin_firma_en_plazo: venció el plazo de firma
+    sin_firma_en_plazo --> recurso_liberado: Dirección confirma la liberación
+    contratada --> vale_entregado: Delegación (PS y RHF)
+    vale_entregado --> planta_entregada: vivero surte el vale
+    planta_entregada --> ministracion_solicitada: Dirección solicita
+    contratada --> ministracion_solicitada: Dirección solicita
+    ministracion_solicitada --> contratada: Finanzas devuelve
+    ministracion_solicitada --> pagada: Finanzas paga (salvo PSAHEM)
+    ministracion_solicitada --> remitida_fiduciaria: Secretaría Técnica (PSAHEM)
+    remitida_fiduciaria --> cheque_emitido: Fiduciaria
+    cheque_emitido --> cheque_enviado: Fiduciaria envía
+    cheque_enviado --> cheque_entregado: Delegación entrega
+    contratada --> baja: acuerdo del Comité (antes de solicitar la primera ministración)
+```
+
 | Estado en pantalla | Quién lo atiende |
 | --- | --- |
 | Solicitud recibida · Aviso de faltantes | Delegación |
 | En revisión de la Dirección | Dirección del programa |
 | Validado · en dictamen | Dirección (dictamen técnico) y Unidad Jurídica (dictamen jurídico), al mismo tiempo |
 | Dictaminada | Secretaría Técnica del Comité |
-| Aprobada · Lista de espera · No factible | Siguen en el sprint 2 (publicación y contrato) |
+| Aprobada | Dirección (publica los resultados) |
+| Lista de espera · No factible | Nadie: esperan una reasignación del Comité o terminan |
+| Resultados publicados · Contrato en la Delegación | Delegación (notifica a la persona; recaba la firma) |
+| Persona beneficiaria notificada · Contrato elaborado | Dirección (elabora y envía el contrato) |
+| Sin firma en plazo | Dirección (confirma la liberación del recurso) |
+| Contrato firmado · Planta entregada · Ministración pagada · Cheque entregado | Dirección (solicita la ministración); la Delegación emite el oficio de pago |
+| Vale de Planta entregado | Vivero (surte el vale) |
+| Ministración solicitada | Administración y Finanzas; en PSAHEM, una solicitud aceptada espera a la Secretaría Técnica |
+| Remitida a la Fiduciaria · Cheque emitido | Fiduciaria |
+| Cheque en la Delegación | Delegación (entrega el cheque) |
+| Recurso liberado | Termina; su monto queda para reasignar |
 | Baja · recurso liberado | Termina el apoyo por un acuerdo del Comité; su recurso se reasigna a la lista de espera |
 | Solicitud desechada | Termina el trámite |
 
@@ -85,7 +125,7 @@ inicio; la contraseña de todos es `Probosque2026`.
 - **Buscar**, **Programa** y **Estado** filtran la lista. El folio abre el expediente.
 - Una Delegación ve solo sus expedientes; una Dirección, los de los programas que tiene a su cargo.
 - Arriba aparecen, si los hay, los **acuerdos del Comité** que le toca cumplir a tu unidad (sección 8).
-- El menú superior cambia según la unidad: el menú **Listados** tiene **Listado preliminar** (Dirección, Unidad
+- El menú superior cambia según la unidad y va agrupado por módulo (**Recepción**, **Dictamen y Comité**, **Publicación y contrato**, **Pagos**); en pantallas angostas queda colapsado. Cada unidad ve solo lo suyo: el menú **Listados** tiene **Listado preliminar** (Dirección, Unidad
   Jurídica y Secretaría Técnica), **Candidatos** y **Beneficiarios** (también la Delegación); la Unidad Jurídica ve
   **Incumplidas**; la Secretaría Técnica, **Sesiones del Comité**. Si abres una pantalla que no le toca a tu unidad,
   aparece **Acceso no permitido** con el botón para volver a la bandeja.
@@ -369,9 +409,10 @@ la Unidad Jurídica y la Secretaría Técnica), con su selector de programa y ej
 
 ![Pendiente en la bandeja de la Dirección](entregas/sprint_1/capturas/hu_2_4_02_pendiente_en_la_bandeja_de_la_direccion.png)
 
-En esta versión los acuerdos de pago y de reportes se registran y se cumplen, pero todavía no ejecutan nada en otros
-módulos: una instrucción de pago de PSAHEM llega a la bandeja de la Fiduciaria (`fiduciaria`), pero los pagos llegan en
-el sprint 2. Además, PSAHEM todavía no tiene reglas cargadas: ese caso solo lo cubren las pruebas automáticas.
+La **instrucción de pago** de PSAHEM es el soporte con el que la Dirección solicita cada ministración (sección 14.2): se
+registra como acuerdo de la sesión de seguimiento, **por ministración**. La validación de reportes (Guardabosques) deja la
+constancia, pero Guardabosques todavía no tiene reglas cargadas. Lo que pasa con la baja y la reasignación cuando ya hay
+publicación, contrato o pagos está en la sección 15.
 
 ---
 
@@ -396,9 +437,257 @@ el sprint 2. Además, PSAHEM todavía no tiene reglas cargadas: ese caso solo lo
 
 ---
 
-## 10. Datos de demostración para practicar
+## 10. Dirección: publicar los resultados y avisar a cada persona (HU-3.1)
 
-Al levantar el sistema se cargan solicitudes de Capturando Carbono 2026 en distintos pasos:
+Usuario de ejemplo: `dir_drff`. Cuando el acta del Comité autoriza la publicación, el expediente de cada persona
+beneficiaria sigue en «Aprobada» y pasa a la bandeja de la Dirección.
+
+1. En la bandeja aparece el panel **Listados autorizados por publicar** (también, en el expediente, el botón
+   **Publicar los resultados**, y en el menú **Publicación y contrato › Publicación**). Abre la sesión.
+2. La pantalla **Publicación de resultados** muestra los tres listados del acta (**Personas beneficiarias**, **Lista de
+   espera** y **No factibles**) con el lugar, el folio, el predio y el municipio. Solo el listado de personas
+   beneficiarias lleva el nombre; nunca se publican CURP, RFC ni documentos. Una persona que salió por un acuerdo del
+   Comité antes de publicar ya no aparece, y la que entró desde la lista de espera aparece como «Reasignación».
+3. Arriba dice la **fecha de la convocatoria**: las Reglas de Operación de CC, PS, RHF y PSAHEM no fijan fecha ni días
+   para publicar, por lo que la pantalla dice «Sin fecha en las reglas» y se registra la fecha y la hora reales.
+4. En **Dónde se publica** escribe los lugares (si lo dejas vacío: la página de PROBOSQUE, Oficinas Centrales y las
+   Delegaciones). Pulsa **Publicar los listados**.
+5. Queda la publicación con **fecha y hora**, quién la hizo y su **acuse** (`AC-…`). Cada persona beneficiaria pasa a
+   «Resultados publicados» y arranca el plazo de su firma. Abajo, **Avisos enviados a las Delegaciones**: un aviso por
+   solicitud, con su acuse; en Plantaciones Sustentables, además, la **Cita a firma del contrato** (5 días hábiles de la
+   Delegación desde la publicación).
+
+La Secretaría Técnica y la Unidad Jurídica consultan la misma pantalla. La publicación se hace una sola vez por sesión; una
+reasignación posterior se publica con el acta de la sesión de seguimiento (sección 15).
+
+![Listados autorizados por publicar](entregas/sprint_2/capturas/hu_3_1_02_listados_autorizados_por_publicar.png)
+
+![Publicada, con su acuse y sus avisos](entregas/sprint_2/capturas/hu_3_1_04_publicada_con_acuse_y_avisos_enviados.png)
+
+### Página pública de resultados
+
+Cualquier persona, sin iniciar sesión, entra por el enlace **Consulte los resultados publicados** de la pantalla de
+entrada (o a `/contrato/resultados/`). Elige el programa con **Ver listados**, consulta los tres listados y puede
+buscar un folio con **Buscar**. Solo existen los programas ya publicados.
+
+![Página pública con la búsqueda por folio](entregas/sprint_2/capturas/hu_3_1_13_pagina_publica_busqueda_por_folio.png)
+
+### Delegación: notificar a la persona
+
+Usuario de ejemplo: `del_toluca` (o la Delegación que atiende el expediente). El expediente «Resultados publicados» está
+en su bandeja, con el panel de notificaciones por entregar. Abre **Publicación y contrato › Notificaciones** (o el botón
+**Notificar a la persona beneficiaria** del expediente). En cada aviso despliega el registro de la entrega, elige el
+**Medio** (en persona, teléfono, correo…), la fecha y la hora (si no la pones, es ahora; no puede ser futura ni anterior al
+envío) y observaciones, y pulsa **Registrar notificación**. Queda la fecha y la hora de la notificación con su acuse; al
+notificar el resultado, el expediente pasa a «Persona beneficiaria notificada» y la Dirección puede elaborar el contrato. La
+pestaña **Contrato** del expediente guarda todos los avisos, con su envío y su notificación.
+
+![Notificaciones por entregar](entregas/sprint_2/capturas/hu_3_1_06_notificaciones_por_entregar_con_plazo_de_la_cita.png)
+
+---
+
+## 11. Contrato: modelos y elaboración (HU-3.2)
+
+### Modelos de contrato
+
+Menú **Publicación y contrato › Modelos** (Dirección y Unidad Jurídica). Las Reglas de Operación no traen el texto del
+Contrato de Adhesión ni del Convenio de Concertación (PSAHEM con fondos concurrentes), así que cada programa y ejercicio tiene
+su modelo, que **la Dirección registra y la Unidad Jurídica valida**:
+
+- **Plantilla base propia**: elige programa y ejercicio y pulsa **Crear plantilla base**. Es un texto de partida marcado
+  «BORRADOR – modelo por validar»: hay que quitarle la marca (**Cambiar el texto › Guardar versión nueva**) y validarlo
+  antes de usarlo. El texto lleva campos entre dobles llaves; la pantalla los lista y un campo desconocido se rechaza.
+- **Cambiar el texto de un modelo** siempre crea una versión nueva **por validar**, aunque la anterior esté validada; la
+  anterior se conserva y los contratos ya elaborados guardan la suya.
+- **Unidad Jurídica** (`juridica`): el panel **Modelos por validar** de su bandeja abre el modelo; elige **Validada** o
+  **Devuelta**, escribe observaciones y pulsa **Registrar la revisión**. Queda la fecha, la hora y quién la validó.
+
+![Revisión de la Unidad Jurídica](entregas/sprint_2/capturas/hu_3_2_06_revision_de_la_unidad_juridica.png)
+
+### Elaborar y enviar el contrato
+
+1. Con el expediente en «Persona beneficiaria notificada», la Dirección abre **Elaborar el contrato** (botón del
+   expediente, o **Publicación y contrato › Contratos**). La pantalla muestra los datos que llevará: persona, predio,
+   modalidad, superficie aprobada, monto y ministraciones.
+2. Si no hay un modelo validado del programa y ejercicio, lo dice y enlaza a **Modelos de contrato**: sin modelo validado
+   no se elabora (el servicio también lo impide). Con modelo, elígelo y pulsa **Elaborar el contrato**.
+3. Se genera el contrato en PDF, con folio `CTO-<programa>-<año>-NNNN` y huella SHA-256. Se puede **Rehacer el contrato**
+   mientras no se envíe.
+4. **Enviar a la Delegación** deja la **fecha y la hora del envío** y su acuse, y el expediente pasa a «Contrato en la
+   Delegación». La Delegación ve el PDF solo desde el envío.
+
+![Contrato elaborado](entregas/sprint_2/capturas/hu_3_2_09_contrato_elaborado.png)
+
+---
+
+## 12. Delegación: firma del contrato (HU-3.3)
+
+Usuario de ejemplo: `del_amecameca`. En la bandeja, el panel **Contratos por firmar** y, en el expediente, el botón
+**Registrar la firma del contrato** (también **Publicación y contrato › Firmas**).
+
+- La pantalla **Firma de contratos** muestra, de cada contrato, dos fechas: la **fecha programada de firma** y el
+  **vencimiento para liberar el recurso** (10 días hábiles), con los días hábiles que faltan.
+- En **Registrar la firma** indica quién firma (la persona o su representante), su nombre, la fecha y hora (por omisión,
+  ahora; ni futura ni anterior al envío del contrato) y sube el **contrato firmado digitalizado**.
+- **Verificación de firmas y sello**: una lista de puntos según el tipo de persona (persona física, jurídico colectiva o
+  núcleo agrario con Presidencia, Secretaría, Tesorería y sello). **Todos deben marcarse**; si no, el contrato no se recibe.
+- Al registrar queda la fecha y la hora de la firma, su acuse y el estado «Contrato firmado». Una firma posterior a la
+  fecha programada pero dentro del vencimiento es válida y queda marcada «Fuera de la fecha programada».
+- **Sin firma al vencer el plazo:** la revisión diaria de plazos lo **señala** («Sin firma en plazo · recurso por
+  liberar») en la bandeja de la Dirección y en **Firmas**. Una firma que llegue después ya no se recibe. **Liberar el recurso
+  no es automático:** la Dirección pulsa **Liberar el recurso** y escribe el motivo; el expediente queda en «Recurso liberado»,
+  con acuse, y el monto queda como recurso liberado para que el Comité lo reasigne a la lista de espera (sección 15).
+
+En MFS y Guardabosques la firma pide además su formalización propia (contrato de servicios técnicos con el RFN y carta
+compromiso; credencial entregada), pero esos dos programas todavía no tienen reglas cargadas.
+
+![Formulario de firma](entregas/sprint_2/capturas/hu_3_3_03_formulario_de_firma.png)
+
+![Contrato firmado, con fecha, hora y acuse](entregas/sprint_2/capturas/hu_3_3_05_contrato_firmado_con_fecha_hora_y_acuse.png)
+
+![Recurso liberado con su motivo](entregas/sprint_2/capturas/hu_3_3_09_recurso_liberado_con_motivo_y_acuse.png)
+
+---
+
+## 13. Vale de Planta y salida del vivero (HU-3.4)
+
+Solo en **Plantaciones Sustentables** y **Restauración Hidrológico-Forestal** (RFI modalidad uno no recibe planta; CC y
+PSAHEM no usan vale).
+
+### Delegación: entregar el vale
+
+En el panel **Contratos firmados por entregar su Vale de Planta** (o **Publicación y contrato › Vales**) abre el expediente
+y **Entregar el vale**:
+
+- La pantalla propone la **planta por hectárea** que fijan las reglas por la superficie aprobada. Captura la cantidad por
+  **especie**, el **vivero que entrega la planta** y, si el total no es el propuesto, el **motivo del ajuste**.
+- Dice la **vigencia**: en PS, 30 días naturales desde la entrega; en RHF, 15 días hábiles.
+- Al **Entregar el vale** queda su folio (`VP-<programa>-<año>-NNNN`), la fecha y la hora y el acuse, y el expediente pasa a
+  «Vale de Planta entregado».
+- **Antes de firmar el contrato** el vale puede entregarse bajo responsabilidad de la persona, con su **carta compromiso**
+  (archivo); al firmarse el contrato el expediente pasa a «Vale de Planta entregado».
+
+### Vivero: validar el vale y registrar la salida
+
+Usuario de ejemplo: `vivero`. En el menú **Planta** (o el panel **Vales de Planta vigentes por surtir**):
+
+1. Escribe el folio del vale y pulsa **Validar el vale**: solo es válido un vale vigente. Uno vencido dice «Vale vencido,
+   no válido» y no deja registrar salida.
+2. Elige la **especie** y la **cantidad (piezas)** (y, si quieres, fecha y hora) y pulsa **Registrar la salida**. Hay salidas
+   parciales; nunca se entrega más de lo autorizado por especie («no se entrega más de lo autorizado»). Cada salida deja su
+   acuse. Al completarse todas, el expediente pasa a «Planta entregada».
+
+### Vale vencido y reposición
+
+Un vale **vencido no es válido**. En **RHF** la persona puede pedir otro: la Delegación pulsa **Reponer el vale**; el vale
+nuevo solo cubre lo **no entregado** y pide confirmar que el vivero tiene planta disponible. En **PS** las Reglas no prevén
+la reposición: la pantalla lo dice, con la regla que cita, y no deja reponer (queda como duda para el cliente).
+
+![Emisión del vale con propuesta y vigencia](entregas/sprint_2/capturas/hu_3_4_02_emision_del_vale_con_propuesta_y_vigencia.png)
+
+![Salida parcial y exceso rechazado](entregas/sprint_2/capturas/hu_3_4_06_salida_parcial_y_exceso_rechazado.png)
+
+![Vale vencido: no es válido](entregas/sprint_2/capturas/hu_3_4_07_vale_vencido_no_es_valido.png)
+
+---
+
+## 14. Pagos: solicitud, pago y cheques (HU-5.1, 5.2 y 5.3)
+
+Cada solicitud tiene dos ministraciones (70 % y 30 %; en CC, un pago único de 100 % hasta 5 ha). Todo se ve en la pestaña
+**Pagos** del expediente y en el menú **Pagos**. En esta versión solo se puede pedir la **primera** ministración: la
+segunda pide la verificación en campo, que llega en el sprint 3.
+
+### 14.1 Delegación: oficio de solicitud de pago y comprobante (HU-5.1)
+
+Con el contrato firmado, el panel **Contratos firmados por emitir el oficio de solicitud de pago** (o el menú **Pagos**)
+lleva a la pestaña **Pagos**:
+
+- **Emitir el oficio** genera el oficio de la Delegación (`OFP-<programa>-<año>-NNNN`) con su acuse. El formato está marcado
+  «borrador»: las Reglas de Operación no traen el formato.
+- En CC, PS y RHF, sube el **comprobante de la cuenta bancaria** (PDF, JPG o PNG) y pulsa **Guardar**. PSAHEM paga con cheque
+  y no lo pide. Un cambio de cuenta es un comprobante nuevo (el último es el vigente).
+
+### 14.2 Dirección: solicitar la ministración (HU-5.1)
+
+El panel **Ministraciones por solicitar** (o el botón **Solicitar la ministración 1**) abre la pestaña **Pagos**, con la lista de
+**soportes** de la ministración: contrato firmado, oficio de la Delegación y comprobante de la cuenta; en PSAHEM, contrato o
+convenio, oficio, dictámenes y la **instrucción de pago del Comité Técnico** (un acuerdo de la sesión de seguimiento,
+sección 8). En PS y RHF con Vale de Planta, la solicitud se hace cuando el vivero ya surtió el vale («Planta entregada»). Cada
+soporte dice «Completo» o «Falta», qué falta y quién lo resuelve.
+
+Pulsa **Enviar la solicitud a Administración y Finanzas**. **Con un soporte faltante no se envía** y el sistema dice cuál. Al
+enviar queda la **fecha y la hora del envío**, el acuse, la copia de los soportes y el estado «Ministración solicitada».
+
+![Solicitud incompleta: dice qué falta](entregas/sprint_2/capturas/hu_5_1_05_solicitud_incompleta_no_se_envia_y_dice_que_falta.png)
+
+![Solicitud enviada, con fecha, hora y acuse](entregas/sprint_2/capturas/hu_5_1_07_solicitud_enviada_con_fecha_hora_y_acuse.png)
+
+### 14.3 Administración y Finanzas: revisar y pagar (HU-5.2)
+
+Usuario de ejemplo: `finanzas`. Menú **Pagos** (o los paneles **Solicitudes de pago por revisar** y **Solicitudes aceptadas
+por pagar**):
+
+1. **Aceptar la solicitud** (vuelve a comprobar los soportes y el importe) o **Devolver con observaciones** (obligatorias):
+   la solicitud regresa al área responsable, que la corrige y la reenvía; cada revisión se conserva.
+2. Solicitud aceptada (todos los programas menos PSAHEM): **Registrar el pago** con la **forma de pago** (transferencia), la
+   **referencia**, la **fecha** y el **importe**, que debe ser **igual al solicitado**. El pago queda asociado a su solicitud,
+   con su fecha y su acuse; el expediente pasa a «Ministración pagada» y a la bandeja de la Delegación llega el **aviso de
+   pago**, que notifica a la persona en **Notificaciones**.
+
+### 14.4 PSAHEM: solicitud de pago a la Fiduciaria (HU-5.2)
+
+En PSAHEM, tras aceptar, la solicitud espera a la **Secretaría Técnica** (`comite`), que pide a la Fiduciaria el pago en un
+máximo de **5 días hábiles** desde que el área envió la solicitud: menú **Pagos** (o el panel **Pagos por solicitar a la
+Fiduciaria**), **Solicitar el pago a la Fiduciaria**, con el oficio o referencia. Queda la **fecha y la hora de la remisión** y
+si fue «en plazo» o «fuera de plazo» (se acepta igual y queda señalada).
+
+### 14.5 Fiduciaria y Delegación: el cheque (HU-5.3)
+
+1. **Fiduciaria** (`fiduciaria`): menú **Cheques**. **Emitir el cheque**: número de cheque (único), importe igual al
+   solicitado y fecha de emisión; queda a nombre de la persona y de su ministración. Luego **Enviar el cheque a la Delegación**
+   (fecha, hora y acuse).
+2. **Delegación**: el cheque está **por entregar**. **Registrar la entrega del cheque**: quién recibe y la fecha y hora (por
+   omisión, ahora). Queda su acuse, el expediente pasa a «Cheque entregado» y la pantalla dice hasta cuándo debe cobrarlo (3
+   meses desde la entrega).
+3. En **Cheques**, la tabla **Entregados sin cobro** muestra cada vencimiento y su situación («en plazo», «por vencer» o
+   «vencido»); la Fiduciaria o la Delegación pueden **Registrar que fue cobrado**. La baja por cheque vencido es del sprint 3.
+
+![Pago registrado, asociado a su solicitud](entregas/sprint_2/capturas/hu_5_2_05_pago_registrado_asociado_a_su_solicitud_con_fecha_y_acuse.png)
+
+![Remisión a la Fiduciaria](entregas/sprint_2/capturas/hu_5_2_08_remision_a_la_fiduciaria_con_fecha_hora_y_acuse.png)
+
+![Cheque entregado, con su vencimiento](entregas/sprint_2/capturas/hu_5_3_05_cheque_entregado_con_fecha_hora_y_vencimiento_del_cobro.png)
+
+---
+
+## 15. Bajas y reasignaciones con contrato o pagos (HU-2.4 en M3 y M5)
+
+Las sesiones de seguimiento (sección 8) siguen funcionando después de publicar y mientras corre el contrato:
+
+- **Baja** (desistimiento, cancelación, baja o sustitución): procede en cualquier etapa **anterior a la primera ministración
+  solicitada** (aprobada, publicada, notificada, contrato elaborado o en la Delegación, sin firma en plazo, contratada, con vale o
+  con planta entregada). La persona queda en «Baja · recurso liberado» y su monto, como recurso liberado. **Dada de baja ya no
+  firma, no se le elabora contrato, no recibe ni se le surte vale, no se emite su oficio ni se solicita su ministración.**
+- **Con una ministración ya solicitada o pagada no hay baja:** el sistema la rechaza y pide el acuerdo de **reintegro**.
+- **Reasignación:** pasa a la siguiente de la lista de espera, en su orden y sin rebasar el recurso liberado. El recurso que la
+  Dirección libera por no firmar en plazo (sección 12) entra igual como recurso liberado y el Comité lo reasigna.
+- **Antes de publicar**, quien salió ya no aparece en la publicación y quien entró aparece como «Reasignación». **Después de
+  publicar**, al cerrar la sesión de seguimiento con reasignaciones su acta queda autorizada y la Dirección la publica con el
+  botón de la sección 10: la persona pasa a «Resultados publicados», recibe su aviso y corren sus plazos de firma.
+- La vista **Listados › Beneficiarios** sigue a la persona en todo el trámite (situación actual, fecha de publicación) y muestra
+  abajo las que salieron, con su causa.
+- La pestaña **Trazabilidad** de cada expediente incluye ahora los registros de M3 y M5 (publicación, modelo de contrato,
+  contrato, firma, vale, salida de planta, oficio, comprobante, solicitud, revisión, pago, remisión y cheque): cada alta o
+  cambio, con quién, cuándo y qué valores.
+
+---
+
+## 16. Datos de demostración para practicar
+
+Al levantar el sistema se cargan solicitudes de los cuatro programas con reglas, en distintos pasos. La demostración usa un
+calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de inicio, sección 1.4).
+
+**Capturando Carbono (recepción, dictamen y Comité)**
 
 | Para practicar | Entra como | Busca |
 | --- | --- | --- |
@@ -416,42 +705,93 @@ Al levantar el sistema se cargan solicitudes de Capturando Carbono 2026 en disti
 | Documentos de los dictámenes y trazabilidad | cualquiera que vea el expediente | Las Trojes, pestañas Documentos y acuses y Trazabilidad |
 | Una persona en el Listado de Incumplidas | `juridica` | Rogelio Bautista Núñez (Cerro de la Cruz, no factible) |
 
-Para empezar de cero con los mismos datos: `docker compose down -v` y `docker compose up --build` (Guía de inicio,
-sección 1.5).
+**Publicación, contrato y pagos (sprint 2)**
+
+| Para practicar | Entra como | Busca |
+| --- | --- | --- |
+| Publicar los listados autorizados (la demostración trae el acta de PSAHEM sin publicar; CC, PS y RHF ya se publicaron) | `dir_drff` | Panel «Listados autorizados por publicar» |
+| Notificar el resultado y la cita (PS) | `del_toluca` | Rancho La Huerta |
+| Un contrato por firmar cuyo plazo ya venció (la revisión de plazos lo señala «Sin firma en plazo») | `del_amecameca`, `dir_drff` | Plantación Los Pinos (PS) |
+| Contrato elaborado por enviar; otro por elaborar (sus plazos de firma también vencieron) | `dir_drff` | Barranca Honda y Ojo de Agua (RHF) |
+| Modelos de contrato por validar | `juridica` | Panel «Modelos por validar» (CC, PS y PSAHEM) |
+| Contratos firmados y un contrato sin firma en plazo, por liberar | `del_amecameca`, `dir_drff` | Mirador de los Pinos y Ladera Verde (firmados), Cañada Seca (sin firma), todos de PS |
+| Vale vigente con salidas parciales | `vivero` | Mirador de los Pinos (PS) y Arroyo Claro (RHF) |
+| Vale vencido: sin reposición en PS; con reposición en RHF | `del_toluca`, `del_valle` | Ladera Verde (PS) y Cerro Gordo (RHF) |
+| Contrato firmado sin oficio de pago | `del_toluca` | Predio El Paraíso (CC) |
+| Solicitud por enviar con todos sus soportes; una devuelta con observaciones | `dir_drff` | Predio Santa Cruz y Predio El Fresno (CC) |
+| Solicitudes enviadas por revisar, y otras ya pagadas | `finanzas` | Por revisar: Predio Las Palomas (CC), Plantación El Cedro (PS). Pagadas: Predio La Ciénega (CC), Plantación La Mesa (PS), Manantial Alto (RHF) |
+| PSAHEM en cada punto del pago | `finanzas`, `comite`, `fiduciaria`, `del_toluca` | Solicitud por revisar: Rancho El Pedregal y Ejido La Joya. Remitida a la Fiduciaria: Bosque Los Cedros. Cheque emitido: Paraje Las Ánimas. Enviado a la Delegación: Monte Alto. Entregados: Cerro del Venado y Loma Verde (este, por vencer sin cobro) |
+
+Los contratos que la demostración dejó por firmar el 19-nov (Plantación Los Pinos, Rancho La Huerta, Barranca Honda, Ojo de Agua) tienen plazo de 10 días hábiles: pasada la fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para probar la firma con datos de hoy, `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS (Guía de inicio y secuencia de prueba).
+
+Para empezar de cero con los mismos datos: `docker compose -p probosque_s2 down -v` y `docker compose -p probosque_s2 up
+--build` (Guía de inicio, sección 1.5). Los plazos que corren desde la fecha de corte se miden con el reloj real: según el
+día en que pruebes, un vale o un cheque aparecerá vencido.
 
 Para probar también la carga de archivos y capturar solicitudes nuevas con resultados conocidos, hay polígonos,
-documentos PDF y fichas de solicitudes en `datos_prueba/sprint_1/`. La
-[secuencia de prueba](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) dice paso a paso qué hacer con ellos y qué debe
-pasar.
+documentos PDF y fichas de solicitudes en `datos_prueba/sprint_1/`, y los documentos de contrato, firma y pagos en
+`datos_prueba/sprint_2/`. La [secuencia de prueba del sprint 2](datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md) dice paso a
+paso qué hacer, por usuario, desde la solicitud autorizada hasta el cheque entregado, y la del
+[sprint 1](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) lleva una solicitud hasta su autorización.
 
 ---
 
-## 11. Calculadora forestal: masa forestal por año
+## 17. Calculadora forestal
 
 Ábrela como dice la Guía de inicio, sección 2. Muestra la **superficie con cobertura arbórea** (hectáreas de bosque)
 dentro de la zona forestal del Estado de México, medida con imágenes Sentinel-2 de noviembre y diciembre de cada año.
 
 ![Calculadora: un año](entregas/sprint_1/capturas/hu_7_1_un_anio.png)
 
-- **Arriba a la derecha** se elige el modo:
+- **Arriba** se elige el modo y los años:
+  - **Comparar años**: elige **Desde** y **Hasta** (los años sin datos están marcados) y ve el bosque de cada uno, el cambio
+    neto, la pérdida por incendio, las otras pérdidas y la ganancia.
   - **Un año**: el bosque de ese año, su cambio desde el año anterior y la tendencia.
-  - **Comparar años**: dos años lado a lado, con las pérdidas por incendio, otras pérdidas y la ganancia.
-- **Las cifras de arriba**: bosque del año, cambio, pérdida por incendio, otras pérdidas, ganancia y tendencia.
 - **Evolución del bosque**: la gráfica de 2023 a 2025 y su tabla; «ver» abre ese año en el mapa.
-- **El mapa** tiene tres vistas: **Bosque**, **Tendencia por municipio** y **Año de pérdida**. **Buscar** encuentra un
-  municipio por nombre; se acerca y aleja con los botones + y −.
-- **Detalle**: toca un municipio en el mapa o en la tabla para ver su serie, su bosque por tipo (coníferas, encino,
-  mesófilo, selva baja, zonas semiáridas) y a qué pasaron sus otras pérdidas.
-- **Municipios**: la tabla ordenable de los 125 municipios, con su zona forestal, bosque, cambio y tendencia.
+- **Detalle**: toca un municipio en el mapa o en la tabla, o búscalo por nombre, para ver su serie, su bosque por tipo
+  (coníferas, encino, mesófilo, selva baja, zonas semiáridas) y a qué pasaron sus otras pérdidas.
+- **Municipios**: la tabla ordenable de los 125 municipios (o solo los que tienen bosque).
 - **Alcances**: qué mide y qué no, de dónde salen los datos y qué no se puede afirmar todavía.
 
+### Balance entre dos años con su histograma (HU-7.2)
+
+La sección **Balance del periodo** del par de años elegido trae, para el **Estado** y para **cada municipio** (elígelo en el
+mapa o en la tabla), la **pérdida por incendio**, las **otras pérdidas**, la **ganancia** y el **cambio neto** en hectáreas:
+
+- **Pérdidas y ganancia en hectáreas**: cuatro barras que parten del bosque inicial; la última es el cambio neto.
+- **Municipios según su cambio neto**: el **histograma** del periodo, con el número de municipios por intervalo de cambio
+  neto (% de su bosque inicial). Solo entran los municipios con 500 ha o más de bosque inicial; la nota dice cuántos pierden,
+  cuántos ganan y cuántos quedan fuera.
+- **Ver como tabla** muestra los mismos números de cada gráfica.
+
+![Balance del periodo del Estado, con su histograma](entregas/sprint_2/capturas/hu_7_2_balance_estado.png)
+
+### Capa de incendios (HU-7.3)
+
+- La vista **Incendios** del mapa dibuja un círculo por cada incendio del periodo (su centroide; el área es proporcional a las
+  hectáreas quemadas dentro del bosque). Toca uno para ver su clave, fecha, municipio y hectáreas.
+- La sección **Incendios del periodo** resume cuántos son, las hectáreas que reporta CONAFOR y las que tienen dNBR ≥ 0.27,
+  dentro del bosque y sin copa al cierre. **Ver los incendios y su tabla** abre la **pérdida por incendio por año** (Estado y
+  municipio) y la tabla ordenable de cada incendio (fecha, municipio, hectáreas reportadas, quemadas en bosque, sin copa y
+  clave).
+- **Un año que CONAFOR todavía no publica** (hoy, 2025) queda señalado en la página: «CONAFOR aún no publica los incendios de
+  2025». La pérdida por incendio de ese periodo aparece con una marca de parcial (†) o «sin dato», nunca como cero, y lo
+  quemado ese año queda dentro de «otras pérdidas».
+
+![Capa de incendios](entregas/sprint_2/capturas/hu_7_3_capa_incendios.png)
+
+![Un año sin publicar](entregas/sprint_2/capturas/hu_7_3_anio_sin_publicar.png)
+
+- **El mapa** tiene cuatro vistas: **Cambio de cobertura**, **Cambio neto por municipio**, **Incendios** y **Año de pérdida**.
+  **Buscar** encuentra un municipio por nombre; se acerca y aleja con los botones + y −.
+
 Ten en cuenta lo que la propia página advierte: el umbral de NDVI es provisional, las «otras pérdidas» no se han
-verificado en campo, CONAFOR aún no publica los incendios de 2025, y el uso al que pasó el terreno perdido es una
-estimación con 55 % de exactitud.
+verificado en campo, CONAFOR aún no publica los incendios de 2025 (ni los de 2026), y el uso al que pasó el terreno perdido
+es una estimación con 55 % de exactitud.
 
 ---
 
-## 12. Preguntas frecuentes
+## 18. Preguntas frecuentes
 
 **No veo un botón que el manual menciona.** Los botones aparecen solo a la unidad a la que le toca el paso y cuando el
 expediente está en el estado que corresponde. Revisa con qué usuario entraste y el estado del expediente.
@@ -460,11 +800,23 @@ expediente está en el estado que corresponde. Revisa con qué usuario entraste 
 faltante o un entregado sin archivo.
 
 **¿Puedo deshacer un paso?** No directamente: cada paso queda en la bitácora y con su acuse. Lo que las reglas permiten
-(reenviar con faltantes, cambiar el polígono con motivo, ajustar un listado con motivo) se hace con su propio botón.
+(reenviar con faltantes, cambiar el polígono con motivo, ajustar un listado con motivo, rehacer un contrato antes de
+enviarlo, devolver una solicitud de pago) se hace con su propio botón.
 
-**¿Dónde están las fechas y plazos oficiales?** En las reglas del programa (`sistema/reglas/CC.json`), con el numeral
-y la línea de las Reglas de Operación. El calendario de días inhábiles 2026 es de demostración.
+**No me deja elaborar el contrato.** El expediente debe estar «Persona beneficiaria notificada» y debe haber un modelo de
+contrato **validado** por la Unidad Jurídica para el programa y ejercicio (sección 11).
 
-**¿Qué falta en esta versión?** Los otros cinco programas no tienen reglas cargadas, y el trámite se detiene en la
-aprobación del Comité. Los pendientes con el cliente están en [`sistema/README.md`](sistema/README.md), sección
-«Pendientes con el cliente», y el resumen del sprint en `entregas/sprint_1/Resumen_sprint_1.pdf`.
+**No me deja enviar la solicitud de pago.** La pestaña **Pagos** dice qué soporte falta y quién lo resuelve; en PSAHEM
+falta, por ejemplo, la instrucción de pago del Comité (sección 8).
+
+**El vale aparece vencido o el contrato, sin firma en plazo.** Los plazos corren con el reloj real desde la fecha de corte de
+la demostración (Guía de inicio, sección 1.4); una demostración vieja se ve vencida, como cualquier expediente real.
+
+**¿Dónde están las fechas y plazos oficiales?** En las reglas de cada programa (`sistema/reglas/CC.json`, `PS.json`,
+`RHF.json` y `PSA.json`), con el numeral y la línea de las Reglas de Operación. El calendario de días inhábiles 2026 es de
+demostración.
+
+**¿Qué falta en esta versión?** Guardabosques y Manejo Forestal Sustentable no tienen reglas cargadas; la segunda
+ministración (verificación en campo), la ejecución, el seguimiento y el cierre llegan en el sprint 3. Los pendientes con el
+cliente están en [`sistema/README.md`](sistema/README.md), sección «Pendientes con el cliente», y el resumen del sprint en
+`entregas/sprint_2/Resumen_sprint_2.pdf`.
