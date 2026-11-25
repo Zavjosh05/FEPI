@@ -135,6 +135,7 @@ numeral y la línea del texto de las ROP.
 | G-04 | Polígonos difíciles: KML de GPS, Shapefile en otra proyección, multipolígonos, geometrías inválidas, predios entre dos municipios. | Los polígonos de hoy son cuadros sintéticos. | Aceptado (sprint 3, con la verificación en campo) |
 | G-05 | Un escenario con nombre por flujo alterno (A a G). | Poder demostrar cada flujo sin armarlo a mano. | Aceptado (se completa en el sprint 3) |
 | G-06 | Datos reales anonimizados: padrón 2025, polígonos y formatos. | Es lo único que valida el sistema contra la operación real. | Por decidir (cliente) |
+| G-07 | Cada rama de sprint con su propio nombre de proyecto de Compose (`probosque_s1`) y sus propias imágenes (`probosque-sistema:sprint-1` y `probosque-sistema-pruebas:sprint-1`) (25-nov-2026). | Con el mismo nombre que `main`, reconstruir la imagen de una rama pisaba la de la otra, y la imagen del sistema lleva el código dentro. | Hecho: `docker-compose.yml`, guía y los comandos de `generar_resumen.py` y `md_a_pdf.py` |
 
 ## 8. Forma de trabajo
 

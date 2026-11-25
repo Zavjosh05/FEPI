@@ -16,7 +16,7 @@ y quedan en `entregas/sprint_N/diagramas/`. Se corre con la imagen de pruebas de
 WeasyPrint y Playwright (desde la raíz del repositorio):
 
     wsl -e bash -lc "docker run --rm -v /mnt/c/Users/<usuario>/Documents/GitHub/FEPI:/repo -w /repo \
-        --entrypoint python probosque-sistema-pruebas:0.1 entregas/generar_resumen.py 1"
+        --entrypoint python probosque-sistema-pruebas:sprint-1 entregas/generar_resumen.py 1"
 
 Con `--html` deja también el HTML intermedio; con `--sin-diagramas` reutiliza los PNG ya dibujados.
 """

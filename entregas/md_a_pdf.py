@@ -3,7 +3,7 @@
 Se corre dentro de la imagen de pruebas del sistema (trae Chromium por Playwright); la biblioteca `markdown` se
 instala al vuelo porque la imagen no la trae:
 
-    wsl -e bash -lc "docker run --rm -v /mnt/c/.../FEPI:/repo -w /repo --entrypoint sh probosque-sistema-pruebas:0.1 \
+    wsl -e bash -lc "docker run --rm -v /mnt/c/.../FEPI:/repo -w /repo --entrypoint sh probosque-sistema-pruebas:sprint-1 \
         -c 'pip install -q markdown && python entregas/md_a_pdf.py ARCHIVO.md [ARCHIVO2.md ...]'"
 
 Cada PDF queda junto a su Markdown, con el mismo nombre. Las rutas de imágenes se resuelven desde la carpeta del

@@ -127,9 +127,7 @@ algunos plazos que se arman hacia atrás para que haya casos vencidos.
 tenías el sistema levantado con datos, usa `docker compose down -v` y `docker compose up --build` para que los dictámenes
 de ejemplo tengan su documento en PDF, la revisión de la propiedad y la reasignación.
 
-**Si en el mismo equipo usas también la versión de `main`:** las dos usan los mismos nombres de contenedores, de
-imágenes y de volúmenes. Al cambiar de una a otra, detén la que corre con `docker compose down -v` y levanta la otra
-con `--build`.
+**Si en el mismo equipo conviven varias ramas** (por ejemplo, esta en su propia carpeta junto a `main`): esta versión usa su propio nombre de proyecto de Compose (`probosque_s1`) y sus propias imágenes (`probosque-sistema:sprint-1` y `probosque-sistema-pruebas:sprint-1`), así que sus contenedores, su base de datos y sus archivos no se mezclan con los de otra rama. Lo único que comparten es el puerto 8080: solo una puede estar levantada a la vez (detén la otra con `docker compose down`, o cambia el puerto como dice la sección 1.7).
 
 ### 1.6 Configuración (opcional)
 
