@@ -2,7 +2,7 @@
 
 Diagrama entidad-relación del Sistema de programas, generado a partir de los modelos de Django con
 `herramientas/diagrama_er.py` (no se dibuja a mano: si cambia un modelo, se vuelve a generar). Son
-76 tablas propias en ocho apps (`nucleo`, `recepcion`, `dictamen`, `contrato`, `pagos`, `portal`, `ejecucion` y
+78 tablas propias en ocho apps (`nucleo`, `recepcion`, `dictamen`, `contrato`, `pagos`, `portal`, `ejecucion` y
 `seguimiento`) sobre PostgreSQL + PostGIS, en ocho áreas (secciones 1 a 8). El diagrama
 completo, con todos los campos, está en [`modelo_datos.mmd`](modelo_datos.mmd).
 
@@ -417,8 +417,10 @@ Un dictamen técnico y uno jurídico por expediente, el Listado de Personas Bene
 predios sancionados, las sesiones del Comité con sus documentos, la resolución de cada expediente en la
 sesión de aprobación y los acuerdos de seguimiento con su área responsable. Cada dictamen guarda su folio, su
 documento PDF (`Documento` de tipo «dictamen») y su huella; el jurídico, la revisión de la propiedad o legal posesión
-(`RevisionPropiedad`). Las bajas y reasignaciones quedan en `MovimientoListado` (sin acuerdo cuando el recurso lo liberó
-la Dirección por un contrato sin firma en plazo, HU-3.3).
+(`RevisionPropiedad`). `MovimientoListado` es el registro único de las bajas (`sale`), las reasignaciones (`entra`) y el
+recurso liberado sin salida de la lista (`libera`: ajuste de superficie y reintegro), con su origen y referencia, sean del
+acuerdo directo del Comité (HU-2.4) o de la propuesta del área (HU-6.1 y HU-6.2); va sin acuerdo cuando el recurso lo liberó
+la Dirección por un contrato sin firma en plazo (HU-3.3), la verificación o el reintegro.
 
 ```mermaid
 erDiagram
@@ -486,12 +488,12 @@ erDiagram
     int id PK
     int acuerdo_id FK
     texto motivo
+    texto origen
+    texto referencia
     int expediente_id FK
     texto movimiento
     texto estado_anterior
     texto estado_nuevo
-    int lugar_lista_espera
-    decimal monto
   }
   PersonaIncumplida {
     int id PK
@@ -1080,23 +1082,23 @@ erDiagram
 
 **Lista de espera, sustituciones e incumplimientos.** Las solicitudes de la persona (sustitución, desistimiento, fallecimiento)
 con su acuse (`SolicitudPersona`); las propuestas del área responsable al Comité (`Propuesta`: reasignación, baja, sustitución,
-caso fortuito, cancelación, suspensión), que se ejecutan al cumplirse su `Acuerdo`; el recurso liberado y a quién se reasigna
-(`RecursoLiberado`); el aviso de omisiones con la fecha que fija el área (`AvisoOmision`); lo que el sistema señala para que una
+caso fortuito, cancelación, suspensión), que se ejecutan al cumplirse su `Acuerdo`; lo que sale, entra o se libera en los
+listados y a quién se reasigna (`MovimientoListado`, el mismo registro de HU-2.4, sección 3); el aviso de omisiones con la fecha que fija el área (`AvisoOmision`); lo que el sistema señala para que una
 persona lo confirme (`Senalamiento`) y el requerimiento de devolución con su monto, la cuenta (`CuentaReintegro`) y el depósito
 (`Requerimiento`). La prórroga de MFS (`Prorroga`) y el adendum (`Adendum`, sección 4) no se dibujan.
 
 ```mermaid
 erDiagram
+  Acuerdo |o--o{ MovimientoListado : acuerdo
   Acuerdo |o--o{ Requerimiento : acuerdo
   Acuerdo ||--o| Propuesta : acuerdo
   Acuerdo }o--o{ Expediente : expedientes
   CuentaReintegro |o--o{ Requerimiento : cuenta
-  Expediente |o--o{ RecursoLiberado : expediente
   Expediente ||--o{ AvisoOmision : expediente
+  Expediente ||--o{ MovimientoListado : expediente
   Expediente ||--o{ Requerimiento : expediente
   Expediente ||--o{ Senalamiento : expediente
   Expediente ||--o{ SolicitudPersona : expediente
-  Propuesta |o--o{ RecursoLiberado : propuesta
   Propuesta |o--o{ Requerimiento : propuesta
   Propuesta |o--o{ Senalamiento : propuesta
   Propuesta |o--o{ SolicitudPersona : propuesta
@@ -1109,6 +1111,17 @@ erDiagram
     int ministracion
     texto periodo
     texto estado
+  }
+  MovimientoListado {
+    int id PK
+    int acuerdo_id FK
+    texto motivo
+    texto origen
+    texto referencia
+    int expediente_id FK
+    texto movimiento
+    texto estado_anterior
+    texto estado_nuevo
   }
   Expediente {
     int id PK
@@ -1148,17 +1161,6 @@ erDiagram
     decimal monto_asignado
     decimal saldo
     int acuerdo_id FK
-  }
-  RecursoLiberado {
-    int id PK
-    int expediente_id FK
-    texto origen
-    decimal monto
-    texto descripcion
-    texto referencia
-    fecha_hora liberado_en
-    int propuesta_id FK
-    fecha_hora reasignado_en
   }
   Requerimiento {
     int id PK

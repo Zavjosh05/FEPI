@@ -331,8 +331,8 @@ ministración en curso o pagada procede el reintegro, no la baja.
 | `ministracion_solicitada` | Administración y Finanzas (en PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica) | Unidad Jurídica, Secretaría Técnica (PSAHEM) |
 | `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
 | `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
-| `recurso_liberado` | — (final; su monto queda para reasignar, HU-2.4) | Unidad Jurídica, Secretaría Técnica |
-| `baja` (recurso liberado) | — (final) | Dirección, Unidad Jurídica, Secretaría Técnica |
+| `recurso_liberado` | — (final; contrato sin firma en plazo, su monto queda para reasignar, HU-3.3) | Unidad Jurídica, Secretaría Técnica |
+| `baja` (recurso liberado) | — (final; salió de la lista por acuerdo del Comité, HU-2.4 y HU-6.1) | Dirección, Unidad Jurídica, Secretaría Técnica |
 
 ### Estados de M4 y M6 (base S3-02b; las acciones las construyen HU-4.x y HU-6.x)
 
@@ -367,7 +367,7 @@ stateDiagram-v2
     en_devolucion --> reintegrada: Administración y Finanzas registra el depósito
     en_ejecucion --> sustitucion: Delegación, solicitud con acuse (F, HU-6.1)
     sustitucion --> en_ejecucion: Comité aprueba la sustitución
-    sustitucion --> recurso_liberado: Comité libera para la lista de espera
+    sustitucion --> baja: Comité da de baja y libera para la lista de espera (HU-6.1)
     en_ejecucion --> prorroga_solicitada: Delegación, MFS (G)
     prorroga_solicitada --> en_ejecucion: Dirección resuelve (adendum o negada)
     concluida --> ejercicio_cerrado: Dirección (HU-6.3)
@@ -456,12 +456,12 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Acuses.** Cada envío o entrega (recepción, envío a la Dirección, validación, aviso de faltantes,
   notificación) genera un `Acuse` con folio `AC-AAAA-NNNNNN`, fecha y hora, PDF (WeasyPrint) y su huella
   SHA-256, y un evento en la bitácora.
-- **Trazabilidad.** Los modelos del trámite (también los de `contrato` y `pagos` desde la integración D-30, migraciones
+- **Trazabilidad.** Los modelos del trámite (también los de `contrato` y `pagos` desde la integración D-32, migraciones
   `contrato 0005_historial_m3` y `pagos 0004_historial_m5`) llevan `django-simple-history`: cada alta, cambio o baja deja
   un renglón con los valores, el usuario, la fecha y la hora y el motivo. `nucleo/trazabilidad.py`
   (`registra_usuario`, `con_usuario`) registra al usuario de cada servicio aunque no haya petición web
   (pruebas, demostración, comandos), y los cambios en lote se hacen con `save()` para que queden en el
-  historial. La pestaña «Trazabilidad» junta el historial de todos los registros del expediente, campo por
+  historial. Desde D-35 también los de `ejecucion` y `seguimiento` (migraciones `ejecucion 0004_historial_m4` y `seguimiento 0005_historial_m6`). La pestaña «Trazabilidad» junta el historial de todos los registros del expediente, campo por
   campo; cada app agrega los suyos en `extensiones.TRAZABILIDAD`. Es el último criterio de aceptación de
   todas las historias del sistema.
 - **Archivos.** `FileSystemStorage` en el volumen `archivos`; no hay URL pública de los archivos: se
@@ -550,16 +550,29 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   sus expedientes y su unidad responsable, que lo ve en su bandeja y lo marca como cumplido. `ministraciones_sin_instruccion` y `periodos_sin_validacion` dicen qué falta.
   `dictamen.seguimiento.RECEPTORES` es el punto de conexión (tipo de acuerdo → funciones) para que otros módulos
   ejecuten un acuerdo al cumplirse.
-- **HU-2.4 junto con M3 y M5 (D-30).** La baja aplica a la persona beneficiaria en cualquier etapa anterior a la primera
+- **HU-2.4 junto con M3 y M5 (D-32).** La baja aplica a la persona beneficiaria en cualquier etapa anterior a la primera
   ministración solicitada (`seguimiento.ESTADOS_CON_BAJA`); con una ministración en curso o pagada el sistema la rechaza y
   pide el acuerdo de reintegro. Dada de baja ya no firma, no se le elabora contrato, no recibe ni surte Vale de Planta, no
   se emite su oficio de pago ni se solicita su ministración (`seguimiento.exigir_vigente` en `contrato` y `pagos`). El
   recurso que la Dirección libera por un contrato sin firma en plazo (HU-3.3) entra como recurso liberado con un
-  `MovimientoListado` sin acuerdo (gancho `AL_LIBERAR_RECURSO` → `seguimiento.al_liberar_recurso`) y el Comité lo
+  `MovimientoListado` sin acuerdo (gancho `AL_LIBERAR_RECURSO` → `dictamen.seguimiento.al_liberar_recurso`, el único) y el Comité lo
   reasigna igual que el de una baja. Si el Comité da de baja a una persona `sin_firma_en_plazo`, el señalamiento deja de
   estar «por liberar». La transición `sin_firma_en_plazo → recurso_liberado` de la Secretaría Técnica se quitó: el
   Comité ahora da de baja por acuerdo y la Dirección confirma la liberación. La Secretaría Técnica consulta los
   expedientes de M3 previos al pago (para poder acordar la baja).
+
+- **HU-2.4 junto con HU-6.1 y HU-6.2 (integración en `prototipos`, D-34).** `MovimientoListado` es el **registro único** de lo que
+  sale (`sale`: la persona deja la Lista de Personas Beneficiarias con lo no ministrado), entra (`entra`: reasignación desde la lista de
+  espera) o se libera sin salir (`libera`: ajuste de superficie de la verificación y reintegro depositado), con `origen`
+  (`datos/dictamen.json` → `movimientos.origenes`) y `referencia`; `seguimiento.RecursoLiberado` ya no existe (migraciones
+  `dictamen 0004`, `seguimiento 0004`). Hay dos caminos y un solo efecto: el acuerdo que el Comité toma directamente (aquí) y la
+  propuesta del área responsable (M6), cuyo acuerdo se registra con `registrar_acuerdo(..., aplicar_efecto=False)` y se ejecuta al
+  cumplirse. Los dos usan `registrar_salida`, `registrar_entrada` y `registrar_liberacion`, y leen el mismo recurso por reasignar
+  (`recurso_liberado`, `recursos_por_reasignar`, de lo más antiguo a lo más nuevo); lo que reasigna una propuesta en trámite queda
+  comprometido (`COMPROMETIDO`, que llena M6) y un acuerdo directo no lo puede volver a reasignar. La salida sin ministración deja
+  `baja` por los dos caminos; con ministración, la propuesta deja `cancelada` y el requerimiento (HU-6.2). La sustitución de la persona
+  titular por la segunda persona beneficiaria (HU-6.1) es el tipo de acuerdo `sustitucion_titular` (constancia); `sustitucion` es la de
+  HU-2.4 (sale y entra la siguiente de la lista de espera).
 
 ### Base de M3 (Publicación y contrato) y M5 (Pagos)
 
@@ -670,7 +683,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Pantallas.** «Publicación de resultados» (Dirección; Secretaría Técnica y Jurídica consultan), «Notificaciones»
   (Delegación entrega; Dirección ve el estado), paneles en las bandejas, siguiente paso en el expediente y la
   pestaña «Contrato».
-- **Bajas y reasignaciones (HU-2.4, D-30).** `publicacion.filas_por_publicar(sesion)` arma lo que se publica: quien
+- **Bajas y reasignaciones (HU-2.4, D-32).** `publicacion.filas_por_publicar(sesion)` arma lo que se publica: quien
   salió por un acuerdo de seguimiento antes de publicar ya no aparece y quien entró desde la lista de espera se publica
   como persona beneficiaria («Reasignación» en la pantalla). Si la reasignación llega después de publicar el acta de
   aprobación, al cerrar la sesión de seguimiento con reasignaciones su acta queda autorizada para publicar
@@ -742,7 +755,7 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   usuario (solo si la transición existe). **Liberar el recurso no es automático:** una persona de la Dirección del programa
   lo confirma con un motivo (`firma.liberar_recurso`; estado `recurso_liberado` y acuse). Una firma que llegue cuando ya está
   señalado se rechaza con un mensaje claro. Al liberar, el monto queda como recurso liberado para que el Comité lo reasigne
-  a la lista de espera (HU-2.4; gancho `extensiones.AL_LIBERAR_RECURSO`, D-30). Se agregó la transición `sin_firma_en_plazo → recurso_liberado` para la Dirección (el
+  a la lista de espera (HU-2.4; gancho `extensiones.AL_LIBERAR_RECURSO`, D-32). Se agregó la transición `sin_firma_en_plazo → recurso_liberado` para la Dirección (el
   flujo la traía solo para la Secretaría Técnica) y `extensiones.AL_FIRMAR` para que HU-3.4 reaccione a la firma.
 - **Pantallas.** «Firmas» (menú de la Delegación y de la Dirección): por firmar con las dos fechas y los días, firmados y
   sin firma con la acción de liberar; «Registrar la firma» (formulario con la verificación y los elementos del programa);
@@ -1159,11 +1172,11 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 
 ### M6 · HU-6.1 Lista de espera y sustituciones
 
-- **Organización.** `seguimiento/models/reasignacion.py` (migración `0001_hu_6_1_reasignacion`: `Propuesta`, `RecursoLiberado`,
-  `SolicitudPersona`, `Prorroga`), servicio `seguimiento/reasignacion.py`, vistas `vistas/reasignacion.py` y `vistas/portal.py` (rutas del
+- **Organización.** `seguimiento/models/reasignacion.py` (migración `0001_hu_6_1_reasignacion`: `Propuesta`, `SolicitudPersona`,
+  `Prorroga`; el recurso liberado se lleva en `dictamen.MovimientoListado` desde D-34), servicio `seguimiento/reasignacion.py`, vistas `vistas/reasignacion.py` y `vistas/portal.py` (rutas del
   portal en `/portal/seguimiento/`), formularios `formularios/reasignacion.py`, plantillas `templates/seguimiento/reasignacion/` y los datos
   por programa en **`datos/seguimiento.json`** (con numeral y línea de las ROP). `Propuesta` es común a M6: HU-6.2 suma sus tipos.
-- **Recurso liberado.** Se registra solo: al confirmar la liberación de un contrato sin firma (`extensiones.AL_LIBERAR_RECURSO`, HU-3.3), al
+- **Recurso liberado** (en `dictamen.MovimientoListado`, el registro único de HU-2.4; D-34). Se registra solo: al confirmar la liberación de un contrato sin firma (`extensiones.AL_LIBERAR_RECURSO`, HU-3.3), al
   cumplirse la baja por desistimiento, por fallecimiento sin sustitución o por caso fortuito (lo no ministrado) y por el ajuste de superficie
   de la verificación (HU-4.2: lo aprobado que ya no se pagará, total menos el mayor entre lo que no depende de la verificación y lo
   verificado). Cada uno dice de qué expediente sale, por qué, cuánto y su acuse o acuerdo.
@@ -1172,7 +1185,7 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   acta (lugar de `ResolucionSesion`), con «alcanza» o «no alcanza». `proponer_reasignacion` recorre la lista en orden y **se detiene en la
   primera a la que ya no le alcanza** (decisión propia, `reasignacion.saltar_si_no_alcanza` en `datos/seguimiento.json`; las reglas solo
   dicen «con base en la Lista de espera», Convocatoria base sexta, línea 909; CC 8.1.9 c, línea 4744; 10.2, línea 4908). La propuesta guarda
-  el recurso (cada `RecursoLiberado` queda apartado), los renglones de la lista con su lugar, monto y saldo, y su acuse para la Secretaría
+  el recurso (lo que reasigna queda comprometido mientras esté en trámite), los renglones de la lista con su lugar, monto y saldo, y su acuse para la Secretaría
   Técnica. Guardabosques sí tiene lista de espera (R-18; base sexta PEG, líneas 9544 a 9546).
 - **Comité.** La Secretaría Técnica lleva cada propuesta (panel de su bandeja y página «Seguimiento») a una sesión de seguimiento convocada,
   como acuerdo del tipo de HU-2.4 (aprueba o no aprueba); el acuerdo queda en la bandeja del área responsable del programa y **al
@@ -1180,7 +1193,8 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   dejando solo constancia (el de la demostración de HU-2.4). Reasignación: las solicitudes que alcanzan pasan de `lista_espera` a
   `aprobada`, con el hito `aprobacion_comite` (en PEG la firma corre desde ahí) y el aviso del resultado a la Delegación; al notificarlo
   pasan a `notificada` (`extensiones.AL_NOTIFICAR`) y su firma corre desde esa notificación, con el tope de las reasignadas
-  (`evento_reasignada` y `fecha_limite_reasignados`, que ya existían en `nucleo.plazos`). El saldo queda como recurso liberado.
+  (`evento_reasignada` y `fecha_limite_reasignados`, que ya existían en `nucleo.plazos`); cada una entra con su `MovimientoListado`
+  (`entra`). El saldo sigue por reasignar.
 - **Criterio 2: cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora.** `registrar_solicitud`, un solo
   servicio para la Delegación (ventanilla) y el portal (la persona con cuenta): aviso del fallecimiento de la persona titular (fecha del
   fallecimiento, hito `fallecimiento_titular`), solicitud de sustitución por la segunda persona beneficiaria (por fallecimiento, calificada
@@ -1192,7 +1206,7 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   sustituye desde la lista de espera (10.2, líneas 9057 a 9059).
 - **Propuestas por expediente** (el área responsable, pestaña «Seguimiento»; una a la vez): sustitución (la persona sustituta queda como
   persona beneficiaria del expediente, con su historial, y el trámite vuelve al estado del que salió), baja por desistimiento o por
-  fallecimiento sin sustitución (sin nada ministrado → `recurso_liberado`; con algo ministrado → `cancelada`, el reintegro es de HU-6.2),
+  fallecimiento sin sustitución (sin nada ministrado → `baja`; con algo ministrado → `cancelada`, el reintegro es de HU-6.2; desde D-34),
   **caso fortuito** (continuar con la meta ajustada, vuelve al estado previo, o terminar sin sanción y liberar lo no ministrado; CC 8.1.7 fr.
   VI, líneas 4642 a 4651) y **sobrevivencia menor por causas no imputables** (PS y RHF 9.4.3 c, líneas 6127 y 3489: con el acuerdo, la
   verificación con ese incumplimiento vuelve a ser soporte de la siguiente ministración). Cada propuesta dice el recurso que libera.
@@ -1203,9 +1217,9 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - **Transiciones agregadas** (`datos/flujo_tramite.json`, 30): `lista_espera → aprobada` (área responsable) y `aprobada → notificada`
   (Delegación) para la reasignación; `→ sustitucion` también desde `publicada`, `notificada`, `contrato_elaborado`,
   `contrato_en_delegacion`, `cheque_entregado`, `comprobacion_enviada` y `verificada` (desistimiento antes de firmar o en cualquier punto
-  de la ejecución); `sustitucion → <estado previo>`, `→ recurso_liberado` y `→ cancelada`, y `caso_fortuito → <estado previo>` y
-  `→ recurso_liberado` para el área responsable, que cumple los acuerdos. Las de la Secretaría Técnica siguen en la tabla. Tipos de acuerdo
-  nuevos en `datos/dictamen.json`: `liberacion_recurso` y `caso_especial`.
+  de la ejecución); `sustitucion → <estado previo>`, `→ baja` y `→ cancelada`, y `caso_fortuito → <estado previo>` y
+  `→ baja` para el área responsable (hasta D-34 eran `→ recurso_liberado`), que cumple los acuerdos. Las de la Secretaría Técnica siguen en la tabla. Tipos de acuerdo
+  nuevos en `datos/dictamen.json`: `liberacion_recurso`, `caso_especial` y (D-34) `sustitucion_titular`.
 - **Corrección.** `contrato.models.ruta_contrato` fallaba con el adendum (no tiene `expediente`): ahora lo toma de su contrato.
 - **Pruebas.** `pruebas/test_hu_6_1.py` (21: criterios, los seis programas en el desistimiento, portal, sustitución con historial, caso
   fortuito, sobrevivencia menor, prórroga, acuerdo sin propuesta, pantallas) y el recorrido `pruebas/e2e/test_recorrido_hu_6_1.py`
@@ -1269,7 +1283,7 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
   área responsable, la Secretaría Técnica, la Unidad Jurídica y Administración y Finanzas): por programa y ejercicio, una fila por
   persona beneficiaria (expediente con contrato firmado) con lo **aprobado** (`reasignacion.total_aprobado` y el ajustado a lo
   verificado de `nucleo.montos`), lo **verificado** (HU-4.2 o la evaluación de reportes en PEG), lo **pagado** (ministraciones pagadas), lo
-  **reintegrado** (requerimientos depositados) y lo **liberado** y **reasignado** (`RecursoLiberado`). Exporta a CSV.
+  **reintegrado** (requerimientos depositados) y lo **liberado** y **reasignado** (`MovimientoListado`). Exporta a CSV.
 - **Comprobación** (`comprobar_expediente`): señala pagado mayor que lo aprobado, verificado sin pago, pagado sin la verificación que la
   regla exige (soportes `verificacion_campo` o `evaluacion_reportes` de `datos/pagos.json`), cancelado sin requerimiento resuelto,
   reintegrado mayor que lo ministrado (más el valor de la planta no establecida) y pago distinto de su solicitud. Las diferencias, su

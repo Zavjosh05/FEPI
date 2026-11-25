@@ -44,7 +44,7 @@ del propio sistema, tomadas por las pruebas automáticas (`entregas/sprint_1/cap
 
 ### Los estados del trámite
 
-La tabla completa del sistema tiene 39 estados. Este diagrama es el **camino principal** de un trámite sin
+La tabla completa del sistema tiene 40 estados. Este diagrama es el **camino principal** de un trámite sin
 complicaciones; abajo están los flujos alternos.
 
 ```mermaid
@@ -85,7 +85,8 @@ Los pasos que ves en el diagrama tienen estas variantes según el programa:
 | Contrato sin firma en plazo | `sin_firma_en_plazo`, `recurso_liberado` | 5.3 |
 | Devolución de la solicitud de pago | vuelve a `contratada` | 6.2 |
 | Caso fortuito o fuerza mayor | `caso_fortuito` | 8.1 |
-| Sustitución o desistimiento | `sustitucion`, `recurso_liberado`, `cancelada` | 8.1 |
+| Baja y reasignación por acuerdo del Comité | `baja` (y la entrada desde `lista_espera` a `aprobada`) | 4.4 y 8.1 |
+| Sustitución o desistimiento | `sustitucion`, `baja`, `cancelada` | 8.1 |
 | Prórroga por causa externa (MFS) | `prorroga_solicitada` | 8.1 |
 | Omisiones, suspensión y cancelación | `omisiones_por_subsanar`, `suspendida`, `cancelada` | 8.2 |
 | Requerimiento y reintegro | `en_devolucion`, `reintegrada` | 8.2 |
@@ -160,13 +161,15 @@ El menú superior se agrupa por módulo y cambia según la unidad (solo ves lo q
 | Grupo del menú | Enlaces |
 | --- | --- |
 | **Recepción** | Registrar solicitud (Delegación) |
-| **Dictamen y Comité** | Listado preliminar, Sesiones del Comité, Incumplidas |
+| **Dictamen y Comité** | Sesiones del Comité, Incumplidas |
+| **Listados** | Listado preliminar (Dirección, Unidad Jurídica y Secretaría Técnica), Candidatos y Beneficiarios (también la Delegación) |
 | **Publicación y contrato** | Publicación, Notificaciones, Modelos, Contratos, Firmas, Vales, Planta (Vivero) |
 | **Pagos** | Pagos, Cheques |
 | **Ejecución y verificación** | Ejecución, Evaluación de reportes |
 | **Seguimiento y cierre** | Seguimiento, Incumplimientos y reintegros, Cierre del ejercicio |
 
-Un grupo con un solo enlace para tu unidad se muestra como enlace simple. En un teléfono el menú queda colapsado.
+Un grupo con un solo enlace para tu unidad se muestra como enlace simple. En un teléfono el menú queda colapsado. Si
+abres una pantalla que no le toca a tu unidad, aparece **Acceso no permitido** con el botón para volver a la bandeja.
 
 ### El expediente
 
@@ -179,13 +182,14 @@ debajo, **el siguiente paso** que le toca a tu unidad, con su botón. Abajo, las
 | **Requisitos** | Los requisitos del programa y su revisión | 3.2 |
 | **Ubicación** | El mapa con el polígono del predio y su historial (no aparece en Guardabosques) | 3.3 |
 | **Validación** | Las revisiones de la Dirección, sus avisos de faltantes y fechas límite | 3.4 |
-| **Dictámenes** | El dictamen técnico y el jurídico | 4.1 y 4.2 |
+| **Dictámenes** | El dictamen técnico y el jurídico, con su documento en PDF | 4.1 y 4.2 |
 | **Contrato** | Publicación, notificación, contrato, firma, vale de planta | 5 |
 | **Pagos** | Oficio, comprobante de la cuenta, cada ministración con sus soportes, pagos y cheques | 6 |
 | **Ejecución** | Comprobaciones, verificación en campo, reportes de Guardabosques | 7 |
 | **Seguimiento** | Sustituciones, desistimientos, casos especiales, prórroga, omisiones, requerimiento, resultados finales y cierre | 8 |
-| **Documentos y acuses** | Todos los archivos y acuses en PDF | 12 |
+| **Documentos y acuses** | Todos los archivos, los documentos de los dictámenes y los acuses en PDF | 12 |
 | **Bitácora** | El registro de todo lo ocurrido | 12 |
+| **Trazabilidad** | El historial de la base de datos: quién cambió qué registro, cuándo y qué valores | 12 |
 
 Los botones de cada pestaña aparecen solo cuando a tu unidad le toca ese paso.
 
@@ -257,12 +261,16 @@ Usuario de ejemplo: `dir_drff`.
 
 1. En la bandeja aparecen los expedientes «En revisión de la Dirección». Abre uno, ve a la pestaña **Validación** y
    pulsa **Abrir pantalla de validación**.
-2. La pantalla muestra cada requisito con la revisión de la Delegación y una **revisión automática con las reglas**.
-   Marca como **Faltante** lo que no cumpla (ilegible, incompleto, no vigente) y escribe observaciones.
-3. Sin faltantes, pulsa **Validar expediente**: queda «Validado · en dictamen», con su constancia en PDF.
+2. La pantalla muestra cada requisito con la revisión de la Delegación, una **revisión automática con las reglas** y
+   una casilla para la **observación de la Dirección**. Marca como **Faltante** lo que no cumpla y escribe en ese mismo
+   renglón **qué falta o por qué no es válido** (ilegible, incompleto, no vigente, no corresponde al titular…): la
+   observación es **obligatoria en cada faltante**. Los que no pasan la revisión con las reglas ya vienen marcados; si
+   no escribes nada, su observación es el motivo de esa revisión.
+3. Sin faltantes, pulsa **Validar expediente**: queda «Validado · en dictamen», con su constancia en PDF (con el
+   resultado de cada requisito).
 4. Con faltantes, pulsa **Emitir aviso de faltantes**: se genera el aviso con su **fecha límite** (5 días hábiles
-   desde el aviso en CC; en PEG las reglas no dan plazo y el aviso dice «sin plazo en las reglas») y el expediente
-   regresa a la Delegación.
+   desde el aviso en CC; en PEG las reglas no dan plazo y el aviso dice «sin plazo en las reglas») y **la observación
+   de cada faltante**, y el expediente regresa a la Delegación.
 
 ![Pantalla de validación](entregas/sprint_1/capturas/hu_1_4_02_pantalla_de_validacion.png)
 
@@ -272,8 +280,9 @@ es más vieja, se marca como faltante.
 **Del lado de la Delegación: atender el aviso.** El aviso va dirigido a la persona solicitante por conducto de la
 Delegación:
 
-1. En la pestaña **Validación** aparece el aviso con la lista de faltantes y su fecha límite. Cuando lo entregues,
-   pulsa **Registrar notificación a la persona solicitante**: queda la fecha y la hora con su acuse.
+1. En la pestaña **Validación** aparece el aviso con cada faltante, su observación y la fecha límite (la observación
+   también aparece en el requisito, en la pestaña **Requisitos**). Cuando lo entregues, pulsa **Registrar notificación
+   a la persona solicitante**: queda la fecha y la hora con su acuse.
 2. Cuando la persona entregue lo faltante, márcalo como entregado en **Requisitos** y pulsa **Reenviar a la
    Dirección con los faltantes**.
 
@@ -302,12 +311,15 @@ Usuario de ejemplo: `dir_drff`. En la pestaña **Dictámenes**, pulsa **Elaborar
   Un criterio que no se cumple impide el dictamen factible.
 - **Resultado**: **Factible** (con la superficie factible en hectáreas) o **No factible** (con su motivo).
 
-Pulsa **Registrar dictamen técnico**. Queda con su acuse.
+Pulsa **Registrar dictamen técnico**. El sistema **expide el documento «Dictamen técnico»** en PDF, con folio propio
+(por ejemplo, `DT-CC-2026-0001`): datos de la solicitud, análisis cartográfico con el croquis del polígono, verificación
+de los criterios, resultado y motivo, plazo, fundamento y firmas (elaboró y Vo. Bo.). El documento queda **adjunto al
+expediente**: se abre con el botón de la pestaña **Dictámenes** o desde **Documentos y acuses**.
 
 ![Análisis cartográfico y lista de verificación](entregas/sprint_1/capturas/hu_2_1_02_analisis_cartografico_y_lista_de_verificacion.png)
 
-En el menú, **Listado preliminar** reúne el resultado técnico y jurídico de cada solicitud validada. **Exportar CSV
-(Excel)** lo descarga para abrirlo en Excel con acentos.
+En el menú **Listados**, **Listado preliminar** reúne el resultado técnico y jurídico de cada solicitud validada.
+**Exportar CSV (Excel)** lo descarga para abrirlo en Excel con acentos.
 
 ### 4.2 Unidad Jurídica: Listado de Incumplidas y dictamen jurídico
 
@@ -318,11 +330,26 @@ procedimiento o sanción. Se agregan con **Inscribir** y se retiran con **Baja**
 borra: queda su historial. (Las cancelaciones de la sección 8.2 inscriben a la persona aquí automáticamente.)
 
 **Dictamen jurídico.** En la pestaña **Dictámenes** de un expediente validado, pulsa **Elaborar dictamen jurídico**.
-El sistema **coteja automáticamente** a la persona (CURP, RFC y nombre) y al predio contra el Listado de Incumplidas y
-muestra las coincidencias. Si hay una coincidencia, no permite el dictamen procedente. Elige **Procedente** o **No
-procedente**, escribe el motivo y pulsa **Registrar dictamen jurídico**. El cotejo queda también en el acuse.
+El sistema **coteja automáticamente** a la persona (CURP, RFC y nombre) con el Listado de Incumplidas y al predio con
+los predios con procedimiento o sanción, y muestra las coincidencias. La pantalla tiene tres pasos:
+
+1. **Documentación legal**: marca cada documento legal del expediente como **Válido** o **No válido**; si no es válido,
+   escribe por qué. Los que no aplican no se revisan.
+2. **Propiedad o legal posesión del predio** (CC 8.1.1.2 fr. VII): el documento con el que se acredita (escritura,
+   certificado parcelario, carpeta básica o PHINA del núcleo agrario, constancia de posesión, contrato de usufructo o
+   arrendamiento…), su número y fecha, a nombre de quién está y si coincide con el titular, la **superficie que ampara**
+   (se compara con la del polígono vigente), la **vigencia** (obligatoria en constancias de posesión y contratos) y si
+   hay **evidencia de conflicto** de propiedad, posesión o representación.
+3. **Resultado**: **Procedente** o **No procedente** con su motivo.
+
+El sistema **no permite el dictamen procedente** si un documento legal no es válido, si no se acredita la propiedad o
+legal posesión, o si hay coincidencias en los catálogos. Al registrarlo **expide el documento «Dictamen jurídico»** en
+PDF (folio `DJ-…`), con la revisión de la documentación, la de la propiedad, el cotejo, el resultado y las firmas,
+adjunto al expediente.
 
 ![Cotejo automático](entregas/sprint_1/capturas/hu_2_2_03_cotejo_automatico.png)
+
+![Revisión de la propiedad o legal posesión](entregas/sprint_1/capturas/hu_2_2_07_revision_de_la_propiedad.png)
 
 ### 4.3 Secretaría Técnica: sesión de aprobación del Comité
 
@@ -349,23 +376,50 @@ Usuario de ejemplo: `comite`. En el menú, **Dictamen y Comité → Sesiones del
 
 ![Acta y autorización de publicación](entregas/sprint_1/capturas/hu_2_3_06_acta_y_autorizacion_de_publicacion.png)
 
-### 4.4 Sesiones de seguimiento y acuerdos
+**Candidatos y beneficiarios.** En el menú **Listados** hay dos vistas separadas (las consultan la Delegación, con solo
+sus expedientes, la Dirección, la Unidad Jurídica y la Secretaría Técnica), con su selector de programa y ejercicio y
+**Exportar CSV (Excel)**:
 
-1. La Secretaría Técnica crea una **Nueva sesión de seguimiento** igual que la de aprobación.
-2. En la sesión, **Registrar acuerdo**: tipo de acuerdo, el texto, los expedientes a los que aplica y el área que debe
-   cumplirlo. Los tipos son: reasignación del recurso liberado, sustitución, caso fortuito, suspensión, cancelación,
-   baja e inscripción en el Listado de Incumplidas, reintegro, **instrucción de pago a la Fiduciaria (por
-   ministración)** (PSAHEM), **validación de la evaluación de reportes mensuales (por periodo)** (PEG), baja por
-   desistimiento o fallecimiento y liberación del recurso, caso especial (sobrevivencia menor por causas no
-   imputables, PS y RHF) y otro.
-3. El área responsable ve el acuerdo en su bandeja, lo atiende y pulsa **Marcar cumplido**.
+- **Candidatos**: las solicitudes que todavía compiten por el apoyo, con filtros **En dictamen**, **Dictaminada · por
+  llevar a la sesión de aprobación** y **Lista de espera** (en su orden, con su lugar y su monto). Muestra el resultado
+  técnico, el jurídico y el de la propiedad.
+- **Beneficiarios**: las personas beneficiarias en cualquier etapa, con su superficie, su monto, su situación y **cómo
+  entraron** (acta de la sesión de aprobación o reasignación por acuerdo), con los totales; abajo, las que **salieron**
+  (por un acuerdo del Comité o por el contrato sin firma en plazo), con la causa y el recurso que liberaron.
 
-Desde el sprint 3, **cumplir un acuerdo ejecuta el efecto**: una reasignación pasa a las personas de la lista de
-espera a «Aprobada»; una cancelación cancela el apoyo e inscribe a la persona en el Listado de Incumplidas; la
-validación de reportes cuenta para el pago de los Guardabosques; la instrucción de pago habilita la solicitud de
-PSAHEM (sección 6). Un acuerdo sin propuesta asociada solo deja constancia.
+![Candidatos](entregas/sprint_1/capturas/hu_2_4_09_candidatos_lista_de_espera.png)
+
+![Beneficiarios](entregas/sprint_1/capturas/hu_2_4_08_beneficiarios_con_reasignacion_y_baja.png)
+
+### 4.4 Reasignaciones e incidentes (sesiones de seguimiento)
+
+1. La Secretaría Técnica crea una **Nueva sesión de seguimiento** igual que la de aprobación y envía su convocatoria.
+2. La sesión muestra la **lista de espera en su orden**, el **recurso liberado sin reasignar** y los **movimientos de
+   los listados** del ejercicio (quién salió, quién entró y qué se liberó, con qué acuerdo).
+3. **Registrar acuerdo**: tipo de acuerdo, **causa del incidente** (escrito de desistimiento, dictamen, aviso de la
+   Delegación…; obligatoria en los incidentes), el texto del acuerdo, los expedientes a los que aplica y el área que
+   debe atenderlo (si lo dejas vacío, la que corresponde al tipo). Lo que hace cada tipo al registrarse:
+
+   | Tipo de acuerdo | Qué pasa en los listados |
+   | --- | --- |
+   | Desistimiento, cancelación o baja | La persona beneficiaria sale de la lista (estado «Baja · recurso liberado») y su monto queda como recurso liberado. Solo antes de la primera ministración solicitada; con una ministración en curso o pagada el sistema la rechaza: procede el reintegro (sección 8) |
+   | Reasignación | Pasan a «Aprobada» las **primeras de la lista de espera, en su orden**, sin rebasar el recurso liberado; si se salta a alguien o no alcanza, el sistema lo impide |
+   | Sustitución por la lista de espera | Las dos cosas en un solo acuerdo: sale la persona beneficiaria y entra la siguiente de la lista de espera |
+   | Caso fortuito, suspensión, reintegro, sustitución de la persona titular, caso especial u otro | Deja la constancia; el área responsable lo atiende |
+   | Instrucción de pago a la Fiduciaria (PSAHEM) · validación de reportes (Guardabosques) | Deja la constancia por ministración o por periodo; habilita la solicitud de pago de PSAHEM (sección 6) y cuenta para el pago de los Guardabosques |
+
+4. El área responsable ve el acuerdo en su bandeja, lo atiende y pulsa **Marcar cumplido**.
+
+**El mismo recurso, por dos caminos.** Además del acuerdo directo, el área responsable puede **proponer** al Comité la baja
+(con el escrito de desistimiento recibido con su acuse), la cancelación o la reasignación calculada en el orden de la lista
+de espera (sección 8). Esos acuerdos aplican su efecto **cuando el área los cumple**. Las dos formas usan el mismo registro
+de los listados y el mismo recurso liberado: lo que una propuesta de reasignación en trámite ya reasigna no se puede
+reasignar otra vez con un acuerdo directo (si el Comité no la aprueba, vuelve a estar libre). Dada de baja, la persona ya no
+firma, no recibe planta ni cobra.
 
 ![Acuerdo con expedientes y área responsable](entregas/sprint_1/capturas/hu_2_4_01_acuerdo_con_expedientes_y_area_responsable.png)
+
+![Reasignación en el orden de la lista de espera](entregas/sprint_1/capturas/hu_2_4_07_reasignacion_en_orden_de_la_lista_de_espera.png)
 
 ---
 
@@ -680,13 +734,17 @@ sustitución, **caso fortuito** (continuar con la meta ajustada, o terminar sin 
 **La página «Seguimiento»** (menú **Seguimiento y cierre → Seguimiento**: área responsable, Secretaría Técnica y
 Unidad Jurídica) muestra, por programa y ejercicio:
 
-1. El **recurso liberado** (de contratos sin firma, bajas, casos fortuitos y ajustes de superficie) y la **lista de
-   espera en su orden**, con «Alcanza» o «No alcanza». Pulsa **Proponer al Comité la reasignación de ...**: la
-   propuesta recorre la lista en orden y se detiene en la primera a la que ya no le alcanza.
+1. El **recurso liberado** (de contratos sin firma, bajas, cancelaciones, casos fortuitos, ajustes de superficie y
+   reintegros) y la **lista de espera en su orden**, con «Alcanza» o «No alcanza». Es el mismo recurso que ve la sesión
+   de seguimiento (sección 4.4): lo que el Comité ya reasignó con un acuerdo directo no aparece. Pulsa **Proponer al
+   Comité la reasignación de ...**: la propuesta recorre la lista en orden y se detiene en la primera a la que ya no le
+   alcanza; mientras esté en trámite, ese recurso queda comprometido.
 2. Las **propuestas por llevar a sesión**: la Secretaría Técnica elige la sesión de seguimiento y pulsa **Registrar el
    acuerdo del Comité** (si no hay sesión convocada, la pantalla pide convocarla en «Sesiones del Comité»).
 3. Cuando el área **cumple el acuerdo** (sección 4.4), se ejecuta: la solicitud de la lista de espera pasa a
-   «Aprobada», se le notifica (desde ahí corre su plazo de firma) y el saldo queda como recurso liberado.
+   «Aprobada», se le notifica (desde ahí corre su plazo de firma) y el saldo sigue como recurso liberado. Una baja
+   aprobada deja a la persona en «Baja · recurso liberado» (o en «Apoyo cancelado», con el reintegro, si ya se le
+   ministró). Todo queda en los movimientos de los listados y en **Listados › Beneficiarios**.
 
 ![Recurso liberado y lista de espera en su orden](entregas/sprint_3/capturas/hu_6_1_05_recurso_liberado_y_lista_de_espera_en_su_orden.png)
 
@@ -874,8 +932,9 @@ Puntos que conviene recordar:
 
 ## 12. Documentos, acuses y bitácora
 
-- La pestaña **Documentos y acuses** reúne los archivos subidos y cada acuse en PDF: recepción, envío a la Dirección,
-  validación, aviso de faltantes, notificación, dictámenes, convocatoria y acta, publicación, contrato, firma, acceso
+- La pestaña **Documentos y acuses** reúne los archivos subidos, los **documentos de los dictámenes** técnico y jurídico
+  (resaltados) y cada acuse en PDF: recepción, envío a la Dirección, validación, aviso de faltantes, notificación,
+  convocatoria y acta, publicación, contrato, firma, acceso
   al portal, vale de planta, oficio y solicitud de pago, pago, remisión a la Fiduciaria, cheque, comprobaciones,
   verificación, evaluación de reportes, solicitudes de sustitución, aviso de omisiones, requerimiento, depósito,
   cierre e informe anual.
@@ -885,6 +944,16 @@ Puntos que conviene recordar:
   plazo) aparecen sin persona.
 
 ![Bitácora de la firma al cierre](entregas/sprint_3/capturas/s3_11_10_bitacora_de_la_firma_al_cierre.png)
+
+- La pestaña **Trazabilidad** muestra lo que guarda la base de datos de cada registro del expediente, de todos los
+  módulos (la solicitud, el predio, la persona, los requisitos, el polígono, las validaciones y sus observaciones, los
+  dictámenes, la revisión de la propiedad, los listados y los acuerdos, la publicación, el contrato, la firma, el vale,
+  los pagos, las comprobaciones, la verificación, los reportes, las solicitudes y propuestas de seguimiento, el
+  requerimiento y el cierre): **cada alta, cambio o baja**, con el usuario y su unidad, la fecha y la hora, el motivo y
+  los campos que cambiaron (antes → después). Se puede filtrar por registro. Nada se borra: un registro dado de baja
+  conserva su historial.
+
+![Trazabilidad](entregas/sprint_1/capturas/hu_2_4_10_trazabilidad_de_la_reasignacion.png)
 
 ---
 
