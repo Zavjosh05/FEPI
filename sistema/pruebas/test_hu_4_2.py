@@ -258,3 +258,25 @@ def test_hu_4_2_pestana_con_el_formulario_y_el_resultado(pagada, usuarios, clien
     assert client.get(reverse("ejecucion:verificacion_archivo", args=[v.pk])).status_code == 200
     assert client.get(reverse("ejecucion:incidencia_archivo", args=[v.incidencias.get().pk])).status_code == 200
     assert client.get(reverse("ejecucion:comprobaciones")).status_code == 200
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 3: trazabilidad
+def test_hu_4_2_trazabilidad_de_la_verificacion_y_sus_incidencias(pagada, usuarios):
+    """Criterio 3: la verificación en campo queda en el historial con la Delegación que la registró y la superficie
+    verificada como valor; aparece en la pestaña «Trazabilidad» del expediente."""
+    exp = _por_verificar(pagada, usuarios, "CC", "2026-11-12 10:00", date(2026, 11, 11))
+    deleg = delegado_de(usuarios, exp)
+    with reloj.en("2026-11-20 13:00"):
+        v = verificacion.registrar_verificacion(deleg, exp, "informe_final_firmado", _archivo("informe_firmado.pdf"),
+                                                fecha_visita=date(2026, 11, 18), superficie_verificada="5.4")
+    alta = v.history.get(history_type="+")
+    assert alta.history_user == deleg and alta.superficie_verificada_ha == Decimal("5.4")
+    filas = _filas_de(exp, "Verificación en campo")
+    assert filas and all(f["usuario"] == deleg for f in filas)
+    assert any(c["despues"].startswith("5.4") for f in filas for c in f["cambios"])

@@ -4,6 +4,7 @@ evaluación del periodo al CASPEG (que la valida con un acuerdo de su sesión de
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Ejercicio, Expediente, Unidad
 
@@ -28,6 +29,7 @@ class RevisionReporte(models.Model):
     revisada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     unidad = models.ForeignKey(Unidad, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     revisada_en = models.DateTimeField(default=timezone.now)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-revisada_en", "-id"]
@@ -58,6 +60,7 @@ class EnvioEvaluacion(models.Model):
     no_cumplen = models.PositiveIntegerField(default=0)
     no_entregaron = models.PositiveIntegerField(default=0)
     datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-enviado_en", "-id"]
@@ -87,6 +90,7 @@ class EvaluacionPeriodo(models.Model):
     unidad = models.ForeignKey(Unidad, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     evaluada_en = models.DateTimeField(default=timezone.now)
     envio = models.ForeignKey(EnvioEvaluacion, null=True, blank=True, on_delete=models.PROTECT, related_name="evaluaciones")
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["periodo", "expediente__folio"]

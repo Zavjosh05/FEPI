@@ -3,6 +3,7 @@ documento dentro del plazo del programa y las incidencias, cada una con su tipo 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente, Unidad
 
@@ -54,6 +55,7 @@ class Verificacion(models.Model):
                                                help_text="Lo ya ministrado por encima de lo verificado (gancho de HU-6.2).")
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-registrada_en", "-id"]
@@ -100,6 +102,7 @@ class Incidencia(models.Model):
     registrada_en = models.DateTimeField(default=timezone.now)
     atendida_en = models.DateTimeField(null=True, blank=True, help_text="La llena HU-6.2 (omisiones, suspensión, cancelación).")
     datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["registrada_en", "id"]

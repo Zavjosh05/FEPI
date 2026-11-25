@@ -47,6 +47,7 @@ from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import leer_json
 from nucleo.models import Evento, Expediente, Persona, TipoUnidad, Unidad
 from nucleo.templatetags.moneda import formato_moneda
+from nucleo.trazabilidad import registra_usuario
 from portal import cuentas
 
 from .models import EstadoPropuesta, MedioSolicitud, Propuesta, Prorroga, SolicitudPersona
@@ -196,6 +197,7 @@ def calcular(ejercicio, recursos=None):
             "fundamento": cfg["programas"].get(ejercicio.programa.clave, {}).get("fundamento", "")}
 
 
+@registra_usuario
 def proponer_reasignacion(usuario, ejercicio, observaciones="", momento=None):
     """El área responsable propone al Comité la reasignación del recurso liberado a la lista de espera (con acuse)."""
     _exigir_area(usuario, ejercicio)
@@ -294,6 +296,7 @@ def ultimo_fallecimiento(expediente):
     return expediente.solicitudes_seguimiento.filter(tipo="fallecimiento").order_by("-presentada_en", "-id").first()
 
 
+@registra_usuario
 def registrar_solicitud(usuario, expediente, tipo, archivo=None, persona_presenta="", motivo="", fecha_hecho=None,
                         segunda=None, causa="", firmas=(), momento=None):
     """Registra la solicitud de sustitución, el desistimiento o el aviso de fallecimiento, con su acuse (fecha y hora).
@@ -462,6 +465,7 @@ def estado_previo(expediente):
     return e.estado_origen.clave if e is not None and e.estado_origen_id else None
 
 
+@registra_usuario
 def proponer(usuario, expediente, tipo, descripcion="", resolucion="", momento=None, base="ministrado"):
     """Propuesta al Comité para un expediente (sustitución, baja, caso fortuito, sobrevivencia menor), con su acuse."""
     _exigir_area(usuario, expediente.ejercicio)
@@ -567,6 +571,7 @@ def sesiones_para(propuesta):
         estado=EstadoSesion.CELEBRADA).order_by("fecha_hora")
 
 
+@registra_usuario
 def llevar_a_sesion(usuario, propuesta, sesion, aprueba=True, descripcion=""):
     """La Secretaría Técnica registra el acuerdo del Comité sobre la propuesta (aprobada o no) en una sesión de seguimiento.
     El acuerdo lo cumple el área responsable del programa; al cumplirlo se ejecuta (``ejecutar_acuerdo``)."""
@@ -773,6 +778,7 @@ def config_prorroga(expediente):
     return cfg if expediente.programa.clave in cfg["programas"] else None
 
 
+@registra_usuario
 def solicitar_prorroga(usuario, expediente, causa, plazo_solicitado=None, archivo=None, plazo_original=None, momento=None):
     """La Delegación registra la solicitud de prórroga por causa externa con su acuse (supuesto: R-17)."""
     cfg = config_prorroga(expediente)
@@ -805,6 +811,7 @@ def solicitar_prorroga(usuario, expediente, causa, plazo_solicitado=None, archiv
     return p
 
 
+@registra_usuario
 def resolver_prorroga(usuario, prorroga, autorizada, motivo, plazo_nuevo=None, archivo_adendum=None, momento=None):
     """El área responsable resuelve la prórroga: autorizada con el adendum al contrato (plazo nuevo) o negada (supuesto)."""
     from contrato.models import Adendum

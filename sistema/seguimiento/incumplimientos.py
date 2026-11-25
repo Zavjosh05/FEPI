@@ -37,6 +37,7 @@ from nucleo import notificaciones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
 from nucleo.templatetags.moneda import formato_moneda
+from nucleo.trazabilidad import registra_usuario
 
 from . import reasignacion
 from .models import (AvisoOmision, CuentaReintegro, EstadoPropuesta, EstadoRequerimiento, Propuesta, Requerimiento,
@@ -106,13 +107,14 @@ def config_cuenta(programa):
 
 
 # ----------------------------------------------------------------------------- cuenta para reintegros
+@registra_usuario
 def registrar_cuenta(usuario, programa, titular, banco, cuenta, referencia="", nota=""):
     """Administración y Finanzas registra la cuenta para los reintegros del programa (la anterior deja de estar vigente)."""
     exigir_unidad(usuario, TipoUnidad.ADMIN_FINANZAS)
     if not ((titular or "").strip() and (banco or "").strip() and (cuenta or "").strip()):
         raise ValidationError("Escriba el titular, el banco y la cuenta.")
     with transaction.atomic():
-        CuentaReintegro.objects.filter(programa=programa, vigente=True).update(vigente=False)
+        _actualizar(CuentaReintegro.objects.filter(programa=programa, vigente=True), vigente=False)
         return CuentaReintegro.objects.create(programa=programa, titular=titular.strip(), banco=banco.strip(),
                                               cuenta=cuenta.strip(), referencia=(referencia or "").strip(),
                                               nota=(nota or "").strip(), registrada_por=usuario)
@@ -124,6 +126,7 @@ def puede_avisar(usuario, expediente):
             and _puede(usuario, expediente, "omisiones_por_subsanar"))
 
 
+@registra_usuario
 def avisar_omision(usuario, expediente, omisiones, vence, causa="", incidencia=None, momento=None):
     """El área responsable avisa las omisiones con la fecha límite para subsanarlas (criterio 1)."""
     reasignacion._exigir_area(usuario, expediente.ejercicio)
@@ -167,8 +170,8 @@ def avisar_omision(usuario, expediente, omisiones, vence, causa="", incidencia=N
         if incidencia is not None:
             incidencia.atendida_en = ahora
             incidencia.save(update_fields=["atendida_en"])
-            Senalamiento.objects.filter(tipo="incidencia", clave=f"incidencia-{incidencia.pk}").update(
-                atendido_en=ahora, atendido_por=usuario, resultado=f"Aviso de omisión {aviso.acuse.folio}")
+            _actualizar(Senalamiento.objects.filter(tipo="incidencia", clave=f"incidencia-{incidencia.pk}"),
+                        atendido_en=ahora, atendido_por=usuario, resultado=f"Aviso de omisión {aviso.acuse.folio}")
     return aviso
 
 
@@ -176,6 +179,7 @@ def aviso_vigente(expediente):
     return expediente.avisos_omision.filter(subsanada_en__isnull=True).order_by("-creado_en", "-id").first()
 
 
+@registra_usuario
 def dar_por_subsanadas(usuario, aviso, motivo, momento=None):
     """El área responsable comprueba que se subsanaron: el expediente vuelve al estado en que estaba."""
     exp = aviso.expediente
@@ -193,9 +197,9 @@ def dar_por_subsanadas(usuario, aviso, motivo, momento=None):
         exp.cambiar_estado(destino, usuario, motivo=motivo.strip(), tipo_evento="omisiones_subsanadas",
                            descripcion=f"Omisiones subsanadas ({'en' if timezone.localtime(ahora).date() <= aviso.vence else 'fuera de'} "
                                        f"plazo): {motivo.strip()}", datos={"aviso": aviso.pk})
-        Senalamiento.objects.filter(expediente=exp, tipo="omision_vencida", clave=f"aviso-{aviso.pk}",
-                                    atendido_en__isnull=True).update(atendido_en=ahora, atendido_por=usuario,
-                                                                     resultado="Omisiones subsanadas")
+        _actualizar(Senalamiento.objects.filter(expediente=exp, tipo="omision_vencida", clave=f"aviso-{aviso.pk}",
+                                                atendido_en__isnull=True),
+                    atendido_en=ahora, atendido_por=usuario, resultado="Omisiones subsanadas")
     return aviso
 
 
@@ -213,6 +217,17 @@ def senalar(expediente, tipo, clave, descripcion, fundamento="", datos=None):
     Evento.registrar(expediente, None, f"senalamiento_{tipo}", f"{descripcion} Se prepara: {s.config.get('accion', '').lower()} "
                      "(lo confirma una persona).", datos={"senalamiento": s.pk})
     return s
+
+
+def _actualizar(qs, **campos):
+    """Como ``qs.update(**campos)``, pero registro por registro para que cada cambio quede en el historial (trazabilidad)."""
+    n = 0
+    for obj in qs:
+        for campo, valor in campos.items():
+            setattr(obj, campo, valor)
+        obj.save(update_fields=list(campos))
+        n += 1
+    return n
 
 
 def abiertos(qs=None):
@@ -295,6 +310,7 @@ def texto_desecho(senalamiento):
     return texto
 
 
+@registra_usuario
 def confirmar(usuario, senalamiento, momento=None):
     """Una persona confirma lo que preparó el sistema (P-08): la propuesta al Comité o el desecho de la solicitud."""
     if senalamiento.atendido_en:
@@ -371,6 +387,7 @@ def monto_por_devolver(expediente, base="ministrado"):
     return ministrado_efectivo(expediente)
 
 
+@registra_usuario
 def inscribir_en_listado(usuario, expediente, acuerdo, motivo):
     """Inscripción automática en el Listado de Personas Beneficiarias Incumplidas con el acuerdo como fundamento (criterio 3)."""
     persona = expediente.beneficiaria
@@ -424,8 +441,8 @@ def _ejecutar_cancelacion(propuesta, acuerdo, usuario):
                                                   ("Motivo", propuesta.descripcion),
                                                   ("Listado de Personas Beneficiarias Incumplidas", "Inscrita por el acuerdo")],
                                        datos={"acuerdo": acuerdo.pk})
-    abiertos(exp.senalamientos.all()).update(atendido_en=timezone.now(), atendido_por=usuario,
-                                             resultado=f"Cancelado por el acuerdo {acuerdo.numero}")
+    _actualizar(abiertos(exp.senalamientos.all()), atendido_en=timezone.now(), atendido_por=usuario,
+                resultado=f"Cancelado por el acuerdo {acuerdo.numero}")
 
 
 def _ejecutar_suspension(propuesta, acuerdo, usuario):
@@ -440,8 +457,8 @@ def _ejecutar_suspension(propuesta, acuerdo, usuario):
     exp.cambiar_estado("suspendida", usuario, motivo=reasignacion._motivo(acuerdo) + " " + propuesta.descripcion,
                        tipo_evento="suspension", descripcion=f"Apoyo suspendido temporalmente (acuerdo {acuerdo.numero}).",
                        datos={"acuerdo": acuerdo.pk})
-    abiertos(exp.senalamientos.filter(tipo="reportes_incumplidos")).update(
-        atendido_en=timezone.now(), atendido_por=usuario, resultado=f"Suspendido por el acuerdo {acuerdo.numero}")
+    _actualizar(abiertos(exp.senalamientos.filter(tipo="reportes_incumplidos")),
+                atendido_en=timezone.now(), atendido_por=usuario, resultado=f"Suspendido por el acuerdo {acuerdo.numero}")
 
 
 # ----------------------------------------------------------------------------- requerimiento y reintegro
@@ -456,6 +473,7 @@ def plazo_reintegro(expediente, requerimiento):
     return f"Reintegro {base}. {texto}"[:400]
 
 
+@registra_usuario
 def emitir_requerimiento(usuario, requerimiento, plantas=0, precio_planta=None, fuente_precio="", momento=None):
     """La Unidad Jurídica emite el requerimiento con el monto y la cuenta para el depósito (criterio 2); lo notifica la Delegación."""
     exigir_unidad(usuario, TipoUnidad.JURIDICA)
@@ -516,6 +534,7 @@ def emitir_requerimiento(usuario, requerimiento, plantas=0, precio_planta=None, 
     return requerimiento
 
 
+@registra_usuario
 def comprobar_deposito(usuario, requerimiento, fecha, importe, referencia, archivo, momento=None):
     """Administración y Finanzas comprueba el depósito del reintegro: el expediente queda reintegrado."""
     exigir_unidad(usuario, TipoUnidad.ADMIN_FINANZAS)

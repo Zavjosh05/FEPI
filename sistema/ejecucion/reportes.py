@@ -34,6 +34,7 @@ from dictamen.comun import exigir_acceso, exigir_programa, exigir_unidad
 from nucleo import extensiones, notificaciones
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, Expediente, TipoUnidad
+from nucleo.trazabilidad import registra_usuario
 
 from . import comprobaciones
 from .models import (EnvioEvaluacion, EvaluacionPeriodo, ResultadoEvaluacion, ResultadoRevision, RevisionReporte)
@@ -255,6 +256,7 @@ def envios_por_validar(ejercicio=None):
 
 
 # ----------------------------------------------------------------------------- revisión de la Delegación
+@registra_usuario
 def revisar(usuario, comprobacion, resultado, observaciones="", momento=None):
     """La Delegación del expediente revisa un reporte mensual o un acuse de depósito recibido (portal o ventanilla)."""
     exp = comprobacion.expediente
@@ -307,6 +309,7 @@ def puede_evaluar(usuario, expediente):
     return usuario.tipo_unidad == TipoUnidad.DIRECCION and usuario.unidad.programas.filter(pk=expediente.programa.pk).exists()
 
 
+@registra_usuario
 def evaluar_periodo(usuario, expediente, periodo, resultado, motivo="", momento=None):
     """«Cumple» o «no cumple» (con su motivo) de un Guardabosque en un periodo con reporte revisado por la Delegación.
     Se puede cambiar mientras la evaluación del periodo no se envía al CASPEG."""
@@ -347,6 +350,7 @@ def evaluar_periodo(usuario, expediente, periodo, resultado, motivo="", momento=
     return e
 
 
+@registra_usuario
 def enviar_evaluacion(usuario, ejercicio, periodo, momento=None, expedientes=None):
     """Envía al CASPEG la evaluación del periodo con fecha, hora y acuse. Pone «no entregó» a quien no tiene reporte (o lo
     tiene devuelto sin corregir) y no se envía mientras haya reportes por revisar o por evaluar. Lo ya enviado no se vuelve a

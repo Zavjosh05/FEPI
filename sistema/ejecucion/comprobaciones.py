@@ -32,6 +32,7 @@ from nucleo import montos, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import leer_json
 from nucleo.models import Evento, TipoUnidad, Transicion, expedientes_visibles
+from nucleo.trazabilidad import registra_usuario
 from portal import cuentas
 
 from .models import Comprobacion, MedioEnvio
@@ -148,6 +149,7 @@ def _fmt(valor):
     return f"{timezone.localtime(valor):%d/%m/%Y %H:%M:%S} h"
 
 
+@registra_usuario
 def registrar_envio(usuario, expediente, tipo, archivo=None, descripcion="", fecha_hecho=None, periodo="",
                     persona_entrega="", momento=None):
     """Registra el envío (portal) o la entrega (ventanilla) con su acuse. Devuelve la ``Comprobacion``."""
@@ -291,6 +293,7 @@ def _cambiar_estado(c, expediente, t, usuario, portal):
     c.save(update_fields=["cambio_estado"])
 
 
+@registra_usuario
 def marcar_revisada(usuario, comprobacion, momento=None):
     """La Delegación del expediente revisa lo que llegó por el portal (queda la fecha, la hora y quién)."""
     exp = comprobacion.expediente

@@ -419,3 +419,28 @@ def test_hu_6_1_pestana_pagina_y_bandejas(contratadas, usuarios, client, contras
     assert r.status_code == 302 and p.acuerdo and p.estado == "en_sesion"
     client.login(username="del_amecameca", password=contrasena)
     assert client.get(reverse("seguimiento:pagina")).status_code == 403
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 3: trazabilidad
+def test_hu_6_1_trazabilidad_de_la_solicitud_la_propuesta_y_su_ejecucion(contratadas, usuarios):
+    """Criterio 3: la solicitud de la persona (Delegación), la propuesta (área responsable), su paso por el Comité y su
+    ejecución, y la salida de la lista quedan en el historial con su usuario."""
+    _, (exp,) = contratadas("CC")
+    deleg, drff = delegado_de(usuarios, exp), usuarios["dir_drff"]
+    s = _desistir(usuarios, exp)
+    assert s.history.get(history_type="+").history_user == deleg
+    p = reasignacion.proponer(drff, exp, "desistimiento")
+    assert p.history.filter(history_type="+").first().history_user == drff
+    _acordar_y_cumplir(usuarios, p)
+    assert p.history.filter(estado="en_sesion").first().history_user == usuarios["comite"]
+    assert p.history.filter(estado="ejecutada").first().history_user == drff
+    assert MovimientoListado.history.get(expediente_id=exp.pk).history_user == drff
+    assert any(f["usuario"] == deleg for f in _filas_de(exp, "Solicitud de sustitución o desistimiento"))
+    assert {f["usuario"].username for f in _filas_de(exp, "Propuesta al Comité")} >= {"dir_drff", "comite"}
+    assert _filas_de(exp, "Movimiento de listado")

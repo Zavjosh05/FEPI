@@ -400,3 +400,25 @@ def test_hu_4_3_el_guardabosque_ve_en_su_portal_la_revision_de_la_delegacion(dos
         r = client.post(reverse("ejecucion_portal:enviar", args=[a.folio]),
                         {"tipo": "reporte_mensual", "periodo": "2026-06", "archivo": pdf("corregido.pdf")}, follow=True)
     assert a.comprobaciones.filter(tipo="reporte_mensual", periodo="2026-06").count() == 2, r.content.decode()[:500]
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 3: trazabilidad
+def test_hu_4_3_trazabilidad_de_la_revision_la_evaluacion_y_su_envio(dos, usuarios, pdf):
+    """Criterio 3: la revisión de la Delegación, la evaluación de la Dirección de Protección Forestal y su envío al CASPEG
+    quedan en el historial con quién, cuándo y qué valores."""
+    a, b = dos
+    envio = _junio_completo(usuarios, a, b, pdf)
+    deleg, dpf = delegado_de(usuarios, a), usuarios["dir_dpf"]
+    assert RevisionReporte.history.filter(expediente_id=a.pk, history_type="+").get().history_user == deleg
+    evaluacion = EvaluacionPeriodo.objects.get(expediente=a, periodo="2026-06")
+    assert evaluacion.history.filter(history_type="+").get().history_user == dpf
+    assert envio.history.get(history_type="+").history_user == dpf
+    assert any(f["usuario"] == deleg for f in _filas_de(a, "Revisión del reporte mensual"))
+    assert any(f["usuario"] == dpf for f in _filas_de(a, "Evaluación por periodo"))
+    assert _filas_de(a, "Envío de la evaluación al CASPEG") and _filas_de(b, "Envío de la evaluación al CASPEG")

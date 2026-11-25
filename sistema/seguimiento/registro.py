@@ -190,6 +190,25 @@ def panel_informes(request):
                   "Ver los informes")
 
 
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M6 en la pestaña «Trazabilidad» (HU-6.1 a HU-6.3)."""
+    from .models import (AvisoOmision, CierreExpediente, CuentaReintegro, Propuesta, Prorroga, Requerimiento, Senalamiento,
+                         SolicitudPersona)
+
+    propuestas = list(expediente.propuestas_seguimiento.values_list("pk", flat=True))
+    cuentas = list(Requerimiento.objects.filter(expediente=expediente, cuenta__isnull=False).values_list("cuenta_id", flat=True))
+    return [
+        ("Solicitud de sustitución o desistimiento", SolicitudPersona.history.filter(expediente_id=expediente.pk)),
+        ("Propuesta al Comité", Propuesta.history.filter(id__in=propuestas)),
+        ("Prórroga por causa externa", Prorroga.history.filter(expediente_id=expediente.pk)),
+        ("Aviso de omisiones", AvisoOmision.history.filter(expediente_id=expediente.pk)),
+        ("Señalamiento del sistema", Senalamiento.history.filter(expediente_id=expediente.pk)),
+        ("Requerimiento de devolución", Requerimiento.history.filter(expediente_id=expediente.pk)),
+        ("Cuenta para reintegros", CuentaReintegro.history.filter(id__in=cuentas)),
+        ("Cierre del expediente", CierreExpediente.history.filter(expediente_id=expediente.pk)),
+    ]
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -232,6 +251,8 @@ def registrar():
     for tipo in TIPOS_ACUERDO_M6:
         dictamen_seguimiento.RECEPTORES.setdefault(tipo, []).append(reasignacion.ejecutar_acuerdo)
     extensiones.DEMOS.append(cargar_demo)
+    if fuentes_trazabilidad not in extensiones.TRAZABILIDAD:
+        extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
 
 
 def cargar_demo():

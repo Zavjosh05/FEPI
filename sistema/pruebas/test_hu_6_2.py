@@ -11,12 +11,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 from dictamen import seguimiento as dictamen_seguimiento
-from dictamen.models import PersonaIncumplida
+from dictamen.models import MovimientoListado, PersonaIncumplida
 from ejecucion import comprobaciones, verificacion
 from nucleo import extensiones, plazos, reloj
 from nucleo.models import Evento, Hito, Programa
 from seguimiento import incumplimientos, reasignacion
-from dictamen.models import MovimientoListado
 from seguimiento.models import Senalamiento
 
 from .conftest import historia
@@ -313,3 +312,30 @@ def test_hu_6_2_pantallas_de_juridica_y_finanzas(pagada, usuarios, client, contr
     client.login(username="finanzas", password=contrasena)
     html = client.get(reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=seguimiento").content.decode()
     assert 'id="form-deposito"' in html and "Comprobar el depósito del reintegro" in html
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 4: trazabilidad
+def test_hu_6_2_trazabilidad_del_aviso_el_senalamiento_y_el_requerimiento(pagada, usuarios):
+    """Criterio 4: el aviso de omisiones, el señalamiento que confirma una persona y el requerimiento quedan en el
+    historial; el señalamiento atendido es un cambio del mismo registro (antes se actualizaba sin dejar rastro)."""
+    exp, aviso = _con_omision_vencida(pagada, usuarios)
+    drff = usuarios["dir_drff"]
+    assert aviso.history.get(history_type="+").history_user == drff
+    incumplimientos.revisar(date(2026, 9, 16))
+    s = Senalamiento.objects.get(expediente=exp)
+    assert s.history.get(history_type="+").history_user is None                     # lo registra el sistema
+    incumplimientos.confirmar(drff, s)
+    _cumplir(usuarios, Senalamiento.objects.get(pk=s.pk).propuesta)
+    s.refresh_from_db()
+    assert s.atendido_en is not None
+    atendido = s.history.filter(history_type="~", atendido_en__isnull=False).first()
+    assert atendido is not None and atendido.history_user == drff                   # quien lo confirmó
+    assert exp.requerimientos.get().history.filter(history_type="+").exists()
+    assert any(f["usuario"] == drff for f in _filas_de(exp, "Aviso de omisiones"))
+    assert len(_filas_de(exp, "Señalamiento del sistema")) >= 2 and _filas_de(exp, "Requerimiento de devolución")

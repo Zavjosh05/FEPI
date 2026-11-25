@@ -4,6 +4,7 @@ registro en los dos medios: fecha y hora, acuse, quién lo envió y, en ventanil
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente
 
@@ -49,6 +50,7 @@ class Comprobacion(models.Model):
                                      related_name="+", help_text="La Delegación revisó lo recibido por el portal.")
     revisada_en = models.DateTimeField(null=True, blank=True)
     datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-enviada_en", "-id"]

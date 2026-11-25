@@ -33,6 +33,7 @@ from dictamen.comun import exigir_acceso, exigir_programa
 from nucleo import extensiones, montos, notificaciones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Evento, TipoUnidad
+from nucleo.trazabilidad import registra_usuario
 
 from .comprobaciones import _fmt, _leer_archivo, datos_ejecucion
 from .models import Incidencia, ResultadoVerificacion, Verificacion
@@ -186,6 +187,7 @@ def fuente_verificacion(expediente, numero):
 
 
 # ----------------------------------------------------------------------------- registro
+@registra_usuario
 def registrar_verificacion(usuario, expediente, tipo_documento, archivo, fecha_visita=None, superficie_verificada=None,
                            sobrevivencia=None, observaciones="", incidencias=(), momento=None):
     """Registra el resultado de la verificación. ``incidencias``: ``[{"tipo", "descripcion", "archivo"}]``."""
@@ -329,6 +331,7 @@ def _acuse(v, expediente, cfg, incidencias, usuario, motivos):
 
 
 # ----------------------------------------------------------------------------- devolución y conclusión
+@registra_usuario
 def devolver_comprobacion(usuario, expediente, motivo):
     """El área responsable regresa la comprobación con observaciones; la Delegación lo notifica a la persona."""
     if usuario.tipo_unidad != TipoUnidad.DIRECCION:
@@ -353,6 +356,7 @@ def ministraciones_pendientes(expediente):
     return [m.numero for m in monto.ministraciones if m.numero not in pagadas and m.importe > 0]
 
 
+@registra_usuario
 def dar_por_concluida(usuario, expediente):
     """Verificado el cumplimiento y sin ministraciones por pagar, el área responsable da por concluidas las actividades."""
     if usuario.tipo_unidad != TipoUnidad.DIRECCION:

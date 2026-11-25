@@ -3,6 +3,7 @@ beneficiarias y el informe anual al Comité con su envío y su recepción."""
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Ejercicio, Expediente
 
@@ -17,6 +18,7 @@ class CierreExpediente(models.Model):
     cerrado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     cerrado_en = models.DateTimeField(default=timezone.now)
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-cerrado_en", "-id"]
@@ -36,6 +38,7 @@ class PadronPublicacion(models.Model):
     publicada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     fundamento = models.CharField(max_length=300, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "publicación del padrón"
@@ -65,6 +68,7 @@ class InformeAnual(models.Model):
     recibido_en = models.DateTimeField(null=True, blank=True)
     acuse_recepcion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     observaciones = models.TextField(blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "informe anual al Comité"

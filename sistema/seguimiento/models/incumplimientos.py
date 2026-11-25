@@ -4,6 +4,7 @@ su cuenta y la comprobación del depósito."""
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from dictamen.models import Acuerdo
 from nucleo.models import Acuse, Expediente, Notificacion, Programa
@@ -23,6 +24,7 @@ class CuentaReintegro(models.Model):
     vigente = models.BooleanField(default=True)
     registrada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     registrada_en = models.DateTimeField(default=timezone.now)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["programa", "-registrada_en"]
@@ -54,6 +56,7 @@ class AvisoOmision(models.Model):
     subsanada_en = models.DateTimeField(null=True, blank=True)
     subsanada_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     motivo_subsanacion = models.TextField(blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-creado_en", "-id"]
@@ -84,6 +87,7 @@ class Senalamiento(models.Model):
     atendido_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     resultado = models.CharField(max_length=300, blank=True)
     propuesta = models.ForeignKey(Propuesta, null=True, blank=True, on_delete=models.SET_NULL, related_name="senalamientos")
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["creado_en", "id"]
@@ -145,6 +149,7 @@ class Requerimiento(models.Model):
     comprobado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     comprobado_en = models.DateTimeField(null=True, blank=True)
     acuse_deposito = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-preparado_en", "-id"]

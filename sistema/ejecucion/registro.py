@@ -138,6 +138,22 @@ def panel_evaluaciones_por_validar(request):
         "accion": "Ver las evaluaciones"}}
 
 
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M4 en la pestaña «Trazabilidad» (HU-4.1 a HU-4.3)."""
+    from .models import Comprobacion, EnvioEvaluacion, EvaluacionPeriodo, Incidencia, RevisionReporte, Verificacion
+
+    envios = list(EvaluacionPeriodo.objects.filter(expediente=expediente, envio__isnull=False)
+                  .values_list("envio_id", flat=True).distinct())
+    return [
+        ("Comprobación", Comprobacion.history.filter(expediente_id=expediente.pk)),
+        ("Verificación en campo", Verificacion.history.filter(expediente_id=expediente.pk)),
+        ("Incidencia de la verificación", Incidencia.history.filter(expediente_id=expediente.pk)),
+        ("Revisión del reporte mensual", RevisionReporte.history.filter(expediente_id=expediente.pk)),
+        ("Evaluación por periodo", EvaluacionPeriodo.history.filter(expediente_id=expediente.pk)),
+        ("Envío de la evaluación al CASPEG", EnvioEvaluacion.history.filter(id__in=envios)),
+    ]
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -168,6 +184,8 @@ def registrar():
     extensiones.AJUSTES_MONTO.append(verificacion.ajustar_monto)  # HU-4.2: pago proporcional a lo verificado
     extensiones.SECCIONES_PORTAL.append(seccion_portal)
     extensiones.DEMOS.append(cargar_demo)
+    if fuentes_trazabilidad not in extensiones.TRAZABILIDAD:
+        extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
 
 
 def cargar_demo():

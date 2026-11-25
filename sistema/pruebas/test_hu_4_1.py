@@ -299,3 +299,33 @@ def test_hu_4_1_la_consulta_sin_cuenta_ve_los_envios_pero_no_envia(pagada, cuent
     assert c.acuse.folio in pagina and 'data-prueba="consulta-sin-envio"' in pagina and "form-envio-portal" not in pagina
     assert client.post(reverse("ejecucion_portal:enviar", args=[exp.folio]), {"tipo": "informe_final"}).status_code == 403
     assert Evento.objects.filter(expediente=exp, tipo="comprobacion").count() == 1
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 3: trazabilidad
+def test_hu_4_1_trazabilidad_de_los_envios_por_el_portal_y_en_ventanilla(pagada, cuenta_portal, usuarios, pdf):
+    """Criterio 3: cada envío queda en el historial con quien lo hizo (la cuenta del portal o la Delegación), y la revisión
+    de la Delegación como cambio del mismo registro; los dos aparecen en la pestaña «Trazabilidad»."""
+    portal_exp, ventanilla_exp = _pagada(pagada, "PS", cuantas=2)
+    with reloj.en(CONTRATO):
+        persona = cuenta_portal(portal_exp)
+    deleg = delegado_de(usuarios, ventanilla_exp)
+    with reloj.en("2026-09-28 11:00"):
+        por_portal = comprobaciones.registrar_envio(persona, portal_exp, "aviso_termino", fecha_hecho=date(2026, 9, 25))
+        en_persona = comprobaciones.registrar_envio(deleg, ventanilla_exp, "aviso_termino", fecha_hecho=date(2026, 9, 25),
+                                                    persona_entrega="Abel Contreras Vega")
+    assert por_portal.history.get(history_type="+").history_user == persona
+    assert en_persona.history.get(history_type="+").history_user == deleg
+    revisa = delegado_de(usuarios, portal_exp)
+    comprobaciones.marcar_revisada(revisa, por_portal)
+    cambio = por_portal.history.filter(history_type="~").latest("history_date")
+    assert cambio.history_user == revisa and cambio.revisada_en is not None
+    filas = _filas_de(portal_exp, "Comprobación")
+    assert any(f["usuario"] == persona and f["tipo"] == "Alta" for f in filas)
+    assert any(f["usuario"] == revisa and f["tipo"] == "Cambio" for f in filas)
+    assert any(f["usuario"] == deleg for f in _filas_de(ventanilla_exp, "Comprobación"))

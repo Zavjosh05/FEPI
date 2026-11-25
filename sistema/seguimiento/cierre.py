@@ -32,6 +32,7 @@ from nucleo import acuses, montos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import Ejercicio, Evento, Expediente, TipoUnidad, Transicion
 from nucleo.templatetags.moneda import formato_moneda
+from nucleo.trazabilidad import registra_usuario
 from pagos import solicitudes
 
 from . import reasignacion
@@ -239,6 +240,7 @@ def puede_cerrar(expediente, diferencias=None):
     return True, ""
 
 
+@registra_usuario
 def cerrar_expediente(usuario, expediente, momento=None):
     """El área responsable cierra el expediente: pasa por «concluida» si hace falta, queda ``ejercicio_cerrado`` con su acuse y la
     copia de los resultados finales."""
@@ -278,6 +280,7 @@ def cerrar_expediente(usuario, expediente, momento=None):
     return expediente
 
 
+@registra_usuario
 def cerrar_listos(usuario, ejercicio, momento=None):
     """Cierra todos los expedientes del ejercicio que ya cuadran; regresa (cerrados, omitidos con su motivo)."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
@@ -397,6 +400,7 @@ def padrones_publicos():
     return PadronPublicacion.objects.select_related("ejercicio__programa").order_by("ejercicio__programa__nombre", "-ejercicio__anio")
 
 
+@registra_usuario
 def publicar_padron(usuario, ejercicio, momento=None):
     """El área responsable publica el padrón: desde entonces la página pública lo muestra y se actualiza sola."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
@@ -451,6 +455,7 @@ def _resumen_informe(filas, total):
             "diferencias": [{"folio": f["folio"], "nombre": d["nombre"], "detalle": d["detalle"]} for f in filas for d in f["diferencias"]]}
 
 
+@registra_usuario
 def enviar_informe(usuario, ejercicio, momento=None):
     """El área responsable envía el informe anual al Comité: genera el PDF con los resultados finales y las diferencias y registra la
     fecha y la hora del envío con su acuse."""
@@ -490,6 +495,7 @@ def sesiones_para_informe(informe):
     return SesionComite.objects.filter(ejercicio__programa=informe.ejercicio.programa).order_by("-fecha_hora")
 
 
+@registra_usuario
 def registrar_recepcion(usuario, informe, sesion=None, observaciones="", momento=None):
     """La Secretaría Técnica registra que recibió el informe y, si lo indica, la sesión del Comité en que se presenta."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)

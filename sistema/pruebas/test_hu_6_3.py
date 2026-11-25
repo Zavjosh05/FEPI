@@ -330,3 +330,21 @@ def test_hu_6_3_ya_no_queda_nada_por_construir_en_la_pestana(pagada, usuarios, c
     html = client.get(reverse("recepcion:expediente", args=[exp.folio]) + "?pestana=seguimiento").content.decode()
     assert 'data-prueba="por-construir"' not in html and 'data-prueba="resultados-expediente"' in html
     assert [h[0] for h in registro.historias_pendientes()] == []
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 4: trazabilidad
+def test_hu_6_3_trazabilidad_del_cierre_del_expediente(pagada, usuarios):
+    """Criterio 4: el cierre del expediente queda en el historial con el área responsable que lo hizo."""
+    exp = _concluida(pagada, usuarios)
+    with reloj.en("2026-11-23 10:30"):
+        c = cierre.cerrar_expediente(usuarios["dir_drff"], exp)
+    c = CierreExpediente.objects.get(expediente=exp) if not isinstance(c, CierreExpediente) else c
+    assert c.history.get(history_type="+").history_user == usuarios["dir_drff"]
+    filas = _filas_de(exp, "Cierre del expediente")
+    assert filas and filas[0]["usuario"] == usuarios["dir_drff"]

@@ -4,6 +4,7 @@ acuerdo que las resuelve. ``Propuesta`` es común a las propuestas de M6 (HU-6.2
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from dictamen.models import Acuerdo
 from nucleo.models import Acuse, Ejercicio, Expediente, Persona, Unidad
@@ -37,6 +38,7 @@ class Propuesta(models.Model):
     acuerdo = models.OneToOneField(Acuerdo, null=True, blank=True, on_delete=models.PROTECT, related_name="propuesta_seguimiento")
     aprobada = models.BooleanField(null=True, help_text="Lo que acordó el Comité (None mientras no se lleve a sesión).")
     ejecutada_en = models.DateTimeField(null=True, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-creada_en", "-id"]
@@ -89,6 +91,7 @@ class SolicitudPersona(models.Model):
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     propuesta = models.ForeignKey(Propuesta, null=True, blank=True, on_delete=models.SET_NULL, related_name="solicitudes")
     datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["presentada_en", "id"]
@@ -127,6 +130,7 @@ class Prorroga(models.Model):
     motivo_resolucion = models.TextField(blank=True)
     adendum = models.ForeignKey("contrato.Adendum", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     acuse_resolucion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["solicitada_en", "id"]
