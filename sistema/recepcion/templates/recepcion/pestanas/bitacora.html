@@ -2,7 +2,7 @@
 <div class="small text-secondary mb-2" data-prueba="orden-bitacora">Orden cronológico: lo más antiguo arriba. Si dos renglones caen en el mismo segundo, va primero el que se registró antes.</div>
 <div class="table-responsive">
 <table class="table table-sm" id="tabla-bitacora">
-  <thead class="table-light"><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Estado</th><th>Acuse</th></tr></thead>
+  <thead class="table-light"><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Estado</th><th>Acuse o documento</th></tr></thead>
   <tbody>
   {% for e in eventos %}
   <tr>
@@ -10,16 +10,10 @@
     <td class="small">{{ e.usuario|default:"Sistema (revisión de plazos)" }}<div class="text-secondary">{{ e.unidad|default:"" }}</div></td>
     <td>{{ e.descripcion }}{% if e.motivo %}<div class="small text-secondary">Motivo: {{ e.motivo }}</div>{% endif %}</td>
     <td class="small">{% if e.estado_destino %}{% if e.estado_origen %}{{ e.estado_origen }} → {% endif %}{{ e.estado_destino }}{% endif %}</td>
-    <td>{% if e.acuse %}<a href="{% url 'nucleo:acuse' e.acuse.folio %}" target="_blank">{{ e.acuse.folio }}</a>{% endif %}</td>
+    <td>{% if e.acuse %}<a href="{% url 'nucleo:acuse' e.acuse.folio %}" target="_blank">{{ e.acuse.folio }}</a>{% elif e.datos.documento %}<a href="{% url 'nucleo:documento' e.datos.documento %}" target="_blank">{{ e.datos.folio|default:"Documento" }}</a>{% endif %}</td>
   </tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
-<details class="mt-3">
-  <summary class="small text-secondary">Historial de cambios del registro del expediente</summary>
-  <table class="table table-sm small mt-2">
-    <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Cambio</th><th>Estado</th></tr></thead>
-    <tbody>{% for h in historial %}<tr><td>{{ h.history_date|date:"d/m/Y H:i:s" }}</td><td>{{ h.history_user|default:"—" }}</td><td>{% if h.history_type == "+" %}Alta del registro{% elif h.history_type == "-" %}Baja del registro{% else %}Cambio{% endif %}{% if h.history_change_reason %}: {{ h.history_change_reason }}{% endif %}</td><td>{{ h.estado }}</td></tr>{% endfor %}</tbody>
-  </table>
-</details>
+<div class="small text-secondary mt-2">La bitácora dice qué pasó en el trámite. El detalle de cada registro en la base de datos (quién, cuándo y qué valores cambiaron) está en la pestaña <a href="?pestana=trazabilidad">Trazabilidad</a>.</div>

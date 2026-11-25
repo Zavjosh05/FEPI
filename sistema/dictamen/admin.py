@@ -6,13 +6,13 @@ from . import models
 
 @admin.register(models.DictamenTecnico)
 class DictamenTecnicoAdmin(SimpleHistoryAdmin):
-    list_display = ["expediente", "resultado", "dentro_de_plazo", "usuario", "fecha_hora"]
+    list_display = ["folio", "expediente", "resultado", "dentro_de_plazo", "usuario", "fecha_hora"]
     list_filter = ["resultado"]
 
 
 @admin.register(models.DictamenJuridico)
 class DictamenJuridicoAdmin(SimpleHistoryAdmin):
-    list_display = ["expediente", "resultado", "usuario", "fecha_hora"]
+    list_display = ["folio", "expediente", "resultado", "usuario", "fecha_hora"]
     list_filter = ["resultado"]
 
 
@@ -44,3 +44,15 @@ class SesionComiteAdmin(SimpleHistoryAdmin):
 class AcuerdoAdmin(SimpleHistoryAdmin):
     list_display = ["numero", "tipo", "unidad_responsable", "estado"]
     list_filter = ["tipo", "estado", "unidad_responsable"]
+
+
+@admin.register(models.RevisionPropiedad)
+class RevisionPropiedadAdmin(SimpleHistoryAdmin):
+    list_display = ["dictamen", "nombre_documento", "titular_documento", "acreditada"]
+    list_filter = ["acreditada", "tipo_documento"]
+
+
+@admin.register(models.MovimientoListado)
+class MovimientoListadoAdmin(SimpleHistoryAdmin):
+    list_display = ["acuerdo", "expediente", "movimiento", "lugar_lista_espera", "monto", "usuario", "fecha_hora"]
+    list_filter = ["movimiento"]

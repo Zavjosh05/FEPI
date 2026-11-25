@@ -49,7 +49,8 @@ def _archivo(nombre):
 
 def test_hu_4_2_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-4.2")
-    assert hu["criterios"] == ["Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del "
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del "
                                "plazo del programa.", "Cada incidencia tiene su tipo y el documento que la avala."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M4.2")
     assert {"CC-DRF-03", "CC-DRF-04", "MFS-DRF-03", "PS-DRF-04", "PS-DRF-05", "RHF-DRF-04", "PSA-DRF-04"} == set(funcion["necesidades"])

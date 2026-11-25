@@ -581,8 +581,11 @@ def llevar_a_sesion(usuario, propuesta, sesion, aprueba=True, descripcion=""):
     tipo = datos_seguimiento()["propuestas"]["tipos"][propuesta.tipo]["acuerdo"]
     texto = (descripcion or "").strip() or (("Se aprueba: " if aprueba else "No se aprueba: ") + propuesta.descripcion)
     with transaction.atomic():
+        causa = f"{propuesta.nombre_tipo} propuesta por el área responsable" + (
+            f" ({propuesta.acuse.folio})" if propuesta.acuse_id else "")
         acuerdo = dictamen_seguimiento.registrar_acuerdo(usuario, sesion, tipo, texto, list(propuesta.expedientes.all()),
-                                                        dictamen_seguimiento.unidad_sugerida(tipo, propuesta.ejercicio))
+                                                        dictamen_seguimiento.unidad_sugerida(tipo, propuesta.ejercicio),
+                                                        causa=causa, aplicar_efecto=False)
         propuesta.acuerdo, propuesta.aprobada, propuesta.estado = acuerdo, bool(aprueba), EstadoPropuesta.EN_SESION
         propuesta.save(update_fields=["acuerdo", "aprobada", "estado"])
     return acuerdo

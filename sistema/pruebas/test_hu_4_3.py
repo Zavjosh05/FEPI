@@ -69,7 +69,8 @@ def _junio_completo(usuarios, a, b, pdf):
 
 def test_hu_4_3_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-4.3")
-    assert hu["criterios"] == ["Existe la evaluación por Guardabosque y por periodo.", "Queda identificado quién no entregó su reporte."]
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Existe la evaluación por Guardabosque y por periodo.", "Queda identificado quién no entregó su reporte."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M4.3")
     assert set(funcion["necesidades"]) == {"PEG-BEN-01", "PEG-BEN-02", "PEG-DRF-03", "PEG-DPF-05"}
     assert "evalúa los reportes mensuales" in necesidades["PEG-DPF-05"]["texto"] and "CASPEG" in necesidades["PEG-DPF-05"]["texto"]

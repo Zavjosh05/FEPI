@@ -25,6 +25,8 @@ def test_hu_5_3_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-5.3")
     assert "asociado a su persona beneficiaria y a su ministración" in hu["criterios"][0]
     assert hu["criterios"][1] == "Existe la fecha de entrega de cada cheque."
+    assert len(hu["criterios"]) == 3
+    assert "trazabilidad" in hu["criterios"][-1]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M5.3")
     assert set(funcion["necesidades"]) == {"PSA-DRF-03", "PSA-FID-01"}
     assert "3 meses" in necesidades["PSA-DRF-03"]["texto"]
@@ -235,3 +237,20 @@ def test_hu_5_3_otras_unidades_ven_los_cheques_pero_no_actuan(client, entregado,
         assert client.post(f"/pagos/cheques/{c.pk}/cobro/").status_code in (302, 403, 404)
     c.refresh_from_db()
     assert not c.cobrado
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_5_3_trazabilidad_del_cheque(entregado, usuarios):
+    """Criterio 3: la emisión y el envío (Fiduciaria) y la entrega (Delegación) del cheque quedan en el historial."""
+    exp, c = entregado()
+    historial = c.history.order_by("history_date", "history_id")
+    assert historial.first().history_type == "+" and historial.first().history_user == usuarios["fiduciaria"]
+    entrega = historial.last()
+    assert entrega.history_user == delegado_de(usuarios, exp) and entrega.entregado_en is not None
+    filas = _filas_de(exp, "Cheque")
+    assert {f["usuario"] for f in filas} >= {usuarios["fiduciaria"], delegado_de(usuarios, exp)}

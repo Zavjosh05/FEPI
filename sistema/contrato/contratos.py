@@ -20,12 +20,14 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from dictamen.comun import exigir_programa, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import montos, plazos, reglas
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.models import Consecutivo, Evento, TipoUnidad, expedientes_visibles
 from nucleo.templatetags.moneda import formato_moneda
 
 from .models import Contrato, EstadoContrato, EstadoVersion, ModeloContrato, TipoModelo, VersionModelo
+from nucleo.trazabilidad import registra_usuario
 
 CAMPOS = {
     "folio_contrato": "Folio del contrato",
@@ -123,6 +125,7 @@ def llenar(texto, datos):
 
 
 # ----------------------------------------------------------------------------- modelos
+@registra_usuario
 def registrar_modelo(usuario, ejercicio, tipo, nombre, texto, es_base=False):
     """El área responsable registra un modelo (versión 1, por validar)."""
     _exigir_area(usuario, ejercicio.programa)
@@ -140,6 +143,7 @@ def registrar_modelo(usuario, ejercicio, tipo, nombre, texto, es_base=False):
     return modelo
 
 
+@registra_usuario
 def crear_plantilla_base(usuario, ejercicio, tipo=TipoModelo.CONTRATO_ADHESION):
     """Plantilla base propia, marcada visiblemente como «BORRADOR – modelo por validar»."""
     if tipo not in PLANTILLAS_BASE:
@@ -148,6 +152,7 @@ def crear_plantilla_base(usuario, ejercicio, tipo=TipoModelo.CONTRATO_ADHESION):
     return registrar_modelo(usuario, ejercicio, tipo, nombre, PLANTILLAS_BASE[tipo], es_base=True)
 
 
+@registra_usuario
 def modificar_modelo(usuario, modelo, texto):
     """Cambia el texto: se crea una versión nueva, por validar (aunque la anterior estuviera validada)."""
     _exigir_area(usuario, modelo.ejercicio.programa)
@@ -171,11 +176,13 @@ def _revisar(usuario, version, estado, observaciones):
     return version
 
 
+@registra_usuario
 def validar_version(usuario, version, observaciones=""):
     """La Unidad Jurídica valida la versión (fecha y hora, quién y observaciones)."""
     return _revisar(usuario, version, EstadoVersion.VALIDADA, observaciones)
 
 
+@registra_usuario
 def devolver_version(usuario, version, observaciones):
     """La Unidad Jurídica la devuelve con observaciones (obligatorias)."""
     if not (observaciones or "").strip():
@@ -241,6 +248,7 @@ def datos_del_contrato(expediente, folio, ahora):
     }
 
 
+@registra_usuario
 def elaborar_contrato(usuario, expediente, modelo, momento=None):
     """Elabora (o rehace, si aún no se envía) el contrato del expediente sobre un modelo validado."""
     _exigir_area(usuario, expediente.programa)
@@ -249,6 +257,7 @@ def elaborar_contrato(usuario, expediente, modelo, momento=None):
     estado = expediente.estado.clave
     if existente and existente.enviado:
         raise ValidationError("El contrato ya se envió a la Delegación; no se rehace.")
+    exigir_vigente(expediente, "ya no se elabora su contrato")
     if existente is None and estado != "notificada":
         if estado == "aprobada":
             raise ValidationError("La solicitud está aprobada pero sus resultados aún no se publican.")
@@ -302,6 +311,7 @@ def elaborar_contrato(usuario, expediente, modelo, momento=None):
     return contrato
 
 
+@registra_usuario
 def enviar_a_delegacion(usuario, contrato, momento=None):
     """Envía el contrato a la Delegación: fecha y hora, acuse y paso a la bandeja de la Delegación."""
     exp = contrato.expediente

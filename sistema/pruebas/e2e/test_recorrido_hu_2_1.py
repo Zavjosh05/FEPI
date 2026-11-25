@@ -3,7 +3,7 @@ from playwright.sync_api import expect
 
 from dictamen import juridico, tecnico
 from nucleo.models import Ejercicio, Usuario
-from pruebas.fixtures_m2 import peg, registrar_peg, registrar_validada  # noqa: F401
+from pruebas.fixtures_m2 import peg, propiedad_en_regla, registrar_peg, registrar_validada  # noqa: F401
 
 
 def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, entrar, captura):  # noqa: F811
@@ -15,7 +15,7 @@ def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, en
                        solicitante="Pablo Juárez Santana")
     otro = registrar_validada(u, cc, municipio="Tlalmanalco", nombre="El Mirador", ha=12, solicitante="Ana Reyes Gil")
     tecnico.dictaminar(u["dir_drff"], otro, "no_factible", "Cobertura de bosque natural mayor al 30 % (fr. XIII).")
-    juridico.dictaminar(u["juridica"], otro, "procedente", "Documentación vigente.")
+    juridico.dictaminar(u["juridica"], otro, "procedente", "Documentación vigente.", propiedad=propiedad_en_regla(otro))
 
     entrar("dir_drff")
     expect(page.locator("#tabla-bandeja")).to_contain_text(exp.folio)
@@ -37,7 +37,11 @@ def test_hu_2_1_recorrido_dictamen_tecnico(datos_e2e, peg, page, live_server, en
     page.click("button:has-text('Registrar dictamen técnico')")
     page.wait_for_url("**pestana=dictamenes")
     expect(page.locator("[data-prueba=resumen-tecnico]")).to_contain_text("Factible")
+    expect(page.locator("[data-prueba=documento-tecnico]")).to_contain_text("DT-CC-2026-")
     captura("hu_2_1_03_dictamen_tecnico_registrado")
+    page.goto(f"{live_server.url}/recepcion/expediente/{exp.folio}/?pestana=documentos")
+    expect(page.locator("[data-prueba=documento-dictamen]")).to_contain_text("Dictamen técnico")
+    captura("hu_2_1_06_documento_del_dictamen_adjunto")
     page.goto(f"{live_server.url}/dictamen/listado/")
     expect(page.locator("#tabla-listado")).to_contain_text("No factible")
     captura("hu_2_1_04_listado_preliminar")

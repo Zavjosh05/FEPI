@@ -8,7 +8,7 @@ from django.utils import timezone
 from nucleo import dias_habiles
 from nucleo.demo import completar_requisitos
 from recepcion import servicios
-from recepcion.models import EstadoRevision, ResultadoValidacion
+from recepcion.models import EstadoRevision, ObservacionValidacion, OrigenObservacion, ResultadoValidacion
 
 from .conftest import historia
 
@@ -39,7 +39,8 @@ def _refrendo_enviado(nueva_solicitud, usuarios, anios_documentacion):
 
 def test_hu_1_4_criterios_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-1.4")
-    assert len(hu["criterios"]) == 2 and "3 años" in hu["criterios"][1]
+    assert len(hu["criterios"]) == 4 and "observación" in hu["criterios"][1] and "3 años" in hu["criterios"][2]
+    assert "trazabilidad" in hu["criterios"][3]
     assert "refrendos" in necesidades["CC-ARP-01"]["texto"]
 
 
@@ -57,7 +58,8 @@ def test_hu_1_4_aviso_de_faltantes_con_fecha_limite(enviado, usuarios, cc):
     """Criterio 1 (faltantes): existe un aviso de faltantes con fecha límite calculada con el plazo del programa."""
     exp = enviado()
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk], "Plano ilegible")
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk], "Plano ilegible",
+                                       observaciones_requisitos={plano.pk: "No trae la coordenada de un vértice."})
     exp.refresh_from_db()
     plazo = cc.plazo("complemento_documentacion_faltante")
     assert val.resultado == ResultadoValidacion.FALTANTES and exp.estado.clave == "faltantes"
@@ -77,7 +79,8 @@ def test_hu_1_4_aviso_de_faltantes_con_fecha_limite(enviado, usuarios, cc):
 def test_hu_1_4_notificacion_por_conducto_de_la_delegacion_y_reenvio(enviado, usuarios, pdf):
     exp = enviado()
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk])
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk],
+                                       observaciones_requisitos={plano.pk: "Ilegible"})
     with pytest.raises(PermissionDenied):
         servicios.registrar_notificacion(usuarios["dir_drff"], val)
     acuse = servicios.registrar_notificacion(usuarios["del_amecameca"], val)
@@ -100,7 +103,8 @@ def test_hu_1_4_dias_inhabiles_mueven_la_fecha_limite(enviado, usuarios):
     hoy = timezone.localdate()
     for i in range(1, 15):
         DiaInhabil.objects.get_or_create(fecha=hoy + timedelta(days=i), defaults={"descripcion": "Prueba"})
-    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [exp.revisiones.first().pk])
+    primero = exp.revisiones.first()
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [primero.pk], observaciones_requisitos={primero.pk: "Incompleto"})
     assert val.fecha_limite > hoy + timedelta(days=14)
 
 
@@ -167,6 +171,67 @@ def test_hu_1_4_pantalla_de_validacion(client, enviado, contrasena):
     r = client.post(f"/recepcion/expediente/{exp.folio}/validar/", {"accion": "validar", "faltante": [plano.pk]})
     assert r.status_code == 200  # no valida si hay faltantes marcados
     r = client.post(f"/recepcion/expediente/{exp.folio}/validar/", {"accion": "faltantes", "faltante": [plano.pk]})
+    assert r.status_code == 200 and "Escriba la observación" in r.content.decode()  # sin observación no hay aviso
+    r = client.post(f"/recepcion/expediente/{exp.folio}/validar/", {"accion": "faltantes", "faltante": [plano.pk],
+                                                                     f"observacion_{plano.pk}": "Sin escala ni coordenadas"})
     assert r.status_code == 302
     exp.refresh_from_db()
     assert exp.estado.clave == "faltantes"
+    html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=validacion").content.decode()
+    assert "Sin escala ni coordenadas" in html
+
+
+def test_hu_1_4_cada_faltante_lleva_su_observacion(enviado, usuarios, pdf):
+    """Criterio 2: cada requisito señalado como faltante tiene su observación y el aviso la incluye."""
+    exp = enviado()
+    plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
+    ine = exp.revisiones.get(requisito__clave="CC-REQ-06")
+    with pytest.raises(ValidationError, match="observación de cada requisito.*CC-REQ-06"):
+        servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk, ine.pk],
+                                     observaciones_requisitos={plano.pk: "Sin coordenada"})
+    exp.refresh_from_db()
+    assert exp.estado.clave == "enviada_direccion" and not exp.validaciones.exists()
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk, ine.pk], "Dos faltantes",
+                                       observaciones_requisitos={plano.pk: "Sin coordenada de un vértice",
+                                                                 ine.pk: "Identificación vencida"})
+    faltantes = {o.revision.requisito.clave: o for o in val.observaciones_requisitos.filter(faltante=True)}
+    assert set(faltantes) == {"CC-REQ-13", "CC-REQ-06"}
+    assert faltantes["CC-REQ-06"].observacion == "Identificación vencida"
+    assert faltantes["CC-REQ-06"].origen == OrigenObservacion.DIRECCION
+    # Cada requisito queda con su resultado (los válidos también).
+    assert val.observaciones_requisitos.count() == exp.revisiones.count()
+    # El aviso (PDF) lleva la observación de cada faltante; la notificación también.
+    detalle = {d["clave"]: d["estado"] for d in val.acuse.contenido["detalle"]}
+    assert detalle == {"CC-REQ-13": "Sin coordenada de un vértice", "CC-REQ-06": "Identificación vencida"}
+    acuse = servicios.registrar_notificacion(usuarios["del_amecameca"], val)
+    assert {d["estado"] for d in acuse.contenido["detalle"]} == {"Sin coordenada de un vértice", "Identificación vencida"}
+    # La Delegación ve la observación en el requisito.
+    ine.refresh_from_db()
+    assert ine.estado == EstadoRevision.FALTANTE and ine.observacion_direccion.observacion == "Identificación vencida"
+
+
+def test_hu_1_4_el_faltante_de_las_reglas_usa_su_motivo_si_no_hay_observacion(nueva_solicitud, usuarios):
+    exp = _refrendo_enviado(nueva_solicitud, usuarios, 2)
+    vieja = exp.revisiones.filter(en_archivo_probosque=True, requisito__es_documento_legal=True).first()
+    vieja.fecha_documento = vieja.fecha_documento.replace(year=vieja.fecha_documento.year - 2)
+    vieja.save()
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp)
+    obs = val.observaciones_requisitos.get(revision=vieja)
+    assert obs.faltante and obs.origen == OrigenObservacion.REGLAS and "no es válida" in obs.observacion
+
+
+def test_hu_1_4_trazabilidad(enviado, usuarios):
+    """Criterio 4: queda el registro en la base de datos de quién validó, cuándo y qué cambió."""
+    exp = enviado()
+    plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk], observaciones_requisitos={plano.pk: "Ilegible"})
+    alta = val.history.get(history_type="+")
+    assert alta.history_user == usuarios["dir_drff"] and alta.history_date
+    assert all(h.history_user == usuarios["dir_drff"] for h in val.history.all())
+    cambio = plano.history.filter(estado=EstadoRevision.FALTANTE).first()
+    assert cambio.history_user == usuarios["dir_drff"] and cambio.history_change_reason.startswith("Aviso de faltantes")
+    assert ObservacionValidacion.history.filter(revision_id=plano.pk, history_user=usuarios["dir_drff"]).exists()
+    from nucleo.trazabilidad import historial_expediente
+    filas = historial_expediente(exp)
+    assert any(f["registro"] == "Observación de la validación" and f["usuario"] == usuarios["dir_drff"] for f in filas)
+    assert any(f["registro"] == "Revisión de requisito" and any(c["despues"] == "Faltante" for c in f["cambios"]) for f in filas)

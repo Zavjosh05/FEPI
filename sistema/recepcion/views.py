@@ -20,6 +20,7 @@ from .models import EstadoRevision, Poligono, ResultadoValidacion
 PESTANAS = [
     ("solicitud", "Solicitud"), ("requisitos", "Requisitos"), ("ubicacion", "Ubicación"),
     ("validacion", "Validación"), ("documentos", "Documentos y acuses"), ("bitacora", "Bitácora"),
+    ("trazabilidad", "Trazabilidad"),
 ]
 
 
@@ -93,7 +94,7 @@ def expediente(request, folio):
     pestanas = [p for p in PESTANAS if p[0] != "ubicacion" or exp.programa.usa_poligono]
     extra = {p["clave"]: p for p in PESTANAS_EXPEDIENTE}
     # Las pestañas de otros módulos van antes de «Documentos y acuses».
-    pestanas[-2:-2] = [(p["clave"], p["nombre"]) for p in PESTANAS_EXPEDIENTE]
+    pestanas[-3:-3] = [(p["clave"], p["nombre"]) for p in PESTANAS_EXPEDIENTE]
     if pestana not in {c for c, _ in pestanas}:
         pestana = "solicitud"
     if pestana in extra:
@@ -102,6 +103,19 @@ def expediente(request, folio):
     contexto.update({"pestana": pestana, "pestanas": pestanas})
     if pestana == "ubicacion":
         contexto["form_poligono"] = PoligonoForm()
+    if pestana == "trazabilidad":
+        from nucleo.trazabilidad import historial_expediente
+
+        filas = historial_expediente(exp)
+        registro = request.GET.get("registro", "")
+        contexto["registros_traza"] = sorted({f["registro"] for f in filas})
+        contexto["registro_traza"] = registro
+        from django.core.paginator import Paginator
+
+        elegidas = [f for f in filas if not registro or f["registro"] == registro]
+        pagina = Paginator(elegidas, 25).get_page(request.GET.get("pagina"))
+        contexto["traza"] = pagina
+        contexto["traza_total"] = len(elegidas)
     return render(request, "recepcion/expediente.html", contexto)
 
 
@@ -121,13 +135,13 @@ def contexto_expediente(request, exp):
         "puede_poligono": es_delegacion and exp.estado.clave in servicios.ESTADOS_POLIGONO and exp.programa.usa_poligono,
         "transiciones_motivo": [t for t in exp.transiciones_posibles(usuario) if t.requiere_motivo],
         "poligonos": list(exp.poligonos.select_related("registrado_por", "prestador")),
-        "validaciones": list(exp.validaciones.prefetch_related("faltantes__requisito")),
+        "validaciones": list(exp.validaciones.prefetch_related("faltantes__requisito",
+                                                               "observaciones_requisitos__revision__requisito")),
         "aviso": servicios.aviso_vigente(exp) if exp.estado.clave == "faltantes" else None,
         "limite_recepcion": servicios.plazo_recepcion(exp),
         "vigencia_refrendo": servicios.vigencia_refrendo(exp) if exp.es_refrendo else None,
         "eventos": exp.eventos.select_related("usuario", "unidad", "acuse", "estado_origen", "estado_destino")
         .order_by("fecha_hora", "id"),     # cronológico; en un mismo instante, el orden en que se registraron (P-23)
-        "historial": exp.history.select_related("history_user", "estado").order_by("-history_date")[:50],
         "es_delegacion": es_delegacion,
         "es_direccion": es_direccion,
         "siguiente_paso": siguiente_paso(usuario, exp),
@@ -275,13 +289,17 @@ def validar(request, folio):
         marcados = request.POST.getlist("faltante")
         evaluacion = servicios.evaluar_para_validacion(exp)
         automaticos = [e for e in evaluacion if not e.valida]
+        notas = {e.revision.pk: request.POST.get(f"observacion_{e.revision.pk}", "") for e in evaluacion}
+        contexto["notas"] = notas
+        contexto["marcados"] = {int(m) for m in marcados if str(m).isdigit()}
         if accion == "validar" and (marcados or automaticos):
             messages.error(request, "Hay requisitos faltantes o no válidos: emita el aviso de faltantes.")
         elif accion == "faltantes" and not (marcados or automaticos):
             messages.error(request, "Marque al menos un requisito faltante para emitir el aviso.")
         else:
             try:
-                val = servicios.validar_expediente(request.user, exp, marcados, request.POST.get("observaciones", ""))
+                val = servicios.validar_expediente(request.user, exp, marcados, request.POST.get("observaciones", ""),
+                                                   observaciones_requisitos=notas)
             except (ValidationError, PermissionDenied) as e:
                 for m in _mensajes_error(e):
                     messages.error(request, m)
@@ -295,6 +313,9 @@ def validar(request, folio):
                                               f"{exp.delegacion.nombre}.")
                 return redirect(reverse("recepcion:expediente", args=[folio]) + "?pestana=validacion")
     contexto["evaluacion"] = servicios.evaluar_para_validacion(exp)
+    notas, marcados = contexto.get("notas", {}), contexto.get("marcados", set())
+    contexto["filas"] = [{"e": e, "nota": notas.get(e.revision.pk, ""), "marcado": e.revision.pk in marcados}
+                         for e in contexto["evaluacion"]]
     from django.utils import timezone
     from nucleo import plazos
 

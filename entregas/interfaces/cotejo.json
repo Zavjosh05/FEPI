@@ -1,0 +1,725 @@
+{
+  "fecha": "23 de noviembre de 2026",
+  "cifras": {
+    "pruebas_sistema": "155",
+    "pruebas_calculadora": "15",
+    "pruebas_rapidas": "146",
+    "pruebas_navegador": "9",
+    "pruebas_nuevas": "26",
+    "capturas_sprint": "71"
+  },
+  "historias": {
+    "HU-1.1": {
+      "funcion": "Empata: registro a nombre del predio, en la Delegación que le corresponde, con acuse, fecha y hora (M1.1).",
+      "codigo": "El formulario de ventanilla tiene las tres secciones que nombra la historia (datos específicos del programa, del predio y de la persona solicitante). Al registrar se genera el folio único (la base de datos no admite repetidos), el acuse en PDF con fecha y hora, y se rechaza un municipio de otra Delegación. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "empata",
+      "nota": "Se agregó el criterio de trazabilidad (observación del 23-nov para todas las historias del sistema); el criterio del folio único no cambió."
+    },
+    "HU-1.2": {
+      "funcion": "Empata: requisitos por programa, tipo de persona y modalidad; expediente digitalizado y enviado a la Dirección con fecha y hora (M1.2).",
+      "codigo": "La pestaña Requisitos marca cada uno como entregado (con su archivo digitalizado), cumple (si no lleva documento), faltante o, si es condicional, «no aplica». El envío solo procede sin faltantes y deja acuse. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "El criterio 1 solo decía «entregado o faltante».",
+      "funcion_vigente": "Empata: requisitos por programa, tipo de persona y modalidad; expediente digitalizado y enviado a la Dirección con fecha y hora (M1.2)."
+    },
+    "HU-1.3": {
+      "funcion": "La función dice que el polígono lo levanta la Delegación o el prestador de servicios forestales (M1.3); la historia solo decía «levantado en campo».",
+      "codigo": "La pestaña Ubicación pide «Levantado en campo por» (Delegación o prestador, con su RFN), acepta GeoJSON, KML o Shapefile o el dibujo en el mapa, calcula la superficie y conserva el polígono anterior y el nuevo. En Guardabosques no aparece, porque el programa no usa polígono. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Diagnóstico Técnico de RHF: llega con las reglas de RHF (sprint 2).",
+      "funcion_vigente": "Empata: polígono levantado en campo por la Delegación o por el prestador de servicios forestales, y cambio de lugar (M1.3)."
+    },
+    "HU-1.4": {
+      "funcion": "Empata: validación por la Dirección que es Instancia Ejecutora, refrendos y aviso de cada faltante con su observación (M1.4).",
+      "codigo": "La pantalla de validación tiene, por requisito, la revisión de la Delegación, la de las reglas y la observación de la Dirección, obligatoria en cada faltante; cada resultado queda en su propio registro (ObservacionValidacion). El aviso de faltantes en PDF, la notificación de la Delegación y la pestaña Requisitos llevan la observación de cada faltante. Fecha límite en días hábiles; en refrendo vale la documentación de hasta 3 años. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Observación del 23-nov: que cada faltante lleve su observación.",
+      "funcion_vigente": "Empata: validación por la Dirección que es Instancia Ejecutora, refrendos y aviso de cada faltante con su observación (M1.4)."
+    },
+    "HU-2.1": {
+      "funcion": "Empata: dictamen técnico con criterios del programa y análisis cartográfico, expedido como documento, y listado preliminar (M2.1).",
+      "codigo": "Lista de verificación con los criterios de las reglas, análisis con PostGIS (superficie, municipio, traslapes), listado preliminar exportable y plazo de 45 días hábiles en Guardabosques. Al registrarlo se expide el documento «Dictamen técnico» en PDF (folio DT-programa-año-consecutivo, croquis del polígono, verificación, resultado, firmas y huella SHA-256), que queda adjunto al expediente. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Observación del 23-nov: el dictamen se mostraba en tarjetas; faltaba el documento que lo expide.",
+      "funcion_vigente": "Empata: dictamen técnico con criterios del programa y análisis cartográfico, expedido como documento, y listado preliminar (M2.1)."
+    },
+    "HU-2.2": {
+      "funcion": "Empata: dictamen jurídico de la documentación legal y de la propiedad o legal posesión del predio, con el cotejo del Listado de Incumplidas y de los predios con procedimiento o sanción, expedido como documento (M2.2).",
+      "codigo": "La pantalla tiene tres pasos: cada documento legal válido o no válido (con su observación), la acreditación de la propiedad o legal posesión (tipo de documento de las ROP, a nombre de quién, superficie que ampara contra la del polígono, vigencia y conflictos) y el resultado. El sistema impide «procedente» si un documento no es válido, si no se acredita la propiedad o si hay coincidencias en los catálogos. Se expide el documento «Dictamen jurídico» en PDF (folio DJ-…), adjunto al expediente. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Observación del 23-nov: recordar la parte jurídica sobre la propiedad y expedir el documento del dictamen. Acta de asamblea en PEG: llega con las reglas de PEG (sprint 3).",
+      "funcion_vigente": "Empata: dictamen jurídico de la documentación legal y de la propiedad o legal posesión del predio, con el cotejo del Listado de Incumplidas y de los predios con procedimiento o sanción (M2.2)."
+    },
+    "HU-2.3": {
+      "funcion": "Empata: convocatoria y documentos, acta con lista de beneficiarias, lista de espera, no factibles y autorización de publicación; vistas de candidatos y de beneficiarios (M2.3).",
+      "codigo": "Nueva sesión, convocatoria con orden del día, documentos y acuse; listados propuestos que el Comité puede ajustar dejando constancia; acta con autorización de publicación. Dos vistas separadas en el menú «Listados»: Candidatos (en dictamen, por aprobar y lista de espera en su orden) y Beneficiarios (aprobadas con su monto y cómo entraron, y las que salieron), exportables a CSV. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Observación del 23-nov: manejar una lista de candidatos, en una vista separada de la de beneficiarios.",
+      "funcion_vigente": "Empata: convocatoria, acta con los listados y autorización de publicación; vistas de candidatos y de beneficiarios (M2.3)."
+    },
+    "HU-2.4": {
+      "funcion": "Empata: reasignaciones y manejo de incidentes en las sesiones de seguimiento; en PSAHEM, instrucción de pago; en PEG, validación de reportes (M2.4).",
+      "codigo": "Cada acuerdo lleva el tipo de incidente, su causa, los expedientes y el área que lo atiende (la ve en su bandeja). Desistimiento, cancelación y baja sacan a la persona beneficiaria (estado «Baja · recurso liberado») y liberan su monto; la reasignación pasa a «aprobada» a las primeras de la lista de espera, en su orden y sin rebasar el recurso liberado; la sustitución hace las dos cosas. Cada salida y entrada queda en MovimientoListado. La instrucción de pago (PSAHEM) y la validación de reportes (PEG) siguen como acuerdos que dejan constancia. Trazabilidad: cada alta y cada cambio quedan en las tablas de historial con el usuario, la fecha y la hora y los valores anteriores; la pestaña «Trazabilidad» del expediente los muestra campo por campo.",
+      "resultado": "ajustada",
+      "nota": "Observación del 23-nov: el criterio de aceptación estaba mal; el título pasa a «Reasignaciones e incidentes» (manejo de incidentes).",
+      "funcion_vigente": "Empata: reasignaciones y manejo de incidentes; en PSAHEM, instrucción de pago; en PEG, validación de reportes (M2.4)."
+    },
+    "HU-3.1": {
+      "funcion": "Empata (M3.1).",
+      "codigo": "Se construye en el sprint 2.",
+      "resultado": "sin_codigo"
+    },
+    "HU-3.2": {
+      "funcion": "Empata en el contrato sobre el modelo validado (M3.2).",
+      "codigo": "Se construye en el sprint 2.",
+      "resultado": "sin_codigo",
+      "nota": "La ampliación de plazo por causa externa en MFS no está en los criterios."
+    },
+    "HU-3.3": {
+      "funcion": "Empata: 10 días hábiles, firmas y sello, contrato de servicios técnicos en MFS y credencial en PEG (M3.3).",
+      "codigo": "Se construye en el sprint 2.",
+      "resultado": "sin_codigo"
+    },
+    "HU-3.4": {
+      "funcion": "Empata: vale vigente, salida por especie y cantidad, reposición del vale (M3.4).",
+      "codigo": "Se construye en el sprint 2. La bandeja del vivero ya existe.",
+      "resultado": "sin_codigo"
+    },
+    "HU-4.1": {
+      "funcion": "Empata: envíos de la persona beneficiaria o el Guardabosque, en el portal o en la Delegación (M4.1).",
+      "codigo": "Se construye en el sprint 3 (con el portal externo).",
+      "resultado": "sin_codigo"
+    },
+    "HU-4.2": {
+      "funcion": "Empata: resultado, ajuste de superficie e incidencias con su documento (M4.2).",
+      "codigo": "Se construye en el sprint 3.",
+      "resultado": "sin_codigo"
+    },
+    "HU-4.3": {
+      "funcion": "Empata: evaluación por periodo para el CASPEG (M4.3).",
+      "codigo": "Se construye en el sprint 3. La validación del periodo por el Comité ya existe (HU-2.4).",
+      "resultado": "sin_codigo"
+    },
+    "HU-5.1": {
+      "funcion": "Empata en la solicitud de cada ministración con soportes a Administración y Finanzas (M5.1).",
+      "codigo": "Se construye en el sprint 2.",
+      "resultado": "sin_codigo",
+      "nota": "La función empieza con el oficio de la Delegación al firmarse el contrato."
+    },
+    "HU-5.2": {
+      "funcion": "Empata: pago y remisión a la Fiduciaria en PSAHEM (M5.2).",
+      "codigo": "Se construye en el sprint 2. La bandeja de Administración y Finanzas ya existe.",
+      "resultado": "sin_codigo",
+      "nota": "El depósito al Guardabosque en PEG no está en los criterios."
+    },
+    "HU-5.3": {
+      "funcion": "Empata: cheques de PSAHEM, envío y entrega (M5.3).",
+      "codigo": "Se construye en el sprint 2. La bandeja de la Fiduciaria ya recibe la instrucción de pago (HU-2.4).",
+      "resultado": "sin_codigo",
+      "nota": "El plazo de 3 meses para cobrar no está en los criterios."
+    },
+    "HU-6.1": {
+      "funcion": "Empata (M6.1).",
+      "codigo": "Se construye en el sprint 3. Los acuerdos de reasignación y sustitución ya se registran (HU-2.4).",
+      "resultado": "sin_codigo"
+    },
+    "HU-6.2": {
+      "funcion": "Empata (M6.2).",
+      "codigo": "Se construye en el sprint 3. La inscripción en el Listado de Incumplidas ya existe (HU-2.2).",
+      "resultado": "sin_codigo"
+    },
+    "HU-6.3": {
+      "funcion": "Empata (M6.3).",
+      "codigo": "Se construye en el sprint 3.",
+      "resultado": "sin_codigo"
+    },
+    "HU-7.1": {
+      "funcion": "Empata: masa forestal de cada año por municipio y Estado, y su evolución (M7.1).",
+      "codigo": "Página de la Calculadora: superficie de cada año para el Estado y los 125 municipios, y la evolución año con año, con carga diferida.",
+      "resultado": "empata"
+    },
+    "HU-7.2": {
+      "funcion": "Empata (M7.2).",
+      "codigo": "Sprint 2: las cifras entre dos años ya existen; falta el histograma.",
+      "resultado": "sin_codigo",
+      "codigo_vigente": "Se construye en el sprint 2; las cifras entre dos años ya se calculan."
+    },
+    "HU-7.3": {
+      "funcion": "Empata (M7.3).",
+      "codigo": "Sprint 2: los incendios ya se cruzan; falta lo que pidan sus criterios.",
+      "resultado": "sin_codigo",
+      "codigo_vigente": "Se construye en el sprint 2; los incendios ya se cruzan con la masa forestal."
+    },
+    "HU-7.4": {
+      "funcion": "Empata (M7.4).",
+      "codigo": "Se construye en el sprint 3.",
+      "resultado": "sin_codigo"
+    },
+    "HU-7.5": {
+      "funcion": "Empata (M7.5).",
+      "codigo": "Se construye en el sprint 3.",
+      "resultado": "sin_codigo"
+    }
+  },
+  "ajustes": [
+    {
+      "historia": "HU-1.2 · Revisión del expediente",
+      "motivo": "La pantalla y el servicio registran cuatro resultados por requisito y exigen el archivo digitalizado para darlo por entregado; el criterio solo nombraba dos. Se agrega lo que ya hace el sistema y lo que dice la función M1.2 («digitalización del expediente»).",
+      "cambios": [
+        {
+          "parte": "Criterio 1",
+          "antes": "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado o faltante.",
+          "ahora": "Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica."
+        }
+      ],
+      "lote": "19-nov"
+    },
+    {
+      "historia": "HU-1.3 · Ubicación del predio",
+      "motivo": "La función M1.3 y el formulario de la pestaña Ubicación dicen quién levanta el polígono: la Delegación o el prestador de servicios forestales (con su RFN). La historia no lo decía.",
+      "cambios": [
+        {
+          "parte": "Historia",
+          "antes": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo, para conocer su ubicación y su superficie real al dictaminar y verificar.",
+          "ahora": "Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales, para conocer su ubicación y su superficie real al dictaminar y verificar."
+        }
+      ],
+      "lote": "19-nov"
+    },
+    {
+      "historia": "HU-2.2 · Dictamen jurídico",
+      "motivo": "El Listado de Personas Beneficiarias Incumplidas es de personas; los predios se cotejan con otro catálogo, el de predios con procedimiento o sanción, como dicen la función M2.2 y la pantalla «Incumplidas». La historia y su criterio 2 ponían el predio dentro del Listado.",
+      "cambios": [
+        {
+          "parte": "Historia",
+          "antes": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular y su predio con el Listado de Personas Beneficiarias Incumplidas, para que solo se aprueben solicitudes procedentes.",
+          "ahora": "Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes."
+        },
+        {
+          "parte": "Criterio 2",
+          "antes": "Una solicitud cuyo predio o titular está en el Listado de Personas Beneficiarias Incumplidas es no procedente.",
+          "ahora": "Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente."
+        }
+      ],
+      "lote": "19-nov"
+    },
+    {
+      "lote": "23-nov",
+      "historia": "HU-1.4 · Validación del expediente",
+      "motivo": "Observación del profesor: que cada una de las observaciones de la validación se haga correctamente. Antes la Dirección marcaba faltantes con una sola observación general; ahora cada requisito faltante lleva la suya y el aviso la incluye.",
+      "cambios": [
+        {
+          "parte": "Historia",
+          "antes": "Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo.",
+          "ahora": "Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar cada faltante con su observación, para que la solicitud pase a dictamen o se corrija a tiempo."
+        },
+        {
+          "parte": "Criterio 2 (nuevo)",
+          "antes": "—",
+          "ahora": "Cada requisito señalado como faltante tiene la observación de la Dirección (qué falta o por qué no es válido) y el aviso de faltantes la incluye."
+        },
+        {
+          "parte": "Criterio 4 (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    },
+    {
+      "lote": "23-nov",
+      "historia": "HU-2.1 · Dictamen técnico",
+      "motivo": "Observación del profesor: faltaba el documento que expide el dictamen técnico; no basta con las tarjetas de la pantalla.",
+      "cambios": [
+        {
+          "parte": "Historia",
+          "antes": "… quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, …",
+          "ahora": "… quiero elaborar el dictamen técnico de cada solicitud, expedido como documento, y el listado preliminar, …"
+        },
+        {
+          "parte": "Criterio 1",
+          "antes": "Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo.",
+          "ahora": "Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo, expedido como documento PDF con folio y adjunto al expediente."
+        },
+        {
+          "parte": "Criterio 4 (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    },
+    {
+      "lote": "23-nov",
+      "historia": "HU-2.2 · Dictamen jurídico",
+      "motivo": "Observaciones del profesor: el documento del dictamen jurídico y «la parte jurídica sobre la propiedad». Las ROP piden acreditar la legal propiedad o posesión del terreno (CC 8.1.1.2 fr. VII) y hacen inelegibles los predios con conflictos de propiedad o posesión (8.1.1.1 fr. VII).",
+      "cambios": [
+        {
+          "parte": "Historia",
+          "antes": "… quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular …",
+          "ahora": "… quiero dictaminar la documentación legal de cada solicitud, revisar que se acredite la propiedad o legal posesión del predio y cotejar a su titular …"
+        },
+        {
+          "parte": "Criterio 1",
+          "antes": "Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo.",
+          "ahora": "Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo, expedido como documento PDF con folio y adjunto al expediente."
+        },
+        {
+          "parte": "Criterio 2 (nuevo)",
+          "antes": "—",
+          "ahora": "Una solicitud cuya propiedad o legal posesión del predio no se acredita (documento a nombre del titular, que ampare la superficie, vigente y sin conflicto) es no procedente."
+        },
+        {
+          "parte": "Criterio 4 (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    },
+    {
+      "lote": "23-nov",
+      "historia": "HU-2.3 · Sesión de aprobación",
+      "motivo": "Observación del profesor: tener la lista de candidatos y manejarla en una vista distinta de la de beneficiarios.",
+      "cambios": [
+        {
+          "parte": "Criterio 3 (nuevo)",
+          "antes": "—",
+          "ahora": "Las solicitudes candidatas (en dictamen, por aprobar y en lista de espera, en su orden) y las personas beneficiarias (con su monto y cómo entraron) se consultan en dos vistas separadas."
+        },
+        {
+          "parte": "Criterio 4 (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    },
+    {
+      "lote": "23-nov",
+      "historia": "HU-2.4 · Reasignaciones e incidentes (antes «Sesiones de seguimiento»)",
+      "motivo": "Observación del profesor: el criterio de aceptación estaba mal y el título debía hablar de reasignaciones o del manejo de incidentes. El criterio anterior solo pedía que el acuerdo dijera expedientes y área, y el segundo era propio de PSAHEM y PEG (la instrucción de pago y la validación de reportes siguen en el sistema como acuerdos que dejan constancia).",
+      "cambios": [
+        {
+          "parte": "Título",
+          "antes": "Sesiones de seguimiento",
+          "ahora": "Reasignaciones e incidentes"
+        },
+        {
+          "parte": "Historia",
+          "antes": "Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio.",
+          "ahora": "Como integrante del Comité, quiero acordar en las sesiones de seguimiento la atención de cada incidente del ejercicio y la reasignación del recurso liberado a la lista de espera, para que el recurso llegue a otra solicitud factible y cada caso tenga un área que lo atienda."
+        },
+        {
+          "parte": "Criterio 1",
+          "antes": "Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo.",
+          "ahora": "Cada incidente (desistimiento, cancelación, baja, sustitución, caso fortuito, suspensión o reintegro) tiene un acuerdo con su causa, los expedientes a los que aplica y el área que debe atenderlo."
+        },
+        {
+          "parte": "Criterio 2",
+          "antes": "En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes.",
+          "ahora": "En una reasignación o sustitución, la persona beneficiaria que sale queda dada de baja y entra la siguiente solicitud de la lista de espera, en su orden, sin rebasar el recurso liberado."
+        },
+        {
+          "parte": "Criterio 3 (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    },
+    {
+      "lote": "23-nov",
+      "historia": "Todas las historias de los módulos M1 a M6 (HU-1.1 a HU-6.3)",
+      "motivo": "Observación del profesor: para la aceptación debe estar la parte de los registros, para tener trazabilidad de la información en la base de datos. Se agregó el mismo criterio al final de las 21 historias del Sistema de programas (no a las de la Calculadora, M7, que no guarda datos de usuarios).",
+      "cambios": [
+        {
+          "parte": "Último criterio (nuevo)",
+          "antes": "—",
+          "ahora": "Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad)."
+        }
+      ]
+    }
+  ],
+  "interfaz": [
+    {
+      "titulo": "Acceso y sesión",
+      "texto": "Cada persona entra con su usuario; el sistema le muestra solo lo que toca a su unidad.",
+      "capturas": [
+        "hu_1_1_01_inicio_de_sesion.png",
+        "n_02_inicio_de_sesion_rechazado.png"
+      ]
+    },
+    {
+      "titulo": "Bandeja de cada unidad",
+      "texto": "La bandeja es la pantalla de inicio de todas las unidades: lista los expedientes cuyo estado le toca atender y, arriba, los acuerdos del Comité que tiene pendientes. Se muestran las once cuentas de demostración. Administración y Finanzas y el vivero ya tienen bandeja, aunque sus funciones (M3.4 y M5) se construyen en el sprint 2.",
+      "capturas": [
+        "n_03_bandeja_del_amecameca.png",
+        "n_04_bandeja_del_valle.png",
+        "n_05_bandeja_del_toluca.png",
+        "n_06_bandeja_dir_drff.png",
+        "n_07_bandeja_dir_dpf.png",
+        "n_08_bandeja_juridica.png",
+        "n_09_bandeja_comite.png",
+        "n_10_bandeja_finanzas.png",
+        "n_11_bandeja_vivero.png",
+        "n_12_bandeja_fiduciaria.png",
+        "n_13_bandeja_admin.png",
+        "n_14_bandeja_todos_los_mios.png",
+        "n_15_bandeja_busqueda.png",
+        "n_18_acceso_negado.png"
+      ]
+    },
+    {
+      "titulo": "Pantallas en un teléfono",
+      "texto": "Las mismas pantallas se acomodan a una pantalla angosta, para las Delegaciones que trabajen desde un teléfono.",
+      "capturas": [
+        "n_16_bandeja_movil.png",
+        "n_17_expediente_movil.png"
+      ]
+    },
+    {
+      "titulo": "M1 · HU-1.1 Registro de la solicitud",
+      "texto": "",
+      "capturas": [
+        "m1_01_registro_formulario.png",
+        "m1_02_registro_delegacion_del_municipio.png",
+        "m1_03_registro_campos_obligatorios.png",
+        "hu_1_1_03_registro_municipio_de_otra_delegacion.png",
+        "hu_1_1_04_registro_rechazado.png",
+        "hu_1_1_05_solicitud_registrada_con_acuse.png",
+        "m1_09_solicitud_desechada.png"
+      ]
+    },
+    {
+      "titulo": "M1 · HU-1.2 Revisión del expediente",
+      "texto": "",
+      "capturas": [
+        "m1_04_requisitos_por_revisar.png",
+        "hu_1_2_02_requisito_entregado_htmx.png",
+        "hu_1_2_03_expediente_completo.png",
+        "hu_1_2_04_envio_con_acuse.png",
+        "hu_1_2_05_bandeja_direccion.png",
+        "m1_08_documentos_y_acuses.png"
+      ]
+    },
+    {
+      "titulo": "M1 · HU-1.3 Ubicación del predio",
+      "texto": "",
+      "capturas": [
+        "hu_1_3_01_ubicacion_sin_poligono.png",
+        "hu_1_3_02_poligono_cargado.png",
+        "hu_1_3_03_dibujo_en_el_mapa.png",
+        "hu_1_3_04_historial_anterior_y_nuevo.png"
+      ]
+    },
+    {
+      "titulo": "M1 · HU-1.4 Validación del expediente",
+      "texto": "Cada requisito faltante lleva la observación de la Dirección: es obligatoria en la pantalla de validación, va en el aviso de faltantes y la Delegación la ve en el requisito.",
+      "capturas": [
+        "m1_11_validacion_en_la_direccion.png",
+        "m1_13_pantalla_de_validacion.png",
+        "hu_1_4_02_pantalla_de_validacion.png",
+        "hu_1_4_03_aviso_de_faltantes_con_fecha_limite.png",
+        "m1_10_aviso_de_faltantes_en_la_delegacion.png",
+        "m1_15_observacion_en_el_requisito.png",
+        "hu_1_4_04_notificacion_por_conducto_de_la_delegacion.png",
+        "hu_1_4_05_refrendo_documentacion_vigente.png",
+        "hu_1_4_06_expediente_validado.png",
+        "m1_12_bitacora.png"
+      ]
+    },
+    {
+      "titulo": "M2 · HU-2.1 Dictamen técnico",
+      "texto": "El dictamen técnico se expide como documento en PDF, con folio, y queda adjunto al expediente (pestaña «Documentos y acuses»).",
+      "capturas": [
+        "hu_2_1_01_bandeja_direccion_en_dictamen.png",
+        "hu_2_1_02_analisis_cartografico_y_lista_de_verificacion.png",
+        "hu_2_1_03_dictamen_tecnico_registrado.png",
+        "hu_2_1_06_documento_del_dictamen_adjunto.png",
+        "ac_06_dictamen_tecnico.png",
+        "ac_10_dictamen_tecnico_resultado_y_firmas.png",
+        "m2_02_listado_preliminar.png",
+        "m2_03_pestana_dictamenes.png"
+      ]
+    },
+    {
+      "titulo": "M2 · HU-2.2 Dictamen jurídico",
+      "texto": "El dictamen jurídico revisa cada documento legal, la acreditación de la propiedad o legal posesión del predio y el cotejo con los catálogos, y se expide como documento en PDF adjunto al expediente.",
+      "capturas": [
+        "hu_2_2_01_bandeja_unidad_juridica.png",
+        "m2_07_incumplidas_y_predios_sancionados.png",
+        "hu_2_2_03_cotejo_automatico.png",
+        "m2_06_dictamen_juridico.png",
+        "hu_2_2_07_revision_de_la_propiedad.png",
+        "hu_2_2_04_procedente_impedido.png",
+        "hu_2_2_05_dictamen_juridico_no_procedente.png",
+        "hu_2_2_08_propiedad_no_acreditada.png",
+        "m2_14_propiedad_no_acreditada.png",
+        "hu_2_2_06_documento_del_dictamen_adjunto.png",
+        "ac_07_dictamen_juridico.png",
+        "ac_11_dictamen_juridico_propiedad_y_resultado.png"
+      ]
+    },
+    {
+      "titulo": "M2 · HU-2.3 Sesión de aprobación",
+      "texto": "Candidatos y personas beneficiarias se consultan en dos vistas separadas, en el menú «Listados».",
+      "capturas": [
+        "m2_08_sesiones_del_comite.png",
+        "hu_2_3_02_nueva_sesion.png",
+        "hu_2_3_03_convocatoria_enviada_con_acuse.png",
+        "hu_2_3_04_listados_propuestos.png",
+        "hu_2_3_05_ajuste_del_comite_con_constancia.png",
+        "hu_2_3_06_acta_y_autorizacion_de_publicacion.png",
+        "m2_04_no_factible.png",
+        "n_19_menu_listados.png",
+        "m2_12_candidatos.png",
+        "m2_13_beneficiarios.png"
+      ]
+    },
+    {
+      "titulo": "M2 · HU-2.4 Reasignaciones e incidentes",
+      "texto": "Cada incidente queda en un acuerdo con su causa; la baja libera el recurso y la reasignación toma a la siguiente de la lista de espera, en su orden.",
+      "capturas": [
+        "hu_2_4_01_acuerdo_con_expedientes_y_area_responsable.png",
+        "hu_2_4_06_desistimiento_libera_el_recurso.png",
+        "hu_2_4_07_reasignacion_en_orden_de_la_lista_de_espera.png",
+        "hu_2_4_08_beneficiarios_con_reasignacion_y_baja.png",
+        "hu_2_4_09_candidatos_lista_de_espera.png",
+        "m2_05_lista_de_espera.png",
+        "m2_11_sesion_2.png",
+        "hu_2_4_02_pendiente_en_la_bandeja_de_la_direccion.png",
+        "hu_2_4_03_acuerdo_cumplido.png"
+      ]
+    },
+    {
+      "titulo": "Trazabilidad en la base de datos (todas las historias)",
+      "texto": "La pestaña «Trazabilidad» de cada expediente junta el historial de sus registros: quién, cuándo, qué tabla y qué valores cambiaron (antes → después).",
+      "capturas": [
+        "m1_14_trazabilidad.png",
+        "hu_1_4_08_trazabilidad.png",
+        "hu_2_4_10_trazabilidad_de_la_reasignacion.png"
+      ]
+    },
+    {
+      "titulo": "Por programa · las seis Reglas de Operación en el mismo sistema",
+      "texto": "Los seis programas usan las mismas pantallas; cambia lo que sale de sus reglas. En el sprint 1 solo Capturando Carbono tiene sus reglas completas; para estas capturas se cargaron a MFS, PS, RHF, PSAHEM y Guardabosques las <b>reglas mínimas de demostración</b> que usan las pruebas (un tipo de persona, un requisito y sus plazos), y se registró un expediente de cada uno con las funciones del sistema. Las reglas completas de esos programas se cargan en los sprints 2 y 3.",
+      "capturas": [
+        "p_01_registro_seis_programas.png",
+        "p_02_bandeja_delegacion_seis_programas.png",
+        "p_03_bandeja_direccion_varios_programas.png",
+        "p_04_bandeja_filtrada_psahem.png",
+        "p_06_bandeja_juridica_varios_programas.png",
+        "p_07_sesiones_de_varios_programas.png"
+      ]
+    },
+    {
+      "titulo": "Capturando Carbono (CC)",
+      "texto": "Programa con sus reglas completas: 26 requisitos, modalidades y polígono.",
+      "capturas": [
+        "p_cc_01_solicitud.png",
+        "p_cc_02_requisitos.png",
+        "p_cc_03_ubicacion.png",
+        "m2_01_dictamen_tecnico.png"
+      ]
+    },
+    {
+      "titulo": "Manejo Forestal Sustentable (MFS)",
+      "texto": "",
+      "capturas": [
+        "p_mfs_01_solicitud.png",
+        "p_mfs_02_requisitos.png",
+        "p_mfs_03_ubicacion.png",
+        "p_mfs_04_dictamen_tecnico.png"
+      ]
+    },
+    {
+      "titulo": "Plantaciones Sustentables (PS)",
+      "texto": "Expediente recién registrado, todavía en la Delegación.",
+      "capturas": [
+        "p_ps_01_solicitud.png",
+        "p_ps_02_requisitos.png",
+        "p_ps_03_ubicacion.png"
+      ]
+    },
+    {
+      "titulo": "Restauración Hidrológico-Forestal (RHF)",
+      "texto": "",
+      "capturas": [
+        "p_rhf_01_solicitud.png",
+        "p_rhf_02_requisitos.png",
+        "p_rhf_03_ubicacion.png",
+        "p_rhf_04_dictamen_tecnico.png"
+      ]
+    },
+    {
+      "titulo": "Pago por Servicios Ambientales Hidrológicos (PSAHEM)",
+      "texto": "Lo propio de PSAHEM en el sprint 1: la instrucción de pago de cada ministración, que el Comité dirige a la Fiduciaria.",
+      "capturas": [
+        "p_psa_01_solicitud.png",
+        "p_psa_02_requisitos.png",
+        "p_psa_03_ubicacion.png",
+        "p_psa_04_dictamen_tecnico.png",
+        "p_psa_05_instruccion_de_pago.png",
+        "p_08_bandeja_fiduciaria_instruccion.png",
+        "hu_2_4_04_instruccion_de_pago_psahem_por_ministracion.png",
+        "hu_2_4_05_bandeja_de_la_fiduciaria.png"
+      ]
+    },
+    {
+      "titulo": "Guardabosques (PEG)",
+      "texto": "Lo propio de Guardabosques: lo atiende la Dirección de Protección Forestal, no usa polígono, su dictamen tiene un plazo de 45 días hábiles y el Comité valida la evaluación de reportes por periodo.",
+      "capturas": [
+        "p_peg_01_solicitud.png",
+        "p_peg_02_requisitos.png",
+        "p_05_bandeja_direccion_guardabosques.png",
+        "p_peg_04_dictamen_tecnico_plazo_45_dias.png",
+        "hu_2_1_05_plazo_de_45_dias_habiles_peg.png",
+        "p_peg_05_dictamen_juridico.png",
+        "p_peg_06_validacion_de_reportes.png"
+      ]
+    },
+    {
+      "titulo": "Acuses y documentos en PDF",
+      "texto": "Cada envío, entrega y sesión genera su acuse en PDF con folio, fecha y hora; cada dictamen, su documento con folio propio (DT-… o DJ-…). Se descargan desde la pestaña «Documentos y acuses» o desde la sesión.",
+      "capturas": [
+        "ac_01_recepcion_de_la_solicitud.png",
+        "ac_02_envio_a_la_direccion.png",
+        "ac_03_aviso_de_faltantes.png",
+        "ac_04_notificacion_del_aviso.png",
+        "ac_05_constancia_de_validacion.png",
+        "ac_06_dictamen_tecnico.png",
+        "ac_07_dictamen_juridico.png",
+        "ac_08_convocatoria.png",
+        "ac_09_acta_de_aprobacion.png"
+      ]
+    },
+    {
+      "titulo": "Administración de catálogos y reglas",
+      "texto": "Panel para el personal que administra el sistema: programas, ejercicios, requisitos, plazos, municipios y días inhábiles se editan como datos, sin cambiar el código.",
+      "capturas": [
+        "a_01_admin.png",
+        "a_02_programa.png",
+        "a_03_ejercicio.png",
+        "a_04_requisito.png",
+        "a_05_plazo.png",
+        "a_07_diainhabil.png"
+      ]
+    },
+    {
+      "titulo": "Recorrido completo del sprint 1 con una sola solicitud",
+      "texto": "La misma solicitud pasa por todas las unidades, cambiando de usuario en cada relevo.",
+      "capturas": [
+        "recorrido_sprint_1_01_registro.png",
+        "recorrido_sprint_1_02_requisitos_con_un_faltante.png",
+        "recorrido_sprint_1_03_poligono_cargado.png",
+        "recorrido_sprint_1_04_direccion_aviso_de_faltantes.png",
+        "recorrido_sprint_1_05_delegacion_notifica_y_reenvia.png",
+        "recorrido_sprint_1_06_dictamen_tecnico_lista_de_verificacion.png",
+        "recorrido_sprint_1_07_dictamen_juridico.png",
+        "recorrido_sprint_1_08_sesion_convocada_y_listados.png",
+        "recorrido_sprint_1_09_acta_y_autorizacion.png",
+        "recorrido_sprint_1_10_bitacora_y_estado_final.png",
+        "recorrido_sprint_1_11_acuses.png",
+        "recorrido_sprint_1_12_trazabilidad.png"
+      ]
+    },
+    {
+      "titulo": "M7 · HU-7.1 Calculadora forestal: masa forestal por año",
+      "texto": "Página estática, sin usuarios: la consulta cualquier persona de PROBOSQUE. Tiene tema claro y oscuro.",
+      "capturas": [
+        "hu_7_1_vista_inicial.png",
+        "hu_7_1_evolucion.png",
+        "hu_7_1_un_anio.png",
+        "hu_7_1_detalle_municipio.png",
+        "hu_7_1_vista_inicial_oscuro.png",
+        "hu_7_1_evolucion_oscuro.png"
+      ]
+    }
+  ],
+  "profesor": {
+    "sin_capturas": [
+      "p_mfs_04_dictamen_tecnico.png",
+      "p_rhf_04_dictamen_tecnico.png",
+      "p_psa_04_dictamen_tecnico.png"
+    ],
+    "textos": {},
+    "pies": {}
+  },
+  "evidencia": [
+    {
+      "titulo": "Pantallas que respaldan los ajustes a las historias",
+      "texto": "La pestaña Requisitos ya registraba «no aplica» en los requisitos condicionales (HU-1.2); el formulario de Ubicación ya preguntaba quién levantó el polígono (HU-1.3); y la pantalla «Incumplidas» ya separaba personas y predios (HU-2.2).",
+      "capturas": [
+        "m1_04_requisitos_por_revisar.png",
+        "m1_06_ubicacion_sin_poligono.png",
+        "m2_07_incumplidas_y_predios_sancionados.png"
+      ]
+    },
+    {
+      "titulo": "Pantallas de lo que se notó",
+      "texto": "Página de acceso negado sin el diseño del sistema, y el rango de superficie escrito como «None a None ha» cuando las reglas del programa no lo traen.",
+      "capturas": [
+        "n_18_acceso_negado.png",
+        "p_mfs_04_dictamen_tecnico.png"
+      ]
+    }
+  ],
+  "evidencia_23nov": [
+    {
+      "titulo": "HU-1.4 · Observación de cada faltante",
+      "texto": "",
+      "capturas": [
+        "m1_13_pantalla_de_validacion.png",
+        "hu_1_4_03_aviso_de_faltantes_con_fecha_limite.png",
+        "ac_03_aviso_de_faltantes.png",
+        "m1_15_observacion_en_el_requisito.png"
+      ]
+    },
+    {
+      "titulo": "HU-2.1 y HU-2.2 · Documento del dictamen adjunto al expediente",
+      "texto": "",
+      "capturas": [
+        "ac_06_dictamen_tecnico.png",
+        "ac_07_dictamen_juridico.png",
+        "hu_2_1_06_documento_del_dictamen_adjunto.png",
+        "m2_03_pestana_dictamenes.png"
+      ]
+    },
+    {
+      "titulo": "HU-2.2 · La parte jurídica sobre la propiedad",
+      "texto": "",
+      "capturas": [
+        "hu_2_2_07_revision_de_la_propiedad.png",
+        "hu_2_2_08_propiedad_no_acreditada.png",
+        "ac_11_dictamen_juridico_propiedad_y_resultado.png",
+        "m2_14_propiedad_no_acreditada.png"
+      ]
+    },
+    {
+      "titulo": "HU-2.4 · Reasignaciones e incidentes",
+      "texto": "",
+      "capturas": [
+        "hu_2_4_06_desistimiento_libera_el_recurso.png",
+        "hu_2_4_07_reasignacion_en_orden_de_la_lista_de_espera.png",
+        "m2_11_sesion_2.png",
+        "m2_05_lista_de_espera.png"
+      ]
+    },
+    {
+      "titulo": "Candidatos y beneficiarios en dos vistas",
+      "texto": "",
+      "capturas": [
+        "n_19_menu_listados.png",
+        "m2_12_candidatos.png",
+        "m2_13_beneficiarios.png",
+        "hu_2_4_08_beneficiarios_con_reasignacion_y_baja.png"
+      ]
+    },
+    {
+      "titulo": "Trazabilidad en la base de datos",
+      "texto": "",
+      "capturas": [
+        "m1_14_trazabilidad.png",
+        "hu_2_4_10_trazabilidad_de_la_reasignacion.png",
+        "recorrido_sprint_1_12_trazabilidad.png",
+        "m1_08_documentos_y_acuses.png"
+      ]
+    }
+  ]
+}

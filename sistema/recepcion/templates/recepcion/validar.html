@@ -11,26 +11,28 @@
 </div>
 <form method="post" class="tarjeta">
   {% csrf_token %}
-  <p class="small text-secondary mb-2">Revise cada requisito que envió {{ exp.delegacion.nombre }}. Marque como faltante lo que no cumpla (ilegible, incompleto, no vigente). Los que no pasan la revisión automática de las reglas ya vienen marcados.
+  <p class="small text-secondary mb-2">Revise cada requisito que envió {{ exp.delegacion.nombre }}. Marque como faltante lo que no cumpla y <strong>escriba en cada uno su observación</strong>: qué falta o por qué no es válido (ilegible, incompleto, no vigente, no corresponde al titular…). El aviso de faltantes lleva la observación de cada requisito. Los que no pasan la revisión automática de las reglas ya vienen marcados con su motivo; puede precisarlo.
   {% if vigencia_refrendo %}En refrendo, la documentación que obra en PROBOSQUE vale si no tiene más de <strong>{{ vigencia_refrendo.texto_plazo }}</strong> ({{ vigencia_refrendo.fundamento }}).{% endif %}</p>
   <div class="table-responsive">
   <table class="table table-sm align-middle" id="tabla-validacion">
-    <thead class="table-light"><tr><th>Faltante</th><th>Clave</th><th>Requisito</th><th>Revisión de la Delegación</th><th>Revisión con las reglas</th></tr></thead>
+    <thead class="table-light"><tr><th>Faltante</th><th>Clave</th><th>Requisito</th><th>Revisión de la Delegación</th><th>Revisión con las reglas</th><th style="min-width:16rem">Observación de la Dirección<div class="fw-normal small text-secondary">obligatoria en cada faltante</div></th></tr></thead>
     <tbody>
-    {% for e in evaluacion %}
+    {% for f in filas %}{% with e=f.e %}
     <tr class="{% if not e.valida %}table-warning{% endif %}" data-clave="{{ e.revision.requisito.clave }}">
-      <td><input class="form-check-input" type="checkbox" name="faltante" value="{{ e.revision.pk }}" aria-label="Faltante {{ e.revision.requisito.clave }}" {% if not e.valida %}checked onclick="return false"{% endif %}></td>
+      <td><input class="form-check-input marca-faltante" type="checkbox" name="faltante" value="{{ e.revision.pk }}" aria-label="Faltante {{ e.revision.requisito.clave }}" data-obs="obs-{{ e.revision.pk }}" {% if not e.valida %}checked onclick="return false"{% elif f.marcado %}checked{% endif %}></td>
       <td class="small fw-semibold text-nowrap">{{ e.revision.requisito.clave }}</td>
       <td class="req-texto small">{{ e.revision.requisito.titulo }}{% if e.revision.requisito.es_documento_legal %} <span class="badge text-bg-light border">Documento legal</span>{% endif %}</td>
-      <td class="small">{{ e.revision.get_estado_display }}{% if e.revision.documento %} · <a href="{% url 'nucleo:documento' e.revision.documento.pk %}" target="_blank">ver archivo</a>{% endif %}{% if e.revision.en_archivo_probosque %} · obra en PROBOSQUE{% endif %}</td>
+      <td class="small">{{ e.revision.get_estado_display }}{% if e.revision.documento %} · <a href="{% url 'nucleo:documento' e.revision.documento.pk %}" target="_blank">ver archivo</a>{% endif %}{% if e.revision.en_archivo_probosque %} · obra en PROBOSQUE{% endif %}{% if e.revision.observaciones %}<div class="text-secondary">Delegación: {{ e.revision.observaciones }}</div>{% endif %}</td>
       <td class="small {% if e.valida %}text-success{% else %}text-danger fw-semibold{% endif %}">{{ e.motivo }}</td>
+      <td><input type="text" class="form-control form-control-sm" name="observacion_{{ e.revision.pk }}" id="obs-{{ e.revision.pk }}" value="{{ f.nota }}"
+                 maxlength="500" placeholder="{% if e.valida %}Observación{% else %}{{ e.motivo }}{% endif %}" aria-label="Observación {{ e.revision.requisito.clave }}"></td>
     </tr>
-    {% endfor %}
+    {% endwith %}{% endfor %}
     </tbody>
   </table>
   </div>
   <div class="mb-3">
-    <label class="form-label" for="observaciones">Observaciones</label>
+    <label class="form-label" for="observaciones">Observaciones generales del aviso o de la validación</label>
     <textarea class="form-control" name="observaciones" id="observaciones" rows="2"></textarea>
   </div>
   <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -43,4 +45,18 @@
     </div>
   </div>
 </form>
+{% endblock %}
+{% block scripts %}
+<script>
+// La observación es obligatoria en los requisitos que la Dirección marca como faltantes.
+document.querySelectorAll(".marca-faltante").forEach(function (c) {
+  var obs = document.getElementById(c.dataset.obs);
+  function ajustar() { if (obs && !c.hasAttribute("onclick")) { obs.required = c.checked; obs.classList.toggle("border-warning", c.checked); } }
+  c.addEventListener("change", ajustar); ajustar();
+});
+// «Validar expediente» no pide observaciones.
+document.querySelectorAll("button[value=validar]").forEach(function (b) {
+  b.addEventListener("click", function () { document.querySelectorAll("#tabla-validacion input[type=text]").forEach(function (i) { i.required = false; }); });
+});
+</script>
 {% endblock %}

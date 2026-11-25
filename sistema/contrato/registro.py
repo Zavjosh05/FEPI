@@ -167,6 +167,30 @@ def panel_modelos_por_validar(request):
     return {"plantilla": "contrato/contratos/_panel_validar.html", "contexto": {"modelos": modelos}}
 
 
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M3 en la pestaña «Trazabilidad» (HU-3.1 a HU-3.4)."""
+    from .models import (Adendum, Contrato, ElementoFormalizacion, FirmaContrato, Publicacion, RenglonVale,
+                         ResultadoPublicado, SalidaPlanta, SinFirma, ValePlanta, VersionModelo)
+
+    publicaciones = list(ResultadoPublicado.objects.filter(expediente=expediente).values_list("publicacion_id", flat=True))
+    contratos = list(Contrato.objects.filter(expediente=expediente).values_list("pk", "version_modelo_id"))
+    firmas = list(FirmaContrato.objects.filter(expediente=expediente).values_list("pk", flat=True))
+    vales = list(ValePlanta.objects.filter(expediente=expediente).values_list("pk", flat=True))
+    return [
+        ("Publicación de resultados", Publicacion.history.filter(id__in=publicaciones)),
+        ("Resultado publicado", ResultadoPublicado.history.filter(expediente_id=expediente.pk)),
+        ("Versión del modelo de contrato", VersionModelo.history.filter(id__in=[v for _, v in contratos])),
+        ("Contrato", Contrato.history.filter(expediente_id=expediente.pk)),
+        ("Adendum", Adendum.history.filter(contrato_id__in=[c for c, _ in contratos])),
+        ("Firma del contrato", FirmaContrato.history.filter(expediente_id=expediente.pk)),
+        ("Formalización propia", ElementoFormalizacion.history.filter(firma_id__in=firmas)),
+        ("Sin firma en plazo", SinFirma.history.filter(expediente_id=expediente.pk)),
+        ("Vale de Planta", ValePlanta.history.filter(expediente_id=expediente.pk)),
+        ("Renglón del vale", RenglonVale.history.filter(vale_id__in=vales)),
+        ("Salida de planta", SalidaPlanta.history.filter(vale_id__in=vales)),
+    ]
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
@@ -175,6 +199,7 @@ def registrar():
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "contrato", "nombre": "Contrato",
                                             "plantilla": "contrato/pestana_contrato.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
+    extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
     extensiones.PANELES_BANDEJA.extend([panel_por_publicar, panel_por_notificar, panel_modelos_por_validar,
                                         panel_por_firmar, panel_sin_firma, panel_vales_por_entregar,
                                         panel_vales_por_surtir])

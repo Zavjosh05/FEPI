@@ -32,6 +32,8 @@ def vencer(vale, dias=40):
 def test_hu_3_4_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-3.4")
     assert "Vale de Planta vigente" in hu["criterios"][0] and "vencido no es válido" in hu["criterios"][2]
+    assert len(hu["criterios"]) == 4
+    assert "trazabilidad" in hu["criterios"][-1]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M3.4")
     assert {"PS-DRF-03", "PS-VIV-01", "RHF-DRF-03", "RHF-VIV-01"} <= set(funcion["necesidades"])
 
@@ -115,8 +117,9 @@ def test_hu_3_4_vigencia_ps_30_dias_naturales_y_rhf_15_dias_habiles(contratadas,
     v_ps = emitir(usuarios, ps, vivero, [(esp["Pino patula"], 4400)], momento=ahora)
     v_rhf = emitir(usuarios, rhf, vivero, [(esp["Oyamel"], 1800)], momento=ahora)
     hoy = timezone.localdate()
-    # 30 días naturales; si el día 30 es inhábil, el plazo vence el siguiente día hábil (regla de nucleo.dias_habiles).
+    # 30 días naturales; si el último cae en día inhábil, vence el siguiente hábil (regla de días hábiles)
     assert v_ps.vence_el == dias_habiles.siguiente_habil(hoy + timedelta(days=30)) and "30" in v_ps.vigencia_texto
+    assert v_ps.vence_el == dias_habiles.calcular_vencimiento(ahora, 30, "dias_naturales")
     assert v_rhf.vence_el == dias_habiles.calcular_vencimiento(ahora, 15, "dias_habiles")
     assert "15" in v_rhf.vigencia_texto and v_rhf.vence_el > hoy + timedelta(days=14)
 
@@ -383,3 +386,22 @@ def test_hu_3_4_el_recorrido_corre_en_ps_y_rhf(contratadas, catalogo_planta, usu
     planta.registrar_salida(usuarios["vivero"], vale, esp["Pino patula"], total)
     exp.refresh_from_db()
     assert exp.estado.clave == "planta_entregada"
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_3_4_trazabilidad_del_vale_y_de_la_salida(contratadas, catalogo_planta, usuarios):
+    """Criterio 4: el vale (Delegación) y cada salida de planta (vivero) quedan en el historial con su usuario."""
+    vivero, esp = catalogo_planta
+    _, (exp,) = contratadas("PS")
+    vale = emitir(usuarios, exp, vivero, [(esp["Pino patula"], 3000), (esp["Oyamel"], 1400)])
+    assert vale.history.get(history_type="+").history_user == delegado_de(usuarios, exp)
+    planta.registrar_salida(usuarios["vivero"], vale, esp["Pino patula"], 1000)
+    salida = SalidaPlanta.objects.get(vale=vale)
+    assert salida.history.get(history_type="+").history_user == usuarios["vivero"]
+    assert any(f["usuario"] == usuarios["vivero"] for f in _filas_de(exp, "Salida de planta"))
+    assert len(_filas_de(exp, "Renglón del vale")) >= 2

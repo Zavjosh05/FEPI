@@ -1,0 +1,44 @@
+{% extends "dictamen/pdf/_base.html" %}
+{% block cuerpo %}
+<h2>I. Objeto</h2>
+<p>{{ conf.definicion }} Se dictamina la solicitud {{ exp.folio }} con los criterios de las Reglas de Operación {{ exp.ejercicio.anio }} del programa y el análisis cartográfico del predio.</p>
+
+<h2>II. Análisis cartográfico del predio</h2>
+{% if croquis %}<div class="croquis">{{ croquis|safe }}</div>{% endif %}
+<table class="datos" style="width:{% if croquis %}66%{% else %}100%{% endif %}">
+  {% if not analisis.usa_poligono %}<tr><th>Polígono</th><td>El programa no usa polígono.</td></tr>
+  {% elif not analisis.tiene_poligono %}<tr><th>Polígono</th><td class="no">Sin polígono registrado.</td></tr>
+  {% else %}
+  <tr><th>Superficie del polígono vigente</th><td>{{ analisis.superficie_ha|floatformat:4 }} ha (EPSG:32614)</td></tr>
+  {% if poligono %}<tr><th>Levantamiento</th><td>{{ poligono.get_levantado_por_display }} · {{ poligono.responsable }} · {{ poligono.fecha_levantamiento|date:"d/m/Y" }}</td></tr>{% endif %}
+  <tr><th>Ubicación en el municipio</th><td>{{ analisis.municipio }}: {{ ubicacion_texto }}{% if analisis.aviso_municipio %}<div class="nota">{{ analisis.aviso_municipio }}</div>{% endif %}</td></tr>
+  <tr><th>Rango de superficie de las reglas</th><td>{% if analisis.superficie_minima_ha is not None and analisis.superficie_maxima_ha is not None %}{{ analisis.superficie_minima_ha }} a {{ analisis.superficie_maxima_ha }} ha · {% if analisis.superficie_en_rango %}<span class="ok">dentro del rango</span>{% else %}<span class="no">fuera del rango</span>{% endif %}{% else %}Las reglas del programa no fijan un rango.{% endif %}</td></tr>
+  <tr><th>Traslapes con otras solicitudes del ejercicio</th><td>{% for t in analisis.traslapes %}<div class="no">{{ t.folio }} ({{ t.predio }}): {{ t.superficie_ha|floatformat:2 }} ha, {{ t.porcentaje }} %</div>{% empty %}Ninguno.{% endfor %}</td></tr>
+  {% endif %}
+</table>
+<div style="clear: both"></div>
+
+<h2>III. Verificación de los criterios del programa</h2>
+<table class="tabla">
+  <thead><tr><th style="width:22%">Grupo</th><th>Criterio</th><th style="width:12%">Numeral</th><th style="width:13%">Revisión</th></tr></thead>
+  <tbody>
+  {% for i in verificacion %}{% if not i.informativo %}
+  <tr><td>{{ i.grupo }}</td><td>{{ i.texto }}{% if i.nota %}<div class="nota">Nota: {{ i.nota }}</div>{% endif %}</td><td>{{ i.numeral }}</td>
+      <td>{% if i.informativo %}<span class="gris">Informativo</span>{% elif i.respuesta == "si" %}<span class="ok">Cumple</span>{% elif i.respuesta == "no" %}<span class="no">No cumple</span>{% elif i.respuesta == "na" %}No aplica{% else %}<span class="gris">Sin marcar</span>{% endif %}</td></tr>
+  {% endif %}{% empty %}<tr><td colspan="4" class="gris">Las reglas del programa no traen criterios técnicos.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<p class="nota">Los criterios de priorización de las reglas no se califican aquí: ordenan las solicitudes factibles en la propuesta de listados al Comité.</p>
+
+<h2>IV. Plazo de dictaminación</h2>
+<p>{% if dictamen.fecha_limite %}{% if plazo %}{% if plazo.cantidad %}{{ plazo.texto_plazo }} {% endif %}({{ plazo.fundamento }}). {% endif %}Fecha límite: <strong>{{ dictamen.fecha_limite|date:"d/m/Y" }}</strong>. El dictamen se emite <strong>{% if dictamen.dentro_de_plazo %}dentro{% else %}fuera{% endif %} del plazo</strong>.{% else %}Las reglas del programa no fijan plazo de dictaminación.{% endif %}</p>
+
+<h2>V. Dictamen</h2>
+<div class="resultado {% if dictamen.resultado != 'factible' %}negativo{% endif %}">
+  <div>Con base en el análisis anterior, la solicitud {{ exp.folio }} se dictamina técnicamente:</div>
+  <div class="r">{{ dictamen.get_resultado_display|upper }}</div>
+  {% if dictamen.superficie_factible_ha %}<div>Superficie factible de apoyo: <strong>{{ dictamen.superficie_factible_ha|floatformat:4 }} ha</strong></div>{% endif %}
+  <div style="margin-top:4px"><strong>Motivo:</strong> {{ dictamen.motivo }}</div>
+</div>
+<p class="nota">Fundamento: Reglas de Operación {{ exp.ejercicio.anio }} del programa {{ exp.ejercicio.programa.nombre }} (glosario, «Dictamen Técnico»; criterios técnicos de elegibilidad y supuestos de inelegibilidad). El dictamen se integra al listado preliminar que se presenta al Comité junto con el dictamen jurídico.</p>
+{% endblock %}

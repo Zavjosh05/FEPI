@@ -21,6 +21,7 @@ from nucleo.notificaciones import emitir_notificacion
 
 from . import pagos
 from .models import Cheque, EstadoSolicitud, SolicitudPago
+from nucleo.trazabilidad import registra_usuario
 
 USO_COBRO = "cobro_cheque"
 
@@ -73,6 +74,7 @@ def por_cobrar(usuario):
 
 
 # ----------------------------------------------------------------------------- emisión
+@registra_usuario
 def emitir_cheque(usuario, solicitud, numero, importe=None, fecha_emision=None, momento=None):
     exigir_unidad(usuario, TipoUnidad.FIDUCIARIA)
     numero = (numero or "").strip()
@@ -120,6 +122,7 @@ def emitir_cheque(usuario, solicitud, numero, importe=None, fecha_emision=None, 
 
 
 # ----------------------------------------------------------------------------- envío
+@registra_usuario
 def enviar_a_delegacion(usuario, cheque, momento=None):
     exigir_unidad(usuario, TipoUnidad.FIDUCIARIA)
     with transaction.atomic():
@@ -153,6 +156,7 @@ def enviar_a_delegacion(usuario, cheque, momento=None):
 
 
 # ----------------------------------------------------------------------------- entrega
+@registra_usuario
 def registrar_entrega(usuario, cheque, recibe_nombre, entregado_en=None, momento=None):
     exigir_unidad(usuario, TipoUnidad.DELEGACION)
     recibe_nombre = (recibe_nombre or "").strip()
@@ -197,6 +201,7 @@ def registrar_entrega(usuario, cheque, recibe_nombre, entregado_en=None, momento
 
 
 # ----------------------------------------------------------------------------- cobro
+@registra_usuario
 def registrar_cobro(usuario, cheque, fecha_cobro=None):
     exigir_unidad(usuario, TipoUnidad.FIDUCIARIA, TipoUnidad.DELEGACION)
     with transaction.atomic():

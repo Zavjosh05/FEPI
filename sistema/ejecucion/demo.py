@@ -44,7 +44,7 @@ from contrato import contratos, publicacion
 from contrato.demo import _delegacion, _firmar_demo
 from contrato.models import ModeloContrato, TipoModelo
 from dictamen import juridico, seguimiento, sesiones, tecnico
-from dictamen.demo import _validada, paso, sesion_aprobacion
+from dictamen.demo import _validada, paso, propiedad_en_regla, sesion_aprobacion
 from dictamen.models import TipoSesion
 from nucleo.demo import CONTRASENA_DEMO, _pdf_demo, _solicitud, archivo_demo, completar_requisitos
 from nucleo.demo_calendario import cuando, habil, habil_antes
@@ -130,7 +130,8 @@ def _lote(u, ejercicio, clave):
         with paso(habil(c["tecnico"], i), 10):
             tecnico.dictaminar(direccion, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
         with paso(habil(c["juridico"], i), 10):
-            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
+            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.",
+                                propiedad=propiedad_en_regla(exp))
         exps.append((exp, destino))
     sesion = sesion_aprobacion(st, ejercicio, c["sesion"], [f"Listado preliminar {clave}"])
     with paso(c["publicacion"], 10):

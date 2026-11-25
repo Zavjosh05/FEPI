@@ -12,7 +12,8 @@ pytestmark = pytest.mark.django_db
 
 def test_hu_1_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-1.1")
-    assert hu["criterios"] == ["Se genera un folio único para la solicitud."]
+    assert hu["criterios"][0] == "Se genera un folio único para la solicitud."
+    assert len(hu["criterios"]) == 2 and "trazabilidad" in hu["criterios"][1]
     assert "CC-DRF-01" in modelo["necesidad_a_funciones"] and "M1.1" in modelo["necesidad_a_funciones"]["CC-DRF-01"]
     assert "municipio que atiende la Delegación" in necesidades["CC-DRF-01"]["texto"]
 
@@ -122,3 +123,17 @@ def test_hu_1_1_pantalla_de_registro(client, cc, contrasena):
     r = client.post("/recepcion/registrar/", datos)
     assert r.status_code == 302
     assert Expediente.objects.filter(predio__nombre="Predio Web").exists()
+
+
+def test_hu_1_1_trazabilidad(nueva_solicitud, usuarios):
+    """Criterio 2: el alta de la solicitud, del predio y de la persona queda en la base de datos con quién la hizo."""
+    from nucleo.trazabilidad import historial_expediente
+
+    exp = nueva_solicitud(nombre="Predio Trazable")
+    del_ame = usuarios["del_amecameca"]
+    assert exp.history.get(history_type="+").history_user == del_ame
+    assert exp.predio.history.get(history_type="+").history_user == del_ame
+    assert exp.solicitante.history.get(history_type="+").history_user == del_ame
+    filas = historial_expediente(exp)
+    alta = next(f for f in filas if f["registro"] == "Expediente" and f["tipo"] == "Alta")
+    assert alta["usuario"] == del_ame and any(c["despues"] == exp.folio for c in alta["cambios"])

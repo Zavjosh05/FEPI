@@ -3,6 +3,7 @@ entrega a la persona beneficiaria y su cobro en un máximo de 3 meses (ROP PSAHE
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente, Notificacion, Persona, Unidad
 
@@ -47,6 +48,8 @@ class Cheque(models.Model):
     cobro_registrado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
                                              related_name="+")
     aviso_cobro = models.CharField(max_length=15, blank=True, help_text="Último aviso de revisar_plazos: por_vencer o vencido.")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-registrado_en", "-id"]

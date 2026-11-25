@@ -21,12 +21,14 @@ from .acuses import emitir_acuse
 from .models import (
     Evento, MedioNotificacion, Notificacion, TipoNotificacion, TipoUnidad, puede_ver_expediente,
 )
+from .trazabilidad import registra_usuario
 
 
 def _fmt(valor):
     return timezone.localtime(valor).strftime("%d/%m/%Y %H:%M:%S h")
 
 
+@registra_usuario
 def emitir_notificacion(expediente, tipo, asunto, usuario, acuse_envio=None, renglones=(), detalle=None,
                         delegacion=None, destinatario=None, observaciones="", datos=None, fecha_hora=None,
                         titulo_acuse=None):
@@ -65,8 +67,10 @@ def puede_notificar(usuario, notificacion):
             and notificacion.notificada_en is None)
 
 
+@registra_usuario
 def registrar_notificacion(usuario, notificacion, medio=MedioNotificacion.PERSONAL, fecha_hora=None,
-                           titulo_acuse=None, renglones=(), detalle=None, descripcion=None, observaciones=""):
+                           titulo_acuse=None, renglones=(), detalle=None, descripcion=None, observaciones="",
+                           encabezado_detalle=None):
     """La Delegación registra que notificó a la persona; emite el acuse de la notificación.
 
     ``fecha_hora`` permite registrar una notificación hecha antes (no futura ni anterior al envío).
@@ -94,7 +98,7 @@ def registrar_notificacion(usuario, notificacion, medio=MedioNotificacion.PERSON
              ("Fecha y hora de la notificación", _fmt(cuando)),
              ("Medio", MedioNotificacion(medio).label), *renglones],
             destinatario=notificacion.destinatario.nombre if notificacion.destinatario else exp.solicitante.nombre,
-            detalle=detalle,
+            detalle=detalle, encabezado_detalle=encabezado_detalle,
         )
         notificacion.notificada_en = cuando
         notificacion.notificada_por = usuario

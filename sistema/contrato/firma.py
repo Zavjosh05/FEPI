@@ -20,12 +20,14 @@ from django.db import transaction
 from django.utils import timezone
 
 from dictamen.comun import exigir_acceso, exigir_programa, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import dias_habiles, extensiones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import leer_json
 from nucleo.models import Expediente, TipoUnidad, expedientes_visibles
 
 from .models import ElementoFormalizacion, FirmaContrato, Firmante, SinFirma
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_SIN_FIRMA = ("publicada", "notificada", "contrato_elaborado", "contrato_en_delegacion")
 EXTENSIONES = (".pdf", ".jpg", ".jpeg", ".png")
@@ -83,7 +85,9 @@ def firmados(usuario):
 def sin_firma(usuario, liberados=False):
     qs = SinFirma.objects.filter(expediente__in=expedientes_visibles(usuario)).select_related(
         "expediente__predio__municipio", "expediente__ejercicio__programa", "expediente__solicitante")
-    return qs.filter(liberado_en__isnull=not liberados)
+    if not liberados:   # la que el Comité ya dio de baja (HU-2.4) no queda por liberar
+        return qs.filter(liberado_en__isnull=True).exclude(expediente__estado__clave="baja")
+    return qs.filter(liberado_en__isnull=False)
 
 
 # ----------------------------------------------------------------------------- firma
@@ -108,6 +112,7 @@ def _nombre(archivo, base):
     return f"{base}{extension}"
 
 
+@registra_usuario
 def registrar_firma(usuario, expediente, firmado_en, firmante, firmante_nombre, archivo, verificacion,
                     elementos=None, observaciones="", momento=None):
     """La Delegación registra el contrato firmado.
@@ -123,6 +128,7 @@ def registrar_firma(usuario, expediente, firmado_en, firmante, firmante_nombre, 
                               "El área responsable debe confirmar la liberación del recurso.")
     if estado == "recurso_liberado":
         raise ValidationError("El recurso de esta solicitud ya se liberó: la firma ya no se puede registrar.")
+    exigir_vigente(expediente, "la firma del contrato ya no se puede registrar")
     if estado != "contrato_en_delegacion":
         raise ValidationError(f"El expediente está «{expediente.estado}»: solo se registra la firma de un contrato que "
                               "ya llegó a la Delegación.")
@@ -247,6 +253,7 @@ def revisar_firmas(hoy):
     return senalados
 
 
+@registra_usuario
 def liberar_recurso(usuario, expediente, motivo, momento=None):
     """El área responsable confirma la liberación del recurso de un contrato sin firma en plazo (con un motivo)."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
@@ -266,7 +273,8 @@ def liberar_recurso(usuario, expediente, motivo, momento=None):
              ("Vencimiento que pasó", f"{senal.vencio_el:%d/%m/%Y}" if senal.vencio_el else "—"),
              ("Motivo de la liberación", motivo.strip()),
              ("Fecha y hora", f"{timezone.localtime(ahora):%d/%m/%Y %H:%M:%S} h"), ("Confirma", usuario.unidad.nombre),
-             ("Reasignación", "Pendiente: la reasignación a la lista de espera es por acuerdo del Comité (HU-6.1, lista de espera y sustituciones).")],
+             ("Reasignación", "El recurso queda liberado para reasignarse a la lista de espera por acuerdo del Comité "
+                              "(HU-2.4 y HU-6.1).")],
             destinatario=expediente.solicitante.nombre)
         senal.liberado_por, senal.liberado_en, senal.motivo_liberacion, senal.acuse_liberacion = (
             usuario, ahora, motivo.strip(), acuse)

@@ -34,4 +34,5 @@ def contexto_dictamenes(request, exp):
         "puede_dictaminar_juridico": tipo == TipoUnidad.JURIDICA and exp.estado.clave == "validada" and juridico is None,
         "resoluciones": exp.resoluciones_comite.select_related("sesion"),
         "acuerdos": exp.acuerdos_comite.select_related("sesion", "unidad_responsable"),
+        "movimientos": exp.movimientos_listado.select_related("acuerdo"),
     }

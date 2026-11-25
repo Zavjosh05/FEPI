@@ -1,7 +1,10 @@
 """HU-3.1 · Publicación de resultados y notificaciones por conducto de la Delegación.
 
 - ``publicar``: el área responsable del programa publica los listados que el Comité autorizó en su acta
-  (CC 9.4.3 fr. III; Convocatoria base quinta). Deja la fecha y hora, su acuse, el hito
+  (CC 9.4.3 fr. III; Convocatoria base quinta). Con las reasignaciones de HU-2.4 (``filas_por_publicar``): quien salió
+  por un acuerdo de seguimiento antes de publicar ya no se publica, y quien entró desde la lista de espera se publica
+  como persona beneficiaria; si la reasignación llega después de publicar, se publica con el acta de la sesión de
+  seguimiento que la acordó (al cerrarla con reasignaciones, el acta autoriza su publicación). Deja la fecha y hora, su acuse, el hito
   ``publicacion_resultados`` de cada solicitud, el cambio de estado de las aprobadas (``aprobada`` →
   ``publicada``) y el aviso del resultado a cada persona por conducto de su Delegación. En PS, además, la
   cita a firma, que la Delegación debe hacer en 5 días hábiles desde la publicación (10.1 inciso h).
@@ -10,12 +13,15 @@
 - ``registrar_entrega``: la Delegación registra que notificó (fecha, hora, medio y acuse). Al notificar el
   resultado de una persona beneficiaria, el expediente pasa a ``notificada`` (``al_notificar``).
 """
+from types import SimpleNamespace
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from dictamen.comun import exigir_programa, exigir_unidad
-from dictamen.models import EstadoSesion, ResultadoListado, SesionComite, TipoSesion
+from dictamen.models import EstadoSesion, MovimientoListado, ResultadoListado, SesionComite, TipoMovimiento, TipoSesion
 from nucleo import dias_habiles, notificaciones, plazos
 from nucleo.acuses import emitir_acuse
 from nucleo.models import (
@@ -23,6 +29,7 @@ from nucleo.models import (
 )
 
 from .models import Publicacion, ResultadoPublicado
+from nucleo.trazabilidad import registra_usuario
 
 LUGARES_POR_OMISION = ("Página de PROBOSQUE (https://probosque.edomex.gob.mx), Oficinas Centrales y "
                        "Delegaciones Regionales Forestales")
@@ -63,9 +70,11 @@ def fecha_limite_publicacion(ejercicio, acta_fecha):
 
 # ----------------------------------------------------------------------------- consultas
 def sesiones_publicables(usuario):
-    """Sesiones de aprobación con acta de los programas que atiende la unidad (publicadas o no)."""
-    qs = SesionComite.objects.filter(tipo=TipoSesion.APROBACION, estado=EstadoSesion.CELEBRADA).select_related(
-        "ejercicio__programa", "publicacion")
+    """Sesiones con acta de los programas que atiende la unidad (publicadas o no): las de aprobación y las de seguimiento
+    que acordaron reasignaciones (HU-2.4)."""
+    qs = SesionComite.objects.filter(
+        Q(tipo=TipoSesion.APROBACION) | Q(tipo=TipoSesion.SEGUIMIENTO, autoriza_publicacion=True),
+        estado=EstadoSesion.CELEBRADA).select_related("ejercicio__programa", "publicacion")
     if usuario.tipo_unidad == TipoUnidad.DIRECCION:
         return qs.filter(ejercicio__programa__in=usuario.unidad.programas.all())
     return qs  # Jurídica, Secretaría Técnica y administración consultan
@@ -76,10 +85,50 @@ def sesiones_por_publicar(usuario):
 
 
 def sesion_de_expediente(expediente):
-    """La sesión de aprobación que lo aprobó (la última resolución a su favor)."""
+    """La sesión con cuya acta se publica: la de aprobación que lo aprobó o, si entró por reasignación (HU-2.4), la de
+    aprobación que lo dejó en lista de espera mientras no se publique y, ya publicada, la de seguimiento que lo reasignó."""
     r = (expediente.resoluciones_comite.filter(resultado=ResultadoListado.BENEFICIARIA)
          .select_related("sesion").order_by("-sesion__fecha_hora").first())
-    return r.sesion if r else None
+    if r is not None:
+        return r.sesion
+    entrada = (MovimientoListado.objects.filter(expediente=expediente, movimiento=TipoMovimiento.ENTRA)
+               .select_related("acuerdo__sesion").order_by("-fecha_hora").first())
+    if entrada is None:
+        return None
+    espera = (expediente.resoluciones_comite.filter(resultado=ResultadoListado.LISTA_ESPERA,
+                                                    sesion__estado=EstadoSesion.CELEBRADA)
+              .select_related("sesion").order_by("-sesion__fecha_hora").first())
+    if espera is not None and not hasattr(espera.sesion, "publicacion"):
+        return espera.sesion
+    return entrada.acuerdo.sesion
+
+
+def filas_por_publicar(sesion):
+    """Renglones de los listados que se publican con el acta: ``[SimpleNamespace(expediente, resultado, orden, monto,
+    reasignada, lugar_espera)]``.
+
+    Sesión de aprobación: sus listados, salvo quien salió por un acuerdo de seguimiento (baja), y con quien entró desde la
+    lista de espera (reasignación) como persona beneficiaria. Sesión de seguimiento: las personas que entraron por
+    reasignación."""
+    if sesion.tipo == TipoSesion.SEGUIMIENTO:
+        movs = (MovimientoListado.objects.filter(acuerdo__sesion=sesion, movimiento=TipoMovimiento.ENTRA)
+                .select_related("expediente__predio__municipio", "expediente__solicitante", "expediente__estado",
+                                "expediente__delegacion").order_by("fecha_hora", "pk"))
+        return [SimpleNamespace(expediente=m.expediente, resultado=ResultadoListado.BENEFICIARIA, orden=None,
+                                monto=m.monto, reasignada=True, lugar_espera=m.lugar_lista_espera) for m in movs]
+    filas = []
+    for r in sesion.resoluciones.select_related(
+            "expediente__predio__municipio", "expediente__solicitante", "expediente__estado", "expediente__delegacion"):
+        estado = r.expediente.estado.clave
+        if r.resultado == ResultadoListado.BENEFICIARIA and estado == "baja":
+            continue                      # salió por un acuerdo de seguimiento antes de publicar
+        if r.resultado == ResultadoListado.LISTA_ESPERA and estado == "aprobada":
+            filas.append(SimpleNamespace(expediente=r.expediente, resultado=ResultadoListado.BENEFICIARIA, orden=None,
+                                         monto=r.monto, reasignada=True, lugar_espera=r.orden))
+            continue
+        filas.append(SimpleNamespace(expediente=r.expediente, resultado=r.resultado, orden=r.orden, monto=r.monto,
+                                     reasignada=False, lugar_espera=None))
+    return filas
 
 
 def notificaciones_visibles(usuario):
@@ -118,25 +167,32 @@ def vencimiento_de(notificacion):
 
 
 # ----------------------------------------------------------------------------- publicar
+@registra_usuario
 def publicar(usuario, sesion, momento=None, lugares=""):
     """Publica los listados de la sesión de aprobación (``Publicacion``). Ver el módulo."""
     exigir_unidad(usuario, TipoUnidad.DIRECCION)
     exigir_programa(usuario, _ConPrograma(sesion.ejercicio.programa))
-    if sesion.tipo != TipoSesion.APROBACION:
-        raise ValidationError("Solo se publican los listados de una sesión de aprobación.")
+    if sesion.tipo not in (TipoSesion.APROBACION, TipoSesion.SEGUIMIENTO):
+        raise ValidationError("Solo se publican los listados de una sesión de aprobación o las reasignaciones de una de "
+                              "seguimiento.")
     if sesion.estado != EstadoSesion.CELEBRADA or not sesion.acta_fecha:
         raise ValidationError("La sesión no tiene acta: el Comité debe aprobar los listados antes de publicarlos.")
     if not sesion.autoriza_publicacion:
-        raise ValidationError("El acta de la sesión no autorizó la publicación de los listados.")
+        raise ValidationError("El acta de la sesión no autorizó la publicación de los listados."
+                              if sesion.tipo == TipoSesion.APROBACION else
+                              "La sesión de seguimiento no acordó reasignaciones que publicar.")
     if Publicacion.objects.filter(sesion=sesion).exists():
         raise ValidationError("Los listados de esta sesión ya se publicaron.")
     ahora = momento or timezone.now()
     if ahora < sesion.acta_fecha:
         raise ValidationError("La publicación no puede ser anterior al acta del Comité.")
-    resoluciones = list(sesion.resoluciones.select_related(
-        "expediente__predio__municipio", "expediente__solicitante", "expediente__estado", "expediente__delegacion"))
+    resoluciones = filas_por_publicar(sesion)
     if not resoluciones:
         raise ValidationError("La sesión no tiene listados que publicar.")
+    if sesion.tipo == TipoSesion.SEGUIMIENTO:
+        resoluciones = [r for r in resoluciones if r.expediente.estado.clave == "aprobada"]
+        if not resoluciones:
+            raise ValidationError("Las personas que entraron por reasignación en esta sesión ya no siguen aprobadas.")
     for r in resoluciones:
         if r.resultado == ResultadoListado.BENEFICIARIA and r.expediente.estado.clave != "aprobada":
             raise ValidationError(f"{r.expediente.folio} está «{r.expediente.estado}»; solo se publica una "
@@ -147,7 +203,7 @@ def publicar(usuario, sesion, momento=None, lugares=""):
     orden = {ResultadoListado.BENEFICIARIA: 0, ResultadoListado.LISTA_ESPERA: 1, ResultadoListado.NO_FACTIBLE: 2}
     resoluciones.sort(key=lambda r: (orden[r.resultado], r.orden or 0, r.expediente.folio))
     with transaction.atomic():
-        detalle = [{"clave": r.get_resultado_display(),
+        detalle = [{"clave": ResultadoListado(r.resultado).label + (" (reasignación)" if r.reasignada else ""),
                     "texto": f"{r.expediente.folio} · {r.expediente.predio.nombre} · {r.expediente.predio.municipio.nombre}"
                              + (f" · {r.expediente.solicitante.nombre}" if r.resultado == ResultadoListado.BENEFICIARIA else ""),
                     "estado": str(r.orden) if r.orden else "—"} for r in resoluciones]
@@ -180,7 +236,8 @@ def publicar(usuario, sesion, momento=None, lugares=""):
                 persona=exp.solicitante.nombre if r.resultado == ResultadoListado.BENEFICIARIA else "")
             plazos.registrar_hito(exp, "publicacion_resultados", usuario, ahora, referencia=f"Sesión {sesion.numero}",
                                   datos={"publicacion": pub.pk, "resultado": r.resultado})
-            texto = f"{sesion.numero}: {r.get_resultado_display()} publicada"
+            texto = f"{sesion.numero}: {ResultadoListado(r.resultado).label} publicada" + (
+                " (entró por reasignación desde la lista de espera)" if r.reasignada else "")
             if r.resultado == ResultadoListado.BENEFICIARIA:
                 exp.cambiar_estado("publicada", usuario, tipo_evento="publicacion_resultados", acuse=acuse,
                                    descripcion=texto, datos={"publicacion": pub.pk})
@@ -194,6 +251,8 @@ def publicar(usuario, sesion, momento=None, lugares=""):
 def _avisos_de_resultado(usuario, pub, resolucion, ahora):
     exp = resolucion.expediente
     texto = TEXTO_RESULTADO[resolucion.resultado]
+    if resolucion.reasignada:
+        texto += " por reasignación del recurso liberado (acuerdo del Comité)"
     if resolucion.resultado == ResultadoListado.LISTA_ESPERA and resolucion.orden:
         texto += f", lugar {resolucion.orden}"
     renglones = [("Solicitud", f"{exp.folio} · {exp.predio.nombre}, {exp.predio.municipio.nombre}"),
@@ -215,6 +274,7 @@ def _avisos_de_resultado(usuario, pub, resolucion, ahora):
 
 
 # ----------------------------------------------------------------------------- avisos y entrega
+@registra_usuario
 def enviar_aviso(usuario, expediente, tipo, asunto, observaciones="", renglones=(), datos=None):
     """Aviso a la persona por conducto de la Delegación (cita a firma, omisiones por subsanar, devolución…)."""
     if usuario.tipo_unidad == TipoUnidad.DELEGACION:
@@ -225,6 +285,7 @@ def enviar_aviso(usuario, expediente, tipo, asunto, observaciones="", renglones=
                                               observaciones=observaciones, datos=datos)
 
 
+@registra_usuario
 def registrar_entrega(usuario, notificacion, medio=MedioNotificacion.PERSONAL, fecha_hora=None, observaciones=""):
     """La Delegación registra que notificó a la persona (fecha, hora, medio) y se emite su acuse."""
     return notificaciones.registrar_notificacion(usuario, notificacion, medio, fecha_hora=fecha_hora,
@@ -247,7 +308,12 @@ def publicaciones_publicas():
 
 
 def renglones_publicos(ejercicio, folio=""):
+    """Lo publicado del ejercicio; de una solicitud publicada más de una vez (lista de espera y luego reasignación) queda
+    su publicación más reciente."""
     qs = ResultadoPublicado.objects.filter(publicacion__ejercicio=ejercicio)
     if folio.strip():
         qs = qs.filter(folio__icontains=folio.strip())
-    return qs.order_by("resultado", "orden", "folio")
+    ultimos = {}
+    for r in qs.order_by("publicacion__publicada_en", "pk"):
+        ultimos[r.expediente_id] = r.pk
+    return qs.filter(pk__in=ultimos.values()).order_by("resultado", "orden", "folio")

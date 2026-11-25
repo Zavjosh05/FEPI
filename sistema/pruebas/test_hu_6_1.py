@@ -65,7 +65,8 @@ def _desistir(usuarios, exp, momento=None):
 
 def test_hu_6_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-6.1")
-    assert hu["criterios"] == ["Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera.",
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera.",
                                "Cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M6.1")
     assert {"CC-BEN-03", "CC-ARP-06", "MFS-ARP-06", "PS-ARP-06", "RHF-ARP-06", "PSA-ARP-06"} <= set(funcion["necesidades"])
@@ -342,8 +343,10 @@ def test_hu_6_1_mfs_prorroga_por_causa_externa_con_adendum(pagada, usuarios, pdf
 def test_hu_6_1_un_acuerdo_sin_propuesta_solo_deja_constancia(notificadas, usuarios):
     _, (_, dos, _) = notificadas("CC", cuantas=3, presupuesto=12000)
     s = _sesion(usuarios, dos.ejercicio)
-    a = dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "reasignacion", "Reasignar", [dos])
-    assert reasignacion.ejecutar_acuerdo in dictamen_seguimiento.RECEPTORES["reasignacion"]
+    # Un acuerdo de constancia (sin efecto en los listados) tomado directamente por el Comité (HU-2.4).
+    a = dictamen_seguimiento.registrar_acuerdo(usuarios["comite"], s, "caso_fortuito", "Atender el aviso", [dos],
+                                               causa="Aviso de la Delegación")
+    assert reasignacion.ejecutar_acuerdo in dictamen_seguimiento.RECEPTORES["caso_fortuito"]
     dictamen_seguimiento.cumplir(usuarios["dir_drff"], a)
     dos.refresh_from_db()
     assert dos.estado.clave == "lista_espera" and not Propuesta.objects.exists()

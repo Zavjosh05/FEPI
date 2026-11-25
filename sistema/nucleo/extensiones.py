@@ -38,13 +38,15 @@ aquí en su ``AppConfig.ready()`` para sumar lo suyo sin que el núcleo dependa 
 - AL_REPORTE_INCUMPLIDO: funciones ``(evaluacion) -> None`` que corren, al enviar al CASPEG la evaluación de un periodo, por cada
   Guardabosque que no cumplió o no entregó su reporte (``ejecucion.models.EvaluacionPeriodo``; HU-4.3). HU-6.2 conecta aquí el
   seguimiento (suspensión por ministración o baja por tres reportes no presentados, PEG 8.1.9.1 a y 8.1.9.2 f).
+- TRAZABILIDAD: funciones ``(expediente) -> [(etiqueta, historial)]`` con el historial (django-simple-history) de los
+  registros del expediente que guarda cada módulo; la pestaña «Trazabilidad» los junta (``nucleo.trazabilidad``).
 """
 
 FILTROS_BANDEJA = []
 EXTRAS_BANDEJA = []
 PANELES_BANDEJA = []
 PESTANAS_EXPEDIENTE = []
-GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Publicación y contrato", "Pagos", "Ejecución y verificación",
+GRUPOS_MENU = ["Recepción", "Dictamen y Comité", "Listados", "Publicación y contrato", "Pagos", "Ejecución y verificación",
                "Seguimiento y cierre"]
 MENU = [{"nombre": "Registrar solicitud", "url": "recepcion:registrar", "grupo": "Recepción", "tipos": ["delegacion"],
          "estricto": True}]
@@ -60,3 +62,4 @@ SECCIONES_PORTAL = []
 AJUSTES_MONTO = []
 AL_INCIDENCIA = []
 AL_REPORTE_INCUMPLIDO = []
+TRAZABILIDAD = []

@@ -46,6 +46,8 @@ def test_hu_3_3_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-3.3")
     assert "fecha y la hora de la firma" in hu["criterios"][0] and "credencial" in hu["criterios"][1]
     assert "señalado para liberar el recurso" in hu["criterios"][2]
+    assert len(hu["criterios"]) == 4
+    assert "trazabilidad" in hu["criterios"][-1]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M3.3")
     assert "PEG-DRF-02" in funcion["necesidades"] and "MFS-PSF-02" in funcion["necesidades"]
 
@@ -293,7 +295,8 @@ def test_hu_3_3_liberar_el_recurso_no_es_automatico_y_lo_confirma_el_area_respon
         extensiones.AL_LIBERAR_RECURSO.pop()
     exp.refresh_from_db()
     assert exp.estado.clave == "recurso_liberado" and s.liberado and s.liberado_por == usuarios["dir_drff"]
-    assert s.acuse_liberacion and "Pendiente" in " ".join(v for _, v in s.acuse_liberacion.contenido["renglones"])
+    assert s.acuse_liberacion and "reasignarse a la lista de espera" in " ".join(
+        v for _, v in s.acuse_liberacion.contenido["renglones"])
     assert llamadas == [(exp.pk, "dir_drff")]
     assert exp.eventos.filter(tipo="recurso_liberado", motivo="La persona no acudió a firmar.").exists()
     with pytest.raises(ValidationError, match="Solo se libera"):
@@ -415,3 +418,27 @@ def test_hu_3_3_la_pestana_ya_no_dice_que_esta_pendiente(en_delegacion, usuarios
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=contrato").content.decode()
     assert "HU-3.3 Firma del contrato" not in html and 'data-prueba="por-firmar-exp"' in html
     assert "Fecha programada de firma" in html and "Vencimiento para liberar el recurso" in html
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+def test_hu_3_3_trazabilidad_de_la_firma_y_de_la_liberacion(en_delegacion, usuarios, pdf):
+    """Criterio 4: la firma (Delegación), el señalamiento (sistema) y la liberación (Dirección) quedan en el historial."""
+    _, (firmado, vencido) = en_delegacion("PS", cuantas=2)
+    f = firmar(usuarios, firmado, pdf)
+    assert f.history.get(history_type="+").history_user == delegado_de(usuarios, firmado)
+    assert any(x["usuario"] == delegado_de(usuarios, firmado) for x in _filas_de(firmado, "Firma del contrato"))
+    vencer(vencido)
+    firma.revisar_firmas(timezone.localdate())
+    s = SinFirma.objects.get(expediente=vencido)
+    assert s.history.get(history_type="+").history_user is None          # lo señaló el sistema
+    firma.liberar_recurso(usuarios["dir_drff"], vencido, "La persona no acudió a firmar.")
+    cambio = s.history.filter(history_type="~").latest("history_date")
+    assert cambio.history_user == usuarios["dir_drff"] and cambio.motivo_liberacion == "La persona no acudió a firmar."
+    filas = _filas_de(vencido, "Sin firma en plazo")
+    assert any(x["usuario"] == usuarios["dir_drff"] and any(c["despues"] == "La persona no acudió a firmar."
+                                                           for c in x["cambios"]) for x in filas)

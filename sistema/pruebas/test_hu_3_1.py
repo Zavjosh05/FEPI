@@ -19,8 +19,9 @@ pytestmark = pytest.mark.django_db
 
 def test_hu_3_1_criterios_y_necesidades_vienen_del_modelo(modelo):
     hu = historia(modelo, "HU-3.1")
-    assert len(hu["criterios"]) == 2 and "publicados en la fecha de la convocatoria" in hu["criterios"][0]
+    assert len(hu["criterios"]) == 3 and "publicados en la fecha de la convocatoria" in hu["criterios"][0]
     assert "acuse" in hu["criterios"][1]
+    assert "trazabilidad" in hu["criterios"][-1]
 
 
 # ----------------------------------------------------------------------------- criterio 1: publicación
@@ -288,3 +289,25 @@ def test_hu_3_1_actas_sin_autorizacion_se_ven_pero_no_se_publican(aprobadas, usu
     assert 'data-prueba="por-publicar"' in lista and "No hay listados autorizados por publicar" in lista
     detalle = client.get(f"/contrato/publicacion/{sesion.pk}/").content.decode()
     assert "no autorizó la publicación" in detalle and 'id="form-publicar"' not in detalle
+
+
+def _filas_de(exp, registro):
+    from nucleo.trazabilidad import historial_expediente
+
+    return [f for f in historial_expediente(exp) if f["registro"] == registro]
+
+
+# ----------------------------------------------------------------------------- criterio 3: trazabilidad
+def test_hu_3_1_trazabilidad_de_la_publicacion_y_de_la_notificacion(aprobadas, usuarios):
+    """Criterio 3: la publicación, su renglón y la notificación quedan en el historial con quién, cuándo y qué cambió."""
+    sesion, (exp,) = aprobadas("CC", cuantas=1)
+    pub = publicacion.publicar(usuarios["dir_drff"], sesion)
+    assert pub.history.get(history_type="+").history_user == usuarios["dir_drff"]
+    assert ResultadoPublicado.history.get(expediente_id=exp.pk).history_user == usuarios["dir_drff"]
+    n = exp.notificaciones.get(tipo="resultados")
+    publicacion.registrar_entrega(usuarios["del_amecameca"], n, "personal")
+    cambio = n.history.filter(history_type="~").latest("history_date")
+    assert cambio.history_user == usuarios["del_amecameca"] and cambio.notificada_en is not None
+    assert any(f["usuario"] == usuarios["dir_drff"] for f in _filas_de(exp, "Publicación de resultados"))
+    notif = _filas_de(exp, "Notificación")
+    assert any(f["usuario"] == usuarios["del_amecameca"] and any(c["antes"] == "—" for c in f["cambios"]) for f in notif)

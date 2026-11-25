@@ -1,9 +1,9 @@
 {
   "cifras": {
-    "pruebas_sistema": "128",
+    "pruebas_sistema": "155",
     "pruebas_calculadora": "15",
-    "capturas": "60",
-    "tablas": "33"
+    "capturas": "71",
+    "tablas": "36"
   },
   "situacion_programa": {
     "CC": "Con reglas cargadas; es el programa con el que se demostró el sprint",
@@ -17,7 +17,7 @@
   "historias": {
     "HU-1.1": {
       "commit": "6ee4927",
-      "como": "Ventanilla de la Delegación: la solicitud se registra a nombre del predio, que recibe un folio propio y lo conserva entre programas. Se genera el acuse en PDF con fecha y hora de recepción. El servicio rechaza un predio cuyo municipio no atiende esa Delegación y dice cuál le corresponde."
+      "como": "Ventanilla de la Delegación: el formulario agrupa los datos generales de la persona solicitante, los del predio y los específicos del programa. Al registrar se genera el folio único de la solicitud (programa, ejercicio, Delegación y consecutivo; la base de datos no admite folios repetidos). Además, el predio recibe su propio folio, se emite el acuse en PDF con fecha y hora, y se rechaza un predio cuyo municipio no atiende esa Delegación. Cada alta queda en el historial de la base de datos con su usuario (trazabilidad, criterio común a todas las historias del sistema desde el 23-nov)."
     },
     "HU-1.2": {
       "commit": "2c92b2c",
@@ -29,23 +29,23 @@
     },
     "HU-1.4": {
       "commit": "26bb9b7",
-      "como": "La Dirección valida el expediente o emite el aviso de faltantes con fecha límite en días hábiles, que se notifica por conducto de la Delegación con su acuse. En un refrendo se acepta la documentación legal vigente de hasta 3 años; el número de años sale de las reglas."
+      "como": "La Dirección valida el expediente o emite el aviso de faltantes con fecha límite en días hábiles, que se notifica por conducto de la Delegación con su acuse. Desde el 23-nov, cada faltante lleva la observación de la Dirección (qué falta o por qué no es válido), que va en el aviso y en el requisito. En un refrendo se acepta la documentación legal vigente de hasta 3 años; el número de años sale de las reglas."
     },
     "HU-2.1": {
       "commit": "3417f37",
-      "como": "Dictamen factible o no factible con motivo, apoyado en una lista de verificación con los criterios del programa (que hay que revisar uno por uno) y en el análisis cartográfico con PostGIS: superficie, municipio y traslapes con otros expedientes. Listado preliminar exportable. El plazo de dictaminación sale de las reglas (45 días hábiles en Guardabosques)."
+      "como": "Dictamen factible o no factible con motivo, apoyado en una lista de verificación con los criterios del programa (que hay que revisar uno por uno) y en el análisis cartográfico con PostGIS: superficie, municipio y traslapes con otros expedientes. Listado preliminar exportable. El plazo de dictaminación sale de las reglas (45 días hábiles en Guardabosques). Desde el 23-nov, el dictamen se expide como documento en PDF (folio DT-…, con croquis, verificación, resultado y firmas) adjunto al expediente."
     },
     "HU-2.2": {
       "commit": "160ae8b",
-      "como": "Dictamen procedente o no procedente con motivo. El Listado de Personas Beneficiarias Incumplidas y los predios con sanción se cotejan de forma automática, y el servicio impide dictaminar procedente una solicitud cuyo predio o titular está en el Listado."
+      "como": "Dictamen procedente o no procedente con motivo, expedido como documento en PDF (folio DJ-…) adjunto al expediente. Revisa cada documento legal y, desde el 23-nov, la acreditación de la propiedad o legal posesión del predio (documento de las ROP a nombre del titular, que ampare la superficie, vigente y sin conflicto). El Listado de Personas Beneficiarias Incumplidas y los predios con procedimiento o sanción se cotejan de forma automática, y el servicio impide dictaminar procedente si algo de esto falla."
     },
     "HU-2.3": {
       "commit": "40ac657",
-      "como": "La Secretaría Técnica arma la convocatoria con orden del día y documentos; el envío guarda fecha, hora y acuse y exige la anticipación de las reglas. El sistema propone los listados (personas beneficiarias, lista de espera con orden, no factibles); el Comité puede ajustarlos dejando constancia. El acta lleva la autorización de publicación y mueve cada expediente a su estado."
+      "como": "La Secretaría Técnica arma la convocatoria con orden del día y documentos; el envío guarda fecha, hora y acuse y exige la anticipación de las reglas. El sistema propone los listados (personas beneficiarias, lista de espera con orden, no factibles); el Comité puede ajustarlos dejando constancia. El acta lleva la autorización de publicación y mueve cada expediente a su estado. Desde el 23-nov, Candidatos y Beneficiarios se consultan en dos vistas separadas (menú «Listados»), exportables a CSV."
     },
     "HU-2.4": {
       "commit": "a27e107",
-      "como": "Los acuerdos de seguimiento son tipificados; cada uno indica los expedientes a los que aplica y el área que debe cumplirlo, y esa área lo ve pendiente en su bandeja hasta marcarlo cumplido. Incluye la instrucción de pago por ministración (PSAHEM) y la validación de reportes por periodo (Guardabosques), probadas con programas mínimos."
+      "como": "Reasignaciones e incidentes (título desde el 23-nov): cada incidente (desistimiento, cancelación, baja, sustitución, caso fortuito…) queda en un acuerdo con su causa, sus expedientes y el área que lo atiende, que lo ve en su bandeja. La baja libera el recurso; la reasignación pasa a «aprobada» a las primeras de la lista de espera, en su orden y sin rebasar el recurso liberado. La instrucción de pago (PSAHEM) y la validación de reportes (Guardabosques) siguen como acuerdos que dejan constancia."
     },
     "HU-7.1": {
       "commit": "d8b71ff",
@@ -61,6 +61,7 @@
     "dictaminada",
     "aprobada",
     "lista_espera",
+    "baja",
     "no_factible"
   ],
   "pie_estados": "Estados del trámite en el sprint 1 y unidad que hace cada paso. En ámbar, los flujos alternos.",
@@ -85,7 +86,8 @@
         "Poligono",
         "Validacion",
         "Acuse",
-        "Evento"
+        "Evento",
+        "ObservacionValidacion"
       ]
     },
     "er_dictamen": {
@@ -93,13 +95,16 @@
       "campos": 5,
       "entidades": [
         "Expediente",
+        "Documento",
         "DictamenTecnico",
         "DictamenJuridico",
+        "RevisionPropiedad",
         "PersonaIncumplida",
         "PredioSancionado",
         "SesionComite",
         "ResolucionSesion",
         "Acuerdo",
+        "MovimientoListado",
         "Unidad"
       ]
     },

@@ -13,6 +13,7 @@ from django.utils import timezone
 from nucleo import dias_habiles, notificaciones, plazos, reglas
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import datos_sistema
+from nucleo.trazabilidad import registra_usuario
 from nucleo.models import (
     Documento, Estado, Evento, Expediente, MedioNotificacion, Municipio, Persona, Predio, TipoDocumento,
     TipoNotificacion, TipoUnidad, puede_ver_expediente,
@@ -20,7 +21,8 @@ from nucleo.models import (
 
 from . import geometria
 from .models import (
-    EstadoRevision, OrigenPoligono, Poligono, ResultadoValidacion, RevisionRequisito, TipoCambio, Validacion,
+    EstadoRevision, ObservacionValidacion, OrigenObservacion, OrigenPoligono, Poligono, ResultadoValidacion,
+    RevisionRequisito, TipoCambio, Validacion,
 )
 
 ESTADOS_EDITABLES_DELEGACION = {"recibida", "faltantes"}
@@ -94,6 +96,7 @@ class DatosSolicitud:
     extra: dict = field(default_factory=dict)
 
 
+@registra_usuario
 def registrar_solicitud(usuario, datos: DatosSolicitud):
     """Registra la solicitud a nombre del predio en la Delegación del usuario y emite el acuse."""
     _exigir_unidad(usuario, TipoUnidad.DELEGACION)
@@ -208,6 +211,7 @@ def puede_usar_archivo_probosque(revision):
     return exp.es_refrendo and revision.requisito.aplica_en_refrendo is False
 
 
+@registra_usuario
 def revisar_requisito(usuario, revision, estado, archivo=None, en_archivo_probosque=False, fecha_documento=None,
                       observaciones=""):
     """La Delegación marca el requisito como entregado (con su archivo), faltante o no aplica."""
@@ -290,6 +294,7 @@ def detalle_requisitos(expediente):
             for r in expediente.revisiones.select_related("requisito")]
 
 
+@registra_usuario
 def enviar_a_direccion(usuario, expediente):
     """Envía el expediente digital a la Dirección con fecha, hora y acuse."""
     _exigir_unidad(usuario, TipoUnidad.DELEGACION)
@@ -320,6 +325,7 @@ def poligono_vigente(expediente):
     return expediente.poligonos.filter(vigente=True).first()
 
 
+@registra_usuario
 def registrar_poligono(usuario, expediente, geom, origen, levantado_por, responsable, fecha_levantamiento,
                        prestador=None, archivo=None, motivo_cambio=""):
     """Registra el polígono levantado en campo. Conserva el anterior (historial)."""
@@ -402,35 +408,65 @@ def evaluar_para_validacion(expediente):
     return resultado
 
 
-def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
+@registra_usuario
+def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones="", observaciones_requisitos=None):
     """La Dirección valida el expediente o emite el aviso de faltantes con fecha límite.
 
-    Los requisitos que no pasan la evaluación automática (por ejemplo, documentación de refrendo
-    no vigente) se agregan siempre a los faltantes.
+    Cada requisito queda con su resultado y su observación (``ObservacionValidacion``):
+    - los que no pasan la evaluación automática (por ejemplo, documentación de refrendo no vigente) son siempre
+      faltantes; su observación es la que escriba la Dirección o, si no escribe nada, el motivo de la evaluación;
+    - los que la Dirección señala como faltantes (``faltantes_ids``) deben llevar su observación: qué falta o por qué
+      no es válido (ilegible, incompleto, no vigente…). Sin ella no se emite el aviso;
+    - los válidos guardan la nota de la Dirección, si la escribió, o el resultado de la evaluación.
+    ``observaciones_requisitos``: {id de la revisión: texto}. ``observaciones``: observación general del aviso.
     """
     _exigir_unidad(usuario, TipoUnidad.DIRECCION)
     _exigir_acceso(usuario, expediente)
+    notas = {int(k): (v or "").strip() for k, v in (observaciones_requisitos or {}).items()}
     evaluacion = evaluar_para_validacion(expediente)
-    faltantes = {e.revision.pk: e for e in evaluacion if not e.valida}
     por_id = {e.revision.pk: e for e in evaluacion}
+    resultado = {}   # pk -> (faltante, origen, observación)
+    for e in evaluacion:
+        if not e.valida:
+            resultado[e.revision.pk] = (True, OrigenObservacion.REGLAS, notas.get(e.revision.pk) or e.motivo)
+    sin_observacion = []
     for pk in faltantes_ids:
         pk = int(pk)
-        if pk in por_id and pk not in faltantes:
-            faltantes[pk] = RevisionEvaluada(por_id[pk].revision, False, "Señalado por la Dirección")
+        if pk not in por_id or pk in resultado:
+            continue
+        if not notas.get(pk):
+            sin_observacion.append(por_id[pk].revision.requisito.clave)
+        resultado[pk] = (True, OrigenObservacion.DIRECCION, notas.get(pk, ""))
+    if sin_observacion:
+        raise ValidationError("Escriba la observación de cada requisito que señala como faltante (qué falta o por qué "
+                              "no es válido): " + ", ".join(sin_observacion) + ".")
+    for e in evaluacion:
+        if e.revision.pk not in resultado:
+            resultado[e.revision.pk] = (False, "", notas.get(e.revision.pk) or e.motivo)
+    faltantes = [pk for pk, (falta, _, _) in resultado.items() if falta]
     detalle = [{"clave": e.revision.requisito.clave, "texto": e.revision.requisito.titulo,
-                "estado": ("Faltante: " + faltantes[e.revision.pk].motivo) if e.revision.pk in faltantes else
-                ("Válido: " + e.motivo)} for e in evaluacion]
+                "estado": ("Faltante: " if resultado[e.revision.pk][0] else "Válido: ") + resultado[e.revision.pk][2]}
+               for e in evaluacion]
     ahora = timezone.now()
+
+    def guardar_observaciones(val):
+        for e in evaluacion:
+            falta, origen, texto = resultado[e.revision.pk]
+            ObservacionValidacion.objects.create(validacion=val, revision=e.revision, faltante=falta, origen=origen,
+                                                 observacion=texto or "—")
+
     with transaction.atomic():
         if not faltantes:
             val = Validacion.objects.create(expediente=expediente, resultado=ResultadoValidacion.VALIDADO,
                                             usuario=usuario, fecha_hora=ahora, observaciones=observaciones,
                                             detalle=detalle)
+            guardar_observaciones(val)
             acuse = emitir_acuse(expediente, "validacion", "Constancia de validación del expediente", usuario,
                                  [("Resultado", "Expediente validado: cumple los requisitos de las reglas"),
                                   ("Fecha y hora", fmt_fecha_hora(ahora)),
                                   ("Observaciones", observaciones or "—")],
-                                 destinatario=expediente.delegacion.nombre, detalle=detalle)
+                                 destinatario=expediente.delegacion.nombre, detalle=detalle,
+                                 encabezado_detalle=["Clave", "Requisito", "Resultado y observación de la Dirección"])
             val.acuse = acuse
             val.save(update_fields=["acuse"])
             expediente.cambiar_estado("validada", usuario, tipo_evento="validacion", acuse=acuse,
@@ -448,17 +484,27 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
             expediente=expediente, resultado=ResultadoValidacion.FALTANTES, usuario=usuario, fecha_hora=ahora,
             observaciones=observaciones, detalle=detalle, fecha_limite=limite, plazo_aplicado=texto_plazo[:300],
         )
-        val.faltantes.set(list(faltantes))
-        RevisionRequisito.objects.filter(pk__in=list(faltantes)).update(estado=EstadoRevision.FALTANTE)
+        val.faltantes.set(faltantes)
+        guardar_observaciones(val)
+        # Uno por uno (no con update()) para que cada cambio quede en el historial de la revisión.
+        for pk in faltantes:
+            revision = por_id[pk].revision
+            if revision.estado != EstadoRevision.FALTANTE:
+                revision.estado = EstadoRevision.FALTANTE
+                revision._change_reason = f"Aviso de faltantes: {resultado[pk][2]}"[:100]
+                revision.save(update_fields=["estado"])
         acuse = emitir_acuse(
             expediente, "aviso_faltantes", "Aviso de faltantes", usuario,
             [("Fecha y hora del aviso", fmt_fecha_hora(ahora)),
              ("Fecha límite para entregar", texto_limite),
              ("Plazo aplicado", texto_plazo),
              ("Conducto", f"Por conducto de {expediente.delegacion.nombre}"),
-             ("Observaciones", observaciones or "—")],
+             ("Requisitos faltantes", str(len(faltantes))),
+             ("Observaciones generales", observaciones or "—")],
             destinatario=f"{expediente.solicitante.nombre}, por conducto de {expediente.delegacion.nombre}",
-            detalle=[d for d in detalle if d["estado"].startswith("Faltante")],
+            detalle=[{"clave": d["clave"], "texto": d["texto"], "estado": d["estado"].removeprefix("Faltante: ")}
+                     for d in detalle if d["estado"].startswith("Faltante")],
+            encabezado_detalle=["Clave", "Requisito", "Observación de la Dirección (qué falta o por qué no es válido)"],
         )
         val.acuse = acuse
         val.notificacion = notificaciones.emitir_notificacion(
@@ -468,17 +514,26 @@ def validar_expediente(usuario, expediente, faltantes_ids=(), observaciones=""):
         val.save(update_fields=["acuse", "notificacion"])
         expediente.cambiar_estado("faltantes", usuario, tipo_evento="aviso_faltantes", acuse=acuse,
                                   descripcion=f"Aviso de faltantes ({len(faltantes)}) con fecha límite {texto_limite}.",
-                                  datos={"fecha_limite": limite.isoformat() if limite else None})
+                                  datos={"fecha_limite": limite.isoformat() if limite else None,
+                                         "faltantes": {por_id[pk].revision.requisito.clave: resultado[pk][2]
+                                                       for pk in faltantes}})
     return val
+
+
+def observaciones_del_aviso(validacion):
+    """Faltantes de un aviso con la observación de la Dirección: [(revisión, observación)]."""
+    return [(o.revision, o.observacion) for o in
+            validacion.observaciones_requisitos.filter(faltante=True).select_related("revision__requisito")]
 
 
 def aviso_vigente(expediente):
     return expediente.validaciones.filter(resultado=ResultadoValidacion.FALTANTES).first()
 
 
+@registra_usuario
 def registrar_notificacion(usuario, validacion, medio=MedioNotificacion.PERSONAL, fecha_hora=None):
-    """La Delegación registra que notificó el aviso de faltantes a la persona solicitante."""
-    """Usa el servicio general del núcleo (``nucleo.notificaciones``)."""
+    """La Delegación registra que notificó el aviso de faltantes a la persona solicitante (servicio general del núcleo,
+    ``nucleo.notificaciones``)."""
     exp = validacion.expediente
     _exigir_unidad(usuario, TipoUnidad.DELEGACION)
     _exigir_acceso(usuario, exp)
@@ -491,8 +546,9 @@ def registrar_notificacion(usuario, validacion, medio=MedioNotificacion.PERSONAL
         titulo_acuse="Acuse de notificación del aviso de faltantes",
         renglones=[("Fecha límite para entregar", f"{validacion.fecha_limite:%d/%m/%Y}" if validacion.fecha_limite
                     else plazos.SIN_PLAZO)],
-        detalle=[{"clave": r.requisito.clave, "texto": r.requisito.titulo, "estado": "Faltante"}
-                 for r in validacion.faltantes.select_related("requisito")],
+        detalle=[{"clave": r.requisito.clave, "texto": r.requisito.titulo, "estado": obs}
+                 for r, obs in observaciones_del_aviso(validacion)],
+        encabezado_detalle=["Clave", "Requisito", "Observación de la Dirección"],
         descripcion="Aviso de faltantes notificado a la persona solicitante.",
     )
 

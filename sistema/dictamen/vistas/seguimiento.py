@@ -1,4 +1,4 @@
-"""HU-2.4 · Acuerdos de las sesiones de seguimiento y su cumplimiento por el área responsable."""
+"""HU-2.4 · Reasignaciones e incidentes: acuerdos de las sesiones de seguimiento y su cumplimiento por el área responsable."""
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -16,8 +16,12 @@ def contexto_sesion(request, sesion):
     tipos = seguimiento.tipos_acuerdo(sesion.ejercicio.programa)
     return {
         "plantilla_tipo": "dictamen/seguimiento/_acuerdos.html",
-        "acuerdos": sesion.acuerdos.select_related("unidad_responsable").prefetch_related("expedientes"),
+        "acuerdos": sesion.acuerdos.select_related("unidad_responsable").prefetch_related("expedientes", "movimientos__expediente"),
         "form_acuerdo": AcuerdoForm(sesion=sesion, tipos=tipos), "tipos_acuerdo": {t["clave"]: t for t in tipos},
+        "lista_espera": seguimiento.lista_de_espera(sesion.ejercicio),
+        "recurso_liberado": seguimiento.recurso_liberado(sesion.ejercicio),
+        "movimientos": seguimiento.movimientos_del_ejercicio(sesion.ejercicio)
+                       .select_related("acuerdo", "expediente__solicitante", "usuario"),
     }
 
 
@@ -34,12 +38,18 @@ def acuerdo(request, pk):
     d = form.cleaned_data
     try:
         a = seguimiento.registrar_acuerdo(request.user, sesion, d["tipo"], d["descripcion"], d["expedientes"],
-                                          d.get("unidad_responsable"), d.get("ministracion"), d.get("periodo", ""))
+                                          d.get("unidad_responsable"), d.get("ministracion"), d.get("periodo", ""),
+                                          causa=d.get("causa", ""))
     except (ValidationError, PermissionDenied) as e:
         for m in mensajes_error(e):
             messages.error(request, m)
     else:
-        messages.success(request, f"Acuerdo {a.numero} registrado; queda pendiente en la bandeja de {a.unidad_responsable}.")
+        cambios = ""
+        if a.movimientos.exists():
+            salen = a.movimientos.filter(movimiento="sale").count()
+            entran = a.movimientos.filter(movimiento="entra").count()
+            cambios = f" Listados: {salen} sale{'n' if salen != 1 else ''} y {entran} entra{'n' if entran != 1 else ''}."
+        messages.success(request, f"Acuerdo {a.numero} registrado; queda pendiente en la bandeja de {a.unidad_responsable}.{cambios}")
     return redirect("dictamen:sesion", pk)
 
 

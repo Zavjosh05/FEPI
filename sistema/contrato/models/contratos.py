@@ -8,6 +8,7 @@ nueva que queda sin validar; un contrato se elabora siempre sobre una versión v
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Ejercicio, Expediente
 
@@ -33,6 +34,8 @@ class ModeloContrato(models.Model):
     es_base = models.BooleanField(default=False, help_text="Plantilla base propia del sistema (borrador por validar).")
     creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     creado_en = models.DateTimeField(default=timezone.now)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["ejercicio", "tipo", "nombre"]
@@ -65,6 +68,8 @@ class VersionModelo(models.Model):
                                      related_name="+")
     revisada_en = models.DateTimeField(null=True, blank=True, help_text="Fecha y hora de la validación o devolución.")
     observaciones = models.TextField(blank=True, help_text="Observaciones de la Unidad Jurídica.")
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["modelo", "-numero"]
@@ -104,6 +109,8 @@ class Contrato(models.Model):
     enviado_en = models.DateTimeField(null=True, blank=True, help_text="Fecha y hora del envío a la Delegación.")
     acuse_envio = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["-elaborado_en"]
 
@@ -129,6 +136,8 @@ class Adendum(models.Model):
     archivo = models.FileField(upload_to=ruta_contrato, max_length=300, blank=True)
     creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     creado_en = models.DateTimeField(default=timezone.now)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["contrato", "creado_en"]

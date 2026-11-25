@@ -179,7 +179,8 @@ erDiagram
 ## 2. Expediente y recepción (M1)
 
 El expediente único por predio: la solicitud, la revisión de cada requisito con su documento, los
-polígonos (el vigente y los anteriores), la validación con su aviso de faltantes, los acuses y la bitácora.
+polígonos (el vigente y los anteriores), la validación con su aviso de faltantes y la observación de la Dirección
+en cada requisito (`ObservacionValidacion`), los acuses y la bitácora.
 La notificación por conducto de la Delegación (`Notificacion`, con el envío y la notificación a la persona) y
 los hitos que arrancan plazos (`Hito`: publicación, firma, entrega del Vale o del cheque) son del núcleo y
 los usan todos los módulos.
@@ -215,6 +216,7 @@ erDiagram
   Predio ||--o{ Expediente : predio
   Requisito |o--o{ Documento : requisito
   Requisito ||--o{ RevisionRequisito : requisito
+  RevisionRequisito ||--o{ ObservacionValidacion : revision
   Unidad |o--o{ Acuse : unidad
   Unidad |o--o{ Documento : unidad
   Unidad |o--o{ Evento : unidad
@@ -222,6 +224,7 @@ erDiagram
   Unidad |o--o{ Notificacion : unidad_origen
   Unidad ||--o{ Expediente : delegacion
   Unidad ||--o{ Notificacion : delegacion
+  Validacion ||--o{ ObservacionValidacion : validacion
   Validacion }o--o{ RevisionRequisito : faltantes
   Acuse {
     int id PK
@@ -363,6 +366,14 @@ erDiagram
     texto telefono
     bool asignacion_confirmada
   }
+  ObservacionValidacion {
+    int id PK
+    int validacion_id FK
+    int revision_id FK
+    bool faltante
+    texto origen
+    texto observacion
+  }
   Poligono {
     int id PK
     int expediente_id FK
@@ -404,13 +415,19 @@ erDiagram
 
 Un dictamen técnico y uno jurídico por expediente, el Listado de Personas Beneficiarias Incumplidas y los
 predios sancionados, las sesiones del Comité con sus documentos, la resolución de cada expediente en la
-sesión de aprobación y los acuerdos de seguimiento con su área responsable.
+sesión de aprobación y los acuerdos de seguimiento con su área responsable. Cada dictamen guarda su folio, su
+documento PDF (`Documento` de tipo «dictamen») y su huella; el jurídico, la revisión de la propiedad o legal posesión
+(`RevisionPropiedad`). Las bajas y reasignaciones quedan en `MovimientoListado` (sin acuerdo cuando el recurso lo liberó
+la Dirección por un contrato sin firma en plazo, HU-3.3).
 
 ```mermaid
 erDiagram
+  Acuerdo |o--o{ MovimientoListado : acuerdo
   Acuerdo }o--o{ Expediente : expedientes
+  DictamenJuridico ||--o| RevisionPropiedad : dictamen
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ SesionComite : ejercicio
+  Expediente ||--o{ MovimientoListado : expediente
   Expediente ||--o{ ResolucionSesion : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
@@ -442,7 +459,10 @@ erDiagram
     texto resultado
     texto motivo
     json cotejo
+    json documentacion
     fecha_hora fecha_hora
+    texto folio UK
+    texto huella
   }
   DictamenTecnico {
     int id PK
@@ -453,6 +473,7 @@ erDiagram
     json verificacion
     json analisis
     fecha fecha_limite
+    texto folio UK
   }
   DocumentoSesion {
     int id PK
@@ -460,6 +481,17 @@ erDiagram
     texto nombre
     archivo archivo
     fecha_hora fecha_hora
+  }
+  MovimientoListado {
+    int id PK
+    int acuerdo_id FK
+    texto motivo
+    int expediente_id FK
+    texto movimiento
+    texto estado_anterior
+    texto estado_nuevo
+    int lugar_lista_espera
+    decimal monto
   }
   PersonaIncumplida {
     int id PK
@@ -491,6 +523,16 @@ erDiagram
     int orden_propuesto
     decimal monto
     json criterios
+  }
+  RevisionPropiedad {
+    int id PK
+    int dictamen_id FK
+    texto tipo_documento
+    texto nombre_documento
+    texto numero_documento
+    fecha fecha_documento
+    texto titular_documento
+    bool titular_coincide
   }
   SesionComite {
     int id PK

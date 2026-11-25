@@ -64,7 +64,7 @@ def siguiente_paso(usuario, exp):
             return {"texto": "Notificar el pago a la persona beneficiaria", "url": reverse("contrato:notificaciones"),
                     "ayuda": "Registre la fecha, la hora y el medio de la notificación."}
     if tipo == TipoUnidad.DELEGACION and firmado and getattr(exp, "oficio_pago", None) is None and estado not in (
-            "sin_firma_en_plazo", "recurso_liberado"):
+            "sin_firma_en_plazo", "recurso_liberado", "baja"):
         return {"texto": "Emitir el oficio de solicitud de pago", "url": _pestana(exp),
                 "ayuda": "El contrato ya está firmado: el oficio de la Delegación es soporte de la solicitud de pago."}
     if tipo == TipoUnidad.DIRECCION and estado in solicitudes.ESTADOS_PARA_SOLICITAR:
@@ -223,12 +223,30 @@ def extra_secretaria_comite(usuario):
     return Q(ejercicio__programa__clave="PSA", estado__clave="ministracion_solicitada", pk__in=aceptadas)
 
 
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M5 en la pestaña «Trazabilidad» (HU-5.1 a HU-5.3)."""
+    from .models import (Cheque, ComprobanteCuenta, OficioPago, Pago, RemisionFiduciaria, RevisionSolicitud,
+                         SolicitudPago)
+
+    solicitudes = list(SolicitudPago.objects.filter(expediente=expediente).values_list("pk", flat=True))
+    return [
+        ("Oficio de pago", OficioPago.history.filter(expediente_id=expediente.pk)),
+        ("Comprobante de cuenta", ComprobanteCuenta.history.filter(expediente_id=expediente.pk)),
+        ("Solicitud de pago", SolicitudPago.history.filter(expediente_id=expediente.pk)),
+        ("Revisión de la solicitud de pago", RevisionSolicitud.history.filter(solicitud_id__in=solicitudes)),
+        ("Pago", Pago.history.filter(expediente_id=expediente.pk)),
+        ("Remisión a la Fiduciaria", RemisionFiduciaria.history.filter(expediente_id=expediente.pk)),
+        ("Cheque", Cheque.history.filter(expediente_id=expediente.pk)),
+    ]
+
+
 def registrar():
     if contexto_pestana in [p["contexto"] for p in extensiones.PESTANAS_EXPEDIENTE]:
         return
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "pagos", "nombre": "Pagos",
                                             "plantilla": "pagos/pestana_pagos.html", "contexto": contexto_pestana})
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
+    extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
     from . import cheques, pagos
 
     extensiones.PANELES_BANDEJA.extend([panel_oficios_por_emitir, panel_por_solicitar, panel_por_revisar, panel_por_remitir,

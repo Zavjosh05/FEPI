@@ -53,7 +53,8 @@ def _con_omision_vencida(pagada, usuarios, programa="CC"):
 
 def test_hu_6_2_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-6.2")
-    assert hu["criterios"] == ["Cada omisión tiene su plazo para corregirse.",
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Cada omisión tiene su plazo para corregirse.",
                                "Un apoyo cancelado tiene su requerimiento de devolución con el monto y la cuenta para el depósito.",
                                "La persona con apoyo cancelado está en el Listado de Personas Beneficiarias Incumplidas."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M6.2")

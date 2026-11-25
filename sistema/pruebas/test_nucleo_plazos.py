@@ -83,7 +83,7 @@ def test_nucleo_faltantes_de_la_direccion_desde_el_aviso(exp_de, usuarios):
     completar_requisitos(usuarios["del_amecameca"], exp)
     servicios.enviar_a_direccion(usuarios["del_amecameca"], exp)
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk])
+    val = servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk], observaciones_requisitos={plano.pk: "Plano ilegible"})
     v = plazos.vencimiento(exp, "faltantes_direccion")
     assert v.evento == "aviso_direccion" and v.decision_propia
     assert v.fecha_evento == val.notificacion.enviada_en and v.vencimiento == val.fecha_limite

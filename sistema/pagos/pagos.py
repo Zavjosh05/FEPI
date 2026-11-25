@@ -27,6 +27,7 @@ from . import solicitudes
 from .models import (
     EstadoSolicitud, Pago, RemisionFiduciaria, ResultadoRevision, RevisionSolicitud, SolicitudPago, TipoPagoRegistrado,
 )
+from nucleo.trazabilidad import registra_usuario
 
 USO_REMISION = "instruccion_pago_fiduciaria"
 
@@ -85,6 +86,7 @@ def en_revision_psa(usuario):
 
 
 # ----------------------------------------------------------------------------- revisión
+@registra_usuario
 def revisar_solicitud(usuario, solicitud, resultado, observaciones="", momento=None):
     """Administración y Finanzas acepta la solicitud o la devuelve al área responsable con observaciones."""
     exigir_unidad(usuario, TipoUnidad.ADMIN_FINANZAS)
@@ -141,6 +143,7 @@ def revisar_solicitud(usuario, solicitud, resultado, observaciones="", momento=N
 
 
 # ----------------------------------------------------------------------------- pago
+@registra_usuario
 def registrar_pago(usuario, solicitud, referencia, fecha_pago, importe=None, tipo=None, motivo_cheque="", momento=None):
     """Administración y Finanzas registra el pago de una solicitud aceptada (transferencia; cheque solo excepcional)."""
     exigir_unidad(usuario, TipoUnidad.ADMIN_FINANZAS)
@@ -210,6 +213,7 @@ def registrar_pago(usuario, solicitud, referencia, fecha_pago, importe=None, tip
 
 
 # ----------------------------------------------------------------------------- PSAHEM: remisión a la Fiduciaria
+@registra_usuario
 def remitir_a_fiduciaria(usuario, solicitud, oficio="", observaciones="", momento=None):
     """PSAHEM: la Secretaría Técnica del Comité Técnico solicita el pago a la Fiduciaria (fecha y hora, acuse y plazo)."""
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)

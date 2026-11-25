@@ -9,10 +9,11 @@ from django.utils import timezone
 from nucleo import dias_habiles
 from nucleo.demo import _pdf_demo, completar_requisitos, cuadro_en_municipio
 from nucleo.models import Ejercicio, Ministracion, Municipio, Plazo, Requisito, TipoPersona, TipoPersonaGeneral
+from dictamen.demo import propiedad_en_regla
 from recepcion import servicios as recepcion
 
 __all__ = ["validada", "dictaminada", "peg", "psa", "registrar_validada", "registrar_peg", "fecha_sesion", "despues_de",
-           "documento_sesion"]
+           "documento_sesion", "propiedad_en_regla"]
 
 
 def registrar_validada(usuarios, ejercicio, municipio="Amecameca", nombre="Predio M2", ha=6, desplazamiento=(0, 0),
@@ -55,7 +56,8 @@ def dictaminada(validada, usuarios):
     def _crear(tecnico_resultado="factible", juridico_resultado="procedente", **kw):
         exp = validada(**kw)
         tecnico.dictaminar(usuarios["dir_drff"], exp, tecnico_resultado, "Motivo técnico de prueba")
-        juridico.dictaminar(usuarios["juridica"], exp, juridico_resultado, "Motivo jurídico de prueba")
+        juridico.dictaminar(usuarios["juridica"], exp, juridico_resultado, "Motivo jurídico de prueba",
+                            propiedad=propiedad_en_regla(exp))
         exp.refresh_from_db()
         return exp
     return _crear

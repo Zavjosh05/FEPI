@@ -26,7 +26,8 @@ def _registrar(usuarios, exp, geom, **extra):
 
 
 def test_hu_1_3_criterios_del_modelo(modelo):
-    assert len(historia(modelo, "HU-1.3")["criterios"]) == 2
+    criterios = historia(modelo, "HU-1.3")["criterios"]
+    assert len(criterios) == 3 and "trazabilidad" in criterios[2]
 
 
 def test_hu_1_3_existe_poligono_asociado_al_expediente(nueva_solicitud, usuarios):
@@ -173,3 +174,13 @@ def _shapefile_zip(geom_utm):
 
 def _area_con_signo(anillo):
     return sum(x1 * y2 - x2 * y1 for (x1, y1), (x2, y2) in zip(anillo, anillo[1:])) / 2
+
+
+def test_hu_1_3_trazabilidad(nueva_solicitud, usuarios):
+    """Criterio 3: el alta del polígono y el paso del anterior a «no vigente» quedan en el historial con su usuario."""
+    exp = nueva_solicitud()
+    mun = exp.predio.municipio
+    primero = _registrar(usuarios, exp, cuadro_en_municipio(mun, 4))
+    _registrar(usuarios, exp, cuadro_en_municipio(mun, 4, (800, 0)), motivo_cambio="Cambio de área")
+    cambios = list(primero.history.order_by("history_date", "history_id").values_list("vigente", "history_user__username"))
+    assert cambios == [(True, "del_amecameca"), (False, "del_amecameca")]

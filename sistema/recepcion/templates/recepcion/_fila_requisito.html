@@ -27,10 +27,12 @@
     {% endif %}
   </td>
 </tr>
-{% if puede_editar_requisitos or error_fila or r.observaciones %}
+{% with obs_dir=r.observacion_direccion %}
+{% if puede_editar_requisitos or error_fila or r.observaciones or obs_dir %}
 <tr class="req-detalle">
   <td colspan="4" class="p-0 border-0">
     {% if r.observaciones %}<div class="small text-secondary px-2 pb-1">Observaciones: {{ r.observaciones }}</div>{% endif %}
+    {% if obs_dir and r.estado == "faltante" %}<div class="small text-danger px-2 pb-1" data-prueba="observacion-direccion">Observación de la Dirección ({{ obs_dir.validacion.fecha_hora|date:"d/m/Y" }}): {{ obs_dir.observacion }}</div>{% endif %}
     {% if error_fila %}<div class="alert alert-danger py-1 px-2 small mx-2 mb-1" data-prueba="error-req">{{ error_fila }}</div>{% endif %}
     {% if puede_editar_requisitos %}
     <div class="collapse {% if error_fila %}show{% endif %}" id="form-req-{{ r.pk }}">
@@ -59,4 +61,5 @@
   </td>
 </tr>
 {% endif %}
+{% endwith %}
 </tbody>

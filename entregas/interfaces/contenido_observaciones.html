@@ -1,0 +1,169 @@
+<section class="portada">
+<p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+<h1>Registro de cambios:<br>observaciones del 23 de noviembre</h1>
+<p class="sub">Qué se cambió en las historias de usuario, en el sistema (pantallas, documentos, base de datos y pruebas)
+y en los documentos del proyecto para atender las seis observaciones del profesor al sprint 1.</p>
+<table>
+<tr><td class="gris">Fecha</td><td>23 de noviembre de 2026</td></tr>
+<tr><td class="gris">Rama</td><td>sprint-1 (cambios sin commit; no se subió nada a GitHub)</td></tr>
+<tr><td class="gris">Bitácora</td><td>Renglón D-29 de <code>entregas/BITACORA.md</code>; tareas O-1 a O-6 de <code>entregas/AVANCE.md</code></td></tr>
+<tr><td class="gris">Verificación</td><td>{{pruebas_sistema}} pruebas del sistema en verde ({{pruebas_rapidas}} sin navegador y {{pruebas_navegador}} recorridos con Chromium)</td></tr>
+</table>
+<div class="caja"><b>En resumen.</b> Cinco historias del sprint 1 cambiaron (HU-1.4, HU-2.1, HU-2.2, HU-2.3 y HU-2.4,
+que ahora se llama «Reasignaciones e incidentes») y las 21 historias del Sistema de programas tienen un criterio nuevo
+de trazabilidad en la base de datos. El sistema ya hace lo que dicen: observación por cada faltante, documento PDF de
+cada dictamen adjunto al expediente, revisión de la propiedad o legal posesión del predio, vistas separadas de
+candidatos y beneficiarios, bajas y reasignaciones en el orden de la lista de espera, y una pestaña de trazabilidad
+con el historial de la base de datos. Hay tres tablas nuevas, un estado nuevo y {{pruebas_nuevas}} pruebas más.</div>
+</section>
+
+<h2 class="salto">1. Las observaciones y cómo se atendieron</h2>
+<table>
+<thead><tr><th style="width:27%">Observación del profesor</th><th style="width:10%">Historia</th><th>Qué se hizo</th></tr></thead>
+<tbody>
+<tr><td>«Que cada uno en el 1.4 de las observaciones se hagan correctamente»</td><td>HU-1.4</td><td>Antes la Dirección
+marcaba los faltantes y escribía <i>una</i> observación general. Ahora cada requisito tiene su casilla de observación en
+la pantalla de validación, obligatoria en cada faltante (qué falta o por qué no es válido); los que marca la revisión con
+las reglas llevan su motivo si no se escribe otro. Cada resultado queda en su propio registro
+(<code>ObservacionValidacion</code>), y el aviso de faltantes en PDF, el acuse de notificación, la pestaña Validación y
+la pestaña Requisitos de la Delegación muestran la observación de cada faltante.</td></tr>
+<tr><td>«Falta documento que expida el dictamen técnico y jurídico, no en tarjetas, sino en un PDF o documento que se
+genere y se adjunte al expediente»</td><td>HU-2.1, HU-2.2</td><td>Al registrar cada dictamen, el sistema expide su
+documento en PDF: folio propio (<code>DT-CC-2026-0001</code>, <code>DJ-CC-2026-0001</code>), datos de la solicitud,
+objeto con la definición de las Reglas, análisis o revisión, resultado con su motivo, fundamento, firmas (elaboró y
+Vo. Bo.) y huella SHA-256. El PDF queda como <code>Documento</code> de tipo «dictamen» del expediente (pestaña
+«Documentos y acuses») y se abre desde la pestaña Dictámenes. Sustituye al acuse que antes llevaba el título del
+dictamen.</td></tr>
+<tr><td>«Revisar el HU 2.4: el criterio de aceptación está mal; de título, reasignaciones o algo por el estilo (manejo
+de incidentes)»</td><td>HU-2.4</td><td>Título «Reasignaciones e incidentes» y criterios nuevos (sección 2). El sistema:
+cada incidente pide su causa; desistimiento, cancelación y baja sacan a la persona beneficiaria (estado nuevo «Baja ·
+recurso liberado») y liberan su monto; la reasignación pasa a «aprobada» a las primeras de la lista de espera, en su
+orden y sin rebasar el recurso liberado; la sustitución hace las dos cosas; cada salida y entrada queda en
+<code>MovimientoListado</code>. La instrucción de pago (PSAHEM) y la validación de reportes (PEG), que eran el criterio 2,
+siguen como acuerdos que dejan constancia.</td></tr>
+<tr><td>«La parte jurídica sobre la propiedad, recordar eso»</td><td>HU-2.2</td><td>El dictamen jurídico revisa la
+acreditación de la legal propiedad o posesión del predio (CC 8.1.1.2 fr. VII): tipo de documento de los que admiten las
+Reglas, a nombre de quién está, superficie que ampara contra la del polígono vigente, vigencia (constancia de posesión,
+usufructo o arrendamiento, este de máximo 5 años) y evidencia de conflicto de propiedad, posesión o representación
+(8.1.1.1 fr. VII). Si no se acredita, el sistema no permite el dictamen procedente. También se marca cada documento
+legal como válido o no válido, con su observación. Todo queda en <code>RevisionPropiedad</code> y en el PDF.</td></tr>
+<tr><td>«Tener una lista de candidatos o manejarla, que sean dos vistas entre los candidatos y los beneficiarios»</td>
+<td>HU-2.3</td><td>Menú «Listados» con dos vistas separadas: <b>Candidatos</b> (en dictamen, dictaminadas por aprobar y
+lista de espera en su orden, con su resultado técnico, jurídico y de propiedad) y <b>Beneficiarios</b> (aprobadas con su
+superficie, monto y cómo entraron, acta o reasignación, y aparte las que salieron), con filtros y exportación a CSV. La
+Delegación ve solo las suyas.</td></tr>
+<tr><td>«Para aceptación es tener la parte de los registros para tener trazabilidad de la información en la BD»</td>
+<td>Todas (M1 a M6)</td><td>Criterio nuevo al final de las 21 historias del Sistema de programas. En el sistema: el
+historial (django-simple-history) registra siempre al usuario, también fuera de una petición web
+(<code>nucleo/trazabilidad.py</code>); los cambios en lote pasaron de <code>update()</code> a <code>save()</code> para
+quedar en el historial; y la pestaña «Trazabilidad» del expediente junta el historial de todos sus registros, con el
+usuario y su unidad, la fecha y la hora, la tabla, el motivo y los campos que cambiaron (antes → después). Cada
+historia tiene una prueba de su criterio de trazabilidad.</td></tr>
+</tbody></table>
+
+<h2 class="salto">2. Las historias, antes y ahora</h2>
+<p>Cambios en <code>sistema/especificacion/modelo.json</code> (fuente de las historias que leen el sistema, sus pruebas y
+los documentos). Roles, funciones, puntos y sprints no cambiaron. Las funciones M1.4, M2.1, M2.2, M2.3 y M2.4 se
+redactaron para decir lo mismo que su historia.</p>
+<!--TABLA_AJUSTES-->
+<div class="aviso"><b>HU-1.1.</b> El 18-nov el profesor pidió que tuviera un solo criterio, el folio único. Ese criterio
+no cambió; se le sumó solo el de trazabilidad, porque la observación del 23-nov es para la aceptación de todas las
+historias. Conviene confirmarlo con el profesor.</div>
+
+<h2 class="salto">3. Cambios en el sistema</h2>
+<h3>Base de datos (migraciones <code>nucleo 0004</code>, <code>recepcion 0002</code>, <code>dictamen 0002</code>)</h3>
+<table>
+<thead><tr><th style="width:30%">Tabla o campo</th><th>Para qué</th></tr></thead>
+<tbody>
+<tr><td><code>ObservacionValidacion</code> (nueva)</td><td>Resultado de cada requisito en cada validación: faltante o válido, quién lo marcó (las reglas o la Dirección) y su observación. HU-1.4.</td></tr>
+<tr><td><code>RevisionPropiedad</code> (nueva)</td><td>Acreditación de la propiedad o legal posesión, una por dictamen jurídico: documento, número, fecha, titular, si coincide, superficies, vigencia, conflicto, resultado y motivos. HU-2.2.</td></tr>
+<tr><td><code>MovimientoListado</code> (nueva)</td><td>Quién sale de la Lista de Personas Beneficiarias y quién entra desde la lista de espera, con qué acuerdo, lugar y monto. HU-2.4.</td></tr>
+<tr><td><code>DictamenTecnico</code> y <code>DictamenJuridico</code></td><td>Nuevos <code>folio</code>, <code>documento</code> (el PDF adjunto) y <code>huella</code>; el jurídico, <code>documentacion</code> (revisión de cada documento legal). Se quitó <code>acuse</code>.</td></tr>
+<tr><td><code>Acuerdo</code></td><td>Nuevos <code>causa</code>, <code>monto_liberado</code> y <code>monto_reasignado</code>.</td></tr>
+<tr><td><code>Documento.tipo</code></td><td>Nuevo tipo «dictamen».</td></tr>
+<tr><td>Tablas <code>historical…</code></td><td>Las de las tres tablas nuevas y los campos nuevos (django-simple-history).</td></tr>
+</tbody></table>
+<h3>Reglas y datos editables</h3>
+<ul>
+<li><code>datos/flujo_tramite.json</code>: estado <code>baja</code> («Baja · recurso liberado», final) y transición
+<code>aprobada → baja</code> de la Secretaría Técnica, con motivo.</li>
+<li><code>datos/dictamen.json</code>: <code>documentos</code> (prefijo, título, área y firma de cada dictamen),
+<code>propiedad</code> (tipos de documento de las Reglas, cuáles piden vigencia, plazo máximo del usufructo, requisitos
+de propiedad de CC), tipo de acuerdo nuevo «Desistimiento», y <code>efecto</code> e <code>incidente</code> de cada tipo.</li>
+</ul>
+<h3>Código y pantallas</h3>
+<table>
+<thead><tr><th style="width:30%">Archivo</th><th>Cambio</th></tr></thead>
+<tbody>
+<tr><td><code>recepcion/servicios.py</code>, <code>validar.html</code>, pestañas Validación y Requisitos</td><td>Observación por requisito, obligatoria en los faltantes (también en el navegador); aviso y notificación con la observación.</td></tr>
+<tr><td><code>dictamen/documentos.py</code> y <code>templates/dictamen/pdf/</code> (nuevos)</td><td>Documento PDF del dictamen técnico (con croquis del polígono) y del jurídico.</td></tr>
+<tr><td><code>dictamen/juridico.py</code>, <code>juridico/dictaminar.html</code></td><td>Tres pasos: documentación legal, propiedad o legal posesión y resultado; reglas que impiden el procedente.</td></tr>
+<tr><td><code>dictamen/seguimiento.py</code>, <code>seguimiento/_acuerdos.html</code></td><td>Causa, efectos de cada tipo de acuerdo, lista de espera, recurso liberado y movimientos en la sesión.</td></tr>
+<tr><td><code>dictamen/listados.py</code>, <code>vistas/listados.py</code>, <code>templates/dictamen/listados/</code> (nuevos)</td><td>Vistas de Candidatos y Beneficiarios, con CSV.</td></tr>
+<tr><td><code>nucleo/trazabilidad.py</code> (nuevo), <code>pestanas/trazabilidad.html</code></td><td>Usuario en el historial y pestaña «Trazabilidad» (25 renglones por página, filtro por registro).</td></tr>
+<tr><td><code>plantillas/base.html</code>, <code>nucleo/contexto.py</code></td><td>Menú «Listados» desplegable (listado preliminar, candidatos y beneficiarios), para que la barra no se desborde.</td></tr>
+<tr><td><code>plantillas/403.html</code> (nuevo)</td><td>Página «Acceso no permitido» con el diseño del sistema (hallazgo del 19-nov).</td></tr>
+<tr><td><code>dictamen/tecnico.py</code></td><td>Sin «None a None ha»: si las reglas no traen rango de superficie, ese criterio no aparece (hallazgo del 19-nov).</td></tr>
+<tr><td><code>nucleo/acuses.py</code></td><td>En los PDF las claves de requisito (CC-REQ-06) ya no se parten en el guion.</td></tr>
+<tr><td><code>dictamen/demo.py</code>, <code>nucleo/demo.py</code></td><td>La demostración trae los dictámenes con su PDF y la revisión de la propiedad, un aviso con dos observaciones, la propiedad no acreditada de El Ocotal y, en la sesión de seguimiento, el desistimiento de La Joya Alta y la reasignación a Las Trojes (4.5 ha; recurso de la sesión de aprobación: $26,000).</td></tr>
+</tbody></table>
+<h3>Pruebas</h3>
+<p>{{pruebas_sistema}} en verde (antes 129). Cada criterio nuevo tiene su prueba: observación de cada faltante
+(<code>test_hu_1_4</code>), documento de cada dictamen (<code>test_hu_2_1</code>, <code>test_hu_2_2</code>), ocho casos de
+propiedad no acreditada y la documentación legal (<code>test_hu_2_2</code>), dos vistas (<code>test_hu_2_3</code>),
+baja, reasignación en orden, recurso insuficiente y sustitución (<code>test_hu_2_4</code>), y la trazabilidad de cada
+historia. Los recorridos con navegador de HU-1.4, HU-2.1, HU-2.2, HU-2.4 y el recorrido completo del sprint pasan por las
+pantallas nuevas.</p>
+
+<h2>4. Cambios en los documentos</h2>
+<table>
+<thead><tr><th style="width:40%">Archivo</th><th>Cambio</th></tr></thead>
+<tbody>
+<tr><td><code>Registro_de_cambios_observaciones_23_nov.pdf</code> (raíz, nuevo)</td><td>Este documento (<code>python entregas/generar_historias_interfaces.py observaciones</code>).</td></tr>
+<tr><td><code>Historias_de_usuario_e_interfaces.pdf</code> (raíz) y <code>entregas/interfaces/Historias_e_interfaces.pdf</code></td><td>Regenerados con las historias, el cotejo y las pantallas nuevas.</td></tr>
+<tr><td><code>entregas/interfaces/cotejo.json</code>, <code>capturas.json</code>, <code>contenido*.html</code></td><td>Cotejo de las historias cambiadas, ajustes del 23-nov, grupos y pies de las capturas nuevas.</td></tr>
+<tr><td><code>entregas/interfaces/capturas/</code></td><td>Capturas nuevas y actualizadas de las pantallas que cambiaron (validación, dictámenes, sesiones, listados, trazabilidad, bandejas con el menú nuevo y los documentos PDF).</td></tr>
+<tr><td><code>entregas/sprint_1/capturas/</code></td><td>Regeneradas por los recorridos de navegador ({{capturas_sprint}} capturas, 11 nuevas).</td></tr>
+<tr><td><code>entregas/sprint_1/planeacion/PLANEACION_SPRINT_1.md</code> y <code>TAREAS_POR_PERSONA_SPRINT_1.md</code> (y sus PDF)</td><td>Historias y criterios vigentes; secciones de los ajustes del 23-nov (T16 a T21).</td></tr>
+<tr><td><code>entregas/sprint_1/Resumen_sprint_1.pdf</code></td><td>Regenerado: historias, cifras, diagramas de estados y entidad-relación, y ajustes O-1 a O-6.</td></tr>
+<tr><td><code>MANUAL_DE_USUARIO.md</code>, <code>GUIA_DE_INICIO.md</code></td><td>Pantallas nuevas; reiniciar la base después de los ajustes.</td></tr>
+<tr><td><code>datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md</code> (y PDF)</td><td>Pasos nuevos para cada observación (A6 a A10, B1 a B2, G2, I y K1b a K4).</td></tr>
+<tr><td><code>sistema/README.md</code>, <code>sistema/docs/modelo_datos.md</code> y <code>.mmd</code></td><td>Decisiones, estados y diagramas con las tablas nuevas (36 tablas propias).</td></tr>
+<tr><td><code>entregas/BITACORA.md</code>, <code>entregas/AVANCE.md</code></td><td>D-29 y tareas O-1 a O-6.</td></tr>
+<tr><td><code>entregas/generar_resumen.py</code>, <code>entregas/md_a_pdf.py</code>, <code>generar_historias_interfaces.py</code></td><td>Mermaid desde una copia local si no hay internet (<code>MERMAID_JS</code>); versión «observaciones» del documento de historias.</td></tr>
+</tbody></table>
+
+<h2 class="salto">5. Decisiones que se tomaron y conviene confirmar</h2>
+<ul>
+<li><b>Lectura de la observación de HU-1.4.</b> Se entendió como «cada faltante con su observación, bien registrada y
+comunicada». Si el profesor se refería a otra cosa de la validación, el cambio es pequeño.</li>
+<li><b>Puntos.</b> No se re-estimaron. HU-2.2 y HU-2.4 crecieron (propiedad y documento; bajas y reasignaciones): de
+3 a 5 puntos sería lo justo; se dejó para que lo decida el equipo.</li>
+<li><b>HU-2.4 y HU-6.1.</b> HU-2.4 es la decisión del Comité (acuerdo, baja y reasignación); HU-6.1 (sprint 3) sigue
+siendo la propuesta del área responsable y las solicitudes de la persona (sustitución, desistimiento con acuse). En la
+rama <code>main</code>, HU-6.1 ya hace la reasignación; al llevar estos cambios a <code>main</code> hay que unirlos.</li>
+<li><b>Efecto inmediato.</b> La baja y la reasignación se aplican al registrar el acuerdo en la sesión; el área
+responsable lo marca cumplido después (notificación, contrato).</li>
+<li><b>Monto que libera una baja.</b> El monto con el que la persona quedó en el acta. Si ya recibió una ministración,
+lo correcto será liberar solo lo no pagado (llega con los pagos, sprint 2).</li>
+<li><b>Superficie que debe amparar el documento de propiedad.</b> La del polígono vigente; si no hay polígono, la
+solicitada.</li>
+<li><b>Documento del dictamen en lugar del acuse.</b> El dictamen ya no genera un acuse aparte; el documento tiene su
+folio y su huella y su emisión queda en la bitácora y en el historial.</li>
+<li><b>Datos existentes.</b> Los dictámenes registrados antes de este cambio no tienen documento ni revisión de la
+propiedad. Para la demostración: <code>docker compose down -v</code> y <code>docker compose up --build</code>.</li>
+</ul>
+
+<h2 class="salto">6. Pantallas que respaldan los cambios</h2>
+<!--INTERFAZ-->
+
+<h2>7. Qué falta</h2>
+<ul>
+<li>Revisar los cambios y hacer el commit en la rama <code>sprint-1</code> (no se hizo ningún commit ni se subió nada).</li>
+<li>Llevar los cambios a <code>main</code> (y a <code>prototipos</code>), uniendo HU-2.4 con HU-6.1 y el estado
+<code>baja</code> con los de M6, y a la carpeta <code>propuesta/</code> con <code>actualizar_propuesta.py</code>.</li>
+<li>Confirmar con el profesor la lectura de HU-1.4 y el criterio de trazabilidad en HU-1.1, y re-estimar HU-2.2 y
+HU-2.4.</li>
+<li>Las capturas por programa (<code>p_*</code>), las de catálogos (<code>a_*</code>) y algunas bandejas del 19-nov
+conservan el menú anterior; se pueden volver a tomar cuando se carguen las reglas de los otros programas.</li>
+</ul>

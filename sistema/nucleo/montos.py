@@ -239,7 +239,7 @@ def _monto_aprobado(expediente, superficie=None, condiciones=()):
                          nombre_regimen(expediente, regimen), tipo_monto=tipo, cantidad=cantidad, supuesto=supuesto)
 
 
-SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado"}
+SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado", "baja"}
 ORDEN_APROBADA = 50  # Estado.orden de «aprobada» en datos/flujo_tramite.json
 
 

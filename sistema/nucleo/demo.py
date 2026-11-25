@@ -193,8 +193,15 @@ def crear_solicitudes():
             servicios.enviar_a_direccion(u["del_valle"], exp)
         with paso("2026-03-04", 11):
             plano = exp.revisiones.filter(requisito__clave="CC-REQ-13").first()
-            servicios.validar_expediente(u["dir_drff"], exp, [plano.pk] if plano else [],
-                                         "El plano no trae la coordenada de un vértice del predio.")
+            ine = exp.revisiones.filter(requisito__clave="CC-REQ-06").first()
+            marcados = [r for r in (plano, ine) if r is not None]
+            servicios.validar_expediente(
+                u["dir_drff"], exp, [r.pk for r in marcados],
+                "Se notifican dos faltantes; la persona solicitante los entrega en la Delegación.",
+                observaciones_requisitos={
+                    **({plano.pk: "El plano no trae la coordenada de un vértice del predio ni la escala."} if plano else {}),
+                    **({ine.pk: "La identificación del representante legal está vencida (vigencia 2025)."} if ine else {}),
+                })
         with paso("2026-03-05", 12):
             servicios.registrar_notificacion(u["del_valle"], servicios.aviso_vigente(exp))
         creadas += 1

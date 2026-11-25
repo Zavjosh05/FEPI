@@ -1,3 +1,4 @@
+{% load moneda %}
 {% with combinado=resultado_combinado %}
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
   <div>
@@ -23,7 +24,13 @@
 {% if acuerdos %}
 <div class="titulo-seccion mt-3">Acuerdos de seguimiento</div>
 <ul class="small">{% for a in acuerdos %}
-  <li><strong>{{ a.numero }}</strong> {{ a.descripcion }} · Debe cumplirlo: {{ a.unidad_responsable }} · <span class="badge {% if a.estado == 'cumplido' %}text-bg-success{% else %}text-bg-warning{% endif %}">{{ a.get_estado_display }}</span></li>
+  <li><strong>{{ a.numero }}</strong> {{ a.descripcion }}{% if a.causa %} (causa: {{ a.causa }}){% endif %} · Debe cumplirlo: {{ a.unidad_responsable }} · <span class="badge {% if a.estado == 'cumplido' %}text-bg-success{% else %}text-bg-warning{% endif %}">{{ a.get_estado_display }}</span></li>
+{% endfor %}</ul>
+{% endif %}
+{% if movimientos %}
+<div class="titulo-seccion mt-3">Movimientos en los listados</div>
+<ul class="small" data-prueba="movimientos-expediente">{% for m in movimientos %}
+  <li>{{ m.fecha_hora|date:"d/m/Y H:i" }} · {% if m.acuerdo %}acuerdo {{ m.acuerdo.numero }}{% else %}{{ m.motivo }}{% endif %}: <strong>{{ m.get_movimiento_display }}</strong>{% if m.lugar_lista_espera %} (lugar {{ m.lugar_lista_espera }}){% endif %}{% if m.monto is not None %} · {{ m.monto|moneda }}{% endif %}</li>
 {% endfor %}</ul>
 {% endif %}
 {% endwith %}

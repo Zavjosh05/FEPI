@@ -25,12 +25,14 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from dictamen.comun import exigir_acceso, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import montos, plazos
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad
 
 from .firma import datos_contrato
 from .models import Especie, RenglonVale, SalidaPlanta, ValePlanta, Vivero
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_ANTICIPADOS = ("notificada", "contrato_elaborado", "contrato_en_delegacion")
 ESTADOS_CON_CONTRATO = ("contratada", "vale_entregado")
@@ -161,12 +163,14 @@ def _validar_carta(carta):
         raise ValidationError("La carta compromiso debe ser PDF, JPG o PNG.")
 
 
+@registra_usuario
 def emitir_vale(usuario, expediente, vivero, renglones, carta=None, motivo_ajuste="", planta_disponible=True,
                 momento=None):
     """La Delegación emite el Vale de Planta. ``renglones``: lista de ``(especie, cantidad)``."""
     exigir_unidad(usuario, TipoUnidad.DELEGACION)
     exigir_acceso(usuario, expediente)
     expediente.refresh_from_db()
+    exigir_vigente(expediente, "ya no se le entrega Vale de Planta")
     ahora = momento or timezone.now()
     situacion = situacion_para_emitir(expediente, timezone.localtime(ahora).date())
     if not situacion["puede"]:
@@ -275,12 +279,14 @@ def _contexto_pdf(vale, vigencia):
 
 
 # ----------------------------------------------------------------------------- salida del vivero
+@registra_usuario
 def validar_vale(usuario, vale, hoy=None):
     """Valida el vale antes de entregar planta. Devuelve su situación; lanza ``ValidationError`` si no es válido."""
     exigir_unidad(usuario, TipoUnidad.VIVERO)
     if vale.vivero.unidad_id != usuario.unidad_id:
         raise PermissionDenied(f"El vale {vale.folio} se surte en {vale.vivero.nombre}, no en su vivero.")
-    vale = ValePlanta.objects.get(pk=vale.pk)
+    vale = ValePlanta.objects.select_related("expediente__estado").get(pk=vale.pk)
+    exigir_vigente(vale.expediente, f"el vale {vale.folio} ya no se surte")
     estado = vale.situacion(hoy)
     if estado == "surtido":
         raise ValidationError(f"El vale {vale.folio} ya se surtió completo: no queda planta por entregar.")
@@ -296,6 +302,7 @@ def validar_vale(usuario, vale, hoy=None):
     return estado
 
 
+@registra_usuario
 def registrar_salida(usuario, vale, especie, cantidad, salido_en=None, observaciones="", momento=None):
     """El personal del vivero registra una salida de planta contra un vale vigente (especie, cantidad, fecha y hora)."""
     exigir_unidad(usuario, TipoUnidad.VIVERO)

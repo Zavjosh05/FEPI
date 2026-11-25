@@ -32,7 +32,7 @@ from django.db import transaction
 from contrato import contratos, firma, planta, publicacion
 from contrato.models import Contrato, Especie, ModeloContrato, TipoModelo, ValePlanta, Vivero
 from dictamen import juridico, tecnico
-from dictamen.demo import _validada, paso, sesion_aprobacion
+from dictamen.demo import _validada, paso, propiedad_en_regla, sesion_aprobacion
 from dictamen.models import SesionComite, TipoSesion
 from nucleo.demo_calendario import cuando, fecha_corte, habil
 from nucleo.models import Ejercicio, Expediente, Usuario
@@ -62,7 +62,8 @@ def dictaminar_lote(u, ejercicio, filas, tecnico_desde, juridico_desde):
         with paso(habil(tecnico_desde, i), 10):
             tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos de elegibilidad de las reglas.")
         with paso(habil(juridico_desde, i), 10):
-            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.")
+            juridico.dictaminar(uj, exp, "procedente", "Documentación legal completa y vigente.",
+                                propiedad=propiedad_en_regla(exp))
         exps.append((exp, fila))
     return exps
 

@@ -82,6 +82,22 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 | A-7 | Recorrido completo por la interfaz, con una sola solicitud y cambio de usuario en cada relevo (P-09) | Hecho | `450a5ac` |
 | Resumen | Resumen en PDF del sprint 1 (`sprint_1/Resumen_sprint_1.pdf`) | Hecho | `0598b95` |
 
+
+### Ajustes por las observaciones del profesor del 23-nov (D-29)
+
+| Tarea | Qué | Estado | Commit |
+| --- | --- | --- | --- |
+| O-1 | HU-1.4: observación de la Dirección en cada requisito faltante y en el aviso | Por verificar | sin commit |
+| O-2 | HU-2.1 y HU-2.2: documento PDF de cada dictamen, adjunto al expediente | Por verificar | sin commit |
+| O-3 | HU-2.2: revisión de la propiedad o legal posesión del predio | Por verificar | sin commit |
+| O-4 | HU-2.4: «Reasignaciones e incidentes» (baja, reasignación en orden y sustitución) | Por verificar | sin commit |
+| O-5 | Vistas de Candidatos y de Beneficiarios | Por verificar | sin commit |
+| O-6 | Trazabilidad en la base de datos: criterio en las historias y pestaña «Trazabilidad» | Por verificar | sin commit |
+
+Pruebas: 155 del sistema en verde (146 sin navegador y 9 recorridos por la interfaz). Capturas de los recorridos
+regeneradas en `sprint_1/capturas/` (71) y de la interfaz en `interfaces/capturas/`.
+En la rama `sprint-2` estas correcciones quedaron integradas con contrato y pagos (D-30, 24-nov).
+
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — terminado el 16-nov
 
 Orden de trabajo. Cada renglón es una tarea que se puede hacer, verificar y commitear por separado; las

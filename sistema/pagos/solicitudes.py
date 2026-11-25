@@ -26,12 +26,14 @@ from django.urls import reverse
 from django.utils import timezone
 
 from dictamen.comun import exigir_acceso, exigir_programa, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import montos, plazos
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.catalogos import leer_json
 from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad, expedientes_visibles
 
 from .models import ComprobanteCuenta, EstadoSolicitud, OficioPago, SolicitudPago
+from nucleo.trazabilidad import registra_usuario
 
 ESTADOS_PARA_SOLICITAR = ("contratada", "planta_entregada", "pagada", "cheque_entregado", "verificada")  # verificada: HU-4.2
 EN_CURSO = (EstadoSolicitud.ENVIADA, EstadoSolicitud.ACEPTADA, EstadoSolicitud.REMITIDA, EstadoSolicitud.PAGADA)
@@ -207,6 +209,8 @@ def ministraciones(expediente):
 
 def puede_solicitar(expediente, numero):
     """(True, "") o (False, motivo): lo que no depende de los soportes (contrato, estado, ministración anterior)."""
+    if expediente.estado.clave == "baja":
+        return False, "La persona beneficiaria fue dada de baja por acuerdo del Comité (HU-2.4): ya no cobra."
     monto = montos.monto_si_aprobado(expediente)
     if monto is None:
         return False, "La solicitud todavía no es de una persona beneficiaria."
@@ -249,7 +253,7 @@ def por_solicitar(usuario):
 def sin_oficio(usuario):
     """Para la Delegación: contratos firmados cuyo oficio de solicitud de pago aún no se emite."""
     return (expedientes_visibles(usuario).filter(firma_contrato__isnull=False, oficio_pago__isnull=True)
-            .exclude(estado__clave__in=("sin_firma_en_plazo", "recurso_liberado")).order_by("fecha_recepcion"))
+            .exclude(estado__clave__in=("sin_firma_en_plazo", "recurso_liberado", "baja")).order_by("fecha_recepcion"))
 
 
 def solicitudes_visibles(usuario):
@@ -268,6 +272,7 @@ def plazo_remision(solicitud):
 
 
 # ----------------------------------------------------------------------------- oficio de la Delegación
+@registra_usuario
 def emitir_oficio(usuario, expediente, momento=None):
     """La Delegación del expediente emite el oficio de solicitud de pago (una vez, con el contrato firmado)."""
     exigir_unidad(usuario, TipoUnidad.DELEGACION)
@@ -277,7 +282,8 @@ def emitir_oficio(usuario, expediente, momento=None):
     if firma is None:
         raise ValidationError("El oficio de solicitud de pago se emite en cuanto el contrato está firmado: este contrato "
                               "todavía no se firma.")
-    if expediente.estado.clave in ("sin_firma_en_plazo", "recurso_liberado"):
+    exigir_vigente(expediente, "ya no se emite el oficio de solicitud de pago")
+    if expediente.estado.clave in ("sin_firma_en_plazo", "recurso_liberado", "baja"):
         raise ValidationError("Este contrato ya no tiene recurso por pagar.")
     if hasattr(expediente, "oficio_pago"):
         raise ValidationError(f"La Delegación ya emitió el oficio {expediente.oficio_pago.folio}.")
@@ -313,6 +319,7 @@ def emitir_oficio(usuario, expediente, momento=None):
 
 
 # ----------------------------------------------------------------------------- comprobante de la cuenta
+@registra_usuario
 def adjuntar_comprobante(usuario, expediente, archivo, descripcion="", momento=None):
     """La Delegación (que recibe el documento al firmar) o el área responsable guarda el comprobante de la cuenta bancaria."""
     exigir_unidad(usuario, TipoUnidad.DELEGACION, TipoUnidad.DIRECCION)
@@ -360,6 +367,7 @@ def _preparar(usuario, expediente, numero, momento=None):
     return sol, m
 
 
+@registra_usuario
 def preparar_solicitud(usuario, expediente, numero, momento=None):
     """El área responsable abre la solicitud de la ministración (queda «por enviar» con la lista de soportes)."""
     with transaction.atomic():
@@ -367,6 +375,7 @@ def preparar_solicitud(usuario, expediente, numero, momento=None):
     return sol
 
 
+@registra_usuario
 def enviar_solicitud(usuario, expediente, numero, observaciones="", momento=None):
     """Envía la solicitud a Administración y Finanzas con fecha, hora y acuse. No se envía si falta un soporte."""
     with transaction.atomic():

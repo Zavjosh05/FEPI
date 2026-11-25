@@ -30,7 +30,8 @@ def _pagada(pagada, programa, **kw):
 
 def test_hu_4_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-4.1")
-    assert hu["criterios"] == ["Cada envío tiene su acuse con la fecha y la hora.",
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Cada envío tiene su acuse con la fecha y la hora.",
                                "Una entrega en persona en la Delegación tiene el mismo registro."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M4.1")
     assert {"CC-BEN-01", "CC-BEN-02", "MFS-BEN-01", "PS-BEN-01", "PS-BEN-02", "RHF-BEN-02", "PSA-BEN-01", "PEG-BEN-01",

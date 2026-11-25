@@ -74,7 +74,8 @@ def _reintegrar(usuarios, exp):
 
 def test_hu_6_3_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-6.3")
-    assert hu["criterios"] == ["Los resultados finales coinciden con las verificaciones y los pagos.",
+    assert "trazabilidad" in hu["criterios"][-1]
+    assert hu["criterios"][:-1] == ["Los resultados finales coinciden con las verificaciones y los pagos.",
                                "El padrón está publicado y actualizado.",
                                "Existe la fecha y la hora del envío del informe al Comité."]
     funcion = next(f for m in modelo["modulos"] for f in m["funciones"] if f["id"] == "M6.3")

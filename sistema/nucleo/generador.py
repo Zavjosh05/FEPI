@@ -122,6 +122,7 @@ def _sesion_y_publicacion(st, drff, ejercicio, programa, aprobables):
 def _avanzar(spec, ejercicio, por_unidad, drff, uj, aprobables, dictaminadas_pendientes):
     """Registra la solicitud y la lleva hasta su estado objetivo; devuelve 1 si la creó (0 si ya existía)."""
     from dictamen import juridico, tecnico
+    from dictamen.demo import propiedad_en_regla
     from recepcion import servicios
 
     i, objetivo, municipio, tipo, modalidad = spec["i"], spec["objetivo"], spec["municipio"], spec["tipo"], spec["modalidad"]
@@ -154,7 +155,8 @@ def _avanzar(spec, ejercicio, por_unidad, drff, uj, aprobables, dictaminadas_pen
     with _paso(habil(registro, 5), 11):
         if objetivo == "faltantes":
             plano = exp.revisiones.order_by("pk").first()
-            servicios.validar_expediente(drff, exp, [plano.pk], "Falta el documento señalado (generador).")
+            servicios.validar_expediente(drff, exp, [plano.pk], "Falta el documento señalado (generador).",
+                                         observaciones_requisitos={plano.pk: "El plano no es legible (generador)."})
             return 1
         servicios.validar_expediente(drff, exp)
     if objetivo == "validada":
@@ -162,7 +164,7 @@ def _avanzar(spec, ejercicio, por_unidad, drff, uj, aprobables, dictaminadas_pen
     with _paso(habil("2026-04-20", i % 30), 10):
         tecnico.dictaminar(drff, exp, "factible", "Cumple los criterios técnicos (generador).")
     with _paso(habil("2026-05-18", i % 30), 10):
-        juridico.dictaminar(uj, exp, "procedente", "Documentación completa (generador).")
+        juridico.dictaminar(uj, exp, "procedente", "Documentación completa (generador).", propiedad=propiedad_en_regla(exp))
     (aprobables if objetivo == "aprobada" else dictaminadas_pendientes).append(exp)
     return 1
 

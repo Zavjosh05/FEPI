@@ -3,6 +3,7 @@ ministración con la copia de sus soportes."""
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from nucleo.models import Acuse, Expediente
 
@@ -30,6 +31,8 @@ class OficioPago(models.Model):
     huella = models.CharField(max_length=64, blank=True, help_text="SHA-256 del PDF.")
     acuse = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
 
+    history = HistoricalRecords()
+
     class Meta:
         ordering = ["-emitido_en"]
         verbose_name = "oficio de solicitud de pago"
@@ -54,6 +57,8 @@ class ComprobanteCuenta(models.Model):
     huella = models.CharField(max_length=64, blank=True)
     subido_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     subido_en = models.DateTimeField(default=timezone.now)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-subido_en", "-id"]
@@ -83,6 +88,8 @@ class SolicitudPago(models.Model):
     acuse_envio = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     soportes = models.JSONField(default=list, blank=True, help_text="Copia de los soportes al momento del envío.")
     observaciones = models.TextField(blank=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["expediente__folio", "ministracion"]

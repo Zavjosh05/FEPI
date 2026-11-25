@@ -13,6 +13,7 @@ from nucleo import dias_habiles
 from nucleo.acuses import emitir_acuse
 from nucleo.catalogos import leer_json
 from nucleo.models import Consecutivo, TipoUnidad
+from nucleo.trazabilidad import registra_usuario
 
 from .comun import datos_dictamen, exigir_unidad
 from .models import CaracterSesion, DocumentoSesion, EstadoSesion, SesionComite
@@ -53,6 +54,7 @@ def integrantes_comite(ejercicio):
     return {"nombre": f"Comité del programa {ejercicio.programa.clave}", "vocales": [], "invitados": []}
 
 
+@registra_usuario
 def crear_sesion(usuario, ejercicio, tipo, fecha_hora, lugar, orden_del_dia, caracter=CaracterSesion.ORDINARIA,
                  presupuesto=None):
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
@@ -66,6 +68,7 @@ def crear_sesion(usuario, ejercicio, tipo, fecha_hora, lugar, orden_del_dia, car
     )
 
 
+@registra_usuario
 def agregar_documento(usuario, sesion, archivo, nombre=""):
     exigir_unidad(usuario, TipoUnidad.SECRETARIA_COMITE)
     if sesion.estado == EstadoSesion.CELEBRADA:
@@ -101,6 +104,7 @@ def anticipacion_requerida(sesion):
     return f"{texto_plazo} de anticipación ({plazo.fundamento})", fin_del_dia
 
 
+@registra_usuario
 def enviar_convocatoria(usuario, sesion, momento=None):
     """Envía la convocatoria con orden del día y documentos; queda la fecha y hora del envío y su acuse.
 
