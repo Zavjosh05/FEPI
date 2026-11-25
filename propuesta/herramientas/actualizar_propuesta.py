@@ -87,8 +87,11 @@ for fila in range(5, ws.max_row + 1):
     if hu in historias:
         h = historias[hu]
         ws.cell(fila, 5).value = h["texto"]
+        cs = h["criterios"]
         for j in range(3):
-            ws.cell(fila, 6 + j).value = h["criterios"][j] if j < len(h["criterios"]) else None
+            ws.cell(fila, 6 + j).value = cs[j] if j < len(cs) else None
+        if len(cs) > 3:  # la matriz original tiene tres columnas de criterios: del tercero en adelante van juntos
+            ws.cell(fila, 8).value = " ".join(f"({k}) {c}" for k, c in enumerate(cs[2:], 3))
         cambiadas += 1
 assert cambiadas == 26, cambiadas
 wb.save(CARPETA / "docs" / "Matriz_funciones_historias_PROBOSQUE.xlsx")
@@ -108,6 +111,7 @@ h3 { font-size: 12pt; color: #1e4d2b; margin: 12pt 0 3pt; }
 p { margin: 0 0 6pt; }
 ul { margin: 0 0 6pt; padding-left: 16pt; } li { margin-bottom: 3pt; }
 table { width: 100%; border-collapse: collapse; font-size: 7.9pt; margin: 3pt 0 8pt; }
+table.hu { font-size: 7.5pt; line-height: 1.32; margin: 2pt 0 6pt; } table.hu td { padding: 2.5pt 4pt; }
 th { background: #1e4d2b; color: #fff; text-align: left; padding: 3pt 4pt; font-weight: bold; }
 td { border: 1px solid #d5d9d6; padding: 3pt 4pt; vertical-align: top; }
 td.id { color: #1e4d2b; font-weight: bold; white-space: nowrap; }
@@ -130,7 +134,7 @@ def filas(ids):
 
 
 def tabla(ids):
-    return f"<table>{ENC}{filas(ids)}</table>"
+    return f"<table class='hu'>{ENC}{filas(ids)}</table>"
 
 
 def modulo(n):
@@ -155,10 +159,11 @@ acciones. En cada envío o entrega existe la fecha y la hora. La columna Puntos 
 <h3>Lista de historias</h3><p>Lista completa de las 26 historias para consulta rápida, con su sprint (sección 8).</p>
 <table><tr><th style='width:10%'>HU</th><th style='width:31%'>Título</th><th>Rol</th><th style='width:9%'>Puntos</th>
 <th style='width:9%'>Sprint</th></tr>{lista}</table>"""
-p12 = modulo(1) + tabla(["HU-1.1", "HU-1.2", "HU-1.3", "HU-1.4"]) + modulo(2) + tabla(["HU-2.1", "HU-2.2", "HU-2.3"])
-p13 = tabla(["HU-2.4"]) + modulo(3) + tabla(["HU-3.1", "HU-3.2", "HU-3.3", "HU-3.4"]) + modulo(4) + tabla(["HU-4.1"])
-p14 = tabla(["HU-4.2", "HU-4.3"]) + modulo(5) + tabla(["HU-5.1", "HU-5.2", "HU-5.3"]) + modulo(6) + tabla(["HU-6.1"])
-p15 = tabla(["HU-6.2", "HU-6.3"])
+# Desde el 25-nov-2026 las historias de M1 a M6 llevan el criterio de trazabilidad: se reparten en las mismas cinco páginas.
+p12 = modulo(1) + tabla(["HU-1.1", "HU-1.2", "HU-1.3", "HU-1.4"]) + modulo(2) + tabla(["HU-2.1"])
+p13 = tabla(["HU-2.2", "HU-2.3", "HU-2.4"]) + modulo(3) + tabla(["HU-3.1"])
+p14 = tabla(["HU-3.2", "HU-3.3", "HU-3.4"]) + modulo(4) + tabla(["HU-4.1", "HU-4.2", "HU-4.3"])
+p15 = modulo(5) + tabla(["HU-5.1", "HU-5.2", "HU-5.3"]) + modulo(6) + tabla(["HU-6.1", "HU-6.2", "HU-6.3"])
 p21 = """<h2 class='barra'>6. Módulo independiente: Calculadora forestal</h2>
 <p>La Calculadora forestal se propone como un módulo aparte de los 6 anteriores. No forma parte del trámite de ningún
 programa ni comparte datos con él: la construye, alimenta y mantiene el equipo desarrollador, y el personal de PROBOSQUE
@@ -202,7 +207,10 @@ with sync_playwright() as p:
     pag = navegador.new_page()
     pag.set_content(documento)
     desbordadas = pag.evaluate("[...document.querySelectorAll('.pagina')].filter(s => s.scrollHeight > s.clientHeight)"
-                               ".map(s => s.dataset.n)")
+                               ".map(s => s.dataset.n + ' (' + (s.scrollHeight - s.clientHeight) + ' px de más)')")
+    print("Espacio libre por página (px):", pag.evaluate(
+        "[...document.querySelectorAll('.pagina')].map(s => s.dataset.n + ': ' + Math.round(s.clientHeight - 60 - "
+        "[...s.children].filter(c => !c.classList.contains('pie')).reduce((a, c) => Math.max(a, c.offsetTop + c.offsetHeight), 0)))"))
     assert not desbordadas, f"Páginas que no caben: {desbordadas}"
     nuevas = pag.pdf(format="Letter", print_background=True, prefer_css_page_size=True)
     navegador.close()

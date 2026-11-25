@@ -14,6 +14,45 @@ original (12-13 de noviembre de 2026).
   - las páginas de historias del PDF de la propuesta (11 a 15 y 21 a 22), con el mismo estilo y la misma
     numeración. Las demás páginas se conservan tal cual.
 
+## 25 de noviembre de 2026 · Observaciones del profesor al sprint 1 y trazabilidad en todas las historias
+
+**Motivo.** Observaciones del profesor del 23 de noviembre al sprint 1, atendidas en las ramas `sprint-1` y
+`sprint-2` (con la redacción de Omar) e integradas en la rama principal junto con el sprint 3.
+
+| Historia | Antes | Ahora |
+| --- | --- | --- |
+| HU-1.4, historia | Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo. | Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar cada faltante con su observación, para que la solicitud pase a dictamen o se corrija a tiempo. |
+| HU-1.4, criterio nuevo | — | Cada requisito señalado como faltante tiene la observación de la Dirección (qué falta o por qué no es válido) y el aviso de faltantes la incluye. |
+| HU-2.1, historia | Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, para proponer al Comité qué solicitudes apoyar. | Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud, expedido como documento, y el listado preliminar, para proponer al Comité qué solicitudes apoyar. |
+| HU-2.1, criterio 1 | Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo. | Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo, expedido como documento PDF con folio y adjunto al expediente. |
+| HU-2.2, historia | Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes. | Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud, revisar que se acredite la propiedad o legal posesión del predio y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes. |
+| HU-2.2, criterio 1 | Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo. | Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo, expedido como documento PDF con folio y adjunto al expediente. |
+| HU-2.2, criterio nuevo | — | Una solicitud cuya propiedad o legal posesión del predio no se acredita (documento a nombre del titular, que ampare la superficie, vigente y sin conflicto) es no procedente. |
+| HU-2.3, criterio nuevo | — | Las solicitudes candidatas (en dictamen, por aprobar y en lista de espera, en su orden) y las personas beneficiarias (con su monto y cómo entraron) se consultan en dos vistas separadas. |
+| HU-2.4, título | Sesiones de seguimiento | Reasignaciones e incidentes |
+| HU-2.4, historia | Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio. | Como integrante del Comité, quiero acordar en las sesiones de seguimiento la atención de cada incidente del ejercicio y la reasignación del recurso liberado a la lista de espera, para que el recurso llegue a otra solicitud factible y cada caso tenga un área que lo atienda. |
+| HU-2.4, criterios | (1) Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo. (2) En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes. | (1) Cada incidente (desistimiento, cancelación, baja, sustitución, caso fortuito, suspensión o reintegro) tiene un acuerdo con su causa, los expedientes a los que aplica y el área que debe atenderlo. (2) En una reasignación o sustitución, la persona beneficiaria que sale queda dada de baja y entra la siguiente solicitud de la lista de espera, en su orden, sin rebasar el recurso liberado. |
+| Las 21 historias de M1 a M6, criterio nuevo al final | — | Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad). |
+
+**Funciones.** M1.4 (aviso de cada faltante con su observación), M2.1 y M2.2 (dictámenes expedidos como documento; M2.2
+con la acreditación de la propiedad o legal posesión), M2.3 (vistas separadas de candidatos y de personas
+beneficiarias) y M2.4 (reasignaciones e incidentes) dicen lo mismo que sus historias.
+
+**Lo que siguió haciendo el sistema.** La instrucción de pago de PSAHEM y la validación de reportes de PEG dejan de ser
+criterio de HU-2.4, pero siguen como acuerdos de seguimiento que dejan constancia, con sus pruebas.
+
+**Cómo se concilió HU-2.4 con HU-6.1 y HU-6.2.** La baja y la reasignación tienen un solo registro en el sistema: lo
+que acuerda el Comité directamente (HU-2.4) y lo que propone el área responsable (HU-6.1 y HU-6.2) usan el mismo recurso
+liberado, en el orden de la lista de espera, y lo que una propuesta en trámite reasigna no se reasigna dos veces. La
+«sustitución» de HU-2.4 (sale la persona beneficiaria y entra la siguiente de la lista de espera) es distinta de la
+sustitución de HU-6.1 (la segunda persona beneficiaria continúa en lugar de la titular).
+
+Puntos, roles y sprints, iguales (conviene volver a estimar HU-2.2 y HU-2.4). Se actualizaron `datos/modelo.json`,
+`CONTEXTO.md`, la matriz y las páginas de historias del PDF de la propuesta. Con el criterio de trazabilidad, ocho
+historias tienen cuatro criterios: en la matriz, que trae tres columnas de criterios, del tercero en adelante van juntos
+en «Criterio 3»; en el PDF, las tablas de historias usan una letra un poco menor y se repartieron de otro modo en las
+mismas páginas 12 a 15 (el PDF sigue con 26 páginas).
+
 ## 19 de noviembre de 2026 · HU-1.2, HU-1.3 y HU-2.2 dicen lo que ya hace su función
 
 **Motivo.** Revisión de las historias contra su función y las pantallas (documento «Historias de usuario e

@@ -97,25 +97,25 @@ Recibe la solicitud en la Delegación, integra el expediente digital del predio 
 **M1.1 · HU-1.1 · Registro de la solicitud** — 3 puntos · sprint 1
 - Función: Registro de la solicitud a nombre del predio en la Delegación que le corresponde, con su acuse y la fecha y la hora de recepción.
 - Historia: Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite.
-- Criterios: Se genera un folio único para la solicitud.
+- Criterios: (1) Se genera un folio único para la solicitud. (2) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-01, MFS-DRF-01, PS-DRF-01, RHF-DRF-01, PSA-DRF-01, PEG-DRF-01
 
 **M1.2 · HU-1.2 · Revisión del expediente** — 3 puntos · sprint 1
 - Función: Revisión de los requisitos según el programa, el tipo de persona y la modalidad; digitalización del expediente (incluido el PTRFI en RHF) y su envío a la Dirección, con la fecha y la hora del envío.
 - Historia: Como personal de la Delegación, quiero revisar los requisitos del expediente y enviarlo digitalizado a la Dirección, para que la solicitud no se detenga por falta de documentos.
-- Criterios: (1) Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica. (2) El expediente digital está en la Dirección, con la fecha y la hora del envío.
+- Criterios: (1) Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo digitalizado), faltante o, si es condicional, no aplica. (2) El expediente digital está en la Dirección, con la fecha y la hora del envío. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-01, MFS-DRF-01, PS-DRF-01, RHF-PSF-01, RHF-DRF-01, PSA-DRF-01, PEG-DRF-01
 
 **M1.3 · HU-1.3 · Ubicación del predio** — 5 puntos · sprint 1
 - Función: Ubicación del predio: polígono levantado en campo por la Delegación o por el prestador de servicios forestales, Diagnóstico Técnico (RHF) y cambio de lugar del polígono antes de plantar (PS).
 - Historia: Como personal de la Delegación, quiero registrar el polígono del predio levantado en campo por la Delegación o por el prestador de servicios forestales, para conocer su ubicación y su superficie real al dictaminar y verificar.
-- Criterios: (1) Existe un polígono asociado al expediente del predio. (2) Si el polígono cambia de lugar, existen el anterior y el nuevo.
+- Criterios: (1) Existe un polígono asociado al expediente del predio. (2) Si el polígono cambia de lugar, existen el anterior y el nuevo. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-01, MFS-PSF-01, MFS-DRF-01, PS-BEN-01, PS-DRF-01, PS-DRF-05, RHF-DRF-01, PSA-DRF-01
 
 **M1.4 · HU-1.4 · Validación del expediente** — 3 puntos · sprint 1
 - Función: Validación del expediente por la Dirección que es Instancia Ejecutora, incluidos los refrendos, y aviso de los faltantes dentro del plazo de evaluación.
-- Historia: Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar los faltantes, para que la solicitud pase a dictamen o se corrija a tiempo.
-- Criterios: (1) El expediente está validado o tiene un aviso de faltantes con fecha límite. (2) En un refrendo, la documentación legal vigente de hasta 3 años es válida.
+- Historia: Como personal del área responsable del programa, quiero validar el expediente contra las reglas del programa y avisar cada faltante con su observación, para que la solicitud pase a dictamen o se corrija a tiempo.
+- Criterios: (1) El expediente está validado o tiene un aviso de faltantes con fecha límite. (2) Cada requisito señalado como faltante tiene la observación de la Dirección (qué falta o por qué no es válido) y el aviso de faltantes la incluye. (3) En un refrendo, la documentación legal vigente de hasta 3 años es válida. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-01, MFS-ARP-01, PS-ARP-01, RHF-ARP-01, PSA-ARP-01, PEG-DPF-01
 
 ### M2. Dictamen y Comité
@@ -124,26 +124,26 @@ Determina si cada solicitud procede y lleva al Comité lo que debe aprobar o aco
 
 **M2.1 · HU-2.1 · Dictamen técnico** — 5 puntos · sprint 1
 - Función: Dictamen técnico con los criterios del programa y su análisis cartográfico (diagnóstico técnico forestal en CC, revisión de polígonos en MFS, Índice de Presión Económica a la Deforestación en PSAHEM), y listado preliminar de solicitudes factibles y no factibles.
-- Historia: Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud y el listado preliminar, para proponer al Comité qué solicitudes apoyar.
-- Criterios: (1) Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo. (2) Existe un listado preliminar con el resultado técnico y jurídico de cada solicitud. (3) En PEG, el dictamen existe dentro de los 45 días hábiles.
+- Historia: Como personal del área responsable del programa, quiero elaborar el dictamen técnico de cada solicitud, expedido como documento, y el listado preliminar, para proponer al Comité qué solicitudes apoyar.
+- Criterios: (1) Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo, expedido como documento PDF con folio y adjunto al expediente. (2) Existe un listado preliminar con el resultado técnico y jurídico de cada solicitud. (3) En PEG, el dictamen existe dentro de los 45 días hábiles. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-02, MFS-ARP-02, PS-ARP-02, RHF-ARP-02, PSA-ARP-02, PEG-DPF-02
 
 **M2.2 · HU-2.2 · Dictamen jurídico** — 3 puntos · sprint 1
 - Función: Dictamen jurídico de la documentación legal, con el cotejo del Listado de Personas Beneficiarias Incumplidas y de los predios con procedimiento o sanción (en PEG, acta de asamblea y representación del núcleo agrario).
-- Historia: Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes.
-- Criterios: (1) Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo. (2) Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente.
+- Historia: Como personal de la Unidad Jurídica, quiero dictaminar la documentación legal de cada solicitud, revisar que se acredite la propiedad o legal posesión del predio y cotejar a su titular con el Listado de Personas Beneficiarias Incumplidas y su predio con los predios con procedimiento o sanción, para que solo se aprueben solicitudes procedentes.
+- Criterios: (1) Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo, expedido como documento PDF con folio y adjunto al expediente. (2) Una solicitud cuya propiedad o legal posesión del predio no se acredita (documento a nombre del titular, que ampare la superficie, vigente y sin conflicto) es no procedente. (3) Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un procedimiento o una sanción, es no procedente. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-UJ-01, MFS-UJ-01, PS-UJ-01, RHF-UJ-01, PSA-UJ-01, PEG-UJ-01
 
 **M2.3 · HU-2.3 · Sesión de aprobación** — 3 puntos · sprint 1
 - Función: Sesión de aprobación: convocatoria y documentos de la sesión, y acta con la lista de personas beneficiarias o el padrón, la lista de espera, las no factibles y la autorización de publicación.
 - Historia: Como integrante del Comité, quiero aprobar en sesión los listados de la convocatoria, para que se puedan publicar.
-- Criterios: (1) Existe la convocatoria con orden del día y documentos, y la fecha y la hora de su envío. (2) Existe un acta con los listados aprobados y la autorización de publicación.
+- Criterios: (1) Existe la convocatoria con orden del día y documentos, y la fecha y la hora de su envío. (2) Existe un acta con los listados aprobados y la autorización de publicación. (3) Las solicitudes candidatas (en dictamen, por aprobar y en lista de espera, en su orden) y las personas beneficiarias (con su monto y cómo entraron) se consultan en dos vistas separadas. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-COM-01, MFS-COM-01, PS-COM-01, RHF-COM-01, PSA-COM-01, PEG-COM-01
 
 **M2.4 · HU-2.4 · Sesiones de seguimiento** — 3 puntos · sprint 1
 - Función: Sesiones de seguimiento: acuerdos de reasignación, sustitución, caso fortuito, suspensión, cancelación, baja y reintegro; en PSAHEM, instrucción de pago a la Fiduciaria; en PEG, validación de la evaluación de reportes.
-- Historia: Como integrante del Comité, quiero tomar acuerdos en las sesiones de seguimiento y asignar cada uno al área que debe cumplirlo, para atender los casos que surgen durante el ejercicio.
-- Criterios: (1) Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo. (2) En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes.
+- Historia: Como integrante del Comité, quiero acordar en las sesiones de seguimiento la atención de cada incidente del ejercicio y la reasignación del recurso liberado a la lista de espera, para que el recurso llegue a otra solicitud factible y cada caso tenga un área que lo atienda.
+- Criterios: (1) Cada incidente (desistimiento, cancelación, baja, sustitución, caso fortuito, suspensión o reintegro) tiene un acuerdo con su causa, los expedientes a los que aplica y el área que debe atenderlo. (2) En una reasignación o sustitución, la persona beneficiaria que sale queda dada de baja y entra la siguiente solicitud de la lista de espera, en su orden, sin rebasar el recurso liberado. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-COM-02, MFS-COM-02, PS-COM-02, RHF-COM-02, PSA-COM-02, PSA-COM-03, PEG-COM-02
 
 ### M3. Publicación y contrato
@@ -153,25 +153,25 @@ Publica los resultados, notifica a las personas y formaliza el apoyo con el cont
 **M3.1 · HU-3.1 · Publicación y notificaciones** — 3 puntos · sprint 2
 - Función: Publicación de los resultados o del padrón en la página de PROBOSQUE y en las Delegaciones, y avisos y notificaciones por conducto de la Delegación (faltantes, cita a firma, omisiones, devoluciones), con la fecha y la hora y su acuse.
 - Historia: Como personal del área responsable del programa, quiero publicar los listados aprobados y avisar a cada persona su resultado por conducto de la Delegación, para que los plazos corran desde una notificación comprobable.
-- Criterios: (1) Los listados autorizados por el Comité están publicados en la fecha de la convocatoria. (2) Cada aviso tiene su acuse y la fecha y la hora de envío y de notificación.
+- Criterios: (1) Los listados autorizados por el Comité están publicados en la fecha de la convocatoria. (2) Cada aviso tiene su acuse y la fecha y la hora de envío y de notificación. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-01, CC-ARP-03, CC-ARP-07, CC-UJ-03, MFS-ARP-01, MFS-ARP-03, MFS-ARP-07, MFS-UJ-03, PS-DRF-02, PS-ARP-01, PS-ARP-03, PS-ARP-07, PS-UJ-03, RHF-ARP-01, RHF-ARP-03, RHF-ARP-07, RHF-UJ-03, PSA-ARP-01, PSA-ARP-03, PSA-ARP-07, PSA-UJ-03, PEG-DPF-01, PEG-DPF-03
 
 **M3.2 · HU-3.2 · Elaboración del contrato** — 3 puntos · sprint 2
 - Función: Validación jurídica del modelo de Contrato de Adhesión o Convenio de Concertación (y su adendum) y elaboración de cada contrato con los datos de la solicitud aprobada; ampliación de plazo por causa externa en MFS.
 - Historia: Como personal del área responsable del programa, quiero elaborar el contrato de cada solicitud aprobada sobre el modelo validado y enviarlo a la Delegación, para que se firme.
-- Criterios: (1) Existe un contrato por solicitud aprobada, elaborado sobre un modelo validado. (2) Existe la fecha y la hora del envío a la Delegación.
+- Criterios: (1) Existe un contrato por solicitud aprobada, elaborado sobre un modelo validado. (2) Existe la fecha y la hora del envío a la Delegación. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-04, CC-UJ-02, MFS-ARP-04, MFS-ARP-06, MFS-UJ-02, PS-ARP-04, PS-UJ-02, RHF-ARP-04, RHF-UJ-02, PSA-ARP-04, PSA-UJ-02, PEG-DPF-04, PEG-UJ-02
 
 **M3.3 · HU-3.3 · Firma del contrato** — 5 puntos · sprint 2
 - Función: Firma del contrato por la persona beneficiaria dentro de los 10 días hábiles (en PSAHEM, el plazo de la convocatoria), con verificación de firmas y sello; contrato de servicios técnicos en MFS y credencial del Guardabosque en PEG.
 - Historia: Como personal de la Delegación, quiero recabar la firma del contrato dentro del plazo y verificar las firmas y el sello, para formalizar el apoyo.
-- Criterios: (1) Existe el contrato firmado, con la fecha y la hora de la firma, dentro del plazo. (2) En MFS existe el contrato de servicios técnicos con el RFN y la carta compromiso; en PEG, la credencial entregada. (3) Un contrato sin firma al vencer el plazo queda señalado para liberar el recurso.
+- Criterios: (1) Existe el contrato firmado, con la fecha y la hora de la firma, dentro del plazo. (2) En MFS existe el contrato de servicios técnicos con el RFN y la carta compromiso; en PEG, la credencial entregada. (3) Un contrato sin firma al vencer el plazo queda señalado para liberar el recurso. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-02, MFS-PSF-02, MFS-DRF-02, PS-DRF-02, RHF-DRF-02, PSA-DRF-02, PEG-DRF-02, PEG-DPF-04
 
 **M3.4 · HU-3.4 · Entrega de planta** — 5 puntos · sprint 2
 - Función: Entrega de planta: Vale de Planta (con carta compromiso si se pide antes del contrato), salida de planta del vivero por especie y cantidad, y vigencia del vale (30 días en PS, 15 días hábiles en RHF) con su reposición.
 - Historia: Como personal del vivero, quiero validar el Vale de Planta y registrar la salida de planta por especie y cantidad, para entregar solo la planta autorizada.
-- Criterios: (1) Existe un Vale de Planta vigente por la especie y la cantidad entregadas. (2) La salida de planta tiene especie, cantidad y fecha. (3) Un vale vencido no es válido y puede reponerse.
+- Criterios: (1) Existe un Vale de Planta vigente por la especie y la cantidad entregadas. (2) La salida de planta tiene especie, cantidad y fecha. (3) Un vale vencido no es válido y puede reponerse. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: PS-DRF-03, PS-VIV-01, RHF-BEN-01, RHF-DRF-03, RHF-VIV-01
 
 ### M4. Ejecución y verificación
@@ -181,19 +181,19 @@ Recibe lo que comprueba la ejecución de las actividades, desde el portal o en l
 **M4.1 · HU-4.1 · Envío de comprobaciones** — 5 puntos · sprint 3
 - Función: Envío de avisos (término, caso fortuito, cambio de polígono), informes, bitácoras, reportes mensuales y acuses de depósito por la persona beneficiaria o el Guardabosque, en el portal o en la Delegación, con la fecha y la hora y su acuse.
 - Historia: Como persona beneficiaria, quiero enviar mis avisos, informes y reportes a la Delegación, para comprobar mis actividades dentro del plazo.
-- Criterios: (1) Cada envío tiene su acuse con la fecha y la hora. (2) Una entrega en persona en la Delegación tiene el mismo registro.
+- Criterios: (1) Cada envío tiene su acuse con la fecha y la hora. (2) Una entrega en persona en la Delegación tiene el mismo registro. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-BEN-01, CC-BEN-02, MFS-BEN-01, PS-BEN-01, PS-BEN-02, RHF-BEN-01, RHF-BEN-02, PSA-BEN-01, PSA-BEN-02, PEG-BEN-01, PEG-BEN-02
 
 **M4.2 · HU-4.2 · Verificación en campo** — 5 puntos · sprint 3
 - Función: Verificación en campo y su resultado (formato, Informe Final o minuta, ajuste de superficie) y documentación de incidencias: caso fortuito, incumplimiento o causa externa.
 - Historia: Como personal de la Delegación, quiero registrar el resultado de la verificación en campo y sus incidencias, para determinar el pago o el trámite que corresponde.
-- Criterios: (1) Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del plazo del programa. (2) Cada incidencia tiene su tipo y el documento que la avala.
+- Criterios: (1) Existe el resultado de la verificación con la superficie verificada y su ajuste, dentro del plazo del programa. (2) Cada incidencia tiene su tipo y el documento que la avala. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-03, CC-DRF-04, MFS-DRF-03, PS-DRF-04, PS-DRF-05, RHF-DRF-04, PSA-DRF-04
 
 **M4.3 · HU-4.3 · Evaluación de reportes** — 3 puntos · sprint 3
 - Función: Revisión de los reportes mensuales y acuses de depósito de los Guardabosques en la Delegación y su evaluación por la Dirección, para validarse en el CASPEG.
 - Historia: Como personal del área responsable del programa, quiero evaluar por periodo los reportes mensuales de cada Guardabosque, para que el CASPEG valide la evaluación antes de cada pago.
-- Criterios: (1) Existe la evaluación por Guardabosque y por periodo. (2) Queda identificado quién no entregó su reporte.
+- Criterios: (1) Existe la evaluación por Guardabosque y por periodo. (2) Queda identificado quién no entregó su reporte. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: PEG-BEN-01, PEG-BEN-02, PEG-DRF-03, PEG-DPF-05
 
 ### M5. Pagos
@@ -203,19 +203,19 @@ Solicita y realiza cada ministración con sus soportes, incluidos los cheques de
 **M5.1 · HU-5.1 · Solicitud de pago** — 3 puntos · sprint 2
 - Función: Oficio de solicitud de pago de la Delegación en cuanto el contrato está firmado y solicitud de cada ministración con sus soportes a Administración y Finanzas, con la fecha y la hora del envío.
 - Historia: Como personal del área responsable del programa, quiero solicitar el pago de cada ministración con todos sus soportes, para que se pague sin pedir nada más.
-- Criterios: (1) La solicitud tiene todos sus soportes. (2) Existe la fecha y la hora del envío a Administración y Finanzas.
+- Criterios: (1) La solicitud tiene todos sus soportes. (2) Existe la fecha y la hora del envío a Administración y Finanzas. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-DRF-02, CC-ARP-05, MFS-DRF-02, MFS-ARP-05, PS-DRF-02, PS-ARP-05, RHF-DRF-02, RHF-ARP-05, PSA-ARP-05, PEG-DPF-06
 
 **M5.2 · HU-5.2 · Pago de la ministración** — 5 puntos · sprint 2
 - Función: Revisión de la solicitud y pago por transferencia (con cheque solo en casos excepcionales); en PSAHEM, remisión a la Fiduciaria; en PEG, depósito al Guardabosque.
 - Historia: Como personal de Administración y Finanzas, quiero revisar la solicitud de pago y pagar la ministración o remitirla a la Fiduciaria, para que la persona beneficiaria reciba su apoyo.
-- Criterios: (1) Cada pago está asociado a su solicitud, con la fecha del pago. (2) En PSAHEM existe la fecha de remisión a la Fiduciaria.
+- Criterios: (1) Cada pago está asociado a su solicitud, con la fecha del pago. (2) En PSAHEM existe la fecha de remisión a la Fiduciaria. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-AF-01, MFS-AF-01, PS-AF-01, RHF-AF-01, PSA-AF-01, PEG-AF-01
 
 **M5.3 · HU-5.3 · Entrega de cheques** — 3 puntos · sprint 2
 - Función: Emisión de los cheques del 70% y del 30% por la Fiduciaria, su envío a las Delegaciones y su entrega a cada persona beneficiaria, que debe cobrarlos en un máximo de 3 meses.
 - Historia: Como personal de la Fiduciaria, quiero emitir los cheques de PSAHEM y enviarlos a las Delegaciones, para que se entreguen a cada persona beneficiaria.
-- Criterios: (1) Cada cheque está asociado a su persona beneficiaria y a su ministración, con la fecha y la hora del envío. (2) Existe la fecha de entrega de cada cheque.
+- Criterios: (1) Cada cheque está asociado a su persona beneficiaria y a su ministración, con la fecha y la hora del envío. (2) Existe la fecha de entrega de cada cheque. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: PSA-DRF-03, PSA-FID-01
 
 ### M6. Seguimiento y cierre
@@ -225,19 +225,19 @@ Atiende lo que se sale del camino normal (lista de espera, sustituciones, incump
 **M6.1 · HU-6.1 · Lista de espera y sustituciones** — 5 puntos · sprint 3
 - Función: Reasignación del recurso liberado a la lista de espera, sustitución por la segunda persona beneficiaria, desistimiento y atención de casos fortuitos, de sobrevivencia menor y de causa externa; solicitudes de la persona beneficiaria con acuse.
 - Historia: Como personal del área responsable del programa, quiero proponer al Comité la reasignación del recurso liberado, las sustituciones y la atención de los casos especiales, para aprovechar todo el presupuesto.
-- Criterios: (1) Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera. (2) Cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora.
+- Criterios: (1) Cada propuesta indica el recurso liberado y sigue el orden de la lista de espera. (2) Cada solicitud de sustitución o de desistimiento tiene su acuse con la fecha y la hora. (3) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-BEN-03, CC-ARP-06, MFS-BEN-02, MFS-ARP-06, PS-BEN-03, PS-ARP-06, RHF-BEN-03, RHF-ARP-06, PSA-BEN-03, PSA-ARP-06
 
 **M6.2 · HU-6.2 · Incumplimientos y reintegros** — 5 puntos · sprint 3
 - Función: Suspensión, omisiones por subsanar, cancelación e inscripción en el Listado de Personas Beneficiarias Incumplidas; requerimiento de devolución (incluido el valor de la planta no establecida), cuenta para reintegros y comprobación del depósito.
 - Historia: Como personal del área responsable del programa, quiero dar seguimiento a las omisiones, la suspensión, la cancelación y la devolución del recurso, para que los incumplimientos se corrijan o se sancionen.
-- Criterios: (1) Cada omisión tiene su plazo para corregirse. (2) Un apoyo cancelado tiene su requerimiento de devolución con el monto y la cuenta para el depósito. (3) La persona con apoyo cancelado está en el Listado de Personas Beneficiarias Incumplidas.
+- Criterios: (1) Cada omisión tiene su plazo para corregirse. (2) Un apoyo cancelado tiene su requerimiento de devolución con el monto y la cuenta para el depósito. (3) La persona con apoyo cancelado está en el Listado de Personas Beneficiarias Incumplidas. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-07, CC-UJ-03, CC-AF-02, MFS-ARP-07, MFS-UJ-03, MFS-AF-02, PS-DRF-05, PS-ARP-07, PS-UJ-03, PS-AF-02, RHF-ARP-07, RHF-UJ-03, RHF-AF-02, PSA-ARP-07, PSA-UJ-03, PSA-AF-02
 
 **M6.3 · HU-6.3 · Cierre del ejercicio** — 3 puntos · sprint 3
 - Función: Listados de resultados finales, informe anual al Comité y padrón de personas beneficiarias publicado (en PEG, con altas, bajas y sustituciones).
 - Historia: Como personal del área responsable del programa, quiero integrar los resultados finales, el padrón y el informe anual del ejercicio, para cerrar el ejercicio y cumplir con la Ley de Transparencia.
-- Criterios: (1) Los resultados finales coinciden con las verificaciones y los pagos. (2) El padrón está publicado y actualizado. (3) Existe la fecha y la hora del envío del informe al Comité.
+- Criterios: (1) Los resultados finales coinciden con las verificaciones y los pagos. (2) El padrón está publicado y actualizado. (3) Existe la fecha y la hora del envío del informe al Comité. (4) Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores y nuevos (trazabilidad).
 - Necesidades: CC-ARP-08, MFS-ARP-08, PS-ARP-08, RHF-ARP-08, PSA-ARP-08, PEG-DPF-07
 
 ### M7. Calculadora forestal
