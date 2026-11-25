@@ -14,8 +14,8 @@ con una solicitud capturada por la ventanilla, está la [secuencia del sprint 1]
 
 | Fuente | Qué trae | Para qué sirve |
 | --- | --- | --- |
-| **Demostración** (`cargar_demo`, se carga sola al levantar el sistema) | Lo del sprint 1 más solicitudes de PS, RHF y PSAHEM con su sesión de aprobación detenidas en cada punto de la publicación, el contrato y los pagos, con un calendario simulado de la Convocatoria 2026 y fecha de corte el 19-nov-2026 | Ver cada pantalla con datos y revisar casos que no se arman rápido: vale vencido, contrato sin firma en plazo, cheque por vencer |
-| **Esta carpeta** (`datos_prueba/sprint_2/`) | Cinco documentos PDF de prueba (contrato firmado, carta compromiso, comprobante de cuenta y dos documentos de sesión) y un script que agrega dos casos de PS **con la fecha de hoy** | Subir archivos y probar lo que la demostración ya dejó vencido por la fecha de corte |
+| **Demostración** (`cargar_demo`, se carga sola al levantar el sistema) | Lo del sprint 1 más solicitudes de PS, RHF y PSAHEM con su sesión de aprobación detenidas en cada punto de la publicación, el contrato y los pagos, con un calendario simulado de la Convocatoria 2026 cuya fecha de corte es **el día en que se carga** | Ver cada pantalla con datos y revisar casos que no se arman rápido: contrato por firmar a un día hábil de vencer, vale vigente y vencido, contrato sin firma en plazo, cheque por vencer |
+| **Esta carpeta** (`datos_prueba/sprint_2/`) | Cinco documentos PDF de prueba (contrato firmado, carta compromiso, comprobante de cuenta y dos documentos de sesión) y un script que agrega dos casos de PS **con la fecha de hoy** | Subir archivos y recorrer de punta a punta lo que la demostración no trae: una solicitud de PS por publicar y una baja con reasignación desde la Lista de espera de PS |
 | **Datos del sprint 1** (`datos_prueba/sprint_1/`) | Polígonos, PDF de requisitos y fichas de solicitudes | Llevar una solicitud nueva hasta su autorización (secuencia del sprint 1) |
 | **Pruebas automáticas** (`sistema/pruebas/`) | 473 pruebas que crean sus propios datos, entre ellas los recorridos completos del sprint 2 por servicios y por la interfaz | Comprobar el sistema sin intervención (Guía de inicio, sección 1.8) |
 
@@ -34,11 +34,14 @@ con una solicitud capturada por la ventanilla, está la [secuencia del sprint 1]
 Los requisitos de las solicitudes (si se capturan desde cero) usan los PDF de `datos_prueba/sprint_1/documentos/`. Todos los
 nombres son inventados.
 
-**Por qué el script.** La demostración se carga con un calendario simulado y su fecha de corte es el 19 de noviembre de 2026.
-Los contratos que quedaron por firmar en esa fecha (*Plantación Los Pinos*, *Rancho La Huerta*, *Barranca Honda* y, con
-los días, *Ojo de Agua*) vencen su plazo de 10 días hábiles y la revisión diaria de plazos los señala «Sin firma en plazo»
-(comprobado el 25-nov: los tres primeros ya estaban señalados); no sirven para probar una firma. Además, la demostración ya publicó PS, RHF y CC, y la Lista de espera de PS está
-vacía. El script crea lo que falta con la hora de hoy.
+**Por qué el script.** La demostración se carga con un calendario simulado cuya fecha de corte es el día de la carga
+(D-32): recién levantada, *Plantación Los Pinos* está por firmar a un día hábil de vencer (sirve para registrar una firma ese
+día), *Cañada Seca* ya venció sin firma, el vale de *Mirador de los Pinos* está vigente y el de *Ladera Verde* vencido, y el
+cheque de *Loma Verde* está por vencer. Lo que la demostración no trae es un caso para recorrer de punta a punta: ya publicó
+PS, RHF y CC (no queda nada de PS por publicar) y la Lista de espera de PS está vacía. El script crea esos dos casos con la hora
+de hoy. Si se prueba días después de la carga, los plazos de la demostración siguen el reloj real: *Plantación Los Pinos*,
+*Rancho La Huerta* y *Barranca Honda* quedarán «Sin firma en plazo» en pocos días hábiles (*Plantación Los Pinos*, al segundo
+día hábil después de la carga); para tenerla fresca, vuelve a levantar el sistema desde cero (`down -v`).
 
 **Comprobado el 25 de noviembre de 2026** en el navegador (Chromium con Playwright, sobre la demostración cargada y el script
 corrido, con las mismas pantallas que usa una persona): los escenarios A, B, C, D, E y F de abajo, paso por paso, y la
@@ -66,7 +69,8 @@ Calculadora, con las cifras que se citan. Lo que no coincidía con la primera re
 >
 > **Sobre las fechas.** Los plazos que corren desde hoy (10 días hábiles para firmar, 30 días para recoger la planta en PS, 3
 > meses para cobrar un cheque) vencerán en la fecha que muestre cada pantalla. Si repites la secuencia otro día, vuelve a
-> levantar el sistema desde cero (`down -v`) y a correr el script.
+> levantar el sistema desde cero (`down -v`, con lo que la demostración toma la nueva fecha de corte) y a correr el script.
+> La fecha de corte no baja del 19-nov-2026 ni pasa del 31-dic-2026; `DEMO_FECHA_CORTE=AAAA-MM-DD` fija otra en ese rango.
 
 ## 3. Escenarios
 

@@ -1,8 +1,8 @@
 """Prepara dos casos de Plantaciones Sustentables con fechas de hoy para la secuencia de prueba del sprint 2.
 
-La demostración se carga con un calendario simulado cuya fecha de corte es el 19-nov-2026: sus plazos de firma ya vencieron
-cuando se prueba después, y no deja nada de PS por publicar ni nadie en la Lista de espera. Este script agrega, con los mismos
-servicios que usa la interfaz y **con la fecha y la hora de hoy**, lo que la secuencia necesita:
+La demostración se carga con un calendario simulado cuya fecha de corte es el día de la carga (D-32), así que sus contratos por
+firmar están en plazo ese día; pero no deja nada de PS por publicar ni a nadie en la Lista de espera de PS. Este script agrega,
+con los mismos servicios que usa la interfaz y **con la fecha y la hora de hoy**, lo que la secuencia necesita:
 
 * **Caso 1, «aprobada y por publicar»** (escenarios B y C): *Plantación Cumbres* (Ozumba, Delegación Amecameca, 4 ha de
   plantación forestal comercial), dictaminada y aprobada por una sesión del Comité cuya acta autoriza la publicación. La

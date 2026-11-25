@@ -122,14 +122,24 @@ consultar los resultados publicados en http://localhost:8080/contrato/resultados
 entrada).
 
 **Fechas de la demostración.** Los datos de ejemplo se cargan con un calendario simulado de la Convocatoria 2026:
-cada paso ocurre en la fecha que le toca (recepción en febrero, dictámenes en abril y mayo, sesiones del Comité,
-publicaciones y contratos hasta el **19 de noviembre de 2026**, la «fecha de corte»). Los plazos que corren desde
-entonces (firma del contrato, vigencia del Vale de Planta, cobro del cheque) se miden con el reloj real: según el día
-en que pruebes, algunos aparecerán vencidos, como en cualquier expediente real.
-Por eso los contratos que la demostración dejó por firmar el 19 de noviembre ya aparecen «Sin firma en plazo»: para probar una
-firma, una publicación de Plantaciones Sustentables o una reasignación con datos de hoy, la
-[secuencia de prueba del sprint 2](datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md) trae un script que los agrega (sección 2 de la
-secuencia).
+cada paso ocurre en la fecha que le toca. La recepción, los dictámenes y las sesiones del Comité de CC y PSAHEM van en
+sus fechas (febrero a julio); lo que sirve por estar cerca de «hoy» (el primer lote de PS y RHF con sus publicaciones y
+contratos por firmar, los vales de planta, las solicitudes de pago y los cheques recientes, la sesión de seguimiento) se
+arma hacia atrás, en días hábiles, desde la **fecha de corte**, que es **el día en que se carga la demostración**. Así,
+recién levantado el sistema, *Plantación Los Pinos* está por firmar a un día hábil de vencer, *Cañada Seca* ya venció sin
+firma, el vale de *Mirador de los Pinos* está vigente y el cheque de *Loma Verde* está por vencer.
+
+- Si la carga es en sábado, domingo o día inhábil, los pasos se cuentan desde el siguiente día hábil.
+- La fecha de corte no baja del 19-nov-2026 ni pasa del 31-dic-2026 (el ejercicio sigue siendo 2026): cargada en 2027, la
+  demostración queda como al cierre de 2026 y sus plazos se ven vencidos.
+- Para fijar otra fecha (entre esas dos), define `DEMO_FECHA_CORTE=AAAA-MM-DD` antes de levantar con una base nueva, por
+  ejemplo `DEMO_FECHA_CORTE=2026-12-15 docker compose up --build` (o en `.env`).
+
+Una vez cargada, los plazos (firma del contrato, vigencia del Vale de Planta, cobro del cheque) se miden con el reloj real:
+si pruebas días después, algunos aparecerán vencidos, como en cualquier expediente real. Para volver a tenerla fresca, borra
+la base y levántala de nuevo (sección 1.5). La [secuencia de prueba del sprint 2](datos_prueba/sprint_2/SECUENCIA_DE_PRUEBA.md)
+trae además un script con casos de Plantaciones Sustentables que la demostración no deja (una solicitud por publicar y una
+baja con reasignación desde la Lista de espera de PS).
 
 ### 1.5 Detener, volver a empezar y borrar
 

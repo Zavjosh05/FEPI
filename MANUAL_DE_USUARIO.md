@@ -685,7 +685,8 @@ Las sesiones de seguimiento (sección 8) siguen funcionando después de publicar
 ## 16. Datos de demostración para practicar
 
 Al levantar el sistema se cargan solicitudes de los cuatro programas con reglas, en distintos pasos. La demostración usa un
-calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de inicio, sección 1.4).
+calendario simulado cuya fecha de corte es **el día en que se carga** (Guía de inicio, sección 1.4): lo reciente queda en su
+punto ese día.
 
 **Capturando Carbono (recepción, dictamen y Comité)**
 
@@ -711,8 +712,8 @@ calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de 
 | --- | --- | --- |
 | Publicar los listados autorizados (la demostración trae el acta de PSAHEM sin publicar; CC, PS y RHF ya se publicaron) | `dir_drff` | Panel «Listados autorizados por publicar» |
 | Notificar el resultado y la cita (PS) | `del_toluca` | Rancho La Huerta |
-| Un contrato por firmar cuyo plazo ya venció (la revisión de plazos lo señala «Sin firma en plazo») | `del_amecameca`, `dir_drff` | Plantación Los Pinos (PS) |
-| Contrato elaborado por enviar (su plazo de firma ya venció); otro por elaborar | `dir_drff` | Barranca Honda y Ojo de Agua (RHF) |
+| Registrar la firma de un contrato en la Delegación (por firmar, a un día hábil de vencer el día de la carga) | `del_amecameca`, `dir_drff` | Plantación Los Pinos (PS) |
+| Contrato elaborado por enviar; otro por elaborar | `dir_drff` | Barranca Honda y Ojo de Agua (RHF) |
 | Modelos de contrato por validar | `juridica` | Panel «Modelos por validar» (CC, PS y PSAHEM) |
 | Contratos firmados y un contrato sin firma en plazo, por liberar | `del_amecameca`, `dir_drff` | Mirador de los Pinos y Ladera Verde (firmados), Cañada Seca (sin firma), todos de PS |
 | Vale vigente con salidas parciales | `vivero` | Mirador de los Pinos (PS) y Arroyo Claro (RHF) |
@@ -722,11 +723,11 @@ calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de 
 | Solicitudes enviadas por revisar, y otras ya pagadas | `finanzas` | Por revisar: Predio Las Palomas (CC), Plantación El Cedro (PS). Pagadas: Predio La Ciénega (CC), Plantación La Mesa (PS), Manantial Alto (RHF) |
 | PSAHEM en cada punto del pago | `finanzas`, `comite`, `fiduciaria`, `del_toluca` | Solicitud por revisar: Rancho El Pedregal y Ejido La Joya. Remitida a la Fiduciaria: Bosque Los Cedros. Cheque emitido: Paraje Las Ánimas. Enviado a la Delegación: Monte Alto. Entregados: Cerro del Venado y Loma Verde (este, por vencer sin cobro) |
 
-Los contratos que la demostración dejó por firmar el 19-nov (Plantación Los Pinos, Rancho La Huerta, Barranca Honda y, más adelante, Ojo de Agua) tienen plazo de 10 días hábiles: pasada la fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para probar la firma con datos de hoy, `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS (Guía de inicio y secuencia de prueba).
+Los contratos que la demostración deja por firmar (Plantación Los Pinos, Rancho La Huerta, Barranca Honda y, más adelante, Ojo de Agua) tienen plazo de 10 días hábiles contados en el calendario de la carga: Plantación Los Pinos vence al día hábil siguiente de la carga y los demás pocos días después; pasada esa fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para tenerlos de nuevo en plazo, vuelve a cargar la demostración en una base nueva. `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS que la demostración no trae (uno por publicar y una baja con reasignación desde la Lista de espera; Guía de inicio y secuencia de prueba).
 
 Para empezar de cero con los mismos datos: `docker compose down -v` y `docker compose up
---build` (Guía de inicio, sección 1.5). Los plazos que corren desde la fecha de corte se miden con el reloj real: según el
-día en que pruebes, un vale o un cheque aparecerá vencido.
+--build` (Guía de inicio, sección 1.5); la fecha de corte vuelve a ser el día de la carga. Después, los plazos se miden con el
+reloj real: según el día en que pruebes, un vale o un cheque aparecerá vencido.
 
 Para probar también la carga de archivos y capturar solicitudes nuevas con resultados conocidos, hay polígonos,
 documentos PDF y fichas de solicitudes en `datos_prueba/sprint_1/`, y los documentos de contrato, firma y pagos en
@@ -810,7 +811,8 @@ contrato **validado** por la Unidad Jurídica para el programa y ejercicio (secc
 falta, por ejemplo, la instrucción de pago del Comité (sección 8).
 
 **El vale aparece vencido o el contrato, sin firma en plazo.** Los plazos corren con el reloj real desde la fecha de corte de
-la demostración (Guía de inicio, sección 1.4); una demostración vieja se ve vencida, como cualquier expediente real.
+la demostración, que es el día en que se cargó (Guía de inicio, sección 1.4); una demostración cargada hace días se ve vencida,
+como cualquier expediente real. Para tenerla fresca, borra la base y levántala de nuevo.
 
 **¿Dónde están las fechas y plazos oficiales?** En las reglas de cada programa (`sistema/reglas/CC.json`, `PS.json`,
 `RHF.json` y `PSA.json`), con el numeral y la línea de las Reglas de Operación. El calendario de días inhábiles 2026 es de
