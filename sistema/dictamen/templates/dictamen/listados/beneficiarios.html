@@ -5,7 +5,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
   <div>
     <h1 class="h4 mb-0">Personas beneficiarias · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
-    <div class="small text-secondary">Aprobadas por el Comité en el acta de la sesión de aprobación o por reasignación en una sesión de seguimiento. Las solicitudes que aún compiten están en <a href="{% url 'dictamen:candidatos' %}?ejercicio={{ ejercicio.pk }}">Candidatos</a>.</div>
+    <div class="small text-secondary">Aprobadas por el Comité en el acta de la sesión de aprobación o por reasignación en una sesión de seguimiento, en cualquier etapa (publicación, contrato y pagos). Las solicitudes que aún compiten están en <a href="{% url 'dictamen:candidatos' %}?ejercicio={{ ejercicio.pk }}">Candidatos</a>.</div>
   </div>
   <div class="d-flex gap-2 align-items-end">
     {% include "dictamen/listados/_selector.html" %}
@@ -20,7 +20,7 @@
 <div class="tarjeta p-0 mb-3">
   <div class="table-responsive">
   <table class="table table-sm table-hover mb-0 small" id="tabla-beneficiarios">
-    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Persona beneficiaria</th><th>Predio</th><th>Delegación</th><th class="text-end">Superficie</th><th class="text-end">Monto</th><th>Cómo entró</th></tr></thead>
+    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Persona beneficiaria</th><th>Predio</th><th>Delegación</th><th class="text-end">Superficie</th><th class="text-end">Monto</th><th>Cómo entró</th><th>Situación</th></tr></thead>
     <tbody>
     {% for f in vigentes %}
     <tr{% if f.reasignada %} class="table-success" data-prueba="reasignada"{% endif %}>
@@ -31,13 +31,14 @@
       <td class="text-end text-nowrap">{{ f.superficie_ha|floatformat:2|default:"—" }} ha</td>
       <td class="text-end text-nowrap">{{ f.monto|moneda }}</td>
       <td>{{ f.via }}{% if f.fecha %}<div class="text-secondary">{{ f.fecha|date:"d/m/Y" }}</div>{% endif %}</td>
+      <td data-prueba="situacion">{{ f.situacion }}<div class="text-secondary">{% if f.publicada_en %}Publicada el {{ f.publicada_en|date:"d/m/Y" }}{% else %}Resultado por publicar{% endif %}</div></td>
     </tr>
-    {% empty %}<tr><td colspan="7" class="text-center text-secondary py-4">Aún no hay personas beneficiarias en este ejercicio.</td></tr>{% endfor %}
+    {% empty %}<tr><td colspan="8" class="text-center text-secondary py-4">Aún no hay personas beneficiarias en este ejercicio.</td></tr>{% endfor %}
     </tbody>
   </table>
   </div>
 </div>
-<div class="titulo-seccion">Salieron de la lista por acuerdo del Comité</div>
+<div class="titulo-seccion">Salieron de la lista (acuerdo del Comité o contrato sin firma en plazo)</div>
 <div class="tarjeta p-0">
   <div class="table-responsive">
   <table class="table table-sm mb-0 small" id="tabla-bajas">
@@ -47,7 +48,7 @@
     <tr>
       <td class="ps-3 text-nowrap"><a href="{% url 'recepcion:expediente' b.folio %}?pestana=dictamenes">{{ b.folio }}</a></td>
       <td>{{ b.beneficiario }}<div class="text-secondary">{{ b.predio }}</div></td>
-      <td>{{ b.acuerdo.numero }}<div class="text-secondary">{{ b.causa }}</div></td>
+      <td>{% if b.acuerdo %}{{ b.acuerdo.numero }}{% else %}Recurso liberado por la Dirección{% endif %}<div class="text-secondary">{{ b.causa }}</div></td>
       <td class="text-end text-nowrap">{{ b.monto|moneda }}</td>
       <td>{{ b.entraron|join:", "|default:"—" }}</td>
       <td class="text-nowrap">{{ b.fecha|date:"d/m/Y H:i" }}</td>

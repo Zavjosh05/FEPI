@@ -64,7 +64,7 @@ def siguiente_paso(usuario, exp):
             return {"texto": "Notificar el pago a la persona beneficiaria", "url": reverse("contrato:notificaciones"),
                     "ayuda": "Registre la fecha, la hora y el medio de la notificación."}
     if tipo == TipoUnidad.DELEGACION and firmado and getattr(exp, "oficio_pago", None) is None and estado not in (
-            "sin_firma_en_plazo", "recurso_liberado"):
+            "sin_firma_en_plazo", "recurso_liberado", "baja"):
         return {"texto": "Emitir el oficio de solicitud de pago", "url": _pestana(exp),
                 "ayuda": "El contrato ya está firmado: el oficio de la Delegación es soporte de la solicitud de pago."}
     if tipo == TipoUnidad.DIRECCION and estado in solicitudes.ESTADOS_PARA_SOLICITAR:

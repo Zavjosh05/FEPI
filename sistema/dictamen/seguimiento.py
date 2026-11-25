@@ -13,6 +13,16 @@ Efectos (``datos/dictamen.json`` → ``tipos_acuerdo[].efecto``):
   la Fiduciaria por ministración y en PEG la validación de los reportes por periodo).
 Cada salida y cada entrada queda en ``MovimientoListado`` (con su historial) y en la bitácora del expediente.
 
+Convivencia con M3 y M5 (sprint 2):
+- la baja aplica a la persona beneficiaria mientras no tenga una ministración solicitada (aprobada, publicada, notificada,
+  con contrato elaborado o por firmar, sin firma en plazo, contratada o con planta en trámite); con una ministración en
+  curso o pagada lo que procede es el reintegro (acuerdo ``reintegro``). Dada de baja ya no puede firmar, recibir planta
+  ni cobrar (``exigir_vigente``, que usan contrato y pagos);
+- el recurso que la Dirección libera por un contrato sin firma en plazo (HU-3.3, ``contrato.firma.liberar_recurso``) entra
+  también como recurso liberado (``al_liberar_recurso``, gancho ``AL_LIBERAR_RECURSO``) y el Comité lo reasigna igual;
+- si los listados del acta ya se publicaron, la persona que entra por reasignación se publica con el acta de la sesión de
+  seguimiento: al cerrarla con reasignaciones queda autorizada su publicación (``cerrar_sesion``, M3 HU-3.1).
+
 Punto de conexión con los módulos M3–M6: ``RECEPTORES`` (tipo de acuerdo -> funciones). Por ahora
 ningún módulo se registra, así que cumplir un acuerdo solo deja la constancia; cuando existan pagos
 (M5) o seguimiento (M6), sus apps agregan aquí la función que ejecuta el acuerdo.
@@ -21,7 +31,7 @@ from decimal import Decimal
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils import timezone
 
 from nucleo.models import Evento, TipoUnidad, Unidad
@@ -35,6 +45,12 @@ from .models import (
 )
 
 CERO = Decimal("0")
+
+# Estados de una persona beneficiaria que el Comité puede dar de baja (sin ministración solicitada ni pagada).
+ESTADOS_CON_BAJA = ("aprobada", "publicada", "notificada", "contrato_elaborado", "contrato_en_delegacion",
+                    "sin_firma_en_plazo", "contratada", "vale_entregado", "planta_entregada")
+ESTADOS_CON_PAGO = ("ministracion_solicitada", "pagada", "remitida_fiduciaria", "cheque_emitido", "cheque_enviado",
+                    "cheque_entregado")
 
 RECEPTORES = {}  # {"instruccion_pago": [funcion(acuerdo)], ...}
 
@@ -85,9 +101,15 @@ def lista_de_espera(ejercicio):
     return lista
 
 
+def movimientos_del_ejercicio(ejercicio):
+    """Movimientos de listado del ejercicio: los de sus acuerdos y los del recurso liberado sin firma (HU-3.3)."""
+    return MovimientoListado.objects.filter(Q(acuerdo__sesion__ejercicio=ejercicio)
+                                            | Q(acuerdo__isnull=True, expediente__ejercicio=ejercicio))
+
+
 def recurso_liberado(ejercicio):
-    """Recurso liberado por las bajas del ejercicio que aún no se reasigna (puede ser 0)."""
-    movs = MovimientoListado.objects.filter(acuerdo__sesion__ejercicio=ejercicio)
+    """Recurso liberado por las bajas del ejercicio (y por contratos sin firma en plazo) que aún no se reasigna."""
+    movs = movimientos_del_ejercicio(ejercicio)
     salio = movs.filter(movimiento=TipoMovimiento.SALE).aggregate(t=Sum("monto"))["t"] or CERO
     entro = movs.filter(movimiento=TipoMovimiento.ENTRA).aggregate(t=Sum("monto"))["t"] or CERO
     return salio - entro
@@ -157,7 +179,11 @@ def registrar_acuerdo(usuario, sesion, tipo, descripcion, expedientes, unidad_re
     accion = efecto(tipo)
     salen, entran = [], []
     if accion in ("baja", "sustitucion"):
-        salen = [e for e in expedientes if e.estado.clave == "aprobada"]
+        con_pago = [f"{e.folio} («{e.estado}»)" for e in expedientes if e.estado.clave in ESTADOS_CON_PAGO]
+        if con_pago:
+            raise ValidationError("Ya tiene una ministración solicitada o pagada: en lugar de la baja procede el reintegro "
+                                  "(acuerdo de reintegro): " + ", ".join(con_pago) + ".")
+        salen = [e for e in expedientes if e.estado.clave in ESTADOS_CON_BAJA]
     if accion in ("reasignacion", "sustitucion"):
         entran = [e for e in expedientes if e.estado.clave == "lista_espera"]
     if accion in ("baja", "reasignacion", "sustitucion"):
@@ -248,8 +274,38 @@ def cerrar_sesion(usuario, sesion, observaciones="", momento=None):
     sesion.estado = EstadoSesion.CELEBRADA
     sesion.acta_fecha = ahora
     sesion.observaciones_acta = observaciones
+    # Con reasignaciones, el acta autoriza publicar a las personas que entran a la Lista de Personas Beneficiarias
+    # (si los listados del acta de aprobación ya se publicaron, se publican con esta sesión: M3 HU-3.1).
+    sesion.autoriza_publicacion = MovimientoListado.objects.filter(acuerdo__sesion=sesion,
+                                                                   movimiento=TipoMovimiento.ENTRA).exists()
     sesion.save()
     return sesion
+
+
+# ----------------------------------------------------------------------------- convivencia con M3 y M5
+def exigir_vigente(expediente, accion):
+    """La persona dada de baja por acuerdo del Comité ya no firma, no recibe planta ni cobra."""
+    if expediente.estado.clave == "baja":
+        mov = (MovimientoListado.objects.filter(expediente=expediente, movimiento=TipoMovimiento.SALE)
+               .select_related("acuerdo").order_by("-fecha_hora").first())
+        cual = f" (acuerdo {mov.acuerdo.numero})" if mov and mov.acuerdo_id else ""
+        raise ValidationError(f"La persona beneficiaria fue dada de baja por acuerdo del Comité{cual}: {accion}.")
+
+
+def al_liberar_recurso(expediente, usuario):
+    """Gancho ``AL_LIBERAR_RECURSO`` (HU-3.3): el monto del contrato sin firma en plazo queda como recurso liberado para
+    que el Comité lo reasigne a la lista de espera."""
+    if MovimientoListado.objects.filter(expediente=expediente, movimiento=TipoMovimiento.SALE).exists():
+        return None
+    monto = monto_aprobado(expediente)
+    mov = MovimientoListado.objects.create(
+        acuerdo=None, expediente=expediente, movimiento=TipoMovimiento.SALE, estado_anterior="sin_firma_en_plazo",
+        estado_nuevo="recurso_liberado", monto=monto, usuario=usuario,
+        motivo="Recurso liberado por falta de firma del contrato en plazo (HU-3.3).")
+    Evento.registrar(expediente, usuario, "recurso_por_reasignar",
+                     "El recurso liberado queda para reasignarse a la lista de espera por acuerdo del Comité"
+                     + (f" ({formato_moneda(monto)})." if monto is not None else "."), datos={"movimiento": mov.pk})
+    return mov
 
 
 # ----------------------------------------------------------------------------- PSAHEM y PEG

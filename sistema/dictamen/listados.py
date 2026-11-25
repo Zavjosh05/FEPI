@@ -3,7 +3,9 @@
 - **Candidatos**: solicitudes que todavía compiten por el apoyo, desde que el expediente se valida hasta que el Comité
   decide: en dictamen, dictaminadas por llevar a la sesión de aprobación y en lista de espera (con su lugar).
 - **Beneficiarios**: personas beneficiarias vigentes (aprobadas por el Comité en el acta o por reasignación), con el
-  monto, la superficie y cómo entraron; aparte, las que salieron por un acuerdo de seguimiento (baja) y quién entró.
+  monto, la superficie, cómo entraron, su situación en el trámite (publicada, notificada, contratada, pagada…) y la fecha
+  en que se publicó su resultado (M3, HU-3.1); aparte, las que salieron por un acuerdo de seguimiento (baja) o porque la
+  Dirección liberó su recurso al no firmarse el contrato en plazo (HU-3.3), y quién entró en su lugar.
 
 Las dos usan ``expedientes_visibles``: la Delegación ve solo los suyos.
 """
@@ -13,6 +15,7 @@ from decimal import Decimal
 
 from .comun import resultado_combinado
 from .models import EstadoSesion, MovimientoListado, ResolucionSesion, TipoMovimiento, TipoSesion
+from .seguimiento import ESTADOS_CON_BAJA, ESTADOS_CON_PAGO, movimientos_del_ejercicio
 
 CERO = Decimal("0")
 SITUACIONES_CANDIDATO = {
@@ -61,10 +64,11 @@ def candidatos(ejercicio, expedientes, situacion=""):
 
 
 def beneficiarios(ejercicio, expedientes):
-    """(vigentes, bajas): las personas beneficiarias aprobadas y las que salieron por acuerdo del Comité."""
+    """(vigentes, bajas): las personas beneficiarias vigentes, en cualquier etapa desde la aprobación hasta el pago, y
+    las que salieron (baja por acuerdo del Comité o recurso liberado por falta de firma en plazo)."""
     vigentes = []
-    for exp in (expedientes.filter(ejercicio=ejercicio, estado__clave="aprobada")
-                .select_related("predio__municipio", "solicitante", "delegacion", "dictamen_tecnico")):
+    for exp in (expedientes.filter(ejercicio=ejercicio, estado__clave__in=ESTADOS_CON_BAJA + ESTADOS_CON_PAGO)
+                .select_related("predio__municipio", "solicitante", "delegacion", "dictamen_tecnico", "estado")):
         entrada = (MovimientoListado.objects.filter(expediente=exp, movimiento=TipoMovimiento.ENTRA)
                    .select_related("acuerdo__sesion").order_by("-fecha_hora").first())
         res = _resolucion(exp)
@@ -77,21 +81,25 @@ def beneficiarios(ejercicio, expedientes):
         else:
             via, fecha, monto = "—", None, None
         tecnico = getattr(exp, "dictamen_tecnico", None)
+        # Publicación de su resultado (M3); la relación la agrega la app de contrato.
+        publicado = (exp.resultados_publicados.select_related("publicacion").order_by("-publicacion__publicada_en").first()
+                     if hasattr(exp, "resultados_publicados") else None)
         vigentes.append({
             "expediente": exp, "folio": exp.folio, "beneficiario": exp.solicitante.nombre, "curp": exp.solicitante.curp,
             "predio": exp.predio.nombre, "municipio": exp.predio.municipio.nombre, "delegacion": exp.delegacion.nombre,
             "superficie_ha": tecnico.superficie_factible_ha if tecnico else exp.superficie_solicitada_ha,
             "monto": monto, "via": via, "reasignada": entrada is not None, "fecha": fecha,
+            "situacion": exp.estado.nombre, "publicada_en": publicado.publicacion.publicada_en if publicado else None,
         })
     vigentes.sort(key=lambda f: (f["reasignada"], f["folio"]))
     bajas = []
-    for m in (MovimientoListado.objects.filter(acuerdo__sesion__ejercicio=ejercicio, movimiento=TipoMovimiento.SALE,
-                                               expediente__in=expedientes)
+    for m in (movimientos_del_ejercicio(ejercicio).filter(movimiento=TipoMovimiento.SALE, expediente__in=expedientes)
               .select_related("acuerdo", "expediente__solicitante", "expediente__predio")):
-        entraron = [x.expediente.folio for x in m.acuerdo.movimientos.filter(movimiento=TipoMovimiento.ENTRA)
-                    .select_related("expediente")]
+        entraron = ([x.expediente.folio for x in m.acuerdo.movimientos.filter(movimiento=TipoMovimiento.ENTRA)
+                     .select_related("expediente")] if m.acuerdo_id else [])
         bajas.append({"expediente": m.expediente, "folio": m.expediente.folio, "beneficiario": m.expediente.solicitante.nombre,
-                      "predio": m.expediente.predio.nombre, "acuerdo": m.acuerdo, "causa": m.acuerdo.causa,
+                      "predio": m.expediente.predio.nombre, "acuerdo": m.acuerdo,
+                      "causa": m.acuerdo.causa if m.acuerdo_id else m.motivo,
                       "monto": m.monto, "fecha": m.fecha_hora, "entraron": entraron})
     return vigentes, bajas
 
@@ -118,4 +126,5 @@ COLUMNAS_CANDIDATOS = [("folio", "Folio"), ("solicitante", "Persona solicitante"
                        ("lugar", "Lugar en la lista de espera"), ("monto", "Monto")]
 COLUMNAS_BENEFICIARIOS = [("folio", "Folio"), ("beneficiario", "Persona beneficiaria"), ("curp", "CURP"),
                           ("predio", "Predio"), ("municipio", "Municipio"), ("delegacion", "Delegación"),
-                          ("superficie_ha", "Superficie (ha)"), ("monto", "Monto"), ("via", "Cómo entró")]
+                          ("superficie_ha", "Superficie (ha)"), ("monto", "Monto"), ("via", "Cómo entró"),
+                          ("situacion", "Situación"), ("publicada_en", "Publicada")]

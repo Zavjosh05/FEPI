@@ -145,7 +145,7 @@ def contexto_solicitudes_exp(request, exp):
     return {
         "oficio": oficio, "ministraciones": filas, "firmado": firmado,
         "puede_emitir_oficio": (tipo == TipoUnidad.DELEGACION and firmado and oficio is None
-                                and exp.estado.clave not in ("sin_firma_en_plazo", "recurso_liberado")),
+                                and exp.estado.clave not in ("sin_firma_en_plazo", "recurso_liberado", "baja")),
         "es_area": tipo == TipoUnidad.DIRECCION, "pide_comprobante": pide_comprobante,
         "comprobantes": list(exp.comprobantes_cuenta.all()),
         "puede_subir_comprobante": pide_comprobante and tipo in (TipoUnidad.DELEGACION, TipoUnidad.DIRECCION) and firmado,

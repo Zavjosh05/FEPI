@@ -122,6 +122,9 @@ def registrar():
     extensiones.PANELES_BANDEJA.append(panel_por_sesionar)
     extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
     extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
+    from .seguimiento import al_liberar_recurso
+
+    extensiones.AL_LIBERAR_RECURSO.append(al_liberar_recurso)
     extensiones.PESTANAS_EXPEDIENTE.append({"clave": "dictamenes", "nombre": "Dictámenes",
                                             "plantilla": "dictamen/pestana_dictamenes.html", "contexto": contexto_pestana})
     T = TipoUnidad

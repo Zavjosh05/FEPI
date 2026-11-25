@@ -22,7 +22,7 @@
       <ul class="small mb-0">{% for m in movimientos %}
         <li><span class="badge {% if m.movimiento == 'sale' %}text-bg-dark{% else %}text-bg-success{% endif %}">{% if m.movimiento == 'sale' %}Sale{% else %}Entra{% endif %}</span>
           <a href="{% url 'recepcion:expediente' m.expediente.folio %}?pestana=dictamenes">{{ m.expediente.folio }}</a> {{ m.expediente.solicitante.nombre }}
-          {% if m.lugar_lista_espera %}(lugar {{ m.lugar_lista_espera }}){% endif %} · {{ m.monto|moneda }} · acuerdo {{ m.acuerdo.numero }} · {{ m.fecha_hora|date:"d/m/Y H:i" }}</li>
+          {% if m.lugar_lista_espera %}(lugar {{ m.lugar_lista_espera }}){% endif %} · {{ m.monto|moneda }} · {% if m.acuerdo %}acuerdo {{ m.acuerdo.numero }}{% else %}{{ m.motivo }}{% endif %} · {{ m.fecha_hora|date:"d/m/Y H:i" }}</li>
       {% empty %}<li class="text-secondary">Aún no hay bajas ni reasignaciones.</li>{% endfor %}</ul>
     </div>
   </div>

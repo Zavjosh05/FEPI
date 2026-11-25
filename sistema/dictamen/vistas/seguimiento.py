@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 from .. import seguimiento
 from ..formularios.seguimiento import AcuerdoForm
-from ..models import Acuerdo, MovimientoListado
+from ..models import Acuerdo
 from .comun import mensajes_error
 from .sesiones import _sesion
 
@@ -20,7 +20,7 @@ def contexto_sesion(request, sesion):
         "form_acuerdo": AcuerdoForm(sesion=sesion, tipos=tipos), "tipos_acuerdo": {t["clave"]: t for t in tipos},
         "lista_espera": seguimiento.lista_de_espera(sesion.ejercicio),
         "recurso_liberado": seguimiento.recurso_liberado(sesion.ejercicio),
-        "movimientos": MovimientoListado.objects.filter(acuerdo__sesion__ejercicio=sesion.ejercicio)
+        "movimientos": seguimiento.movimientos_del_ejercicio(sesion.ejercicio)
                        .select_related("acuerdo", "expediente__solicitante", "usuario"),
     }
 

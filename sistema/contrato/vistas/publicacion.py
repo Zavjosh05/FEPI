@@ -54,9 +54,10 @@ def detalle(request, pk):
             messages.success(request, f"Resultados publicados (acuse {pub.acuse.folio}). Los avisos quedaron en la "
                                       "bandeja de notificaciones de cada Delegación.")
             return redirect("contrato:publicacion", pub.sesion_id)
-    resoluciones = sesion.resoluciones.select_related("expediente__predio__municipio", "expediente__solicitante")
+    resoluciones = publicacion.filas_por_publicar(sesion)   # con las bajas y reasignaciones de HU-2.4
     listados = [(clave, nombre, [r for r in resoluciones if r.resultado == clave])
-                for clave, nombre in ResultadoListado.choices]
+                for clave, nombre in ResultadoListado.choices
+                if sesion.tipo == "aprobacion" or clave == ResultadoListado.BENEFICIARIA]
     limite, fundamento = publicacion.fecha_limite_publicacion(sesion.ejercicio, sesion.acta_fecha)
     return render(request, "contrato/publicacion/detalle.html", {
         "sesion": sesion, "pub": pub, "form": form, "listados": listados, "limite": limite, "fundamento": fundamento,

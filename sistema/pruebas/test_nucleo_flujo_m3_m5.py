@@ -96,8 +96,25 @@ def test_nucleo_sin_firma_en_plazo_y_liberacion_del_recurso(aprobada, usuarios):
         exp.cambiar_estado("sin_firma_en_plazo", usuarios["del_amecameca"], motivo="x")
     _pasar(exp, "sin_firma_en_plazo", usuarios["dir_drff"], motivo="Venció el plazo de firma")
     assert _quien_atiende(exp, usuarios) == {"dir_drff", "comite"}
-    _pasar(exp, "recurso_liberado", usuarios["comite"], motivo="Acuerdo del Comité")
+    with pytest.raises(TransicionNoPermitida):  # el Comité no libera: da de baja por acuerdo (HU-2.4)
+        exp.cambiar_estado("recurso_liberado", usuarios["comite"], motivo="Acuerdo del Comité")
+    _pasar(exp, "recurso_liberado", usuarios["dir_drff"], motivo="Confirma la liberación")
     assert exp.estado.final and not _quien_atiende(exp, usuarios)
+
+
+def test_nucleo_baja_por_acuerdo_desde_los_estados_sin_ministracion(aprobada, usuarios):
+    """HU-2.4 con M3: el Comité da de baja a la persona beneficiaria antes de solicitar una ministración, no después."""
+    from dictamen.seguimiento import ESTADOS_CON_BAJA, ESTADOS_CON_PAGO
+
+    for origen in ESTADOS_CON_BAJA:
+        assert Transicion.objects.filter(origen__clave=origen, destino__clave="baja",
+                                         tipo_unidad=TipoUnidad.SECRETARIA_COMITE).exists(), origen
+    for origen in ESTADOS_CON_PAGO:
+        assert not Transicion.objects.filter(origen__clave=origen, destino__clave="baja").exists(), origen
+    exp = aprobada("CC")
+    _pasar(exp, "publicada", usuarios["dir_drff"])
+    _pasar(exp, "baja", usuarios["comite"], motivo="Desistimiento")
+    assert exp.estado.final
 
 
 def test_nucleo_psahem_paga_con_cheque_de_la_fiduciaria(aprobada, usuarios):

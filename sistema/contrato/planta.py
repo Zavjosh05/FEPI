@@ -25,6 +25,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from dictamen.comun import exigir_acceso, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import montos, plazos
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.models import Consecutivo, Evento, TipoUnidad, Unidad
@@ -167,6 +168,7 @@ def emitir_vale(usuario, expediente, vivero, renglones, carta=None, motivo_ajust
     exigir_unidad(usuario, TipoUnidad.DELEGACION)
     exigir_acceso(usuario, expediente)
     expediente.refresh_from_db()
+    exigir_vigente(expediente, "ya no se le entrega Vale de Planta")
     ahora = momento or timezone.now()
     situacion = situacion_para_emitir(expediente, timezone.localtime(ahora).date())
     if not situacion["puede"]:
@@ -280,7 +282,8 @@ def validar_vale(usuario, vale, hoy=None):
     exigir_unidad(usuario, TipoUnidad.VIVERO)
     if vale.vivero.unidad_id != usuario.unidad_id:
         raise PermissionDenied(f"El vale {vale.folio} se surte en {vale.vivero.nombre}, no en su vivero.")
-    vale = ValePlanta.objects.get(pk=vale.pk)
+    vale = ValePlanta.objects.select_related("expediente__estado").get(pk=vale.pk)
+    exigir_vigente(vale.expediente, f"el vale {vale.folio} ya no se surte")
     estado = vale.situacion(hoy)
     if estado == "surtido":
         raise ValidationError(f"El vale {vale.folio} ya se surtió completo: no queda planta por entregar.")

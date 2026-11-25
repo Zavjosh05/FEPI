@@ -133,7 +133,7 @@ def monto_aprobado(expediente, superficie=None, condiciones=()):
                          ministraciones(expediente, total, regimen), regimen_nombre=nombre_regimen(expediente, regimen))
 
 
-SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado"}
+SIN_APOYO = {"lista_espera", "no_factible", "desechada", "recurso_liberado", "baja"}
 ORDEN_APROBADA = 50  # Estado.orden de «aprobada» en datos/flujo_tramite.json
 
 

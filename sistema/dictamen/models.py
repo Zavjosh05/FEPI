@@ -313,9 +313,14 @@ class TipoMovimiento(models.TextChoices):
 
 class MovimientoListado(models.Model):
     """HU-2.4 · Cambio de listado por un acuerdo de seguimiento: la persona beneficiaria que sale (desistimiento,
-    cancelación, baja o sustitución) y la solicitud de la lista de espera que entra en su lugar (reasignación)."""
+    cancelación, baja o sustitución) y la solicitud de la lista de espera que entra en su lugar (reasignación).
 
-    acuerdo = models.ForeignKey(Acuerdo, on_delete=models.PROTECT, related_name="movimientos")
+    Sin acuerdo: el recurso que el área responsable liberó por un contrato sin firma en plazo (HU-3.3); queda como
+    recurso liberado para que el Comité lo reasigne."""
+
+    acuerdo = models.ForeignKey(Acuerdo, null=True, blank=True, on_delete=models.PROTECT, related_name="movimientos",
+                                help_text="Vacío cuando el recurso se liberó por falta de firma del contrato en plazo (HU-3.3).")
+    motivo = models.CharField(max_length=300, blank=True, help_text="Origen del movimiento cuando no viene de un acuerdo.")
     expediente = models.ForeignKey(Expediente, on_delete=models.PROTECT, related_name="movimientos_listado")
     movimiento = models.CharField(max_length=10, choices=TipoMovimiento.choices)
     estado_anterior = models.CharField(max_length=40)
@@ -332,4 +337,5 @@ class MovimientoListado(models.Model):
         verbose_name_plural = "movimientos de listado"
 
     def __str__(self):
-        return f"{self.acuerdo.numero} · {self.expediente.folio}: {self.get_movimiento_display()}"
+        origen = self.acuerdo.numero if self.acuerdo_id else "Sin firma en plazo"
+        return f"{origen} · {self.expediente.folio}: {self.get_movimiento_display()}"

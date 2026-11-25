@@ -20,6 +20,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from dictamen.comun import exigir_programa, exigir_unidad
+from dictamen.seguimiento import exigir_vigente
 from nucleo import montos, plazos
 from nucleo.acuses import _pdf, emitir_acuse
 from nucleo.models import Consecutivo, Evento, TipoUnidad, expedientes_visibles
@@ -238,6 +239,7 @@ def elaborar_contrato(usuario, expediente, modelo, momento=None):
     estado = expediente.estado.clave
     if existente and existente.enviado:
         raise ValidationError("El contrato ya se envió a la Delegación; no se rehace.")
+    exigir_vigente(expediente, "ya no se elabora su contrato")
     if existente is None and estado != "notificada":
         if estado == "aprobada":
             raise ValidationError("La solicitud está aprobada pero sus resultados aún no se publican (HU-3.1).")

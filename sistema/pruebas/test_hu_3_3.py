@@ -290,7 +290,8 @@ def test_hu_3_3_liberar_el_recurso_no_es_automatico_y_lo_confirma_el_area_respon
         extensiones.AL_LIBERAR_RECURSO.pop()
     exp.refresh_from_db()
     assert exp.estado.clave == "recurso_liberado" and s.liberado and s.liberado_por == usuarios["dir_drff"]
-    assert s.acuse_liberacion and "Pendiente" in " ".join(v for _, v in s.acuse_liberacion.contenido["renglones"])
+    assert s.acuse_liberacion and "reasignarse a la lista de espera" in " ".join(
+        v for _, v in s.acuse_liberacion.contenido["renglones"])
     assert llamadas == [(exp.pk, "dir_drff")]
     assert exp.eventos.filter(tipo="recurso_liberado", motivo="La persona no acudió a firmar.").exists()
     with pytest.raises(ValidationError, match="Solo se libera"):
