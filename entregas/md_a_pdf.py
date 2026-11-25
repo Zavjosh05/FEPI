@@ -60,6 +60,9 @@ def convertir(md_path, pagina):
     for i, codigo in enumerate(bloques):
         cuerpo = cuerpo.replace(f"<p>MERMAID{i}FIN</p>", f"<pre class='mermaid'>{html.escape(codigo)}</pre>")
     cuerpo = cuerpo.replace("<p>[[SALTO]]</p>", "<div class='salto'></div>")
+    # Los enlaces a archivos del repositorio no sirven dentro de un PDF (quedarían como rutas del equipo donde se
+    # generó): se dejan como texto. Se conservan los de internet, correo y anclas internas.
+    cuerpo = re.sub(r"<a href=\"(?!https?:|mailto:|#)[^\"]*\">(.*?)</a>", r"<span class='enlace-local'>\1</span>", cuerpo, flags=re.S)
     documento = (f"<!doctype html><html lang='es'><head><meta charset='utf-8'><base href='{md_path.parent.as_uri()}/'>"
                  f"<style>{ESTILO}</style></head><body>{cuerpo}"
                  f"<script src='{MERMAID_JS}'></script>"

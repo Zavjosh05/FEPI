@@ -136,6 +136,7 @@ numeral y la línea del texto de las ROP.
 | G-05 | Un escenario con nombre por flujo alterno (A a G). | Poder demostrar cada flujo sin armarlo a mano. | Aceptado (se completa en el sprint 3) |
 | G-06 | Datos reales anonimizados: padrón 2025, polígonos y formatos. | Es lo único que valida el sistema contra la operación real. | Por decidir (cliente) |
 | G-07 | Cada rama de sprint con su propio nombre de proyecto de Compose (`probosque_s1`) y sus propias imágenes (`probosque-sistema:sprint-1` y `probosque-sistema-pruebas:sprint-1`) (25-nov-2026). | Con el mismo nombre que `main`, reconstruir la imagen de una rama pisaba la de la otra, y la imagen del sistema lleva el código dentro. | Hecho: `docker-compose.yml`, guía y los comandos de `generar_resumen.py` y `md_a_pdf.py` |
+| G-08 | `entregas/md_a_pdf.py` deja como texto los enlaces a archivos del repositorio (25-nov-2026). | Dentro del PDF esos enlaces quedaban como rutas `file:` del equipo donde se generó y no abrían nada. | Hecho: se regeneraron la planeación, las tareas por persona y la secuencia de prueba del sprint 1 |
 
 ## 8. Forma de trabajo
 
