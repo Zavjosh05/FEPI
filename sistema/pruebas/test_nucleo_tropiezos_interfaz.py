@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 
 from dictamen import juridico, tecnico
+from dictamen.demo import propiedad_en_regla
 from nucleo.demo import completar_requisitos, cuadro_en_municipio
 from nucleo.pasos import siguiente_paso
 from recepcion import servicios
@@ -36,7 +37,7 @@ def test_nucleo_p13_siguiente_paso_en_cada_relevo(nueva_solicitud, usuarios):
     servicios.enviar_a_direccion(deleg, exp)
     assert _paso(dirc, exp) == "Validar expediente" and _paso(deleg, exp) is None
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    aviso = servicios.validar_expediente(dirc, exp, [plano.pk])
+    aviso = servicios.validar_expediente(dirc, exp, [plano.pk], observaciones_requisitos={plano.pk: "Plano ilegible"})
     assert _paso(deleg, exp) == "Registrar la notificación del aviso de faltantes"
     servicios.registrar_notificacion(deleg, aviso)
     assert _paso(deleg, exp) == "Revisar requisitos"
@@ -47,7 +48,7 @@ def test_nucleo_p13_siguiente_paso_en_cada_relevo(nueva_solicitud, usuarios):
     assert _paso(dirc, exp) == "Elaborar el dictamen técnico" and _paso(jur, exp) == "Elaborar el dictamen jurídico"
     tecnico.dictaminar(dirc, exp, "factible", "Bien")
     assert _paso(dirc, exp) is None
-    juridico.dictaminar(jur, exp, "procedente", "Bien")
+    juridico.dictaminar(jur, exp, "procedente", "Bien", propiedad=propiedad_en_regla(exp))
     p = siguiente_paso(comite, exp)
     assert p["texto"] == "Llevar a sesión de aprobación" and f"ejercicio={exp.ejercicio_id}" in p["url"]
 
@@ -74,7 +75,7 @@ def test_nucleo_p15_aviso_de_faltantes_enlaza_al_requisito(client, nueva_solicit
     completar_requisitos(usuarios["del_amecameca"], exp)
     servicios.enviar_a_direccion(usuarios["del_amecameca"], exp)
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk])
+    servicios.validar_expediente(usuarios["dir_drff"], exp, [plano.pk], observaciones_requisitos={plano.pk: "Plano ilegible"})
     client.login(username="del_amecameca", password=contrasena)
     html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=validacion").content.decode()
     assert f'?pestana=requisitos#req-{plano.pk}"' in html

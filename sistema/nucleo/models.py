@@ -531,7 +531,9 @@ class Expediente(models.Model):
         """
         if isinstance(destino, str):
             destino = Estado.objects.get(clave=destino)
-        with transaction.atomic():
+        from .trazabilidad import con_usuario
+
+        with con_usuario(usuario), transaction.atomic():
             actual = Expediente.objects.select_for_update().get(pk=self.pk)
             if por_sistema and usuario is None:
                 transicion = (Transicion.objects.filter(origen=actual.estado, destino=destino)
@@ -553,7 +555,7 @@ class Expediente(models.Model):
             self.estado = destino
             if destino.clave == "enviada_direccion":
                 self.enviado_direccion = timezone.now()
-            self._change_reason = transicion.accion
+            self._change_reason = transicion.accion[:100]
             self.save()
             Evento.registrar(
                 self, usuario, tipo_evento, descripcion or transicion.accion,
@@ -566,6 +568,7 @@ class TipoDocumento(models.TextChoices):
     REQUISITO = "requisito", "Requisito"
     ACUSE = "acuse", "Acuse"
     POLIGONO = "poligono", "Archivo del polígono"
+    DICTAMEN = "dictamen", "Dictamen (documento emitido por PROBOSQUE)"
     OTRO = "otro", "Otro"
 
 

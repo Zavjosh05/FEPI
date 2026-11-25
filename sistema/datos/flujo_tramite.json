@@ -22,6 +22,7 @@
     {"clave": "cheque_emitido", "nombre": "Cheque emitido", "descripcion": "PSAHEM: la Fiduciaria emitió el cheque; falta enviarlo a la Delegación (HU-5.3).", "tipo_unidad_bandeja": "fiduciaria", "visible_para": "admin_finanzas", "color": "info", "orden": 85},
     {"clave": "cheque_enviado", "nombre": "Cheque en la Delegación · por entregar", "descripcion": "PSAHEM: cheque enviado a la Delegación, que lo entrega a la persona beneficiaria (HU-5.3). Desde la entrega corren los 3 meses para cobrarlo (R-14).", "tipo_unidad_bandeja": "delegacion", "visible_para": "fiduciaria,admin_finanzas", "color": "warning", "orden": 86},
     {"clave": "cheque_entregado", "nombre": "Cheque entregado", "descripcion": "PSAHEM: cheque entregado a la persona beneficiaria, con fecha (HU-5.3); el área responsable solicita la siguiente ministración cuando corresponda.", "tipo_unidad_bandeja": "direccion", "visible_para": "fiduciaria,admin_finanzas", "color": "success", "orden": 88},
+    {"clave": "baja", "nombre": "Baja · recurso liberado", "descripcion": "El Comité acordó en sesión de seguimiento el desistimiento, la cancelación, la baja o la sustitución de la persona beneficiaria; su recurso queda para la lista de espera (HU-2.4).", "visible_para": "direccion,juridica,secretaria_comite", "flujo_alterno": "C", "final": true, "color": "dark", "orden": 90},
     {"clave": "no_factible", "nombre": "No factible", "descripcion": "El Comité aprobó la Lista de solicitudes No factibles (dictamen técnico no factible o jurídico no procedente; flujo alterno B).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "B", "final": true, "color": "danger", "orden": 90},
     {"clave": "desechada", "nombre": "Solicitud desechada", "descripcion": "No se complementó la documentación faltante en el plazo (ROP CC 8.1.1.2 fr. XIV; flujo alterno A).", "tipo_unidad_bandeja": "", "flujo_alterno": "A", "final": true, "color": "dark", "orden": 95},
     {"clave": "recurso_liberado", "nombre": "Recurso liberado", "descripcion": "El Comité dio de baja a la persona beneficiaria por no firmar en plazo y liberó el recurso (flujo alterno D).", "visible_para": "juridica,secretaria_comite", "flujo_alterno": "D", "final": true, "color": "dark", "orden": 92}
@@ -62,6 +63,7 @@
     {"origen": "remitida_fiduciaria", "destino": "cheque_emitido", "tipo_unidad": "fiduciaria", "programa": "PSA", "accion": "Emitir el cheque (HU-5.3)"},
     {"origen": "cheque_emitido", "destino": "cheque_enviado", "tipo_unidad": "fiduciaria", "programa": "PSA", "accion": "Enviar el cheque a la Delegación (HU-5.3)"},
     {"origen": "cheque_enviado", "destino": "cheque_entregado", "tipo_unidad": "delegacion", "programa": "PSA", "accion": "Registrar la entrega del cheque (HU-5.3)"},
-    {"origen": "cheque_entregado", "destino": "ministracion_solicitada", "tipo_unidad": "direccion", "programa": "PSA", "accion": "Solicitar la siguiente ministración (HU-5.1)"}
+    {"origen": "cheque_entregado", "destino": "ministracion_solicitada", "tipo_unidad": "direccion", "programa": "PSA", "accion": "Solicitar la siguiente ministración (HU-5.1)"},
+    {"origen": "aprobada", "destino": "baja", "tipo_unidad": "secretaria_comite", "accion": "Baja de la persona beneficiaria por acuerdo del Comité (desistimiento, cancelación, baja o sustitución)", "requiere_motivo": true}
   ]
 }

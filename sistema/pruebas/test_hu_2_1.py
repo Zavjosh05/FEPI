@@ -19,7 +19,8 @@ pytestmark = pytest.mark.django_db
 
 def test_hu_2_1_criterios_y_necesidades_vienen_del_modelo(modelo, necesidades):
     hu = historia(modelo, "HU-2.1")
-    assert len(hu["criterios"]) == 3 and "45 días hábiles" in hu["criterios"][2]
+    assert len(hu["criterios"]) == 4 and "45 días hábiles" in hu["criterios"][2]
+    assert "documento PDF" in hu["criterios"][0] and "trazabilidad" in hu["criterios"][3]
     assert "M2.1" in modelo["necesidad_a_funciones"]["CC-ARP-02"]
     assert "análisis cartográfico" in necesidades["CC-ARP-02"]["texto"]
 
@@ -31,10 +32,39 @@ def test_hu_2_1_cada_solicitud_tiene_dictamen_tecnico_con_motivo(validada, usuar
         tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "  ")
     d = tecnico.dictaminar(usuarios["dir_drff"], exp, "no_factible", "Densidad arbolada menor a 60 %.")
     assert d.resultado == "no_factible" and d.motivo.startswith("Densidad")
-    assert d.acuse.archivo.open("rb").read(4) == b"%PDF"
-    assert exp.eventos.filter(tipo="dictamen_tecnico", acuse=d.acuse).exists()
+    assert exp.eventos.filter(tipo="dictamen_tecnico", datos__documento=d.documento.pk).exists()
     with pytest.raises(ValidationError, match="ya tiene"):
         tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Otra vez")
+
+
+def test_hu_2_1_el_dictamen_tecnico_se_expide_como_documento_adjunto(validada, usuarios, client, contrasena):
+    """Criterio 1: el dictamen se expide como documento PDF con folio y queda adjunto al expediente."""
+    import hashlib
+
+    from dictamen import documentos
+    from nucleo.models import TipoDocumento
+
+    exp = validada()
+    d = tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Reforestación de 6 años con densidad de 72 %.")
+    assert d.folio == f"DT-CC-{exp.ejercicio.anio}-0001"
+    doc = d.documento
+    assert doc.expediente == exp and doc.tipo == TipoDocumento.DICTAMEN and d.folio in doc.nombre
+    contenido = doc.archivo.open("rb").read()
+    assert contenido[:4] == b"%PDF" and hashlib.sha256(contenido).hexdigest() == d.huella
+    html = documentos.html_tecnico(d, d.folio)
+    for texto in ("DICTAMEN TÉCNICO", "Análisis cartográfico", "Verificación de los criterios", "FACTIBLE",
+                  "Reforestación de 6 años", exp.folio, "Vo. Bo.", "<svg"):
+        assert texto in html
+    otro = tecnico.dictaminar(usuarios["dir_drff"], validada(nombre="Otro", municipio="Ozumba"), "no_factible", "No cumple")
+    assert otro.folio == f"DT-CC-{exp.ejercicio.anio}-0002"
+    client.login(username="dir_drff", password=contrasena)
+    from django.urls import reverse
+    r = client.get(reverse("nucleo:documento", args=[doc.pk]))
+    assert r.status_code == 200 and b"".join(r.streaming_content if r.streaming else [r.content])[:4] == b"%PDF"
+    html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=documentos").content.decode()
+    assert d.folio in html and "Dictamen" in html
+    html = client.get(f"/recepcion/expediente/{exp.folio}/?pestana=dictamenes").content.decode()
+    assert f"Documento del dictamen técnico {d.folio}" in html
 
 
 def test_hu_2_1_lista_de_verificacion_sale_de_las_reglas(cc):
@@ -95,7 +125,7 @@ def test_hu_2_1_existe_listado_preliminar_con_resultado_tecnico_y_juridico(valid
     b = validada(nombre="Predio No Factible", municipio="Tlalmanalco")
     c = validada(nombre="Predio Pendiente", municipio="Ozumba")
     tecnico.dictaminar(usuarios["dir_drff"], a, "factible", "Cumple")
-    juridico.dictaminar(usuarios["juridica"], a, "procedente", "Documentación vigente")
+    juridico.dictaminar(usuarios["juridica"], a, "procedente", "Documentación vigente", propiedad=propiedad_en_regla(a))
     tecnico.dictaminar(usuarios["dir_drff"], b, "no_factible", "Bosque natural mayor al 30 %")
     from nucleo.models import expedientes_visibles
     filas = {f["folio"]: f for f in tecnico.listado_preliminar(cc, expedientes_visibles(usuarios["dir_drff"]))}
@@ -158,7 +188,7 @@ def test_hu_2_1_bandeja_de_la_direccion_y_paso_a_dictaminada(validada, usuarios)
     assert exp in bandeja(usuarios["dir_drff"]) and exp in bandeja(usuarios["juridica"])
     tecnico.dictaminar(usuarios["dir_drff"], exp, "factible", "Cumple")
     assert exp not in bandeja(usuarios["dir_drff"]) and exp in bandeja(usuarios["juridica"])
-    juridico.dictaminar(usuarios["juridica"], exp, "procedente", "Vigente")
+    juridico.dictaminar(usuarios["juridica"], exp, "procedente", "Vigente", propiedad=propiedad_en_regla(exp))
     exp.refresh_from_db()
     assert exp.estado.clave == "dictaminada" and exp in bandeja(usuarios["comite"])
     assert exp.eventos.filter(tipo="dictaminada").exists()

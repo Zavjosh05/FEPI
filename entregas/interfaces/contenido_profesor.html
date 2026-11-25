@@ -1,0 +1,50 @@
+<section class="portada">
+<p class="gris">PROBOSQUE · Programas 2026 · Prototipos</p>
+<h1>Historias de usuario<br>e interfaces</h1>
+<p class="sub">Las 26 historias de usuario de los 7 módulos, su relación con el código y las pantallas del sistema, y
+las interfaces que hoy tiene cada módulo y cada programa.</p>
+<table>
+<tr><td class="gris">Alcance</td><td>7 módulos (M1 a M6 del Sistema de programas y M7 Calculadora forestal), {{funciones}} funciones y {{historias}} historias</td></tr>
+<tr><td class="gris">Construido</td><td>Sprint 1: recepción y dictamen (M1, M2) y masa forestal por año (M7.1)</td></tr>
+<tr><td class="gris">Fecha</td><td>23 de noviembre de 2026</td></tr>
+<tr><td class="gris">Repositorio</td><td>github.com/Zavjosh05/FEPI, rama sprint-1</td></tr>
+<tr><td class="gris">Equipo</td><td>Joshua, Omar, Cin y Angel</td></tr>
+</table>
+<div class="caja"><b>En una frase.</b> Cada una de las {{funciones}} funciones de los 7 módulos tiene su historia de
+usuario; las {{construidas}} historias del sprint 1 ya funcionan en el sistema, con una prueba o más por criterio de
+aceptación y con las pantallas que se muestran en este documento, y las otras {{sin_codigo}} se construyen en los
+sprints 2 y 3.</div>
+</section>
+
+<h2 class="salto">1. Los 7 módulos y sus historias</h2>
+<p>Los seis programas de PROBOSQUE (Capturando Carbono, Manejo Forestal Sustentable, Plantaciones Sustentables,
+Restauración Hidrológico-Forestal, PSAHEM y Guardabosques) siguen las mismas etapas, por eso el Sistema de programas
+tiene seis módulos generales, uno por grupo de etapas, que sirven a todos los programas. La Calculadora forestal es un
+séptimo módulo, independiente. Cada función tiene una sola historia, con el mismo número: la función M1.1 tiene la
+historia HU-1.1.</p>
+<!--TABLA_MODULOS-->
+
+<h2 class="salto">2. Historias de usuario</h2>
+<p>Las {{historias}} historias, por módulo, en el formato «Como [rol], quiero [acción], para [beneficio]». Los criterios
+de aceptación son condiciones que deben cumplirse para dar por terminada la historia. Los puntos dan la complejidad en
+la escala Fibonacci (1, 2, 3, 5 y 8).</p>
+<!--TABLAS_HISTORIAS-->
+
+<h2 class="salto">3. Las historias en el código y en las pantallas</h2>
+<p>Para cada historia, qué parte de su módulo atiende y cómo la resuelven el código y las pantallas. Las historias del
+sprint 1 tienen {{pruebas_sistema}} pruebas automáticas en el Sistema de programas y {{pruebas_calculadora}} en la
+Calculadora, que comprueban sus criterios de aceptación y recorren las pantallas en el navegador.</p>
+<p><span class="ok">Empata</span>: la historia dice lo que hacen su función y el sistema. <span class="pend">Sin código
+aún</span>: se construye en el sprint 2 o 3.</p>
+<!--TABLA_COTEJO-->
+
+<h2 class="salto">4. Interfaz</h2>
+<p>Las pantallas del sistema, agrupadas por módulo y por historia, y después por programa. Se tomaron con el sistema
+levantado con sus datos de demostración, en Chromium a 1366 × 900 (los teléfonos, a 390 × 844). Cada pie dice qué muestra
+la pantalla y en qué archivo del repositorio está.</p>
+<div class="caja"><b>Módulos de los sprints 2 y 3.</b> M3 (publicación y contrato) y M5 (pagos) se construyen en el
+sprint 2; M4 (ejecución y verificación) y M6 (seguimiento y cierre), en el sprint 3, junto con el portal de las personas
+beneficiarias; M7.2 a M7.5, en los sprints 2 y 3. Desde ahora ya existen sus puntos de entrada: las bandejas de
+Administración y Finanzas, del vivero y de la Fiduciaria, la instrucción de pago de PSAHEM que llega a la Fiduciaria y los
+acuerdos del Comité que esos módulos van a ejecutar.</div>
+<!--INTERFAZ-->

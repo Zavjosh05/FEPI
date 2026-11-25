@@ -8,7 +8,7 @@ from dictamen import juridico, tecnico
 from dictamen.models import SesionComite
 from nucleo.demo import _pdf_demo
 from nucleo.models import Ejercicio, Usuario
-from pruebas.fixtures_m2 import fecha_sesion, registrar_validada
+from pruebas.fixtures_m2 import propiedad_en_regla, fecha_sesion, registrar_validada
 
 
 def test_hu_2_3_recorrido_sesion_de_aprobacion(datos_e2e, page, live_server, entrar, captura, tmp_path):
@@ -23,7 +23,7 @@ def test_hu_2_3_recorrido_sesion_de_aprobacion(datos_e2e, page, live_server, ent
                                  solicitante=f"Titular de {nombre}")
         tecnico.dictaminar(u["dir_drff"], exp, resultado,
                            "Cumple los criterios técnicos" if resultado == "factible" else "Densidad menor a la mínima")
-        juridico.dictaminar(u["juridica"], exp, "procedente", "Documentación vigente")
+        juridico.dictaminar(u["juridica"], exp, "procedente", "Documentación vigente", propiedad=propiedad_en_regla(exp))
 
     entrar("comite")
     expect(page.locator("#tabla-bandeja")).to_contain_text("Los Ocotes")

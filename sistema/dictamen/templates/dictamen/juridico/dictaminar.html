@@ -22,21 +22,55 @@
     {% if exp.es_refrendo %}<div class="alert alert-info small">Refrendo: las ROP piden un nuevo dictamen jurídico aunque la documentación legal obre en PROBOSQUE (CC 10.1 fr. IV).</div>{% endif %}
   </div>
   <div class="col-12 col-lg-7">
-    <div class="tarjeta mb-3">
-      <div class="titulo-seccion mb-1">Documentación legal del expediente</div>
-      <table class="table table-sm small mb-0">
-        {% for r in documentos_legales %}
-        <tr><td class="fw-semibold text-nowrap">{{ r.requisito.clave }}</td><td>{{ r.requisito.titulo }}</td>
-          <td class="text-nowrap">{{ r.get_estado_display }}{% if r.documento %} · <a href="{% url 'nucleo:documento' r.documento.pk %}" target="_blank">ver</a>{% endif %}{% if r.en_archivo_probosque %} · archivo PROBOSQUE {{ r.fecha_documento|date:"d/m/Y" }}{% endif %}</td></tr>
-        {% empty %}<tr><td class="text-secondary">Sin documentos legales.</td></tr>{% endfor %}
-      </table>
-    </div>
-    <form method="post" class="tarjeta" id="form-dictamen-juridico">
+    <form method="post" id="form-dictamen-juridico">
       {% csrf_token %}
-      <label class="form-label">{{ form.resultado.label }}</label>
-      {% for r in form.resultado %}<div class="form-check">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}
-      <div class="mt-2">{% include "recepcion/_campo.html" with campo=form.motivo %}</div>
-      <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar dictamen jurídico</button></div>
+      <div class="tarjeta mb-3" data-prueba="documentacion-legal">
+        <div class="titulo-seccion mb-1">1. Documentación legal del expediente</div>
+        <div class="small text-secondary mb-2">Marque cada documento legal como válido o no válido; si no es válido, escriba por qué. Un documento no válido impide el dictamen procedente.</div>
+        <table class="table table-sm small mb-0 align-middle">
+          <thead class="table-light"><tr><th>Clave</th><th>Documento</th><th>Expediente</th><th class="text-nowrap">Revisión jurídica</th></tr></thead>
+          {% for f in filas_legales %}{% with r=f.r %}
+          <tr{% if r.requisito.clave in requisitos_propiedad %} class="table-success-subtle"{% endif %}>
+            <td class="fw-semibold text-nowrap">{{ r.requisito.clave }}</td>
+            <td>{{ r.requisito.titulo }}{% if r.requisito.clave in requisitos_propiedad %} <span class="badge text-bg-light border">Propiedad</span>{% endif %}</td>
+            <td class="text-nowrap">{{ r.get_estado_display }}{% if r.documento %} · <a href="{% url 'nucleo:documento' r.documento.pk %}" target="_blank">ver</a>{% endif %}{% if r.en_archivo_probosque %} · archivo PROBOSQUE {{ r.fecha_documento|date:"d/m/Y" }}{% endif %}</td>
+            <td style="min-width:13rem">
+              {% if r.estado == "no_aplica" %}<span class="text-secondary">No aplica</span>{% else %}
+              <div class="btn-group btn-group-sm" role="group" aria-label="Revisión {{ r.requisito.clave }}">
+                <input type="radio" class="btn-check" name="doc_{{ r.requisito.clave }}" id="doc-{{ r.requisito.clave }}-si" value="si" {% if f.marca.valido == True %}checked{% endif %} required>
+                <label class="btn btn-outline-success" for="doc-{{ r.requisito.clave }}-si">Válido</label>
+                <input type="radio" class="btn-check" name="doc_{{ r.requisito.clave }}" id="doc-{{ r.requisito.clave }}-no" value="no" {% if f.marca.valido == False %}checked{% endif %}>
+                <label class="btn btn-outline-danger" for="doc-{{ r.requisito.clave }}-no">No válido</label>
+              </div>
+              <input type="text" class="form-control form-control-sm mt-1" name="obs_{{ r.requisito.clave }}" value="{{ f.marca.observacion|default:'' }}" placeholder="Observación" aria-label="Observación {{ r.requisito.clave }}">
+              {% endif %}
+            </td>
+          </tr>
+          {% endwith %}{% empty %}<tr><td class="text-secondary">Sin documentos legales.</td></tr>{% endfor %}
+        </table>
+      </div>
+      <div class="tarjeta mb-3" data-prueba="propiedad">
+        <div class="titulo-seccion mb-1">2. Propiedad o legal posesión del predio</div>
+        <div class="small text-secondary mb-2">Las reglas piden acreditar la legal propiedad o posesión del terreno con documento legible, que abarque la superficie que se destinará al programa y vigente (constancias de posesión, usufructo o arrendamiento), sin conflictos de propiedad, posesión o representación (CC 8.1.1.2 fr. VII; 8.1.1.1 fr. VII). Superficie del predio a apoyar: <strong>{{ superficie_a_acreditar|default:"—" }} ha</strong>{% if exp.poligonos.exists %} (polígono vigente){% else %} (solicitada){% endif %}.</div>
+        <div class="row g-2">
+          <div class="col-12">{% include "recepcion/_campo.html" with campo=form.tipo_documento %}</div>
+          <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.numero_documento %}</div>
+          <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.fecha_documento %}</div>
+          <div class="col-md-7">{% include "recepcion/_campo.html" with campo=form.titular_documento %}</div>
+          <div class="col-md-5"><label class="form-label d-block">{{ form.titular_coincide.label }}</label>{% for r in form.titular_coincide %}<div class="form-check form-check-inline">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}</div>
+          <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.superficie_documento_ha %}</div>
+          <div class="col-md-6">{% include "recepcion/_campo.html" with campo=form.vigente_hasta %}</div>
+          <div class="col-12 mb-2"><label class="form-label d-block">{{ form.sin_conflicto.label }}</label>{% for r in form.sin_conflicto %}<div class="form-check form-check-inline">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}</div>
+          <div class="col-12">{% include "recepcion/_campo.html" with campo=form.observaciones_propiedad %}</div>
+        </div>
+      </div>
+      <div class="tarjeta">
+        <div class="titulo-seccion mb-1">3. Resultado</div>
+        {% for r in form.resultado %}<div class="form-check">{{ r.tag }} <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label></div>{% endfor %}
+        <div class="mt-2">{% include "recepcion/_campo.html" with campo=form.motivo %}</div>
+        <div class="small text-secondary mb-2">Al registrar el dictamen se expide su documento en PDF con folio, que queda adjunto al expediente.</div>
+        <div class="d-flex justify-content-end"><button class="btn btn-primary" type="submit">Registrar dictamen jurídico</button></div>
+      </div>
     </form>
   </div>
 </div>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Candidatos{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Candidatos · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
+    <div class="small text-secondary">Solicitudes que todavía compiten por el apoyo: validadas en dictamen, dictaminadas por llevar a la sesión de aprobación y en lista de espera (en su orden). Las personas beneficiarias están en <a href="{% url 'dictamen:beneficiarios' %}?ejercicio={{ ejercicio.pk }}">Beneficiarios</a>.</div>
+  </div>
+  <div class="d-flex gap-2 align-items-end">
+    {% include "dictamen/listados/_selector.html" %}
+    <a class="btn btn-outline-primary btn-sm text-nowrap" href="?ejercicio={{ ejercicio.pk }}&situacion={{ situacion }}&formato=csv" data-prueba="exportar-csv">Exportar CSV (Excel)</a>
+  </div>
+</div>
+<ul class="nav nav-pills small mb-2" data-prueba="filtro-situacion">
+  <li class="nav-item"><a class="nav-link {% if not situacion %}active{% endif %}" href="?ejercicio={{ ejercicio.pk }}">Todos <span class="badge text-bg-light border">{{ total }}</span></a></li>
+  {% for clave, nombre, n in situaciones %}
+  <li class="nav-item"><a class="nav-link {% if situacion == clave %}active{% endif %}" href="?ejercicio={{ ejercicio.pk }}&situacion={{ clave }}">{{ nombre }} <span class="badge text-bg-light border">{{ n }}</span></a></li>
+  {% endfor %}
+</ul>
+<div class="tarjeta p-0">
+  <div class="table-responsive">
+  <table class="table table-sm table-hover mb-0 small" id="tabla-candidatos">
+    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Persona solicitante</th><th>Predio</th><th class="text-end">Superficie</th><th>Técnico</th><th>Jurídico</th><th>Propiedad</th><th>Resultado</th><th>Situación</th><th class="text-end">Monto</th></tr></thead>
+    <tbody>
+    {% for f in filas %}
+    <tr data-situacion="{{ f.situacion }}">
+      <td class="ps-3 text-nowrap"><a href="{% url 'recepcion:expediente' f.folio %}?pestana=dictamenes">{{ f.folio }}</a></td>
+      <td>{{ f.solicitante }}<div class="text-secondary">{{ f.delegacion }}</div></td>
+      <td>{{ f.predio }}<div class="text-secondary">{{ f.municipio }}</div></td>
+      <td class="text-end text-nowrap">{{ f.superficie_ha|floatformat:2|default:"—" }} ha</td>
+      <td>{{ f.tecnico }}</td><td>{{ f.juridico }}</td>
+      <td>{% if f.propiedad == "Acreditada" %}<span class="text-success">Acreditada</span>{% elif f.propiedad == "No acreditada" %}<span class="text-danger">No acreditada</span>{% else %}<span class="text-secondary">Pendiente</span>{% endif %}</td>
+      <td><span class="badge {% if f.resultado == 'factible' %}text-bg-success{% elif f.resultado == 'no_factible' %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ f.resultado_texto }}</span></td>
+      <td>{{ f.situacion_texto }}{% if f.lugar %} · <strong>lugar {{ f.lugar }}</strong>{% endif %}</td>
+      <td class="text-end text-nowrap">{{ f.monto|moneda }}</td>
+    </tr>
+    {% empty %}<tr><td colspan="10" class="text-center text-secondary py-4">No hay candidatos en este ejercicio.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

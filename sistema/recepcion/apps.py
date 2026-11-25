@@ -13,3 +13,19 @@ class RecepcionConfig(AppConfig):
 
         if siguiente_paso not in extensiones.SIGUIENTES_PASOS:
             extensiones.SIGUIENTES_PASOS.append(siguiente_paso)
+
+        if fuentes_trazabilidad not in extensiones.TRAZABILIDAD:
+            extensiones.TRAZABILIDAD.append(fuentes_trazabilidad)
+
+
+def fuentes_trazabilidad(expediente):
+    """Registros del módulo M1 en la pestaña «Trazabilidad»."""
+    from .models import ObservacionValidacion, Poligono, RevisionRequisito, Validacion
+
+    return [
+        ("Revisión de requisito", RevisionRequisito.history.filter(expediente_id=expediente.pk)),
+        ("Polígono", Poligono.history.filter(expediente_id=expediente.pk)),
+        ("Validación", Validacion.history.filter(expediente_id=expediente.pk)),
+        ("Observación de la validación", ObservacionValidacion.history.filter(
+            validacion_id__in=list(Validacion.objects.filter(expediente=expediente).values_list("pk", flat=True)))),
+    ]

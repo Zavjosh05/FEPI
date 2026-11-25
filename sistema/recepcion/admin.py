@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Poligono, RevisionRequisito, Validacion
+from .models import ObservacionValidacion, Poligono, RevisionRequisito, Validacion
 
 
 @admin.register(RevisionRequisito)
@@ -20,3 +20,9 @@ class PoligonoAdmin(GISModelAdmin, SimpleHistoryAdmin):
 @admin.register(Validacion)
 class ValidacionAdmin(SimpleHistoryAdmin):
     list_display = ["expediente", "resultado", "fecha_limite", "usuario", "fecha_hora", "notificado_en"]
+
+
+@admin.register(ObservacionValidacion)
+class ObservacionValidacionAdmin(SimpleHistoryAdmin):
+    list_display = ["validacion", "revision", "faltante", "origen", "observacion"]
+    list_filter = ["faltante", "origen"]

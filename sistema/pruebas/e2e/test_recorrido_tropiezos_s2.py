@@ -47,7 +47,8 @@ def test_recorrido_s2_02_tropiezos_p13_a_p18(datos_e2e, page, live_server, entra
     # P-15: el aviso de faltantes lleva a la fila del requisito.
     servicios.enviar_a_direccion(deleg, exp)
     plano = exp.revisiones.get(requisito__clave="CC-REQ-13")
-    servicios.validar_expediente(Usuario.objects.get(username="dir_drff"), exp, [plano.pk])
+    servicios.validar_expediente(Usuario.objects.get(username="dir_drff"), exp, [plano.pk],
+                                 observaciones_requisitos={plano.pk: "Plano ilegible"})
     page.goto(f"{base}/recepcion/expediente/{exp.folio}/?pestana=validacion")
     page.click("[data-prueba=faltantes-aviso] a[data-requisito='CC-REQ-13']")
     page.wait_for_url(f"**pestana=requisitos#req-{plano.pk}")

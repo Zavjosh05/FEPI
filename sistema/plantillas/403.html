@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}Acceso no permitido{% endblock %}
+{% block contenido %}
+<div class="tarjeta text-center py-5" data-prueba="acceso-negado">
+  <div class="display-6 mb-2">Acceso no permitido</div>
+  <p class="mb-1">Esta pantalla o este expediente no le corresponden a su unidad{% if unidad_actual %} ({{ unidad_actual.nombre }}){% endif %}.</p>
+  {% if exception %}<p class="small text-secondary">{{ exception }}</p>{% endif %}
+  <a class="btn btn-primary mt-2" href="{% url 'nucleo:bandeja' %}">Volver a la bandeja</a>
+</div>
+{% endblock %}

@@ -1,0 +1,470 @@
+# Manual de usuario (versión del sprint 1)
+
+Este manual explica cómo usar el prototipo tal como quedó al cerrar el **sprint 1** (14 de noviembre de 2026), con los
+ajustes por las observaciones del profesor del 23 de noviembre (observación de cada faltante, documento de los
+dictámenes, propiedad del predio, candidatos y beneficiarios, reasignaciones e incidentes y trazabilidad). Para
+ponerlo a funcionar, sigue primero la [Guía de inicio](GUIA_DE_INICIO.md).
+
+**Qué cubre esta versión**
+
+- **Sistema de programas**, para el programa **Capturando Carbono 2026**, el único con reglas cargadas en este
+  punto: desde que la persona solicitante entrega su solicitud en la Delegación hasta que el Comité aprueba los
+  listados y da seguimiento a sus acuerdos.
+  - Recepción (módulo M1): registro de la solicitud, revisión de requisitos, ubicación del predio y validación.
+  - Dictamen y Comité (módulo M2): dictámenes técnico y jurídico (con su documento en PDF), listado preliminar,
+    candidatos y beneficiarios, sesión de aprobación, y reasignaciones e incidentes en las sesiones de seguimiento.
+- **Calculadora forestal**: la masa forestal del Estado de México por año, de 2023 a 2025.
+
+Lo que sigue después de la aprobación (publicación, contrato, pagos, ejecución, verificación y cierre) llegó en los
+sprints 2 y 3 y está en la rama `main`.
+
+Las imágenes de este manual son capturas del propio sistema, tomadas por las pruebas automáticas
+(`entregas/sprint_1/capturas/`).
+
+---
+
+## 1. Ideas básicas
+
+| Término | Qué es |
+| --- | --- |
+| **Expediente** | Todo lo de una solicitud a un programa: datos, requisitos, documentos, polígono, revisiones, dictámenes, acuses y bitácora. Su folio tiene la forma `CC-2026-AME-0001` (programa, ejercicio, Delegación y número). |
+| **Folio del predio** | El predio tiene su propio folio (`PRED-000001`), que conserva si vuelve a solicitar en otro programa o ejercicio. |
+| **Estado** | En qué paso va el expediente. Cada estado tiene una unidad que lo atiende; el sistema solo permite los pasos de las reglas y a la unidad que le toca. |
+| **Bandeja** | La pantalla de inicio de cada usuario: los expedientes que le toca atender a su unidad. |
+| **Acuse** | Comprobante en PDF con folio (`AC-2026-000001`), fecha y hora, que se genera en cada envío o entrega. Queda en el expediente. |
+| **Bitácora** | Registro de todo lo que pasó en el expediente: quién, qué y cuándo. No se puede borrar. |
+| **Días hábiles** | Los plazos de las Reglas de Operación se cuentan sin sábados, domingos ni días inhábiles del calendario 2026 de demostración. |
+
+### Los estados de una solicitud
+
+```mermaid
+stateDiagram-v2
+    [*] --> recibida: Delegación registra
+    recibida --> enviada_direccion: Delegación envía
+    recibida --> desechada: no se completó en plazo
+    enviada_direccion --> validada: Dirección valida
+    enviada_direccion --> faltantes: Dirección avisa faltantes
+    faltantes --> enviada_direccion: Delegación reenvía
+    faltantes --> desechada: faltantes no atendidos
+    validada --> dictaminada: dictamen técnico y jurídico
+    dictaminada --> aprobada: acta del Comité
+    dictaminada --> lista_espera: acta del Comité
+    dictaminada --> no_factible: acta del Comité
+    lista_espera --> aprobada: reasignación por acuerdo
+    aprobada --> baja: desistimiento, cancelación, baja o sustitución
+```
+
+| Estado en pantalla | Quién lo atiende |
+| --- | --- |
+| Solicitud recibida · Aviso de faltantes | Delegación |
+| En revisión de la Dirección | Dirección del programa |
+| Validado · en dictamen | Dirección (dictamen técnico) y Unidad Jurídica (dictamen jurídico), al mismo tiempo |
+| Dictaminada | Secretaría Técnica del Comité |
+| Aprobada · Lista de espera · No factible | Siguen en el sprint 2 (publicación y contrato) |
+| Baja · recurso liberado | Termina el apoyo por un acuerdo del Comité; su recurso se reasigna a la lista de espera |
+| Solicitud desechada | Termina el trámite |
+
+---
+
+## 2. Entrar, la bandeja y el expediente
+
+### Entrar y salir
+
+Abre **http://localhost:8080/entrar/**, escribe tu usuario y contraseña y pulsa **Entrar**. Para cambiar de unidad
+pulsa **Salir** (arriba a la derecha) y entra con otro usuario. Los usuarios de demostración están en la Guía de
+inicio; la contraseña de todos es `Probosque2026`.
+
+![Inicio de sesión](entregas/sprint_1/capturas/hu_1_1_01_inicio_de_sesion.png)
+
+### La bandeja
+
+![Bandeja de la Delegación](entregas/sprint_1/capturas/hu_1_1_02_bandeja_delegacion.png)
+
+- **Por atender**: lo que tu unidad debe hacer ahora. **Todos los míos**: también lo que ya pasó a otra unidad pero
+  sigue siendo de tu Delegación o programa.
+- **Buscar**, **Programa** y **Estado** filtran la lista. El folio abre el expediente.
+- Una Delegación ve solo sus expedientes; una Dirección, los de los programas que tiene a su cargo.
+- Arriba aparecen, si los hay, los **acuerdos del Comité** que le toca cumplir a tu unidad (sección 8).
+- El menú superior cambia según la unidad: el menú **Listados** tiene **Listado preliminar** (Dirección, Unidad
+  Jurídica y Secretaría Técnica), **Candidatos** y **Beneficiarios** (también la Delegación); la Unidad Jurídica ve
+  **Incumplidas**; la Secretaría Técnica, **Sesiones del Comité**. Si abres una pantalla que no le toca a tu unidad,
+  aparece **Acceso no permitido** con el botón para volver a la bandeja.
+
+La bandeja también funciona en un teléfono: la tabla se acomoda al ancho de la pantalla.
+
+### El expediente
+
+Arriba están el programa, el folio, el predio, la persona solicitante, el estado y la fecha y hora de recepción. Abajo,
+las pestañas:
+
+| Pestaña | Qué contiene |
+| --- | --- |
+| **Solicitud** | Los datos registrados en ventanilla y el acuse de recepción |
+| **Requisitos** | Los requisitos del programa y su revisión (sección 3.2) |
+| **Ubicación** | El mapa con el polígono del predio y su historial (sección 3.3) |
+| **Validación** | Las revisiones de la Dirección, sus avisos de faltantes y fechas límite (sección 4) |
+| **Dictámenes** | El dictamen técnico y el jurídico (secciones 5 y 6) |
+| **Documentos y acuses** | Todos los archivos, los documentos de los dictámenes y los acuses en PDF |
+| **Bitácora** | El registro de todo lo ocurrido |
+| **Trazabilidad** | El historial de la base de datos: quién cambió qué registro, cuándo y qué valores (sección 9) |
+
+Los botones de cada pestaña aparecen solo cuando a tu unidad le toca ese paso.
+
+---
+
+## 3. Delegación: recibir la solicitud
+
+Usuario de ejemplo: `del_amecameca`.
+
+### 3.1 Registrar la solicitud
+
+En la bandeja, pulsa **Registrar solicitud** y llena:
+
+- **Datos específicos del programa**: programa y ejercicio, tipo de persona, modalidad (tipo de superficie), si es
+  refrendo, si se solicita por medio de representante legal y observaciones de la ventanilla.
+- **Datos del predio**: folio de predio ya registrado (si ya tuvo expediente en PROBOSQUE), municipio, nombre del
+  predio, superficie solicitada en hectáreas y localidad o paraje.
+- **Datos generales de la persona solicitante**: nombre o razón social, CURP, RFC, teléfono, correo y representante
+  legal o comisariado.
+
+Pulsa **Registrar y generar acuse**. Se genera el **folio único** de la solicitud (por ejemplo `CC-2026-AME-0001`:
+programa, ejercicio, Delegación y un consecutivo que no se repite en el programa y ejercicio). El expediente queda en
+«Solicitud recibida» y se emite el **acuse de recepción** en PDF, con el folio, la fecha, la hora y el plazo de 5 días
+hábiles para completar la documentación.
+
+![Solicitud registrada con su acuse](entregas/sprint_1/capturas/hu_1_1_05_solicitud_registrada_con_acuse.png)
+
+> Si el municipio del predio lo atiende otra Delegación, el formulario lo avisa al elegirlo y el sistema no deja
+> registrar: dice qué Delegación corresponde.
+
+### 3.2 Revisar los requisitos
+
+En la pestaña **Requisitos** está la lista que piden las reglas para el tipo de persona y la modalidad de la
+solicitud, cada uno con su numeral de las Reglas de Operación. Arriba, un resumen: entregados, faltantes, «no
+aplican» y sin revisar.
+
+En cada renglón pulsa **Revisar** y elige:
+
+- **Entregado**, con su archivo digitalizado (**Elegir archivo**), o **Faltante**. En los requisitos opcionales o
+  condicionales aparece también **No aplica**.
+- En los requisitos que son condiciones y no documentos: **Cumple** o **No cumple**.
+
+Pulsa **Guardar**. El renglón cambia sin recargar la página.
+
+![Requisito entregado](entregas/sprint_1/capturas/hu_1_2_02_requisito_entregado_htmx.png)
+
+**Enviar a la Dirección.** El botón **Enviar expediente digital a la Dirección** se habilita cuando todos los
+requisitos están revisados, ninguno está faltante y cada entregado tiene su archivo (en un refrendo, la documentación
+vigente que ya obra en PROBOSQUE vale sin volver a subirla). Si falta algo, la pantalla dice qué. Al enviar se genera
+un acuse y el expediente pasa a la bandeja de la Dirección.
+
+![Envío con acuse](entregas/sprint_1/capturas/hu_1_2_04_envio_con_acuse.png)
+
+Si la persona no completó su documentación en el plazo, la Delegación puede **Tener por desechada la solicitud**
+(pide un motivo).
+
+### 3.3 Ubicar el predio
+
+En la pestaña **Ubicación** se registra el polígono del predio, levantado en campo. No es requisito para enviar el
+expediente: las reglas lo levantan después de la entrega.
+
+1. Sube el archivo del polígono (**GeoJSON, KML o Shapefile en .zip**) o dibújalo en el mapa con la herramienta de
+   polígono.
+2. Indica quién lo levantó (personal de la Delegación o prestador de servicios forestales, con su RFN), su nombre y
+   la fecha del levantamiento.
+3. Si ya había un polígono, escribe el motivo del cambio.
+4. Pulsa **Registrar polígono**.
+
+![Polígono cargado](entregas/sprint_1/capturas/hu_1_3_02_poligono_cargado.png)
+
+El sistema calcula la superficie en hectáreas y avisa si el polígono cae fuera del municipio. Rechaza una geometría
+inválida. Cada cambio conserva el polígono anterior en el **Historial de polígonos**, marcado como «corrección» o
+«cambio de lugar» según cuánto se traslapan.
+
+![Historial del polígono](entregas/sprint_1/capturas/hu_1_3_04_historial_anterior_y_nuevo.png)
+
+---
+
+## 4. Dirección: validar el expediente
+
+Usuario de ejemplo: `dir_drff`.
+
+1. En la bandeja aparecen los expedientes «En revisión de la Dirección». Abre uno, ve a la pestaña **Validación** y
+   pulsa **Abrir pantalla de validación**.
+2. La pantalla muestra cada requisito con la revisión de la Delegación, una **revisión automática con las reglas** y
+   una casilla para la **observación de la Dirección**. Marca como **Faltante** lo que no cumpla y escribe en ese mismo
+   renglón **qué falta o por qué no es válido** (ilegible, incompleto, no vigente, no corresponde al titular…): la
+   observación es **obligatoria en cada faltante**. Los que no pasan la revisión con las reglas ya vienen marcados; si
+   no escribes nada, su observación es el motivo de esa revisión.
+3. Sin faltantes, pulsa **Validar expediente**: queda «Validado · en dictamen», con su constancia en PDF (con el
+   resultado de cada requisito).
+4. Con faltantes, pulsa **Emitir aviso de faltantes**: se genera el aviso con su **fecha límite** (5 días hábiles
+   desde el aviso) y **la observación de cada faltante**, y el expediente regresa a la Delegación para que lo notifique.
+
+![Pantalla de validación](entregas/sprint_1/capturas/hu_1_4_02_pantalla_de_validacion.png)
+
+![Aviso de faltantes con fecha límite](entregas/sprint_1/capturas/hu_1_4_03_aviso_de_faltantes_con_fecha_limite.png)
+
+**En un refrendo**, la documentación que ya obra en PROBOSQUE vale si no tiene más de 3 años desde la recepción; si
+es más vieja, se marca como faltante.
+
+### Del lado de la Delegación: atender el aviso de faltantes
+
+El aviso va dirigido a la persona solicitante **por conducto de la Delegación**:
+
+1. En la pestaña **Validación** del expediente aparece el aviso con cada faltante, su observación y la fecha límite
+   (la observación también aparece en el requisito, en la pestaña **Requisitos**). Cuando
+   entregues el aviso a la persona, pulsa **Registrar notificación a la persona solicitante**: queda la fecha y la
+   hora con su acuse.
+2. Cuando la persona entregue lo faltante, márcalo como entregado en **Requisitos** y pulsa **Reenviar a la
+   Dirección con los faltantes**.
+
+Si vence la fecha límite sin respuesta, la Dirección puede tener la solicitud por desechada.
+
+![Notificación por conducto de la Delegación](entregas/sprint_1/capturas/hu_1_4_04_notificacion_por_conducto_de_la_delegacion.png)
+
+---
+
+## 5. Dirección: dictamen técnico y listado preliminar
+
+Con el expediente validado, la Dirección y la Unidad Jurídica dictaminan al mismo tiempo. Cuando ya están los dos
+dictámenes, el expediente pasa a «Dictaminada», en la bandeja de la Secretaría Técnica.
+
+### Dictamen técnico
+
+En la pestaña **Dictámenes**, pulsa **Elaborar dictamen técnico**. La pantalla tiene:
+
+- **Análisis cartográfico**: el mapa con el polígono vigente, los de otros expedientes que se traslapan y el
+  municipio; la superficie, si está dentro del rango del programa (1 a 200 ha en Capturando Carbono), si cae dentro
+  del municipio y los traslapes con otras solicitudes del mismo ejercicio, en hectáreas.
+- **Plazo de dictaminación**: en Capturando Carbono, la fecha límite de la Convocatoria (30 de junio de 2026). Dice si
+  va en plazo, por vencer o vencido.
+- **Lista de verificación** con los criterios del programa: en cada uno, **Cumple**, **No cumple** o **No aplica**,
+  con una nota. Un criterio que no se cumple impide el dictamen factible.
+- **Resultado**: **Factible** (con la superficie factible en hectáreas) o **No factible** (con su motivo).
+
+Pulsa **Registrar dictamen técnico**. El sistema **expide el documento «Dictamen técnico»** en PDF, con folio propio
+(por ejemplo, `DT-CC-2026-0001`): datos de la solicitud, análisis cartográfico con el croquis del polígono, verificación
+de los criterios, resultado y motivo, plazo, fundamento y firmas (elaboró y Vo. Bo.). El documento queda **adjunto al
+expediente**: se abre con el botón de la pestaña **Dictámenes** o desde **Documentos y acuses**.
+
+![Análisis cartográfico y lista de verificación](entregas/sprint_1/capturas/hu_2_1_02_analisis_cartografico_y_lista_de_verificacion.png)
+
+### Listado preliminar
+
+En el menú **Listados**, **Listado preliminar** reúne el resultado técnico y jurídico de cada solicitud validada. **Exportar CSV
+(Excel)** lo descarga para abrirlo en Excel con acentos.
+
+![Listado preliminar](entregas/sprint_1/capturas/hu_2_1_04_listado_preliminar.png)
+
+---
+
+## 6. Unidad Jurídica: Listado de Incumplidas y dictamen jurídico
+
+Usuario de ejemplo: `juridica`.
+
+### Listado de Personas Beneficiarias Incumplidas
+
+En el menú, **Incumplidas** muestra el Listado de Personas Beneficiarias Incumplidas y los predios con procedimiento
+o sanción. Se agregan con **Inscribir** y se retiran con **Baja**, que desactiva el registro pero no lo borra: queda
+su historial.
+
+![Listado de Incumplidas](entregas/sprint_1/capturas/hu_2_2_02_listado_de_incumplidas.png)
+
+### Dictamen jurídico
+
+En la pestaña **Dictámenes** de un expediente validado, pulsa **Elaborar dictamen jurídico**. El sistema **coteja
+automáticamente** a la persona (CURP, RFC y nombre) con el Listado de Incumplidas y al predio con los predios con
+procedimiento o sanción, y muestra las coincidencias. La pantalla tiene tres pasos:
+
+1. **Documentación legal**: marca cada documento legal del expediente como **Válido** o **No válido**; si no es válido,
+   escribe por qué. Los que no aplican no se revisan.
+2. **Propiedad o legal posesión del predio** (CC 8.1.1.2 fr. VII): el documento con el que se acredita (escritura,
+   certificado parcelario, carpeta básica o PHINA del núcleo agrario, constancia de posesión, contrato de usufructo o
+   arrendamiento…), su número y fecha, a nombre de quién está y si coincide con el titular, la **superficie que ampara**
+   (se compara con la del polígono vigente), la **vigencia** (obligatoria en constancias de posesión y contratos; el de
+   usufructo o arrendamiento no puede pasar de 5 años) y si hay **evidencia de conflicto** de propiedad, posesión o
+   representación.
+3. **Resultado**: **Procedente** o **No procedente** con su motivo.
+
+El sistema **no permite el dictamen procedente** si un documento legal no es válido, si no se acredita la propiedad o
+legal posesión, o si hay coincidencias en los catálogos. Al registrarlo **expide el documento «Dictamen jurídico»** en PDF
+(folio `DJ-…`), con la revisión de la documentación, la de la propiedad, el cotejo, el resultado y las firmas, adjunto al
+expediente.
+
+![Cotejo automático](entregas/sprint_1/capturas/hu_2_2_03_cotejo_automatico.png)
+
+![Revisión de la propiedad o legal posesión](entregas/sprint_1/capturas/hu_2_2_07_revision_de_la_propiedad.png)
+
+![Propiedad no acreditada](entregas/sprint_1/capturas/hu_2_2_08_propiedad_no_acreditada.png)
+
+---
+
+## 7. Secretaría Técnica: sesión de aprobación del Comité
+
+Usuario de ejemplo: `comite`. En el menú, **Sesiones del Comité**.
+
+1. **Nueva sesión de aprobación**: programa y ejercicio, carácter (ordinaria o extraordinaria), fecha y hora, lugar o
+   plataforma digital y orden del día (un punto por renglón). Pulsa **Crear sesión**.
+2. **Agregar documento**: al menos uno (por ejemplo, el listado preliminar y los dictámenes).
+3. **Enviar convocatoria a los integrantes**: el sistema exige la anticipación de las reglas (3 días hábiles antes de
+   la sesión; 24 horas si es extraordinaria) y genera el acuse con la fecha, la hora, el orden del día y los
+   integrantes del Comité según las reglas.
+4. **Generar propuesta** de listados: ordena las solicitudes factibles por los criterios de priorización que se
+   pueden leer del expediente (reforestaciones primero, luego refrendos, y por fecha y hora de registro) y asigna
+   hasta donde alcance el **Recurso disponible** que escribas ($2,000 por hectárea factible); las demás van a la lista
+   de espera con su lugar. Las no factibles van a su propia lista.
+5. Si el Comité decide otra cosa, **Ajustar** mueve una solicitud de lista o de lugar, con un motivo obligatorio que
+   queda en el acta. Una no factible no puede pasar a las listas de apoyo.
+6. **Registrar acta con los listados aprobados**: genera el acta en PDF con la Lista de Personas Beneficiarias, la
+   Lista de espera, la Lista de solicitudes No factibles y la autorización de publicación, y mueve cada expediente a
+   «Aprobada», «Lista de espera» o «No factible». **Cerrar la sesión** deja la sesión como celebrada.
+
+![Listados propuestos](entregas/sprint_1/capturas/hu_2_3_04_listados_propuestos.png)
+
+![Acta y autorización de publicación](entregas/sprint_1/capturas/hu_2_3_06_acta_y_autorizacion_de_publicacion.png)
+
+### Candidatos y beneficiarios
+
+En el menú **Listados** hay dos vistas separadas (las consultan la Delegación, con solo sus expedientes, la Dirección,
+la Unidad Jurídica y la Secretaría Técnica), con su selector de programa y ejercicio y **Exportar CSV (Excel)**:
+
+- **Candidatos**: las solicitudes que todavía compiten por el apoyo, con filtros **En dictamen**, **Dictaminada · por
+  llevar a la sesión de aprobación** y **Lista de espera** (en su orden, con su lugar y su monto). Muestra el resultado
+  técnico, el jurídico y el de la propiedad.
+- **Beneficiarios**: las personas beneficiarias aprobadas, con su superficie, su monto y **cómo entraron** (acta de la
+  sesión de aprobación o reasignación por acuerdo), con los totales; abajo, las que **salieron** por un acuerdo del
+  Comité, con la causa y el recurso que liberaron.
+
+![Candidatos](entregas/sprint_1/capturas/hu_2_4_09_candidatos_lista_de_espera.png)
+
+![Beneficiarios](entregas/sprint_1/capturas/hu_2_4_08_beneficiarios_con_reasignacion_y_baja.png)
+
+---
+
+## 8. Reasignaciones e incidentes (sesiones de seguimiento)
+
+1. La Secretaría Técnica crea una **Nueva sesión de seguimiento** igual que la de aprobación y envía su convocatoria.
+2. La sesión muestra la **lista de espera en su orden**, el **recurso liberado sin reasignar** y los **movimientos de
+   los listados** del ejercicio (quién salió y quién entró, con qué acuerdo).
+3. **Registrar acuerdo**: tipo de acuerdo, **causa del incidente** (escrito de desistimiento, dictamen, aviso de la
+   Delegación…; obligatoria en los incidentes), el texto del acuerdo, los expedientes a los que aplica y el área que
+   debe atenderlo (si lo dejas vacío, la que corresponde al tipo). Lo que hace cada tipo:
+
+   | Tipo de acuerdo | Qué pasa en los listados |
+   | --- | --- |
+   | Desistimiento, cancelación o baja | La persona beneficiaria sale de la lista (estado «Baja · recurso liberado») y su monto queda como recurso liberado |
+   | Reasignación | Pasan a «Aprobada» las **primeras de la lista de espera, en su orden**, sin rebasar el recurso liberado; si se salta a alguien o no alcanza, el sistema lo impide |
+   | Sustitución | Las dos cosas en un solo acuerdo: sale la persona beneficiaria y entra la siguiente de la lista de espera |
+   | Caso fortuito, suspensión, reintegro u otro | Deja la constancia; el área responsable lo atiende |
+   | Instrucción de pago a la Fiduciaria (PSAHEM) · validación de reportes (Guardabosques) | Deja la constancia por ministración o por periodo |
+
+4. El área responsable ve el acuerdo en su bandeja, lo atiende y pulsa **Marcar cumplido**.
+
+![Acuerdo con su causa, expedientes y área responsable](entregas/sprint_1/capturas/hu_2_4_01_acuerdo_con_expedientes_y_area_responsable.png)
+
+![Desistimiento: libera el recurso](entregas/sprint_1/capturas/hu_2_4_06_desistimiento_libera_el_recurso.png)
+
+![Reasignación en el orden de la lista de espera](entregas/sprint_1/capturas/hu_2_4_07_reasignacion_en_orden_de_la_lista_de_espera.png)
+
+![Pendiente en la bandeja de la Dirección](entregas/sprint_1/capturas/hu_2_4_02_pendiente_en_la_bandeja_de_la_direccion.png)
+
+En esta versión los acuerdos de pago y de reportes se registran y se cumplen, pero todavía no ejecutan nada en otros
+módulos: una instrucción de pago de PSAHEM llega a la bandeja de la Fiduciaria (`fiduciaria`), pero los pagos llegan en
+el sprint 2. Además, PSAHEM todavía no tiene reglas cargadas: ese caso solo lo cubren las pruebas automáticas.
+
+---
+
+## 9. Documentos, acuses y bitácora
+
+- La pestaña **Documentos y acuses** reúne los archivos subidos, los **documentos de los dictámenes** técnico y jurídico
+  (resaltados) y cada acuse en PDF: recepción, envío a la Dirección, validación, aviso de faltantes, notificación,
+  convocatoria y acta.
+- Los archivos no tienen dirección pública: solo los descarga quien tiene permiso sobre el expediente.
+- La pestaña **Bitácora** lista cada paso con su fecha y hora, quién lo hizo y qué hizo (con el motivo, cuando el
+  paso lo pide).
+
+![Bitácora](entregas/sprint_1/capturas/hu_1_4_07_bitacora.png)
+
+- La pestaña **Trazabilidad** muestra lo que guarda la base de datos de cada registro del expediente (la solicitud, el
+  predio, la persona, los requisitos, el polígono, las validaciones y sus observaciones, los dictámenes, la revisión de la
+  propiedad, los listados y los acuerdos): **cada alta, cambio o baja**, con el usuario y su unidad, la fecha y la hora,
+  el motivo y los campos que cambiaron (antes → después). Se puede filtrar por registro. Nada se borra: un registro
+  dado de baja conserva su historial.
+
+![Trazabilidad](entregas/sprint_1/capturas/hu_2_4_10_trazabilidad_de_la_reasignacion.png)
+
+---
+
+## 10. Datos de demostración para practicar
+
+Al levantar el sistema se cargan solicitudes de Capturando Carbono 2026 en distintos pasos:
+
+| Para practicar | Entra como | Busca |
+| --- | --- | --- |
+| Revisar requisitos a medias | `del_amecameca` | Los Ocotes (`CC-2026-AME-0001`) |
+| Enviar a la Dirección y ver un polígono dibujado | `del_amecameca` | Ejido San Rafael (`CC-2026-AME-0002`) |
+| Validar o avisar faltantes | `dir_drff` | La Cañada (`CC-2026-AME-0003`) |
+| Un aviso de faltantes ya notificado | la Delegación que lo atiende | Rancho El Capulín |
+| Una solicitud desechada | la Delegación que la atiende | El Tecolote |
+| Dictamen técnico con plazo vencido | `dir_drff` | El Ocotal (`CC-2026-TOL-0009`) |
+| Dictamen jurídico pendiente, con traslape | `juridica` | Los Encinos del Monte |
+| Expediente listo para el Comité | `comite` | Potrero Viejo |
+| Una sesión de aprobación completa | `comite` | Sesión SO-CC-2026-01 |
+| Incidentes y reasignación (La Joya Alta desiste y entra Las Trojes) | `comite`, `dir_drff`, `juridica` | Sesión SO-CC-2026-02 · Listados › Beneficiarios |
+| Propiedad no acreditada (constancia de posesión vencida) | `juridica` | El Ocotal, pestaña Dictámenes |
+| Documentos de los dictámenes y trazabilidad | cualquiera que vea el expediente | Las Trojes, pestañas Documentos y acuses y Trazabilidad |
+| Una persona en el Listado de Incumplidas | `juridica` | Rogelio Bautista Núñez (Cerro de la Cruz, no factible) |
+
+Para empezar de cero con los mismos datos: `docker compose down -v` y `docker compose up --build` (Guía de inicio,
+sección 1.5).
+
+Para probar también la carga de archivos y capturar solicitudes nuevas con resultados conocidos, hay polígonos,
+documentos PDF y fichas de solicitudes en `datos_prueba/sprint_1/`. La
+[secuencia de prueba](datos_prueba/sprint_1/SECUENCIA_DE_PRUEBA.md) dice paso a paso qué hacer con ellos y qué debe
+pasar.
+
+---
+
+## 11. Calculadora forestal: masa forestal por año
+
+Ábrela como dice la Guía de inicio, sección 2. Muestra la **superficie con cobertura arbórea** (hectáreas de bosque)
+dentro de la zona forestal del Estado de México, medida con imágenes Sentinel-2 de noviembre y diciembre de cada año.
+
+![Calculadora: un año](entregas/sprint_1/capturas/hu_7_1_un_anio.png)
+
+- **Arriba a la derecha** se elige el modo:
+  - **Un año**: el bosque de ese año, su cambio desde el año anterior y la tendencia.
+  - **Comparar años**: dos años lado a lado, con las pérdidas por incendio, otras pérdidas y la ganancia.
+- **Las cifras de arriba**: bosque del año, cambio, pérdida por incendio, otras pérdidas, ganancia y tendencia.
+- **Evolución del bosque**: la gráfica de 2023 a 2025 y su tabla; «ver» abre ese año en el mapa.
+- **El mapa** tiene tres vistas: **Bosque**, **Tendencia por municipio** y **Año de pérdida**. **Buscar** encuentra un
+  municipio por nombre; se acerca y aleja con los botones + y −.
+- **Detalle**: toca un municipio en el mapa o en la tabla para ver su serie, su bosque por tipo (coníferas, encino,
+  mesófilo, selva baja, zonas semiáridas) y a qué pasaron sus otras pérdidas.
+- **Municipios**: la tabla ordenable de los 125 municipios, con su zona forestal, bosque, cambio y tendencia.
+- **Alcances**: qué mide y qué no, de dónde salen los datos y qué no se puede afirmar todavía.
+
+Ten en cuenta lo que la propia página advierte: el umbral de NDVI es provisional, las «otras pérdidas» no se han
+verificado en campo, CONAFOR aún no publica los incendios de 2025, y el uso al que pasó el terreno perdido es una
+estimación con 55 % de exactitud.
+
+---
+
+## 12. Preguntas frecuentes
+
+**No veo un botón que el manual menciona.** Los botones aparecen solo a la unidad a la que le toca el paso y cuando el
+expediente está en el estado que corresponde. Revisa con qué usuario entraste y el estado del expediente.
+
+**No me deja enviar el expediente a la Dirección.** La pantalla dice qué falta: requisitos sin revisar, alguno
+faltante o un entregado sin archivo.
+
+**¿Puedo deshacer un paso?** No directamente: cada paso queda en la bitácora y con su acuse. Lo que las reglas permiten
+(reenviar con faltantes, cambiar el polígono con motivo, ajustar un listado con motivo) se hace con su propio botón.
+
+**¿Dónde están las fechas y plazos oficiales?** En las reglas del programa (`sistema/reglas/CC.json`), con el numeral
+y la línea de las Reglas de Operación. El calendario de días inhábiles 2026 es de demostración.
+
+**¿Qué falta en esta versión?** Los otros cinco programas no tienen reglas cargadas, y el trámite se detiene en la
+aprobación del Comité. Los pendientes con el cliente están en [`sistema/README.md`](sistema/README.md), sección
+«Pendientes con el cliente», y el resumen del sprint en `entregas/sprint_1/Resumen_sprint_1.pdf`.

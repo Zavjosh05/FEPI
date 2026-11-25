@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load moneda %}
+{% block titulo %}Beneficiarios{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-0">Personas beneficiarias · {{ ejercicio.programa.nombre }} {{ ejercicio.anio }}</h1>
+    <div class="small text-secondary">Aprobadas por el Comité en el acta de la sesión de aprobación o por reasignación en una sesión de seguimiento. Las solicitudes que aún compiten están en <a href="{% url 'dictamen:candidatos' %}?ejercicio={{ ejercicio.pk }}">Candidatos</a>.</div>
+  </div>
+  <div class="d-flex gap-2 align-items-end">
+    {% include "dictamen/listados/_selector.html" %}
+    <a class="btn btn-outline-primary btn-sm text-nowrap" href="?ejercicio={{ ejercicio.pk }}&formato=csv" data-prueba="exportar-csv">Exportar CSV (Excel)</a>
+  </div>
+</div>
+<div class="row g-2 mb-2 small" data-prueba="totales">
+  <div class="col-auto"><span class="badge text-bg-success fs-6">{{ totales.n }} persona{{ totales.n|pluralize:"s" }} beneficiaria{{ totales.n|pluralize:"s" }}</span></div>
+  <div class="col-auto"><span class="badge text-bg-light border fs-6">{{ totales.superficie|floatformat:2 }} ha</span></div>
+  <div class="col-auto"><span class="badge text-bg-light border fs-6">{{ totales.monto|moneda }}</span></div>
+</div>
+<div class="tarjeta p-0 mb-3">
+  <div class="table-responsive">
+  <table class="table table-sm table-hover mb-0 small" id="tabla-beneficiarios">
+    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Persona beneficiaria</th><th>Predio</th><th>Delegación</th><th class="text-end">Superficie</th><th class="text-end">Monto</th><th>Cómo entró</th></tr></thead>
+    <tbody>
+    {% for f in vigentes %}
+    <tr{% if f.reasignada %} class="table-success" data-prueba="reasignada"{% endif %}>
+      <td class="ps-3 text-nowrap"><a href="{% url 'recepcion:expediente' f.folio %}?pestana=dictamenes">{{ f.folio }}</a></td>
+      <td>{{ f.beneficiario }}{% if f.curp %}<div class="text-secondary">{{ f.curp }}</div>{% endif %}</td>
+      <td>{{ f.predio }}<div class="text-secondary">{{ f.municipio }}</div></td>
+      <td>{{ f.delegacion }}</td>
+      <td class="text-end text-nowrap">{{ f.superficie_ha|floatformat:2|default:"—" }} ha</td>
+      <td class="text-end text-nowrap">{{ f.monto|moneda }}</td>
+      <td>{{ f.via }}{% if f.fecha %}<div class="text-secondary">{{ f.fecha|date:"d/m/Y" }}</div>{% endif %}</td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center text-secondary py-4">Aún no hay personas beneficiarias en este ejercicio.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+<div class="titulo-seccion">Salieron de la lista por acuerdo del Comité</div>
+<div class="tarjeta p-0">
+  <div class="table-responsive">
+  <table class="table table-sm mb-0 small" id="tabla-bajas">
+    <thead class="table-light"><tr><th class="ps-3">Folio</th><th>Persona</th><th>Acuerdo y causa</th><th class="text-end">Recurso liberado</th><th>Entró en el mismo acuerdo (sustitución)</th><th>Fecha</th></tr></thead>
+    <tbody>
+    {% for b in bajas %}
+    <tr>
+      <td class="ps-3 text-nowrap"><a href="{% url 'recepcion:expediente' b.folio %}?pestana=dictamenes">{{ b.folio }}</a></td>
+      <td>{{ b.beneficiario }}<div class="text-secondary">{{ b.predio }}</div></td>
+      <td>{{ b.acuerdo.numero }}<div class="text-secondary">{{ b.causa }}</div></td>
+      <td class="text-end text-nowrap">{{ b.monto|moneda }}</td>
+      <td>{{ b.entraron|join:", "|default:"—" }}</td>
+      <td class="text-nowrap">{{ b.fecha|date:"d/m/Y H:i" }}</td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-center text-secondary py-3">Ninguna.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

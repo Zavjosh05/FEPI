@@ -12,8 +12,8 @@
   {% endif %}
   {% if tecnico %}
   <div class="small"><strong>Motivo:</strong> {{ tecnico.motivo }}</div>
-  <div class="small">Superficie factible: {{ tecnico.superficie_factible_ha|default:"—" }} ha · {{ tecnico.usuario }} · {{ tecnico.fecha_hora|date:"d/m/Y H:i" }}
-    {% if tecnico.acuse %}· <a href="{% url 'nucleo:acuse' tecnico.acuse.folio %}" target="_blank">{{ tecnico.acuse.folio }}</a>{% endif %}</div>
+  <div class="small">Superficie factible: {{ tecnico.superficie_factible_ha|default:"—" }} ha · {{ tecnico.usuario }} · {{ tecnico.fecha_hora|date:"d/m/Y H:i" }}</div>
+  {% if tecnico.documento %}<a class="btn btn-outline-primary btn-sm mt-2" data-prueba="documento-tecnico" href="{% url 'nucleo:documento' tecnico.documento.pk %}" target="_blank">Documento del dictamen técnico {{ tecnico.folio }} (PDF)</a>{% endif %}
   {% if tecnico.analisis.traslapes %}<div class="small text-danger">Traslapes: {% for t in tecnico.analisis.traslapes %}{{ t.folio }} ({{ t.superficie_ha|floatformat:2 }} ha){% if not forloop.last %}, {% endif %}{% endfor %}</div>{% endif %}
   {% elif puede_dictaminar_tecnico %}
   <a class="btn btn-primary btn-sm mt-2" href="{% url 'dictamen:tecnico' exp.folio %}">Elaborar dictamen técnico</a>

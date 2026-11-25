@@ -22,13 +22,15 @@ Con `--html` deja también el HTML intermedio; con `--sin-diagramas` reutiliza l
 """
 import html
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 ESPEC = RAIZ / "sistema" / "especificacion"
-MERMAID_JS = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
+# Sin internet, se puede apuntar a una copia local: MERMAID_JS=file:///ruta/mermaid.min.js
+MERMAID_JS = os.environ.get("MERMAID_JS", "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js")
 PROGRAMAS = {"CC": "Capturando Carbono", "MFS": "Manejo Forestal Sustentable", "PS": "Plantaciones Sustentables",
              "RHF": "Restauración Hidrológico-Forestal", "PSA": "PSAHEM", "PEG": "Guardabosques",
              "CF": "Calculadora forestal"}
@@ -235,6 +237,8 @@ def dibujar(diagramas, carpeta):
     with sync_playwright() as p:
         navegador = p.chromium.launch()
         pagina = navegador.new_page(viewport={"width": 2200, "height": 1200}, device_scale_factor=2)
+        if MERMAID_JS.startswith("file://"):
+            pagina.goto(MERMAID_JS)   # con origen file:// la página puede cargar la copia local de Mermaid
         for nombre, codigo in diagramas.items():
             pagina.set_content(
                 "<html><body style='margin:0;background:#fff'>"

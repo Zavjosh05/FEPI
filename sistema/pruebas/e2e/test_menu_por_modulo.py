@@ -51,7 +51,7 @@ def test_p_21_la_direccion_ve_sus_grupos_en_el_orden_de_los_modulos(page, datos_
     page.set_viewport_size({"width": 1366, "height": 900})
     entrar("dir_drff")
     grupos = [g.strip() for g in page.locator("nav.barra-probosque button.dropdown-toggle").all_inner_texts()]
-    assert grupos == ["Dictamen y Comité", "Publicación y contrato"]   # «Pagos» es un solo enlace para la Dirección
+    assert grupos == ["Dictamen y Comité", "Listados", "Publicación y contrato"]   # «Pagos» es un solo enlace para la Dirección
     expect(page.locator("nav.barra-probosque a.nav-link:text-is('Pagos')")).to_be_visible()
     page.click("button.dropdown-toggle:text-is('Publicación y contrato')")
     expect(page.locator("a.dropdown-item:text-is('Contratos')")).to_be_visible()
@@ -67,7 +67,7 @@ def test_p_21_la_delegacion_y_la_secretaria_tecnica_solo_ven_lo_suyo(page, datos
     page.click("button.dropdown-toggle:text-is('Publicación y contrato')")
     captura("s2_14_menu_delegacion")
     entrar("comite")
-    assert [g.strip() for g in barra.locator("button.dropdown-toggle").all_inner_texts()] == ["Dictamen y Comité"]
+    assert [g.strip() for g in barra.locator("button.dropdown-toggle").all_inner_texts()] == ["Dictamen y Comité", "Listados"]
     page.click("button.dropdown-toggle:text-is('Dictamen y Comité')")
     captura("s2_14_menu_secretaria_tecnica")
 

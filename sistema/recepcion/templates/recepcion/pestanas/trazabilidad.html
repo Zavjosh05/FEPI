@@ -1,0 +1,36 @@
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-2">
+  <div>
+    <div class="titulo-seccion mb-1">Trazabilidad en la base de datos</div>
+    <div class="small text-secondary">Cada alta, cambio o baja de los registros del expediente queda en su tabla de historial con quién lo hizo, la fecha y la hora, el motivo y los valores anteriores y nuevos. Nada se borra: un registro dado de baja conserva su historial.</div>
+  </div>
+  <form method="get" class="d-flex gap-2 align-items-center">
+    <input type="hidden" name="pestana" value="trazabilidad">
+    <select name="registro" class="form-select form-select-sm w-auto" aria-label="Registro" onchange="this.form.submit()">
+      <option value="">Todos los registros</option>
+      {% for r in registros_traza %}<option value="{{ r }}" {% if r == registro_traza %}selected{% endif %}>{{ r }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+<div class="table-responsive">
+<table class="table table-sm small align-top" id="tabla-trazabilidad">
+  <thead class="table-light"><tr><th>Fecha y hora</th><th>Usuario</th><th>Registro</th><th>Movimiento</th><th>Campos (antes → después)</th></tr></thead>
+  <tbody>
+  {% for f in traza %}
+  <tr>
+    <td class="text-nowrap">{{ f.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+    <td>{{ f.usuario|default:"Sistema" }}{% if f.unidad %}<div class="text-secondary">{{ f.unidad }}</div>{% endif %}</td>
+    <td>{{ f.registro }}<div class="text-secondary">{{ f.objeto }} · <code>{{ f.tabla }}</code></div></td>
+    <td><span class="badge {% if f.tipo == 'Alta' %}text-bg-success{% elif f.tipo == 'Baja' %}text-bg-danger{% else %}text-bg-info{% endif %}">{{ f.tipo }}</span>{% if f.motivo %}<div class="text-secondary">{{ f.motivo }}</div>{% endif %}</td>
+    <td>{% for c in f.cambios|slice:":14" %}<div><span class="text-secondary">{{ c.campo }}:</span> {% if c.antes %}<span class="text-decoration-line-through text-danger">{{ c.antes }}</span> → {% endif %}<span>{{ c.despues }}</span></div>{% endfor %}{% if f.cambios|length > 14 %}<div class="text-secondary">… y {{ f.cambios|length|add:"-14" }} campos más</div>{% endif %}</td>
+  </tr>
+  {% empty %}<tr><td colspan="5" class="text-secondary">Sin registros.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="d-flex justify-content-between align-items-center small">
+  <span class="text-secondary">{{ traza_total }} movimiento{{ traza_total|pluralize }} · página {{ traza.number }} de {{ traza.paginator.num_pages }}</span>
+  <span class="d-flex gap-2">
+    {% if traza.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?pestana=trazabilidad&registro={{ registro_traza|urlencode }}&pagina={{ traza.previous_page_number }}">Más recientes</a>{% endif %}
+    {% if traza.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?pestana=trazabilidad&registro={{ registro_traza|urlencode }}&pagina={{ traza.next_page_number }}">Anteriores</a>{% endif %}
+  </span>
+</div>

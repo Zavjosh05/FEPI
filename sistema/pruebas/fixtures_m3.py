@@ -5,7 +5,7 @@ import pytest
 from django.utils import timezone
 
 from dictamen import aprobacion, juridico, sesiones, tecnico
-from dictamen.demo import _validada
+from dictamen.demo import _validada, propiedad_en_regla
 from dictamen.models import TipoSesion
 from nucleo.models import Ejercicio
 
@@ -43,7 +43,8 @@ def aprobadas(catalogos, usuarios):
             exp = _validada(u[deleg], u["dir_drff"], ejercicio, municipio, predio, persona, modalidad, ha)
             malo = no_factible and i == len(datos) - 1
             tecnico.dictaminar(u["dir_drff"], exp, "no_factible" if malo else "factible", "Dictamen técnico de prueba.")
-            juridico.dictaminar(u["juridica"], exp, "procedente", "Documentación completa.")
+            juridico.dictaminar(u["juridica"], exp, "procedente", "Documentación completa.",
+                                propiedad=propiedad_en_regla(exp))
             exps.append(exp)
         fecha = timezone.localtime(timezone.now()) - timedelta(hours=2)
         sesion = sesiones.crear_sesion(

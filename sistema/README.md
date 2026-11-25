@@ -7,8 +7,9 @@ Guardabosques (PEG). Tienen reglas cargadas CC, PS, RHF y PSAHEM; MFS y PEG exis
 
 Historias implementadas: HU-1.1 Registro de la solicitud, HU-1.2 Revisión del expediente,
 HU-1.3 Ubicación del predio, HU-1.4 Validación del expediente, HU-2.1 Dictamen técnico, HU-2.2 Dictamen
-jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Sesiones de seguimiento y, del sprint 2, HU-3.1 Publicación y
-notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques.
+jurídico, HU-2.3 Sesión de aprobación, HU-2.4 Reasignaciones e incidentes (antes «Sesiones de seguimiento») y, del
+sprint 2, HU-3.1 Publicación y notificaciones, HU-3.2 Elaboración del contrato, HU-3.3 Firma del contrato, HU-3.4 Entrega
+de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 Entrega de cheques.
 
 ## Cómo levantar
 
@@ -115,11 +116,14 @@ Solicitudes de demostración (CC 2026): Los Ocotes (recibida, revisión a medias
 (recibida, completa, con polígono), La Cañada (en la Dirección), Rancho El Capulín (aviso de faltantes
 notificado), El Tecolote (desechada) y, para M2: Los Encinos del Monte (con dictamen técnico, falta el
 jurídico; traslapa con La Joya Alta), El Ocotal (en dictamen, plazo vencido), Potrero Viejo
-(dictaminada, en la bandeja de la Secretaría Técnica) y la sesión de aprobación SO-CC-2026-01 con acta:
-Predio Agua Blanca (refrendo, con cambio de lugar del polígono) y La Joya Alta aprobadas, Las Trojes en
-lista de espera y Cerro de la Cruz no factible (su titular, Rogelio Bautista Núñez, está en el Listado
-de Incumplidas). La sesión de seguimiento SO-CC-2026-02 tiene tres acuerdos (uno cumplido; dos
-pendientes en las bandejas de la Dirección y de la Unidad Jurídica).
+(dictaminada, en la bandeja de la Secretaría Técnica) y la sesión de aprobación SO-CC-2026-01 con acta
+(recurso de $26,000): Predio Agua Blanca (refrendo, con cambio de lugar del polígono) y La Joya Alta
+aprobadas, Las Trojes en lista de espera y Cerro de la Cruz no factible (su titular, Rogelio Bautista
+Núñez, está en el Listado de Incumplidas). El Ocotal tiene dictamen jurídico no procedente porque no se
+acredita la legal posesión (constancia vencida que no ampara toda la superficie). La sesión de
+seguimiento SO-CC-2026-02 tiene cuatro acuerdos: caso fortuito de Agua Blanca, desistimiento de La Joya
+Alta (baja, libera $10,000; cumplido), reasignación a Las Trojes, primera de la lista de espera (pasa a
+aprobada), y otro para la Unidad Jurídica. Cada dictamen tiene su documento en PDF adjunto.
 Para las historias de M3 y M5 hay además dos solicitudes aprobadas de cada uno de PS (Plantación Los Pinos,
 Rancho La Huerta), RHF (Barranca Honda, Ojo de Agua) y PSAHEM (Bosque El Zarco, Monte La Loma), cada programa
 con su sesión de aprobación y su acta (`contrato/demo.py`). PS y RHF ya publicaron sus resultados (HU-3.1, a
@@ -145,17 +149,18 @@ sistema/
 ├── probosque/         proyecto Django (settings, urls, wsgi)
 ├── nucleo/            app común: modelos, días hábiles, acuses PDF, carga de catálogos y reglas,
 │                      bandeja, permisos, comandos (cargar_catalogos, cargar_reglas, cargar_demo,
-│                      revisar_plazos) y datos de demostración
+│                      revisar_plazos), datos de demostración y trazabilidad.py (historial)
 ├── recepcion/         app M1: revisión de requisitos, polígonos, validación; servicios.py (reglas),
 │                      geometria.py (GeoJSON/KML/SHP), vistas y plantillas por pestaña
 ├── dictamen/          app M2, un módulo por historia: tecnico.py (HU-2.1), juridico.py (HU-2.2),
-│                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); sesiones.py y comun.py
+│                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); documentos.py (PDF de los
+│                      dictámenes), listados.py (candidatos y beneficiarios); sesiones.py y comun.py
 │                      compartidos; vistas/, formularios/ y templates/dictamen/ con la misma división;
-│                      registro.py conecta la app con las bandejas, el menú y los plazos del núcleo
+│                      registro.py conecta la app con las bandejas, el menú, la trazabilidad y los plazos del núcleo
 ├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 a 5.3): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
-├── plantillas/        base.html
+├── plantillas/        base.html y 403.html (acceso no permitido)
 ├── estaticos/         css, js del mapa y vendor/ (Bootstrap 5.3.9, htmx 2.0.11, Leaflet 1.9.4,
 │                      Leaflet-Geoman 2.20.6; sin CDN)
 ├── reglas/            CC.json, PS.json, RHF.json, PSA.json, catalogos.json, indice_rop.json (extraídos de las ROP;
@@ -189,9 +194,11 @@ stateDiagram-v2
     dictaminada --> aprobada: acta del Comité, Lista de Personas Beneficiarias (HU-2.3)
     dictaminada --> lista_espera: acta del Comité, Lista de espera (C)
     dictaminada --> no_factible: acta del Comité, Lista de No factibles (B)
-    lista_espera --> aprobada: reasignación por acuerdo del Comité
+    lista_espera --> aprobada: reasignación por acuerdo del Comité (HU-2.4)
+    aprobada --> baja: desistimiento, cancelación, baja o sustitución por acuerdo del Comité (HU-2.4)
     desechada --> [*]
     no_factible --> [*]
+    baja --> [*]
 ```
 
 Sprint 2 (tabla lista; las acciones las construyen las historias HU-3.x y HU-5.x). En M5 el expediente
@@ -241,7 +248,8 @@ stateDiagram-v2
 | `ministracion_solicitada` | Administración y Finanzas (en PSAHEM, una solicitud ya aceptada espera a la Secretaría Técnica) | Unidad Jurídica, Secretaría Técnica (PSAHEM) |
 | `remitida_fiduciaria`, `cheque_emitido` | Fiduciaria (PSAHEM) | Administración y Finanzas |
 | `cheque_enviado` | Delegación (entrega el cheque) | Fiduciaria, Administración y Finanzas |
-| `recurso_liberado` | — (final) | Unidad Jurídica, Secretaría Técnica |
+| `recurso_liberado` | — (final; su monto queda para reasignar, HU-2.4) | Unidad Jurídica, Secretaría Técnica |
+| `baja` (recurso liberado) | — (final) | Dirección, Unidad Jurídica, Secretaría Técnica |
 
 Una Delegación solo ve sus expedientes; una Dirección, los de los programas de los que es Instancia
 Ejecutora; las demás unidades, los estados que atienden o consultan. Además, cada unidad ve en su bandeja
@@ -287,7 +295,9 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   lo levantó (Delegación o prestador con RFN). Si el programa no usa polígono (PEG), la pestaña no
   aparece y el servicio lo rechaza.
 - **HU-1.4.** La Dirección ve cada requisito con una revisión automática contra las reglas y marca los
-  faltantes. Sin faltantes, el expediente queda validado (constancia en PDF). Con faltantes, se emite el
+  faltantes; **cada faltante lleva su observación** (obligatoria si lo marca la Dirección; si lo marca la
+  revisión con las reglas y no se escribe nada, su motivo). Cada requisito queda con su resultado y su
+  observación en `ObservacionValidacion`; el aviso, la notificación y la pestaña Requisitos la muestran. Sin faltantes, el expediente queda validado (constancia en PDF). Con faltantes, se emite el
   aviso con fecha límite = fecha del aviso + 5 días hábiles (plazo de las reglas, calendario de días
   inhábiles), dirigido a la persona solicitante por conducto de la Delegación; el expediente pasa a la
   bandeja de la Delegación, que registra la notificación (acuse) y reenvía cuando recibe lo faltante.
@@ -301,6 +311,13 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 - **Acuses.** Cada envío o entrega (recepción, envío a la Dirección, validación, aviso de faltantes,
   notificación) genera un `Acuse` con folio `AC-AAAA-NNNNNN`, fecha y hora, PDF (WeasyPrint) y su huella
   SHA-256, y un evento en la bitácora.
+- **Trazabilidad.** Los modelos del trámite llevan `django-simple-history`: cada alta, cambio o baja deja
+  un renglón con los valores, el usuario, la fecha y la hora y el motivo. `nucleo/trazabilidad.py`
+  (`registra_usuario`, `con_usuario`) registra al usuario de cada servicio aunque no haya petición web
+  (pruebas, demostración, comandos), y los cambios en lote se hacen con `save()` para que queden en el
+  historial. La pestaña «Trazabilidad» junta el historial de todos los registros del expediente, campo por
+  campo; cada app agrega los suyos en `extensiones.TRAZABILIDAD`. Es el último criterio de aceptación de
+  todas las historias del sistema.
 - **Archivos.** `FileSystemStorage` en el volumen `archivos`; no hay URL pública de los archivos: se
   descargan por vistas que revisan la unidad del usuario.
 - **Revisión de plazos.** En este sprint `revisar_plazos` solo señala en la bitácora (una vez) los
@@ -341,13 +358,23 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   límite de la Convocatoria (30-jun-2026). El dictamen queda «en plazo» o «fuera de plazo»; sin
   dictamen, «en plazo», «por vencer» (5 días hábiles o menos) o «vencido», y `revisar_plazos` lo señala
   una vez en la bitácora. El listado preliminar reúne el resultado técnico y jurídico de cada solicitud
-  validada y se exporta a CSV en UTF-8 con BOM (Excel lo abre con acentos).
+  validada y se exporta a CSV en UTF-8 con BOM (Excel lo abre con acentos). Al registrarlo se expide el
+  **documento «Dictamen técnico»** (`dictamen/documentos.py`, plantilla `dictamen/pdf/dictamen_tecnico.html`):
+  folio `DT-<programa>-<año>-<consecutivo>`, datos de la solicitud, análisis con el croquis del polígono,
+  verificación, plazo, resultado y firmas; se guarda como `Documento` de tipo «dictamen» del expediente,
+  con su huella SHA-256 en el dictamen.
 - **HU-2.2.** El Listado de Personas Beneficiarias Incumplidas y los predios con procedimiento o
   sanción son catálogos con historial (`django-simple-history`); una baja desactiva, no borra. El cotejo
   es automático (persona, CURP, RFC, nombre sin acentos y predio) y se muestra en la pantalla y en el
   acuse. Con coincidencias, el **servicio** rechaza el dictamen procedente. Un predio sancionado con el
   reintegro hecho deja de impedir el apoyo (CC 8.1.1.1, inelegibles fr. III). En refrendo se pide el
-  dictamen igual (CC 10.1 fr. IV).
+  dictamen igual (CC 10.1 fr. IV). Cada documento legal se marca válido o no válido (con su observación).
+  La **propiedad o legal posesión** del predio (`RevisionPropiedad`) se acredita con un documento de los
+  que admiten las ROP (`datos/dictamen.json` → `propiedad.tipos_documento`, CC 8.1.1.2 fr. VII), a nombre
+  del titular, que ampare la superficie del polígono vigente (o la solicitada), vigente si es constancia de
+  posesión o contrato (usufructo o arrendamiento, máximo 5 años) y sin evidencia de conflicto (8.1.1.1
+  fr. VII). Si falta algo, el servicio rechaza el dictamen procedente. Se expide el **documento «Dictamen
+  jurídico»** (folio `DJ-…`) con la revisión de la documentación, la propiedad, el cotejo y el resultado.
 - **HU-2.3.** La convocatoria exige orden del día y al menos un documento y se rechaza si no se envía con
   la anticipación de las reglas (`convocatoria_sesion_comite`: 3 días hábiles; 24 horas si es
   extraordinaria); su acuse lleva la fecha y la hora del envío, el orden del día y los integrantes del
@@ -360,11 +387,19 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   acta, en el historial y en la bitácora; una no factible no puede pasar a los listados de apoyo. El acta
   (PDF) trae los tres listados y la autorización de publicación, y mueve cada expediente a `aprobada`,
   `lista_espera` o `no_factible`.
-- **HU-2.4.** Los tipos de acuerdo y el área que los cumple por omisión están en `datos/dictamen.json`
-  (reasignación, sustitución, caso fortuito, suspensión, cancelación, baja, reintegro, instrucción de
-  pago a la Fiduciaria solo en PSAHEM y por ministración, validación de reportes solo en PEG y por
-  periodo, y otro). Cada acuerdo lleva sus expedientes y su unidad responsable, que lo ve en su bandeja y
-  lo marca como cumplido. `ministraciones_sin_instruccion` y `periodos_sin_validacion` dicen qué falta.
+- **Candidatos y beneficiarios** (HU-2.3). `dictamen/listados.py` arma dos vistas separadas (menú
+  «Listados»): candidatos (validadas en dictamen, dictaminadas por aprobar y lista de espera en su orden) y
+  beneficiarios (aprobadas con su monto y cómo entraron: acta o reasignación; aparte, las que salieron),
+  con exportación a CSV. Usan `expedientes_visibles`: la Delegación ve solo las suyas.
+- **HU-2.4 · Reasignaciones e incidentes.** Los tipos de acuerdo, el área que los atiende por omisión y su
+  efecto están en `datos/dictamen.json` (desistimiento, cancelación y baja → `baja`; reasignación →
+  `reasignacion`; sustitución → `sustitucion`; caso fortuito, suspensión, reintegro, instrucción de pago
+  a la Fiduciaria solo en PSAHEM y por ministración, validación de reportes solo en PEG y por periodo, y
+  otro → `registro`). Los incidentes piden su causa. La baja pasa a la persona beneficiaria a `baja` y su
+  monto (el del acta) queda como recurso liberado; la reasignación pasa a `aprobada` a las primeras de la
+  lista de espera, en su orden (lugar del acta), y no rebasa el recurso liberado sin reasignar; la
+  sustitución hace las dos cosas. Cada salida y entrada queda en `MovimientoListado`. Cada acuerdo lleva
+  sus expedientes y su unidad responsable, que lo ve en su bandeja y lo marca como cumplido. `ministraciones_sin_instruccion` y `periodos_sin_validacion` dicen qué falta.
   Los acuerdos todavía no ejecutan nada en otros módulos: `dictamen.seguimiento.RECEPTORES` es el punto
   de conexión (tipo de acuerdo → funciones) para pagos (M5) y seguimiento (M6).
 
@@ -793,4 +828,5 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 - `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
   aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
-  queda, el acuse y el renglón de la bitácora.
+  queda, el acuse y el renglón de la bitácora; al final, los dos documentos de los dictámenes y que el
+  historial de la base de datos tenga a cada unidad que intervino.

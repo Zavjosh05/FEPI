@@ -3,6 +3,8 @@
 - RevisionRequisito (HU-1.2): cada requisito aplicable queda entregado, faltante o no aplica.
 - Poligono (HU-1.3): polígono levantado en campo; los anteriores se conservan (historial).
 - Validacion (HU-1.4): validación de la Dirección o aviso de faltantes con fecha límite.
+- ObservacionValidacion (HU-1.4): resultado y observación de la Dirección sobre cada requisito al validar (qué falta o
+  por qué no es válido); el aviso de faltantes las lleva una por una.
 """
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -48,6 +50,12 @@ class RevisionRequisito(models.Model):
     @property
     def tiene_archivo(self):
         return self.documento_id is not None
+
+    @property
+    def observacion_direccion(self):
+        """Última observación de la Dirección sobre este requisito en un aviso de faltantes (HU-1.4), o None."""
+        return (self.observaciones_direccion.filter(faltante=True, validacion__resultado="faltantes")
+                .select_related("validacion").order_by("-validacion__fecha_hora", "-id").first())
 
 
 class LevantadoPor(models.TextChoices):
@@ -152,3 +160,28 @@ class Validacion(models.Model):
     @property
     def acuse_notificacion(self):
         return self.notificacion.acuse_notificacion if self.notificacion_id else None
+
+
+class OrigenObservacion(models.TextChoices):
+    REGLAS = "reglas", "Revisión con las reglas"
+    DIRECCION = "direccion", "Señalado por la Dirección"
+
+
+class ObservacionValidacion(models.Model):
+    """HU-1.4 · Lo que la Dirección dictó sobre cada requisito en una validación: válido o faltante, y su observación."""
+
+    validacion = models.ForeignKey(Validacion, on_delete=models.CASCADE, related_name="observaciones_requisitos")
+    revision = models.ForeignKey(RevisionRequisito, on_delete=models.PROTECT, related_name="observaciones_direccion")
+    faltante = models.BooleanField(default=False)
+    origen = models.CharField(max_length=20, choices=OrigenObservacion.choices, blank=True,
+                              help_text="Quién lo marcó como faltante: la revisión con las reglas o la Dirección.")
+    observacion = models.TextField(help_text="Qué falta o por qué no es válido; en los válidos, la nota de la revisión.")
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ["revision__requisito__orden", "id"]
+        verbose_name = "observación de la validación"
+        verbose_name_plural = "observaciones de la validación"
+
+    def __str__(self):
+        return f"{self.revision.requisito.clave}: {'Faltante' if self.faltante else 'Válido'} · {self.observacion[:60]}"
