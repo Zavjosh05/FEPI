@@ -118,8 +118,12 @@ corre con `docker compose --profile pruebas run --rm pruebas`.
 
 **Objetivo.** Criterios de aceptación:
 
-1. Existe la convocatoria con orden del día y documentos, y su fecha y hora.
+1. Existe la convocatoria con orden del día y documentos, y la fecha y la hora de su envío.
 2. Existe un acta con los listados aprobados y la autorización de publicación.
+3. Las solicitudes candidatas (en dictamen, por aprobar y en lista de espera, en su orden) y las personas
+   beneficiarias (con su monto y cómo entraron) se consultan en dos vistas separadas.
+4. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -182,7 +186,11 @@ navegador (`e2e/test_recorrido_hu_2_3.py`) con capturas `hu_2_3_*`.
 **Historia.** Como personal de la Delegación, quiero registrar la solicitud con los datos generales de la persona
 solicitante, los datos del predio y los datos específicos del programa, para iniciar su trámite.
 
-**Criterio de aceptación:** se genera un folio único para la solicitud.
+**Criterios de aceptación:**
+
+1. Se genera un folio único para la solicitud.
+2. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -221,8 +229,11 @@ municipio de la Delegación, solo la Delegación registra y predio ya registrado
 
 **Objetivo.** Criterios de aceptación:
 
-1. Cada requisito del programa, del tipo de persona y de la modalidad está revisado.
-2. El expediente digital está en la Dirección con la fecha y la hora del envío.
+1. Cada requisito del programa, del tipo de persona y de la modalidad está revisado como entregado (con su archivo
+   digitalizado), faltante o, si es condicional, no aplica.
+2. El expediente digital está en la Dirección, con la fecha y la hora del envío.
+3. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -251,8 +262,10 @@ municipio de la Delegación, solo la Delegación registra y predio ya registrado
 
 **Objetivo.** Criterios de aceptación:
 
-1. Existe un polígono asociado al expediente.
+1. Existe un polígono asociado al expediente del predio.
 2. Si el polígono cambia de lugar, existen el anterior y el nuevo.
+3. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -283,7 +296,11 @@ corrección y cambio de lugar. Además, el recorrido con navegador (capturas `hu
 **Objetivo.** Criterios de aceptación:
 
 1. El expediente está validado o tiene un aviso de faltantes con fecha límite.
-2. En un refrendo, la documentación legal vigente de hasta 3 años es válida.
+2. Cada requisito señalado como faltante tiene la observación de la Dirección (qué falta o por qué no es válido) y
+   el aviso de faltantes la incluye.
+3. En un refrendo, la documentación legal vigente de hasta 3 años es válida.
+4. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -369,9 +386,12 @@ a recepción que pidió la integración.
 
 **Objetivo.** Criterios de aceptación:
 
-1. Cada solicitud tiene un dictamen técnico factible o no factible, con su sustento.
+1. Cada solicitud tiene un dictamen técnico factible o no factible, con su motivo, expedido como documento PDF con
+   folio y adjunto al expediente.
 2. Existe un listado preliminar con el resultado técnico y jurídico de cada solicitud.
 3. En PEG, el dictamen existe dentro de los 45 días hábiles.
+4. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -401,8 +421,14 @@ recorrido con navegador (capturas `hu_2_1_*`).
 
 **Objetivo.** Criterios de aceptación:
 
-1. Cada solicitud tiene un dictamen jurídico procedente o no procedente.
-2. Una solicitud cuyo titular o predio está en el Listado de Personas Beneficiarias Incumplidas no es procedente.
+1. Cada solicitud tiene un dictamen jurídico procedente o no procedente, con su motivo, expedido como documento PDF
+   con folio y adjunto al expediente.
+2. Una solicitud cuya propiedad o legal posesión del predio no se acredita (documento a nombre del titular, que
+   ampare la superficie, vigente y sin conflicto) es no procedente.
+3. Una solicitud cuyo titular está en el Listado de Personas Beneficiarias Incumplidas, o cuyo predio tiene un
+   procedimiento o una sanción, es no procedente.
+4. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
@@ -432,7 +458,7 @@ recorrido con navegador (capturas `hu_2_1_*`).
 
 **Objetivo.** Criterios de aceptación:
 
-1. Existe la superficie en hectáreas de cada año disponible, por municipio.
+1. Existe la superficie en hectáreas de cada año disponible, por municipio y para el Estado.
 2. Existe la evolución año con año.
 
 **Cómo se diseñó.**
@@ -474,12 +500,16 @@ Capturas `hu_7_1_*`.
 
 **Commit:** `d8b71ff`.
 
-### T12 · Sesiones de seguimiento (HU-2.4, 3 puntos)
+### T12 · Reasignaciones e incidentes (HU-2.4, 3 puntos)
 
 **Objetivo.** Criterios de aceptación:
 
-1. Cada acuerdo indica a qué expedientes aplica y qué área debe cumplirlo.
-2. En PSAHEM existe la instrucción de pago de cada ministración; en PEG, la validación de cada periodo de reportes.
+1. Cada incidente (desistimiento, cancelación, baja, sustitución, caso fortuito, suspensión o reintegro) tiene un
+   acuerdo con su causa, los expedientes a los que aplica y el área que debe atenderlo.
+2. En una reasignación o sustitución, la persona beneficiaria que sale queda dada de baja y entra la siguiente
+   solicitud de la lista de espera, en su orden, sin rebasar el recurso liberado.
+3. Queda en la base de datos el registro de quién hizo cada acción, con la fecha y la hora y los valores anteriores
+   y nuevos (trazabilidad).
 
 **Cómo se diseñó.**
 
