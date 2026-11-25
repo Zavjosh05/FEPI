@@ -5,9 +5,10 @@ El porqué de cada decisión está en [BITACORA.md](BITACORA.md).
 
 ## Siguiente paso
 
-> **Sprint 3 terminado y entregado a Joshua (18-nov-2026)**: las 26 historias construidas y verificadas; resumen en
-> `sprint_3/Resumen_sprint_3.pdf`. Sigue su revisión: si sube la rama `prototipos` y si la une a `main`, y las
-> decisiones del cliente que lista la sección 9 del resumen (en la bitácora, estado «Por decidir»).
+> **Observaciones del profesor integradas en `prototipos` (25-nov-2026)**: la rama `sprint-2` (correcciones del sprint 1
+> y su adaptación a M3 y M5) quedó unida al sprint 3 y conciliada con él (tabla «Integración en prototipos», abajo; D-33 a
+> D-36 de la bitácora). Sigue la revisión de Joshua: unir `prototipos` a `main` y subirla, y las decisiones del cliente
+> (sección 9 del resumen del sprint 3; en la bitácora, estado «Por decidir»).
 
 ## Cómo retomar un trabajo interrumpido
 
@@ -83,7 +84,7 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 | Resumen | Resumen en PDF del sprint 1 (`sprint_1/Resumen_sprint_1.pdf`) | Hecho | `0598b95` |
 
 
-### Ajustes por las observaciones del profesor del 23-nov (D-29)
+### Ajustes por las observaciones del profesor del 23-nov (D-31; en las ramas `sprint-1` y `sprint-2` es D-29)
 
 | Tarea | Qué | Estado | Commit |
 | --- | --- | --- | --- |
@@ -96,7 +97,8 @@ Pruebas al cierre: 128 del sistema (121 antes de los ajustes; la última es el r
 
 Pruebas: 155 del sistema en verde (146 sin navegador y 9 recorridos por la interfaz). Capturas de los recorridos
 regeneradas en `sprint_1/capturas/` (71) y de la interfaz en `interfaces/capturas/`.
-En la rama `sprint-2` estas correcciones quedaron integradas con contrato y pagos (D-30, 24-nov).
+En la rama `sprint-2` estas correcciones quedaron integradas con contrato y pagos (D-32, 24-nov), y en `prototipos` con
+el sprint 3 (D-33 a D-36, 25-nov; tabla «Integración en prototipos»).
 
 ## Sprint 2 · Contrato y pagos (M3, M5; M7.2 y M7.3) — terminado el 16-nov
 
@@ -153,3 +155,18 @@ registra por separado; las que dicen «en paralelo» no tocan los mismos archivo
 | S3-12 | Verificación final: batería con PDF reales, Calculadora, sitio con base nueva | S3-10, S3-11 | Hecho | batería con PDF reales 564 + 40 (1 omitida a propósito); Calculadora 77; base nueva y navegador |
 | S3-13 | Resumen en PDF del sprint 3 (`sprint_3/Resumen_sprint_3.pdf`) | S3-12 | Hecho | 36 páginas, con diagramas y anexo de capturas |
 | S3-14 | Entrega a Joshua para revisión (sin subir hasta que lo indique) | S3-13 | Hecho | entregado el 18-nov; sin subir |
+
+## Integración en prototipos de las observaciones del profesor (25-nov-2026)
+
+La rama `sprint-2` (cierre del sprint 2 + correcciones del sprint 1 por las observaciones del 23-nov + su adaptación a M3 y
+M5) se unió a `prototipos`, que tiene el sprint 3. Decisiones en la bitácora (D-33 a D-36).
+
+| Tarea | Qué | Estado | Commit |
+| --- | --- | --- | --- |
+| I-1 | Unir `sprint-2` a `prototipos` y resolver los conflictos (migración del núcleo renumerada; menú de siete grupos) | Hecho | `7bb499d` |
+| I-2 | Conciliar HU-2.4 con HU-6.1 y HU-6.2: `MovimientoListado` como registro único de bajas, reasignaciones y recurso liberado | Hecho | `8712a39` |
+| I-3 | Dictámenes como documento PDF también en el sprint 3 (sin el `acuse` de los dictámenes) | Hecho | `7bb499d` (el código del sprint 3 ya no lo usaba al unir; manual en `4451923`) |
+| I-4 | Trazabilidad en M4 y M6 (historial, pestaña y una prueba por historia) | Hecho | `9f5fd39` |
+| I-5 | Historias de M1 a M6 en `modelo.json` (redacción de las observaciones y criterio de trazabilidad) y en la propuesta | Hecho | `a0c0d78` |
+| I-6 | Manual de usuario, README del sistema y modelo de datos | Hecho | `4451923` |
+| I-7 | Batería completa (también con PDF reales) y Calculadora | En curso | — |
