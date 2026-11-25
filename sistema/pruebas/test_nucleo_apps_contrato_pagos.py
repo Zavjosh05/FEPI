@@ -5,6 +5,7 @@ from django.core.management import call_command
 
 from contrato.models import FirmaContrato, SalidaPlanta, SinFirma, ValePlanta
 from nucleo import extensiones, montos
+from nucleo.demo_calendario import fecha_corte
 from nucleo.models import Estado, Expediente
 
 pytestmark = pytest.mark.django_db
@@ -66,7 +67,7 @@ def test_nucleo_demo_deja_aprobadas_de_ps_rhf_y_psahem(catalogos):
     assert FirmaContrato.objects.filter(expediente__in=antes).count() == 5 and SinFirma.objects.count() == 1
     # HU-3.4: vales vigentes, uno vencido (PS, sin reposición) y uno vencido con su reposición (RHF), con salidas parciales.
     vales = ValePlanta.objects.filter(expediente__in=antes)
-    assert vales.count() == 5 and {v.situacion() for v in vales} == {"vigente", "vencido", "repuesto"}
+    assert vales.count() == 5 and {v.situacion(fecha_corte()) for v in vales} == {"vigente", "vencido", "repuesto"}
     assert ValePlanta.objects.filter(repone__isnull=False).count() == 1 and SalidaPlanta.objects.count() >= 4
     assert not any(v.surtido for v in vales)
     # HU-5.1: contratos firmados de CC, PS, RHF y PSAHEM con su oficio y la solicitud de la primera ministración.

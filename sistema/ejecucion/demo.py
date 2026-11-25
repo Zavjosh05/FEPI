@@ -1,6 +1,8 @@
 """Datos de demostración de MFS y Guardabosques (idempotente; S3-02e): solicitudes recibidas y, para las historias de M4,
 expedientes contratados y con la primera ministración pagada, listos para comprobar. Todo con los servicios de M1 a M5, igual
-que la interfaz, en las fechas del calendario de 2026 (reloj simulado, ``nucleo/reloj.py``):
+que la interfaz, en las fechas del calendario de 2026 (reloj simulado, ``nucleo/reloj.py``). Lo de M4 depende del calendario
+de las reglas (fechas límite de conclusión y de entrega del informe o la verificación) y va fijo; solo los reportes mensuales
+del PEG siguen a la fecha de corte (``nucleo/demo_calendario.py``, por omisión el día de la carga):
 
 - **MFS** (Comité de Admisión y Seguimiento; aprobación hasta el 24-jun y firma hasta el 15-jul): registro en marzo, sesión el
   16-jun, firma el 26-jun y primera ministración pagada en julio. Bosque Los Volcanes (Programa de Manejo maderable de 7 a 95 ha,
@@ -16,9 +18,10 @@ que la interfaz, en las fechas del calendario de 2026 (reloj simulado, ``nucleo/
 **HU-4.1 · Envío de comprobaciones** (``_comprobaciones``): en MFS, Bosque Los Volcanes entrega su Bitácora en la Delegación el
 2-oct (queda por verificar y su segunda ministración tiene soporte) y Aserradero La Cumbre sigue esperando su solicitud de
 auditoría; en PEG, Margarito Sánchez Ruiz envía por el portal sus reportes de junio a octubre (el de octubre, del 4-nov, está
-por revisar en la Delegación) y la Delegación recaba su acuse de depósito; Ejido San Bartolo entrega en ventanilla los de junio y
-julio (le falta agosto). Del lote de pagos (``pagos/demo.py``): Predio La Ciénega (CC) avisa el término el 10-nov y entrega su
-Informe Final el 17-nov, Plantación La Mesa (PS) avisa el término el 28-sep y Manantial Alto (RHF, Restauración Forestal
+por revisar en la Delegación; cargada después de noviembre, también los meses que hayan terminado antes de la fecha de corte, y
+el último es el que queda por revisar: ``_reportes_san_juan``) y la Delegación recaba su acuse de depósito; Ejido San Bartolo
+entrega en ventanilla los de junio y julio (le falta agosto). Del lote de pagos (``pagos/demo.py``): Predio La Ciénega (CC)
+avisa el término el 10-nov y entrega su Informe Final el 17-nov, Plantación La Mesa (PS) avisa el término el 28-sep y Manantial Alto (RHF, Restauración Forestal
 Integral Modalidad uno, que concluye en octubre) el 28-oct.
 
 **HU-4.2 · Verificación en campo** (``_verificaciones``): el área responsable revisa la Bitácora de Bosque Los Volcanes el 6-oct y
@@ -36,6 +39,8 @@ CASPEG los valida el 15-sep: San Juan cobra su segunda ministración (22-sep); S
 queda «no entregó» en agosto y su segunda ministración no se puede solicitar. Septiembre (San Juan, con observaciones) queda por
 evaluar y el reporte de octubre de San Juan por revisar en la Delegación.
 """
+from datetime import date, timedelta
+
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.db import transaction
@@ -46,8 +51,9 @@ from contrato.models import ModeloContrato, TipoModelo
 from dictamen import juridico, seguimiento, sesiones, tecnico
 from dictamen.demo import _validada, paso, propiedad_en_regla, sesion_aprobacion
 from dictamen.models import TipoSesion
+from nucleo import dias_habiles
 from nucleo.demo import CONTRASENA_DEMO, _pdf_demo, _solicitud, archivo_demo, completar_requisitos
-from nucleo.demo_calendario import cuando, habil, habil_antes
+from nucleo.demo_calendario import con_corte, cuando, fecha_corte, habil, habil_antes, meses_terminados
 from nucleo.models import Ejercicio, Expediente, Usuario
 from pagos import pagos, solicitudes
 
@@ -194,6 +200,7 @@ def _portal_demo():
         cuenta.save(update_fields=["activada_en", "codigo_hash"])
 
 
+@con_corte
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}
@@ -232,10 +239,24 @@ def _revisar(u, c, fecha, resultado="revisado", observaciones="", hora=16):
         return reportes.revisar(_delegacion(u, c.expediente), c, resultado, observaciones)
 
 
+def _reportes_san_juan():
+    """Reportes mensuales de San Juan por el portal: ``[(periodo, fecha de envío, revisión o None)]``. Julio a septiembre van
+    fijos; desde octubre, uno por cada mes que terminó antes de la fecha de corte (``meses_terminados``), enviado el segundo día
+    hábil del mes siguiente (o la fecha de corte, si ésta llega antes) y revisado ese día, salvo el último, que queda por revisar
+    en la Delegación. Con el corte de referencia (19-nov) es solo octubre, enviado el 4-nov."""
+    filas = [("2026-07", "2026-08-04", ("revisado", "")), ("2026-08", "2026-09-03", ("revisado", "")),
+             ("2026-09", "2026-10-05", ("con_observaciones", "Falta la evidencia fotográfica de dos recorridos."))]
+    meses = meses_terminados("2026-10")
+    for i, periodo in enumerate(meses):
+        anio, mes = map(int, periodo.split("-"))
+        fin = dias_habiles.sumar_meses(date(anio, mes, 1), 1) - timedelta(days=1)
+        envio = min(habil(fin, 2), fecha_corte())
+        filas.append((periodo, envio, None if i == len(meses) - 1 else ("revisado", "")))
+    return filas
+
+
 def _comprobaciones(u):
     """HU-4.1: envíos por el portal y entregas en ventanilla, cada uno en su fecha (idempotente por expediente)."""
-    from datetime import date
-
     def exp_de(nombre):
         return Expediente.objects.filter(predio__nombre=nombre, firma_contrato__isnull=False).first()
 
@@ -246,9 +267,7 @@ def _comprobaciones(u):
     san_juan = exp_de("Ejido San Juan")
     margarito = Usuario.objects.filter(username="SARM800101HMCNZR09", cuenta_externa__activada_en__isnull=False).first()
     if san_juan is not None and margarito is not None:
-        for periodo, fecha, revision in (("2026-07", "2026-08-04", ("revisado", "")), ("2026-08", "2026-09-03", ("revisado", "")),
-                                         ("2026-09", "2026-10-05", ("con_observaciones", "Falta la evidencia fotográfica de dos recorridos.")),
-                                         ("2026-10", "2026-11-04", None)):
+        for periodo, fecha, revision in _reportes_san_juan():
             if san_juan.comprobaciones.filter(tipo="reporte_mensual", periodo=periodo).exists():
                 continue
             c = _envio(margarito, san_juan, "reporte_mensual", fecha, 9, periodo=periodo,
@@ -278,8 +297,6 @@ def _comprobaciones(u):
 # ----------------------------------------------------------------------------- HU-4.2
 def _verificaciones(u):
     """HU-4.2: resultados de la verificación (y su segunda ministración en MFS), idempotente por expediente."""
-    from datetime import date
-
     from . import verificacion
 
     def pendiente(nombre):

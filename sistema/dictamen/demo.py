@@ -7,7 +7,8 @@ Todo ocurre en las fechas del calendario de la Convocatoria de CC 2026 (reloj si
 24 de marzo (recepción hasta el 27-mar), validación en el plazo de la ventanilla, dictámenes en abril y mayo (la fecha límite es el
 30-jun) y la sesión de aprobación del Comité el 14-jul (aprobación del 1 al 31-jul). Hay casos fuera de plazo a propósito: El Ocotal
 nunca tuvo dictamen técnico (venció el 30-jun; el jurídico no acredita la posesión) y Potrero Viejo se dictaminó el 15-jul, después de la fecha límite. La sesión de seguimiento se
-convocó con anticipación y se celebra después de la fecha de corte (``nucleo/demo_calendario.py``)."""
+convocó con anticipación y se celebra después de la fecha de corte (``nucleo/demo_calendario.py``): sus fechas son del calendario de
+referencia (corte el 19-nov-2026) y se trasladan a la fecha de corte de la carga, en días hábiles (``reciente``, D-32)."""
 from datetime import timedelta
 from decimal import Decimal
 
@@ -17,7 +18,7 @@ from django.utils import timezone
 
 from nucleo import reloj
 from nucleo.demo import _pdf_demo, _solicitud, completar_requisitos, cuadro_en_municipio
-from nucleo.demo_calendario import cuando, habil, habil_antes
+from nucleo.demo_calendario import con_corte, cuando, habil, habil_antes, reciente
 from nucleo.models import Ejercicio, Predio, Unidad, Usuario
 from recepcion import servicios as recepcion
 
@@ -113,6 +114,7 @@ def _existe(ejercicio, nombre):
     return Predio.objects.filter(nombre=nombre, expedientes__ejercicio=ejercicio).first()
 
 
+@con_corte
 @transaction.atomic
 def cargar_demo():
     ejercicio = Ejercicio.objects.filter(programa__clave="CC", reglas_cargadas__isnull=False).order_by("-anio").first()
@@ -205,28 +207,30 @@ def cargar_demo():
         juridico.dictaminar(uj, potrero, "procedente", "Documentación legal vigente.", propiedad=propiedad_en_regla(potrero))
     creadas += 1
 
-    # Sesión de seguimiento con acuerdos: se convoca en noviembre y se celebra después de la fecha de corte
-    fecha_seg = habil("2026-11-24")
-    with paso("2026-11-09", 12):
+    # Sesión de seguimiento con acuerdos: se convoca unos días antes de la fecha de corte y se celebra después (fechas del
+    # calendario de referencia, trasladadas a la fecha de corte)
+    fecha_seg = reciente("2026-11-24")
+    aviso = reciente("2026-11-10")
+    with paso(reciente("2026-11-09"), 12):
         seg = sesiones.crear_sesion(st, ejercicio, TipoSesion.SEGUIMIENTO, cuando(fecha_seg, 11),
                                     "Sala de juntas de PROBOSQUE, Metepec",
                                     "Lista de asistencia y declaración de quórum\nSeguimiento de casos del ejercicio\nAsuntos generales")
         sesiones.agregar_documento(st, seg, ContentFile(_pdf_demo("Casos para seguimiento"), name="casos.pdf"), "Casos para seguimiento")
-    with paso("2026-11-10", 10):
+    with paso(aviso, 10):
         sesiones.enviar_convocatoria(st, seg)
     drff_unidad = Unidad.objects.get(clave="DRFF")
-    with paso("2026-11-11", 10):
+    with paso(reciente("2026-11-11"), 10):
         if agua_blanca is not None:
             seguimiento.registrar_acuerdo(st, seg, "caso_fortuito", "Atender el aviso de incendio en la parte baja del predio "
                                           "y ajustar la propuesta FO-PB-520-B con la Delegación.", [agua_blanca], drff_unidad,
-                                          causa="Aviso de incendio de la Delegación Toluca del 10/11/2026.")
+                                          causa=f"Aviso de incendio de la Delegación Toluca del {aviso:%d/%m/%Y}.")
         # Incidente: La Joya Alta desiste; su recurso se reasigna a la primera de la lista de espera (Las Trojes).
         joya.refresh_from_db()
         baja = None
         if joya.estado.clave == "aprobada":
             baja = seguimiento.registrar_acuerdo(
                 st, seg, "desistimiento", f"Se acepta el desistimiento de {joya.solicitante.nombre} y se libera su recurso.",
-                [joya], drff_unidad, causa="Escrito de desistimiento presentado en la Delegación Amecameca el 10/11/2026.")
+                [joya], drff_unidad, causa=f"Escrito de desistimiento presentado en la Delegación Amecameca el {aviso:%d/%m/%Y}.")
             lista = seguimiento.lista_de_espera(ejercicio)
             if lista and (lista[0]["monto"] is None or lista[0]["monto"] <= seguimiento.recurso_liberado(ejercicio)):
                 seguimiento.registrar_acuerdo(
@@ -235,6 +239,6 @@ def cargar_demo():
         seguimiento.registrar_acuerdo(st, seg, "otro", "Revisar con la Unidad Jurídica la situación del titular del Cerro de la Cruz.",
                                       [cruz], Unidad.objects.get(clave="UJ"))
     if baja is not None:
-        with paso("2026-11-12", 10):
+        with paso(reciente("2026-11-12"), 10):
             seguimiento.cumplir(drff, baja, "Se notificó la baja por conducto de la Delegación Amecameca.")
     return creadas

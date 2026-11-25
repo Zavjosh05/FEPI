@@ -147,7 +147,7 @@ notificada y por elaborar. En HU-3.3 cada uno de PS y RHF tiene un segundo lote 
 sesión y publicación: en PS, dos contratos firmados en plazo (Mirador de los Pinos, Ladera Verde) y uno sin firma al
 vencer el plazo, señalado y por liberar (Cañada Seca); en RHF, tres firmados (Arroyo Claro, Cerro Gordo y Peña Blanca, esta
 de RFI Modalidad uno, que no recibe planta). Cañada Seca venció su plazo de firma por el calendario (publicada el 24-sep). Plantación Los Pinos queda por firmar en
-la Delegación. **MFS y Guardabosques** (`ejecucion/demo.py`): en MFS, Bosque Los Volcanes (ETF de 7 a 95 ha, polígono del prestador)
+la Delegación, a un día hábil de vencer el día de la carga. **MFS y Guardabosques** (`ejecucion/demo.py`): en MFS, Bosque Los Volcanes (ETF de 7 a 95 ha, polígono del prestador)
 y Aserradero La Cumbre (FSC de cadena de custodia) con la primera ministración pagada (70 % y 50 %), listos para entregar su Bitácora o
 solicitud de auditoría (HU-4.1), Predio El Mirador contratado y Predio Agua Fría recién recibido; en PEG, Ejido San Juan y Ejido San
 Bartolo con su Guardabosque, la evaluación de los reportes de junio validada por el CASPEG y el depósito del 25 %, Ejido Santa Ana
@@ -161,17 +161,20 @@ por solicitar en $2,000 (proporcional); Manantial Alto, completo y en plazo (con
 verificado y con sus actividades concluidas. **Evaluación de reportes (HU-4.3):** el CASPEG validó la evaluación de junio (7-jul) y las de
 julio y agosto (15-sep); Margarito Sánchez Ruiz cobró su segunda ministración (22-sep); Ejido San Bartolo no entregó agosto y Ejido Santa
 Ana ningún mes, así que quedan señalados y sin ministración; septiembre (con observaciones) queda por evaluar y el reporte de octubre por
-revisar en la Delegación. **Lista de espera y sustituciones** (`seguimiento/demo.py`): un lote de RHF (Bosques de Agua, 2 ha)
+revisar en la Delegación (cargada después de noviembre, San Juan entregó también cada mes terminado antes de la fecha de corte y el
+último es el que queda por revisar). **Lista de espera y sustituciones** (`seguimiento/demo.py`): un lote de RHF (Bosques de Agua, 2 ha)
 aprobado el 8-sep con recurso para dos: Loma del Aire avisa el fallecimiento de su titular (5-oct) y la segunda persona beneficiaria pide
 continuar en plazo (9-oct); Arroyo Seco desiste por escrito (6-oct); el Comité acuerda las dos el 22-oct y el área las cumple el 23-oct
 (Loma del Aire sigue con Rosa Robles Díaz; Arroyo Seco libera su recurso); la reasignación del 26-oct alcanza al lugar 1 de la lista de
-espera, se acuerda el 10-nov, Paraje El Rocío queda aprobada el 11-nov y se le notifica el 13-nov; Cerro La Mina sigue en lista de espera.
+espera, se acuerda el 10-nov, Paraje El Rocío queda aprobada el 11-nov y se le notifica el 13-nov (por firmar en plazo, a 7 días hábiles de vencer el día de la
+carga); Cerro La Mina sigue en lista de espera.
 En MFS, Aserradero La Cumbre tiene una prórroga por causa externa por resolver (16-nov). **Incumplimientos y reintegros:**
 Administración y Finanzas registró las cuentas para reintegros de CC, PS, RHF y PSAHEM (12-nov); Loma del Aire recibió un aviso de
 omisiones con fecha límite del 6-nov, el sistema lo señaló vencido, el área propuso la cancelación, el Comité la acordó y la Unidad
 Jurídica la cumplió (Rosa Robles Díaz en el Listado de Incumplidas), emitió el requerimiento por la planta no establecida ($3,500) y
 Administración y Finanzas comprobó el depósito (18-nov, reintegrada); los reportes no entregados de Ejido San Bartolo y Ejido Santa Ana
-quedan señalados para que el área los confirme. El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
+quedan señalados para que el área los confirme. Las fechas de octubre y noviembre de este párrafo son las del calendario de
+referencia (corte el 19-nov): la carga las traslada a su fecha de corte (ver «Reloj simulado y calendario de la demostración»). El portal de personas beneficiarias (`/portal/`) tiene activa la cuenta de Margarito
 Sánchez Ruiz (usuario `SARM800101HMCNZR09`, contraseña de demostración); los demás Guardabosques tienen su código de primer acceso en el
 acuse «Acceso al portal» de su expediente. La página pública de resultados está en
 `/contrato/resultados/` (sin iniciar sesión; enlace en la pantalla de entrada). `cargar_demo` carga antes las reglas de los cuatro
@@ -887,7 +890,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   vez por situación, de los entregados sin cobro **por vencer** (5 días hábiles o menos) o **vencidos**, y hay un panel en las bandejas.
   Solo es aviso: la baja por cheque vencido (8.1.9, fr. VII) es del sprint 3.
 - **Demostración.** En PSAHEM, cheque emitido (Paraje Las Ánimas), enviado (Monte Alto), entregado (Cerro del Venado) y entregado hace
-  el 21-ago, por vencer sin cobro en la fecha de corte (Loma Verde); Bosque Los Cedros espera su cheque.
+  casi tres meses, por vencer sin cobro en la fecha de corte (Loma Verde: vence a dos días hábiles de ella;
+  `demo_calendario.entrega_cheque_por_vencer`); Bosque Los Cedros espera su cheque.
 
 ### Tropiezos de interfaz del sprint 2 (P-23 a P-31)
 
@@ -909,7 +913,7 @@ se prueban en `pruebas/test_nucleo_tropiezos_interfaz_s2.py`:
 - **P-31** El cobro del cheque lleva rótulo «Cobro del cheque», ayuda y fecha rotulada, y solo se ve a la Fiduciaria y a la
   Delegación del cheque.
 
-### Reloj simulado y calendario de la demostración (G-03, P-03)
+### Reloj simulado y calendario de la demostración (G-03, P-03, D-37)
 
 `nucleo/reloj.py`: `with reloj.en("2026-03-02 10:30") as r: ...` hace que **todo** el sistema vea ese momento como «ahora»
 (`timezone.now`, `localdate`, `auto_now`, los `default=timezone.now` de los modelos, folios, acuses, bitácora y plazos) y al salir
@@ -918,17 +922,33 @@ dependencias (sustituye `django.utils.timezone.now` y los valores por omisión d
 la demostración, el generador y las pruebas; la interfaz y los servicios no cambian. El sistema no usa `datetime.now()` ni
 `date.today()` (se revisó con grep).
 
-La carga de demostración (`nucleo/demo.py`, `dictamen/demo.py`, `contrato/demo.py`, `pagos/demo.py`) pone cada paso en su fecha del
+La carga de demostración (`nucleo/demo.py`, `dictamen/demo.py`, `contrato/demo.py`, `pagos/demo.py`, `ejecucion/demo.py`,
+`seguimiento/demo.py`) pone cada paso en su fecha del
 calendario de la Convocatoria 2026 (`nucleo/demo_calendario.py`): solicitudes entre el 3-feb y el 24-mar (recepción del 28-ene al
 27-mar), dictámenes de abril a junio (límite 30-jun en CC y PSAHEM; 30-abr en PS y RHF), sesión de aprobación de CC el 14-jul y de
 PSAHEM el 15-jul (aprobación del 1 al 31-jul), y, donde las reglas no dan fecha límite de aprobación (PS y RHF), sesiones en agosto,
-septiembre y noviembre para que los plazos de firma estén vigentes o vencidos según el caso. Casos fuera de plazo a propósito:
+septiembre y pocos días antes de la fecha de corte para que los plazos de firma estén vigentes o vencidos según el caso. Casos fuera de plazo a propósito:
 Los Ocotes (revisión sin terminar, plazo de la ventanilla vencido), El Tecolote (desechada), El Ocotal (dictamen vencido), Potrero
 Viejo (dictaminado el 15-jul, fuera de plazo), Cañada Seca (sin firma en plazo), Ladera Verde y Cerro Gordo (vales vencidos) y
-Loma Verde (cheque entregado el 21-ago, por vencer). **Fecha de corte:** el «hoy» de la demostración es el 19-nov-2026
-(`DEMO_FECHA_CORTE=AAAA-MM-DD` la cambia): con ella se señalan lo sin firma y lo por vencer, y lo vigente (vales, firmas por vencer) se
-arma hacia atrás desde ella. La carga da lo mismo el día que se corra (se prueba corriéndola con un reloj de 2031) y es idempotente.
-Una vez cargada, el sistema usa el reloj real, así que un sitio de demostración viejo muestra sus plazos vencidos, como cualquier
+Loma Verde (cheque por vencer). **Fecha de corte:** el «hoy» de la demostración es **el día en que se corre la carga**,
+sin bajar del 19-nov-2026 ni pasar del 31-dic-2026 (en 2027 la demostración queda como al cierre del ejercicio 2026);
+`DEMO_FECHA_CORTE=AAAA-MM-DD` fija otra dentro de ese rango (`docker-compose.yml` la pasa al contenedor; las pruebas la fijan en el
+19-nov en `pruebas/conftest.py`). Se calcula una vez al empezar (`demo_calendario.carga()`; cada `cargar_demo` lleva `@con_corte`).
+Lo que sirve por estar cerca de «hoy» (primer lote de PS y RHF con sesión, publicación, notificaciones y contratos; vales y sus
+salidas; solicitudes de pago, revisiones, remisiones y cheques de octubre y noviembre; sesiones de seguimiento de CC y PSAHEM; en M6,
+la cadena de Loma del Aire, Arroyo Seco y Paraje El Rocío desde el aviso del fallecimiento, con sus sesiones de seguimiento, la
+omisión, la cancelación, el requerimiento y el depósito, más las cuentas para reintegros y la prórroga de MFS) está escrito en el
+calendario de referencia (corte el 19-nov) y `demo_calendario.reciente` lo traslada a la fecha de corte conservando los días hábiles
+que lo separan de ella (una fecha inhábil de la referencia conserva los días naturales desde su hábil anterior); si la fecha de corte
+es inhábil, se cuenta desde el siguiente día hábil (`ancla`) y nada queda después de hoy. El cheque de Loma Verde se arma desde su
+entrega, que `entrega_cheque_por_vencer` elige para que su plazo de 3 meses venza a dos días hábiles. Los reportes mensuales del PEG
+van por mes (`meses_terminados`): Ejido San Juan entregó cada mes terminado antes de la fecha de corte y el último queda por revisar.
+La verificación de M4 (avisos de término, Informe Final, visitas y conclusión) sigue fija porque depende de las fechas límite de
+conclusión de las reglas; el cierre de Loma del Aire, los padrones y el informe anual ocurren en la fecha de corte. Con el corte de
+referencia la carga es idéntica a la anterior; con otro, cada caso queda en el mismo punto
+(`test_demo_fecha_de_corte_es_hoy_y_los_casos_quedan_en_su_punto`, con un martes de diciembre, un sábado y 2027). El resto
+(recepción, dictamen, sesiones de julio, segundo lote de septiembre) no depende del día de la carga, que es idempotente. Una vez
+cargada, el sistema usa el reloj real, así que una demostración cargada hace días muestra sus plazos vencidos, como cualquier
 expediente real.
 
 **Bordes de los plazos (G-03).** `pruebas/test_nucleo_plazos_bordes.py` fija, con el reloj simulado, el último momento válido y el

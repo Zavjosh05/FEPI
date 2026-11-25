@@ -13,6 +13,10 @@ from nucleo.catalogos import cargar_catalogos, cargar_reglas_disponibles
 from nucleo.demo import CONTRASENA_DEMO, _pdf_demo, crear_usuarios
 from nucleo.models import Ejercicio, Municipio, Usuario
 
+# La demostración toma por fecha de corte el día de la carga (D-32); las pruebas la fijan en la fecha de corte de referencia
+# para ser deterministas (las que prueban otra la cambian con monkeypatch).
+os.environ["DEMO_FECHA_CORTE"] = "2026-11-19"
+
 RAIZ_SISTEMA = Path(__file__).resolve().parents[1]
 ESPECIFICACION = RAIZ_SISTEMA / "especificacion"
 

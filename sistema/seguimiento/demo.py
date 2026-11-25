@@ -1,5 +1,12 @@
 """Datos de demostración del módulo M6 (idempotente), con los servicios del sistema y en las fechas del calendario de 2026
-(reloj simulado, ``nucleo/reloj.py``; fecha de corte 19-nov-2026).
+(reloj simulado, ``nucleo/reloj.py``; fecha de corte: por omisión el día de la carga, ``nucleo/demo_calendario.py``).
+
+**Calendario.** El lote se registra, dictamina, aprueba (8-sep) y firma (17-sep) en fechas fijas. Desde el fallecimiento del
+28-sep, todo (sustitución, desistimiento, sesiones de seguimiento, reasignación y su notificación, omisión, cancelación,
+requerimiento, depósito, cuentas para reintegros y la prórroga de MFS) está escrito en el calendario de referencia (corte el
+19-nov-2026) y se traslada a la fecha de corte de la carga en días hábiles (``reciente``; D-32 de la rama del sprint 2): Paraje
+El Rocío queda por firmar en plazo y el resto de la cadena a los mismos días hábiles de «hoy». Las fechas de abajo son las de
+referencia.
 
 **HU-6.1 · Lista de espera y sustituciones** (lote propio de RHF, ``LOTE``): cuatro solicitudes de Bosques de Agua de 2 ha
 registradas en marzo; la sesión de aprobación del 8-sep tiene recurso para dos (Arroyo Seco y Loma del Aire, que firman el 17-sep)
@@ -44,7 +51,7 @@ from dictamen.demo import paso, sesion_aprobacion
 from dictamen.models import TipoSesion
 from nucleo import montos
 from nucleo.demo import _pdf_demo, archivo_demo
-from nucleo.demo_calendario import cuando, habil, habil_antes
+from nucleo.demo_calendario import con_corte, cuando, fecha_corte, habil, habil_antes, reciente
 from nucleo.models import Ejercicio, Expediente, Usuario
 
 from . import cierre, incumplimientos, reasignacion
@@ -64,7 +71,13 @@ CALENDARIO = dict(registro="2026-03-18", tecnico="2026-04-23", juridico="2026-04
                   notificacion_omision="2026-10-28", vence_omision="2026-11-06", revision="2026-11-09",
                   propuesta_cancelacion="2026-11-10", cumplir_cancelacion="2026-11-11", cuentas="2026-11-12",
                   requerimiento="2026-11-13", notificacion_requerimiento="2026-11-16", deposito="2026-11-18")
+DESDE_RECIENTE = "2026-09-28"   # de aquí en adelante, las fechas de CALENDARIO se trasladan a la fecha de corte
 CUENTAS = {"CC": "PROBOSQUE", "PS": "PROBOSQUE", "RHF": "PROBOSQUE", "PSA": "Fiduciaria del FIPASAHEM"}
+
+
+def _calendario():
+    """``CALENDARIO`` con las fechas recientes (desde el fallecimiento) llevadas a la fecha de corte de la carga."""
+    return {k: (reciente(v) if v >= DESDE_RECIENTE else v) for k, v in CALENDARIO.items()}
 
 
 def _ejercicio(clave):
@@ -83,7 +96,7 @@ def _sesion_seguimiento(st, ejercicio, fecha, tema):
 
 
 def _lote_reasignacion(u, ejercicio):
-    c = CALENDARIO
+    c = _calendario()
     drff, st = u["dir_drff"], u["comite"]
     filas = [(*f, habil(c["registro"], i)) for i, f in enumerate(LOTE)]
     exps = [exp for exp, _ in dictaminar_lote(u, ejercicio, filas, c["tecnico"], c["juridico"])]
@@ -152,20 +165,19 @@ def _prorroga_mfs(u):
         if mfs else None
     if exp is None or exp.prorrogas.exists():
         return 0
-    with paso(CALENDARIO["prorroga"], 10):
+    with paso(_calendario()["prorroga"], 10):
         reasignacion.solicitar_prorroga(
             _delegacion(u, exp), exp, "La entidad certificadora pospuso la auditoría de cadena de custodia por causas ajenas a la "
-            "persona beneficiaria.", habil("2027-02-26"), archivo_demo("prorroga.pdf", "Escrito de solicitud de prorroga"),
-            habil("2026-12-15"))
+            "persona beneficiaria.", reciente(habil("2027-02-26")),
+            archivo_demo("prorroga.pdf", "Escrito de solicitud de prorroga"), reciente(habil("2026-12-15")))
     return 0
 
 
 def _incumplimientos(u):
     from dictamen.models import SesionComite
-    from nucleo.demo_calendario import fecha_corte
     from nucleo.models import Programa
 
-    c = CALENDARIO
+    c = _calendario()
     with paso(c["cuentas"], 9):
         for clave, titular in CUENTAS.items():
             p = Programa.objects.filter(clave=clave).first()
@@ -211,8 +223,6 @@ def _cierre(u):
     """HU-6.3: el día de corte el área responsable de RHF cierra Loma del Aire (reintegro depositado), publica el padrón de RHF
     (con la baja de Arroyo Seco y la cancelación de Loma del Aire) y envía el informe anual al Comité, que la Secretaría Técnica aún no
     recibe; la Dirección de Protección Forestal publica el padrón del PEG (con sus altas, bajas y sustituciones)."""
-    from nucleo.demo_calendario import fecha_corte
-
     corte = fecha_corte()
     rhf = _ejercicio("RHF")
     if rhf is not None:
@@ -232,6 +242,7 @@ def _cierre(u):
             cierre.publicar_padron(u["dir_dpf"], peg)
 
 
+@con_corte
 @transaction.atomic
 def cargar_demo():
     u = {x.username: x for x in Usuario.objects.all()}

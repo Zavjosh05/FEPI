@@ -5,7 +5,7 @@ import pytest
 from django.core.management import call_command
 from django.utils import timezone
 
-from nucleo import reloj
+from nucleo import demo_calendario, reloj
 from nucleo.demo_calendario import cuando, fecha_corte, habil, habil_antes
 from nucleo.models import Acuse, Evento, Expediente
 
@@ -42,9 +42,55 @@ def test_calendario_habil_y_fecha_de_corte(catalogos, monkeypatch):
     assert habil("2026-03-14") == date(2026, 3, 17)          # sábado → el 16 es inhábil (Benito Juárez)
     assert habil("2026-02-02") == date(2026, 2, 3)
     assert habil_antes("2026-03-17", 1) == date(2026, 3, 13)
-    assert fecha_corte() == date(2026, 11, 19)
-    monkeypatch.setenv("DEMO_FECHA_CORTE", "2026-10-01")
-    assert fecha_corte() == date(2026, 10, 1)
+    assert fecha_corte() == date(2026, 11, 19)                # la de las pruebas (conftest)
+    monkeypatch.setenv("DEMO_FECHA_CORTE", "2026-12-01")
+    assert fecha_corte() == date(2026, 12, 1)
+    for fuera in ("2026-10-01", "2027-01-04"):                # fuera del ejercicio de la demostración
+        monkeypatch.setenv("DEMO_FECHA_CORTE", fuera)
+        with pytest.raises(ValueError):
+            fecha_corte()
+
+
+def test_demo_fecha_de_corte_es_hoy_con_topes(catalogos, monkeypatch):
+    """D-32: sin DEMO_FECHA_CORTE, la fecha de corte es el día de la carga, sin bajar del 19-nov ni pasar del 31-dic-2026."""
+    monkeypatch.delenv("DEMO_FECHA_CORTE")
+    for hoy, corte in (("2026-11-25", "2026-11-25"), ("2026-12-15", "2026-12-15"), ("2026-11-28", "2026-11-28"),
+                       ("2026-06-01", "2026-11-19"), ("2027-02-10", "2026-12-31"), ("2031-07-07", "2026-12-31")):
+        with reloj.en(f"{hoy} 08:00"):
+            assert fecha_corte() == date.fromisoformat(corte), hoy
+    # Durante la carga la fecha de corte no cambia aunque el reloj simulado se mueva a otros días
+    with reloj.en("2026-12-15 08:00"):
+        with demo_calendario.carga() as corte:
+            with reloj.en("2026-03-02 10:00"):
+                assert fecha_corte() == corte == date(2026, 12, 15)
+    # Sábado: la fecha de corte es hoy y los pasos recientes se cuentan desde el lunes (ancla)
+    with reloj.en("2026-11-28 08:00"), demo_calendario.carga():
+        assert demo_calendario.ancla() == date(2026, 11, 30)
+        assert demo_calendario.reciente("2026-11-19") == date(2026, 11, 28)
+        assert demo_calendario.reciente("2026-11-18") == date(2026, 11, 27)
+
+
+def test_demo_calendario_reciente_conserva_la_referencia_y_el_cheque_por_vencer(catalogos, monkeypatch):
+    """Con el corte de referencia, ``reciente`` deja cada fecha igual; con cualquier otro, el cheque de Loma Verde vence a 1-5 días
+    hábiles de la fecha de corte (por vencer) y no antes."""
+    from nucleo import dias_habiles
+
+    fechas = ["2026-10-06", "2026-10-12", "2026-10-14", "2026-10-20", "2026-10-22", "2026-11-03", "2026-11-04", "2026-11-05",
+              "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-17", "2026-11-19",
+              "2026-11-24"]
+    assert all(demo_calendario.reciente(f) == date.fromisoformat(f) for f in fechas)
+    assert demo_calendario.entrega_cheque_por_vencer() == date(2026, 8, 21)
+    # Fechas inhábiles de la referencia (M6: el requerimiento se notifica el lunes 16-nov) y meses del PEG
+    assert demo_calendario.reciente("2026-11-16") == date(2026, 11, 16)
+    assert demo_calendario.meses_terminados("2026-10") == ["2026-10"]
+    dia = date(2026, 11, 19)
+    while dia <= date(2026, 12, 31):
+        monkeypatch.setenv("DEMO_FECHA_CORTE", dia.isoformat())
+        entrega = demo_calendario.entrega_cheque_por_vencer()
+        vence = dias_habiles.siguiente_habil(dias_habiles.sumar_meses(entrega, 3))
+        assert dias_habiles.es_habil(entrega) and 1 <= dias_habiles.dias_habiles_entre(dia, vence) <= 5, dia
+        assert [demo_calendario.reciente(f) for f in fechas] == sorted(demo_calendario.reciente(f) for f in fechas), dia
+        dia += timedelta(days=1)
 
 
 def test_demo_ocurre_en_el_calendario_de_la_convocatoria_sin_importar_el_dia_de_la_carga(catalogos):
@@ -78,3 +124,76 @@ def test_demo_ocurre_en_el_calendario_de_la_convocatoria_sin_importar_el_dia_de_
     los_pinos = Expediente.objects.get(predio__nombre="Plantación Los Pinos")
     assert los_pinos.estado.clave == "contrato_en_delegacion"
     assert plazos.vencimiento(los_pinos, "firma_liberacion").estado(fecha_corte()) in ("en plazo", "por vencer")
+
+
+def _estado_clave(nombre):
+    return Expediente.objects.get(predio__nombre=nombre).estado.clave
+
+
+@pytest.mark.parametrize("hoy", ["2026-12-15", "2026-11-28", "2027-02-10"])     # martes; sábado; 2027 (tope: 31-dic-2026)
+def test_demo_fecha_de_corte_es_hoy_y_los_casos_quedan_en_su_punto(catalogos, monkeypatch, hoy):
+    """D-32: cargada otro día, la demostración arma sus casos recientes desde ese día: Los Pinos por firmar y en plazo, a un
+    día hábil de vencer; Cañada Seca señalada sin firma; el cheque de Loma Verde por vencer; el vale de Mirador de los Pinos
+    vigente y el de Ladera Verde vencido; y nada ocurre después de la fecha de corte."""
+    from contrato.models import SinFirma, ValePlanta
+    from nucleo import dias_habiles, plazos
+    from pagos import cheques
+    from pagos.models import Cheque
+
+    monkeypatch.delenv("DEMO_FECHA_CORTE")
+    with reloj.en(f"{hoy} 07:30"):
+        call_command("cargar_demo")
+        corte = demo_calendario.corte_para(timezone.localdate())
+    ancla = dias_habiles.siguiente_habil(corte)
+    assert not Evento.objects.filter(fecha_hora__gt=cuando(corte, 23, 59)).exists()
+    assert not Evento.objects.filter(fecha_hora__year__gt=2026).exists()
+    # Recepción y dictamen siguen en el calendario de la Convocatoria
+    from dictamen.models import SesionComite
+    assert timezone.localdate(SesionComite.objects.get(numero="SO-CC-2026-01").fecha_hora) == date(2026, 7, 14)
+    # Contratos: Los Pinos en la Delegación, por firmar, a un día hábil (desde el ancla) de vencer; Barranca Honda por enviar
+    los_pinos = Expediente.objects.get(predio__nombre="Plantación Los Pinos")
+    assert los_pinos.estado.clave == "contrato_en_delegacion"
+    v = plazos.vencimiento(los_pinos, "firma_liberacion")
+    assert v.estado(corte) == "por vencer" and dias_habiles.dias_habiles_entre(ancla, v.vencimiento) == 1
+    assert _estado_clave("Barranca Honda") == "contrato_elaborado" and _estado_clave("Ojo de Agua") == "notificada"
+    assert not SinFirma.objects.filter(expediente__predio__nombre__in=["Plantación Los Pinos", "Barranca Honda",
+                                                                         "Rancho La Huerta", "Ojo de Agua"]).exists()
+    # El contrato vencido sin firma, señalado
+    assert _estado_clave("Cañada Seca") == "sin_firma_en_plazo" and SinFirma.objects.count() == 1
+    # Vales: vigentes (Mirador de los Pinos, Arroyo Claro), vencido (Ladera Verde) y repuesto (Cerro Gordo)
+    vale = {v.expediente.predio.nombre: v.situacion(corte) for v in ValePlanta.objects.filter(repone__isnull=True)
+            if not v.surtido}                                   # los surtidos son los del lote de pagos de PS
+    assert vale == {"Mirador de los Pinos": "vigente", "Arroyo Claro": "vigente", "Ladera Verde": "vencido",
+                    "Cerro Gordo": "repuesto"}
+    assert ValePlanta.objects.get(repone__isnull=False).situacion(corte) == "vigente"
+    # Cheque por vencer (Loma Verde) con su aviso; los de noviembre, en plazo
+    loma = Cheque.objects.get(expediente__predio__nombre="Loma Verde")
+    assert cheques.vencimiento_cobro(loma).estado(corte) == "por vencer"
+    assert loma.expediente.eventos.filter(tipo="cheque_por_vencer").count() == 1
+    venado = Cheque.objects.get(expediente__predio__nombre="Cerro del Venado")
+    assert cheques.vencimiento_cobro(venado).estado(corte) == "en plazo"
+    assert _estado_clave("Monte Alto") == "cheque_enviado" and _estado_clave("Paraje Las Ánimas") == "cheque_emitido"
+    # La sesión de seguimiento de CC se convocó antes de la fecha de corte y se celebra después
+    seg = SesionComite.objects.get(ejercicio__programa__clave="CC", tipo="seguimiento")
+    assert timezone.localdate(seg.convocatoria_enviada) <= corte < timezone.localdate(seg.fecha_hora)
+    # M6: Paraje El Rocío, reasignado desde la lista de espera, por firmar en plazo (a 7 días hábiles, como en la referencia);
+    # Loma del Aire cancelada, con su reintegro y su expediente cerrado; la prórroga de MFS por resolver antes de su plazo
+    rocio = Expediente.objects.get(predio__nombre="Paraje El Rocío")
+    v = plazos.vencimiento(rocio, "firma_liberacion")
+    assert rocio.estado.clave == "notificada" and v.estado(corte) == "en plazo"
+    assert dias_habiles.dias_habiles_entre(ancla, v.vencimiento) == 7
+    loma_aire = Expediente.objects.get(predio__nombre="Loma del Aire")
+    assert loma_aire.estado.clave == "ejercicio_cerrado" and loma_aire.avisos_omision.get().vence < corte
+    assert loma_aire.requerimientos.get().estado == "depositado"
+    cumbre = Expediente.objects.get(predio__nombre="Aserradero La Cumbre")
+    prorroga = cumbre.prorrogas.get()
+    assert cumbre.estado.clave == "prorroga_solicitada" and prorroga.plazo_original > corte
+    # M4 (PEG): San Juan entregó cada mes terminado antes de la fecha de corte; el último queda por revisar en la Delegación
+    from ejecucion import reportes as ejecucion_reportes
+
+    san_juan = Expediente.objects.get(predio__nombre="Ejido San Juan")
+    meses = [f"2026-{m:02d}" for m in range(6, 13) if dias_habiles.sumar_meses(date(2026, m, 1), 1) - timedelta(days=1) < corte]
+    entregados = san_juan.comprobaciones.filter(tipo="reporte_mensual")
+    assert sorted(entregados.values_list("periodo", flat=True)) == meses
+    assert list(entregados.filter(revisada_en__isnull=True).values_list("periodo", flat=True)) == [meses[-1]]
+    assert all(f["estado"] != "no_entrego" for f in ejecucion_reportes.historial(san_juan, corte)), hoy
