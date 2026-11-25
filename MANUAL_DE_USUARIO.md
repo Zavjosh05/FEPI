@@ -712,7 +712,7 @@ calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de 
 | Publicar los listados autorizados (la demostración trae el acta de PSAHEM sin publicar; CC, PS y RHF ya se publicaron) | `dir_drff` | Panel «Listados autorizados por publicar» |
 | Notificar el resultado y la cita (PS) | `del_toluca` | Rancho La Huerta |
 | Un contrato por firmar cuyo plazo ya venció (la revisión de plazos lo señala «Sin firma en plazo») | `del_amecameca`, `dir_drff` | Plantación Los Pinos (PS) |
-| Contrato elaborado por enviar; otro por elaborar (sus plazos de firma también vencieron) | `dir_drff` | Barranca Honda y Ojo de Agua (RHF) |
+| Contrato elaborado por enviar (su plazo de firma ya venció); otro por elaborar | `dir_drff` | Barranca Honda y Ojo de Agua (RHF) |
 | Modelos de contrato por validar | `juridica` | Panel «Modelos por validar» (CC, PS y PSAHEM) |
 | Contratos firmados y un contrato sin firma en plazo, por liberar | `del_amecameca`, `dir_drff` | Mirador de los Pinos y Ladera Verde (firmados), Cañada Seca (sin firma), todos de PS |
 | Vale vigente con salidas parciales | `vivero` | Mirador de los Pinos (PS) y Arroyo Claro (RHF) |
@@ -722,7 +722,7 @@ calendario simulado con fecha de corte el **19 de noviembre de 2026** (Guía de 
 | Solicitudes enviadas por revisar, y otras ya pagadas | `finanzas` | Por revisar: Predio Las Palomas (CC), Plantación El Cedro (PS). Pagadas: Predio La Ciénega (CC), Plantación La Mesa (PS), Manantial Alto (RHF) |
 | PSAHEM en cada punto del pago | `finanzas`, `comite`, `fiduciaria`, `del_toluca` | Solicitud por revisar: Rancho El Pedregal y Ejido La Joya. Remitida a la Fiduciaria: Bosque Los Cedros. Cheque emitido: Paraje Las Ánimas. Enviado a la Delegación: Monte Alto. Entregados: Cerro del Venado y Loma Verde (este, por vencer sin cobro) |
 
-Los contratos que la demostración dejó por firmar el 19-nov (Plantación Los Pinos, Rancho La Huerta, Barranca Honda, Ojo de Agua) tienen plazo de 10 días hábiles: pasada la fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para probar la firma con datos de hoy, `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS (Guía de inicio y secuencia de prueba).
+Los contratos que la demostración dejó por firmar el 19-nov (Plantación Los Pinos, Rancho La Huerta, Barranca Honda y, más adelante, Ojo de Agua) tienen plazo de 10 días hábiles: pasada la fecha, la revisión diaria de plazos los señala «Sin firma en plazo» y ya no se les puede registrar la firma. Para probar la firma con datos de hoy, `datos_prueba/sprint_2/preparar_casos_ps.py` agrega dos casos de PS (Guía de inicio y secuencia de prueba).
 
 Para empezar de cero con los mismos datos: `docker compose -p probosque_s2 down -v` y `docker compose -p probosque_s2 up
 --build` (Guía de inicio, sección 1.5). Los plazos que corren desde la fecha de corte se miden con el reloj real: según el
