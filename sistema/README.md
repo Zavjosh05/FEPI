@@ -13,13 +13,15 @@ de planta, HU-5.1 Solicitud de pago, HU-5.2 Pago de la ministración y HU-5.3 En
 
 ## Cómo levantar
 
-Requisitos: Docker con Compose 2.24 o posterior. En Windows, Docker vive en WSL:
+Requisitos: Docker con Compose 2.24 o posterior. En Windows, Docker vive en WSL: desde PowerShell, en la carpeta
+`sistema/`, cada comando lleva `wsl` delante (corre en Ubuntu en la misma carpeta, sin escribir rutas `/mnt/c/...`):
 
-```
-wsl -e bash -lc "cd /mnt/c/Users/<usuario>/Documents/GitHub/FEPI/sistema && docker compose up --build"
+```powershell
+cd sistema
+wsl docker compose up --build
 ```
 
-En otro equipo basta con `docker compose up --build` dentro de `sistema/`.
+En Ubuntu, Linux o macOS basta con `docker compose up --build` dentro de `sistema/`.
 
 - El sitio queda en **http://localhost:8080** (Nginx → Gunicorn).
 - Al arrancar, el contenedor `web` aplica las migraciones, recolecta los estáticos y corre
@@ -40,7 +42,7 @@ Servicios de `docker-compose.yml`:
 
 ## Cómo probar
 
-Desde `sistema/` (en este equipo, dentro de WSL: `wsl -e bash -lc "cd /mnt/c/.../FEPI/sistema && <comando>"`).
+Desde `sistema/` (en Windows, desde PowerShell, con `wsl` delante: `wsl docker compose ...`).
 Docker Compose acepta argumentos para el servicio `pruebas`; al terminar, `docker compose down`.
 
 **En paralelo (pytest-xdist 3.8.0).** La batería corre por omisión en paralelo: pytest-django crea una base por proceso

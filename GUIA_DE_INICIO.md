@@ -34,7 +34,7 @@ funcionar:
 | Unos **3 GB libres** en disco | Imágenes de Docker y base de datos | La imagen de pruebas, opcional, ocupa más. |
 | **Internet** la primera vez | Descargar las imágenes de Docker y las bibliotecas de Python | Después solo hace falta para el mapa base de fondo. |
 
-Para comprobar que Docker está listo:
+Para comprobar que Docker está listo (en PowerShell, `wsl docker compose version`):
 
 ```bash
 docker compose version
@@ -74,23 +74,29 @@ cd FEPI
 git checkout sprint-2
 ```
 
-En Windows con WSL, el repositorio puede quedar en una carpeta de Windows, por ejemplo
-`C:\Users\<usuario>\Documents\GitHub\FEPI`, y dentro de Ubuntu se llega a ella con
-`/mnt/c/Users/<usuario>/Documents/GitHub/FEPI`.
+En Windows, estos comandos se escriben en PowerShell (con Git para Windows) y el repositorio queda en una carpeta de
+Windows; Docker se usa desde ahí, como dice la sección 1.3.
 
 ### 1.3 Levantar el sistema
 
-Desde la carpeta `sistema/`:
+Docker está instalado dentro de Ubuntu (WSL), no en Windows. Por eso el comando depende de dónde lo escribas.
+
+**En Windows, desde PowerShell** (sin abrir Ubuntu), en la carpeta del repositorio que bajaste en 1.2:
+
+```powershell
+cd sistema
+wsl docker compose up --build
+```
+
+`wsl` corre el comando dentro de Ubuntu, en la misma carpeta: no hace falta escribir rutas `/mnt/c/...`. En PowerShell,
+`docker` solo no funciona («docker no se reconoce como nombre de un cmdlet»). **Todos los comandos `docker compose` de
+esta guía se escriben igual en PowerShell, con `wsl` delante.**
+
+**En Ubuntu, Linux, macOS o la terminal de Docker Desktop:**
 
 ```bash
 cd sistema
 docker compose up --build
-```
-
-En Windows, desde PowerShell, sin abrir Ubuntu:
-
-```powershell
-wsl -e bash -lc "cd /mnt/c/Users/<usuario>/Documents/GitHub/FEPI/sistema && docker compose up --build"
 ```
 
 **La primera vez tarda varios minutos**: construye la imagen y, al arrancar, crea la base de datos, carga los
@@ -133,7 +139,8 @@ firma, el vale de *Mirador de los Pinos* está vigente y el cheque de *Loma Verd
 - La fecha de corte no baja del 19-nov-2026 ni pasa del 31-dic-2026 (el ejercicio sigue siendo 2026): cargada en 2027, la
   demostración queda como al cierre de 2026 y sus plazos se ven vencidos.
 - Para fijar otra fecha (entre esas dos), define `DEMO_FECHA_CORTE=AAAA-MM-DD` antes de levantar con una base nueva, por
-  ejemplo `DEMO_FECHA_CORTE=2026-12-15 docker compose up --build` (o en `.env`).
+  ejemplo `DEMO_FECHA_CORTE=2026-12-15 docker compose up --build`; en PowerShell,
+  `wsl env DEMO_FECHA_CORTE=2026-12-15 docker compose up --build` (o ponla en `.env`).
 
 Una vez cargada, los plazos (firma del contrato, vigencia del Vale de Planta, cobro del cheque) se miden con el reloj real:
 si pruebas días después, algunos aparecerán vencidos, como en cualquier expediente real. Para volver a tenerla fresca, borra
@@ -149,6 +156,8 @@ baja con reasignación desde la Lista de espera de PS).
 | Volver a levantar | `docker compose up` (los datos se conservan) |
 | Borrar todo y empezar de cero | `docker compose down -v` y luego `docker compose up --build` |
 | Correr en segundo plano | `docker compose up -d --build`; ver lo que pasa con `docker compose logs -f web` |
+
+En PowerShell, cada comando con `wsl` delante: `wsl docker compose down`, `wsl docker compose up --build`…
 
 `down -v` borra la base de datos y los archivos subidos; al volver a levantar, la demostración se carga de nuevo.
 
@@ -169,8 +178,12 @@ la base se crea: si la cambias después, borra la base con `docker compose down 
 
 | Síntoma | Causa probable y qué hacer |
 | --- | --- |
+| `docker` no se reconoce como nombre de un cmdlet (PowerShell) | Docker está dentro de Ubuntu, no en Windows. Escribe el comando con `wsl` delante: `wsl docker compose up --build` (sección 1.3). |
+| `bash: usuario: No such file or directory` o `cd: ... No such file or directory` | Se copió una ruta con un marcador como `<usuario>` o con otra carpeta. No escribas la ruta: entra a la carpeta en PowerShell (`cd sistema`) y usa `wsl docker compose up --build`. |
+| `wsl docker ...` dice que no encuentra `docker` | WSL no abre Ubuntu por omisión. Revisa con `wsl -l -v` y elige Ubuntu con `wsl --set-default Ubuntu-24.04`. |
+| `Cannot connect to the Docker daemon` | El servicio de Docker no está corriendo en Ubuntu: `wsl sudo service docker start` (pide tu contraseña de Ubuntu) y vuelve a intentar. |
 | `docker: command not found` o `permission denied` | Docker no está instalado, o tu usuario no está en el grupo `docker`: repite el paso 2 de 1.1 y `wsl --shutdown`. |
-| `port is already allocated` o la página no abre | Otro programa usa el puerto 8080. Ciérralo, o cambia `"8080:80"` en `sistema/docker-compose.yml` por, por ejemplo, `"8090:80"`, y entra por ese puerto. |
+| `port is already allocated` o la página no abre | Otro programa usa el puerto 8080; puede ser otra versión del sistema (otra rama) que sigue levantada: detenla con `docker compose down` en su carpeta `sistema/`. Ciérralo, o cambia `"8080:80"` en `sistema/docker-compose.yml` por, por ejemplo, `"8090:80"`, y entra por ese puerto. |
 | La página da error 502 o no deja entrar | La primera carga sigue en curso. Espera a que la ventana de `docker compose` deje de escribir y recarga. |
 | Ves otra versión del sistema | Faltó `--build`, o quedó corriendo la de otra rama (sección 1.5). |
 | El sistema se apagó solo en Windows | WSL apaga Ubuntu cuando no hay ventanas suyas abiertas. Deja abierta la ventana de `docker compose up`. |
@@ -184,6 +197,8 @@ Desde `sistema/`, la corrida completa de esta versión (473 pruebas, con Chromiu
 ```bash
 docker compose --profile pruebas run --rm pruebas
 ```
+
+En PowerShell: `wsl docker compose --profile pruebas run --rm pruebas`.
 
 Si una corrida anterior se interrumpió, puede quedar una base de pruebas a medias y la siguiente falla con «database
 … already exists»: corre `docker compose down`, o agrega `--create-db` a `pytest`. Corre un solo comando

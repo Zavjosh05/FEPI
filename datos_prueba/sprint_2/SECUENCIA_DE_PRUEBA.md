@@ -50,8 +50,8 @@ Calculadora, con las cifras que se citan. Lo que no coincidía con la primera re
 ## 2. Antes de empezar
 
 1. Levanta el sistema como dice la [Guía de inicio](../../GUIA_DE_INICIO.md). Si conviven varias ramas, usa su nombre de
-   proyecto: `docker compose up --build` desde `sistema/`. Para partir de la demostración limpia:
-   `docker compose down -v` y de nuevo `up --build`.
+   proyecto: `docker compose up --build` desde `sistema/` (en PowerShell, `wsl docker compose up --build`). Para partir de
+   la demostración limpia: `docker compose down -v` y de nuevo `up --build`.
 2. Con el sistema ya levantado y la demostración cargada, **corre una sola vez** el script de esta carpeta, desde `sistema/`:
 
    ```bash
@@ -59,7 +59,11 @@ Calculadora, con las cifras que se citan. Lo que no coincidía con la primera re
    ```
 
    Debe terminar con «Listo. Caso 1: … Plantación Cumbres …; Caso 2: … Vereda Alta …, … Cañada Honda …». Si lo corres otra vez
-   dice «Ya estaba preparado». En Windows con WSL, antepón `wsl -e bash -lc "cd /mnt/c/Users/<usuario>/…/sistema && …"`.
+   dice «Ya estaba preparado». En PowerShell no se puede usar `<` para leer un archivo; desde `sistema/` escribe:
+
+   ```powershell
+   wsl sh -c "docker compose exec -T web python manage.py shell < ../datos_prueba/sprint_2/preparar_casos_ps.py"
+   ```
 3. Abre http://localhost:8080/entrar/. Contraseña de todos los usuarios: `Probosque2026`. Para cambiar de unidad: **Salir** y
    entra con el usuario que indica cada paso.
 4. Ten a la mano la carpeta `documentos/` de esta carpeta.
