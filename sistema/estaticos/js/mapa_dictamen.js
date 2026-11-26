@@ -4,7 +4,10 @@
   if (!div || !window.L) return;
   const mapa = L.map(div);
   if (div.dataset.teselas) {
-    L.tileLayer(div.dataset.teselas, { maxZoom: 19, attribution: "&copy; colaboradores de OpenStreetMap" }).addTo(mapa);
+    L.tileLayer(div.dataset.teselas, {
+      maxZoom: 19, attribution: "&copy; colaboradores de OpenStreetMap",
+      referrerPolicy: "strict-origin-when-cross-origin",   // OSM bloquea las teselas sin Referer (ver mapa_poligono.js)
+    }).addTo(mapa);
   }
   mapa.setView([19.35, -99.6], 9);
   fetch(div.dataset.url, { credentials: "same-origin" })
