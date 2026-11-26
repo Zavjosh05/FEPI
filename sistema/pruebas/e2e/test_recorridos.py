@@ -114,6 +114,13 @@ def test_hu_1_3_recorrido_ubicacion_del_predio(datos_e2e, page, live_server, ent
         "type": "Feature", "properties": {"nombre": "Predio La Joya"},
         "geometry": json.loads(cuadro_en_municipio(exp.predio.municipio, 12).geojson)}]}))
     page.set_input_files("#id_archivo", str(ruta))
+    # Al elegir el archivo se ve en el mapa (vista previa) antes de registrarlo
+    expect(page.locator("[data-prueba=vista-previa-poligono]")).to_contain_text("aún sin registrar")
+    expect(page.locator("[data-prueba=vista-previa-poligono]")).to_contain_text("12.00 ha, dentro del municipio")
+    assert page.evaluate("() => { let n = 0; window.mapaPoligono.eachLayer(l => { if (l.getTooltip && l.getTooltip() "
+                         "&& String(l.getTooltip().getContent()).includes('sin registrar')) n++; }); return n; }") >= 1
+    assert not exp.poligonos.exists()
+    captura("hu_1_3_02a_vista_previa_del_archivo")
     page.fill("#id_responsable", "Ing. Carlos Ortega")
     page.click("button:has-text('Registrar polígono')")
     page.wait_for_selector("#mapa[data-listo='1']")

@@ -14,6 +14,7 @@ urlpatterns = [
     path("expediente/<str:folio>/estado/", views.cambiar_con_motivo, name="cambiar_estado"),
     path("expediente/<str:folio>/poligono/", views.registrar_poligono, name="poligono"),
     path("expediente/<str:folio>/poligonos.json", views.poligonos_geojson, name="poligonos_geojson"),
+    path("expediente/<str:folio>/poligono/vista-previa/", views.vista_previa_poligono, name="poligono_vista_previa"),
     path("expediente/<str:folio>/poligono/<int:pk>/archivo/", views.archivo_poligono, name="archivo_poligono"),
     path("expediente/<str:folio>/validar/", views.validar, name="validar"),
     path("expediente/<str:folio>/notificar/", views.notificar, name="notificar"),

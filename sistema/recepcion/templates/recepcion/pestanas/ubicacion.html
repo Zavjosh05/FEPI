@@ -1,11 +1,12 @@
 {% with vigente=poligonos|first %}
 <div class="row g-3">
   <div class="col-12 col-xl-8">
-    <div id="mapa" data-url="{% url 'recepcion:poligonos_geojson' exp.folio %}" data-teselas="{{ MAPA_TESELAS_URL }}" data-editable="{{ puede_poligono|yesno:'1,0' }}"></div>
+    <div id="mapa" data-url="{% url 'recepcion:poligonos_geojson' exp.folio %}" data-teselas="{{ MAPA_TESELAS_URL }}" data-editable="{{ puede_poligono|yesno:'1,0' }}" data-vista-previa="{% url 'recepcion:poligono_vista_previa' exp.folio %}"></div>
     <div class="leyenda-mapa small text-secondary mt-1">
       <span style="border-color:#1f5130;background:#1f513033"></span>Polígono vigente
       <span class="ms-3" style="border-color:#888;border-style:dashed"></span>Polígonos anteriores
       <span class="ms-3" style="border-color:#c47f00"></span>Municipio {{ exp.predio.municipio.nombre }}
+      {% if puede_poligono %}<span class="ms-3" style="border-color:#1d5fbf;border-style:dashed;background:#1d5fbf22"></span>Archivo elegido (sin registrar){% endif %}
       {% if not MAPA_TESELAS_URL %}<em class="ms-3">· sin mapa base (no hay servidor de teselas configurado)</em>{% endif %}
     </div>
   </div>
@@ -27,6 +28,7 @@
       {% csrf_token %}
       <div class="titulo-seccion mb-2">{% if vigente %}Registrar cambio del polígono{% else %}Registrar polígono levantado en campo{% endif %}</div>
       {% include "recepcion/_campo.html" with campo=form_poligono.archivo %}
+      <div id="vista-previa-poligono" class="small mb-2" data-prueba="vista-previa-poligono" aria-live="polite"></div>
       <div class="small text-secondary mb-3">O dibújelo en el mapa con la herramienta de polígono (respaldo); el dibujo se guarda al registrar.</div>
       {{ form_poligono.dibujo }}
       {% include "recepcion/_campo.html" with campo=form_poligono.levantado_por %}
