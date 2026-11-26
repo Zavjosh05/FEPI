@@ -56,6 +56,11 @@ class ModeloContrato(models.Model):
         v = self.vigente
         return v is not None and v.estado == EstadoVersion.VALIDADA
 
+    @property
+    def por_validar_base(self):
+        """Plantilla base del sistema que aún no se valida: se muestra con la marca «BORRADOR – modelo por validar»."""
+        return self.es_base and not self.validado
+
 
 class VersionModelo(models.Model):
     modelo = models.ForeignKey(ModeloContrato, on_delete=models.CASCADE, related_name="versiones")

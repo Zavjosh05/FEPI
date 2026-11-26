@@ -9,7 +9,7 @@ que cambie el programa) a:
   ``publicacion_resultados``, ``entrega_vale``, ``entrega_cheque``, ``firma_contrato``…);
 - opcionales: ``tipo_notificacion`` (para ``notificacion_persona``), ``tope`` (``{"plazo": clave}`` toma
   su ``fecha_fin``; ``{"fecha": "AAAA-MM-DD"}``; ``{"dato": campo, "solo_reasignadas": true}`` toma un
-  campo extra del plazo), ``evento_reasignada`` (otro evento para las personas reasignadas desde la lista
+  campo extra del plazo; ``{"uso": clave}`` toma el vencimiento de otro uso, sin ``tope`` de uso a su vez), ``evento_reasignada`` (otro evento para las personas reasignadas desde la lista
   de espera), ``unidad`` (cuando las reglas no dicen si los días son hábiles), ``decision_propia`` y
   ``nota``.
 
@@ -174,6 +174,9 @@ def _fecha_tope(expediente, plazo, tope):
     if "plazo" in tope:
         otro = expediente.ejercicio.plazo(tope["plazo"])
         return otro.fecha_fin if otro else None
+    if "uso" in tope:
+        otro = vencimiento(expediente, tope["uso"])
+        return otro.vencimiento if otro is not None else None
     if "dato" in tope and plazo is not None:
         valor = plazo.datos.get(tope["dato"])
         return date.fromisoformat(valor) if valor else None

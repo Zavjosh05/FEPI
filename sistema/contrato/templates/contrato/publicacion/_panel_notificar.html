@@ -2,7 +2,7 @@
   <div class="titulo-seccion">Notificaciones por entregar a las personas ({{ panel.total }})</div>
   <div class="small mb-2">Avisos que la Delegación debe entregar; al registrar cada entrega queda su fecha, hora, medio y acuse.</div>
   <ul class="small mb-2">{% for n in panel.notificaciones %}
-    <li><a href="{% url 'contrato:notificaciones' %}?ver=pendientes&aviso={{ n.pk }}#notificacion-{{ n.pk }}" data-prueba="registrar-entrega">{{ n.expediente.folio }}</a> · {{ n.get_tipo_display }} · enviada el {{ n.enviada_en|date:"d/m/Y H:i" }}</li>
+    <li><a href="{% url 'contrato:notificaciones' %}?ver=pendientes&aviso={{ n.pk }}#notificacion-{{ n.pk }}" data-prueba="registrar-entrega">{{ n.expediente.folio }}</a> · {{ n.tipo_texto }} · enviada el {{ n.enviada_en|date:"d/m/Y H:i" }}</li>
   {% endfor %}</ul>
   <a class="btn btn-sm btn-outline-primary" href="{% url 'contrato:notificaciones' %}">Abrir la bandeja de notificaciones</a>
 </div>

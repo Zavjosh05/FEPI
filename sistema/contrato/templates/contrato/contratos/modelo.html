@@ -5,7 +5,7 @@
   <div>
     <div class="small text-secondary">{{ m.ejercicio.programa.nombre }} {{ m.ejercicio.anio }} · {{ m.get_tipo_display }}</div>
     <h1 class="h4 mb-0">{{ m.nombre }}</h1>
-    {% if m.es_base %}<span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}
+    {% if m.por_validar_base %}<span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}
   </div>
   <a class="btn btn-outline-secondary btn-sm" href="{% url 'contrato:modelos' %}">Volver a los modelos</a>
 </div>

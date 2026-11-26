@@ -175,8 +175,25 @@ def _revisar(usuario, version, estado, observaciones):
 
 @registra_usuario
 def validar_version(usuario, version, observaciones=""):
-    """La Unidad Jurídica valida la versión (fecha y hora, quién y observaciones)."""
-    return _revisar(usuario, version, EstadoVersion.VALIDADA, observaciones)
+    """La Unidad Jurídica valida la versión (fecha y hora, quién y observaciones). El texto de una plantilla base que todavía
+    lleva la marca «BORRADOR» no se valida: el área responsable se la quita antes (versión nueva). Al validarla, la marca sale
+    también del nombre del modelo."""
+    if MARCA_BORRADOR in version.texto:
+        raise ValidationError(f"El texto todavía lleva la marca «{MARCA_BORRADOR}»: el área responsable debe quitarla "
+                              "(versión nueva) antes de validarlo; si no está conforme, devuélvalo con observaciones.")
+    version = _revisar(usuario, version, EstadoVersion.VALIDADA, observaciones)
+    _quitar_marca_del_nombre(version.modelo)
+    return version
+
+
+def _quitar_marca_del_nombre(modelo):
+    marca = f" ({MARCA_BORRADOR})"
+    if marca not in modelo.nombre:
+        return
+    nombre = modelo.nombre.replace(marca, "").strip()
+    if not ModeloContrato.objects.filter(ejercicio=modelo.ejercicio, tipo=modelo.tipo, nombre=nombre).exclude(pk=modelo.pk).exists():
+        modelo.nombre = nombre
+        modelo.save(update_fields=["nombre"])
 
 
 @registra_usuario

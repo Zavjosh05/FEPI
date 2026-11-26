@@ -43,7 +43,7 @@
         <thead class="table-light"><tr><th>Solicitud</th><th>Aviso</th><th>Envío</th><th>Notificada</th></tr></thead>
         <tbody>
         {% for n in notificaciones %}
-        <tr><td class="text-nowrap">{{ n.expediente.folio }}</td><td>{{ n.get_tipo_display }}</td>
+        <tr><td class="text-nowrap">{{ n.expediente.folio }}</td><td>{{ n.tipo_texto }}</td>
           <td class="text-nowrap">{{ n.enviada_en|date:"d/m/Y H:i" }}{% if n.acuse_envio %}<div><a href="{% url 'nucleo:acuse' n.acuse_envio.folio %}" target="_blank">{{ n.acuse_envio.folio }}</a></div>{% endif %}</td>
           <td class="text-nowrap">{% if n.notificada_en %}{{ n.notificada_en|date:"d/m/Y H:i" }}{% else %}<span class="text-warning-emphasis">Por notificar</span>{% endif %}</td></tr>
         {% endfor %}

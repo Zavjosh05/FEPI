@@ -85,13 +85,14 @@ CALENDARIO = {
                 oficio="2026-08-10"),
 }
 # Fechas de cada destino (la solicitud se envía a Administración y Finanzas, ésta la revisa y, según el caso, la paga o la
-# Secretaría Técnica la remite). Loma Verde es el cheque por vencer: se tramitó en agosto; los demás cheques, en noviembre.
+# Secretaría Técnica la remite). Las «enviada» y «aceptada» se envían dos días hábiles antes de la fecha de corte: en PSAHEM la
+# Secretaría Técnica tiene 5 días hábiles desde ese envío para remitirlas a la Fiduciaria y deben quedar en plazo (D-33). Loma Verde es el cheque por vencer: se tramitó en agosto; los demás cheques, en noviembre.
 FECHAS_DESTINO = {
     "pagada": dict(solicitud="2026-09-21", revision="2026-09-24", pago="2026-09-28"),
-    "enviada": dict(solicitud="2026-11-10"),
+    "enviada": dict(solicitud="2026-11-17"),
     "devuelta": dict(solicitud="2026-10-20", revision="2026-10-22"),
     "por_enviar": dict(preparar="2026-11-12"),
-    "aceptada": dict(solicitud="2026-11-05", revision="2026-11-09"),
+    "aceptada": dict(solicitud="2026-11-17", revision="2026-11-18"),
     "remitida": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10"),
     "cheque_emitido": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10", emision="2026-11-12"),
     "cheque_enviado": dict(solicitud="2026-11-05", revision="2026-11-09", remision="2026-11-10", emision="2026-11-12",

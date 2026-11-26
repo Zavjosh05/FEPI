@@ -500,7 +500,9 @@ su modelo, que **la Dirección registra y la Unidad Jurídica valida**:
 - **Cambiar el texto de un modelo** siempre crea una versión nueva **por validar**, aunque la anterior esté validada; la
   anterior se conserva y los contratos ya elaborados guardan la suya.
 - **Unidad Jurídica** (`juridica`): el panel **Modelos por validar** de su bandeja abre el modelo; elige **Validada** o
-  **Devuelta**, escribe observaciones y pulsa **Registrar la revisión**. Queda la fecha, la hora y quién la validó.
+  **Devuelta**, escribe observaciones y pulsa **Registrar la revisión**. Queda la fecha, la hora y quién la validó. Un
+  texto que todavía lleva la marca «BORRADOR» no se valida; al validar la plantilla base, la marca sale de su nombre y de
+  las pantallas.
 
 ![Revisión de la Unidad Jurídica](entregas/sprint_2/capturas/hu_3_2_06_revision_de_la_unidad_juridica.png)
 
