@@ -54,7 +54,8 @@ los recorridos con navegador del sistema cubren esos mismos pasos.
 ## 2. Antes de empezar
 
 1. Levanta el sistema como dice la [Guía de inicio](../../GUIA_DE_INICIO.md). Para partir de la demostración limpia:
-   `docker compose down -v` y `docker compose up --build` desde `sistema/`.
+   `docker compose down -v` y `docker compose up --build` desde `sistema/` (en PowerShell, con `wsl` delante:
+   `wsl docker compose down -v`).
 2. Abre http://localhost:8080/entrar/. Contraseña de todos los usuarios: `Probosque2026`.
 3. Ten a la mano `fichas_solicitudes.csv` (se abre en Excel) y las carpetas `poligonos/` y `documentos/`.
 4. Para cambiar de unidad: **Salir** y entra con el usuario que indica cada paso.
