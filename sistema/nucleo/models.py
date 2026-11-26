@@ -682,6 +682,11 @@ class TipoNotificacion(models.TextChoices):
     OTRO = "otro", "Otra notificación"
 
 
+# Título del aviso de resultados según lo que se publicó (``Notificacion.datos["resultado"]``, claves de ``ResultadoListado``).
+RESULTADO_AVISO = {"beneficiaria": "Resultados (persona beneficiaria)", "lista_espera": "Resultados (lista de espera)",
+                   "no_factible": "Resultados (no factible)"}
+
+
 class MedioNotificacion(models.TextChoices):
     PERSONAL = "personal", "En persona, en la Delegación o en el predio"
     CORREO = "correo", "Correo electrónico"
@@ -725,7 +730,14 @@ class Notificacion(models.Model):
         verbose_name_plural = "notificaciones"
 
     def __str__(self):
-        return f"{self.expediente.folio} · {self.get_tipo_display()} ({'notificada' if self.notificada_en else 'por notificar'})"
+        return f"{self.expediente.folio} · {self.tipo_texto} ({'notificada' if self.notificada_en else 'por notificar'})"
+
+    @property
+    def tipo_texto(self):
+        """Tipo de aviso para pantallas: el de resultados dice cuál fue (persona beneficiaria, lista de espera o no factible)."""
+        if self.tipo == TipoNotificacion.RESULTADOS:
+            return RESULTADO_AVISO.get((self.datos or {}).get("resultado"), "Resultados de la publicación")
+        return self.get_tipo_display()
 
     @property
     def notificada(self):

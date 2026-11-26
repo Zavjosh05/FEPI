@@ -7,7 +7,7 @@
   <tr id="notificacion-{{ n.pk }}" data-notificacion="{{ n.pk }}" data-tipo="{{ n.tipo }}"{% if f.abierta %} class="table-warning"{% endif %}>
     <td class="text-nowrap"><a href="{% url 'recepcion:expediente' n.expediente.folio %}?pestana=contrato">{{ n.expediente.folio }}</a>
       <div class="text-secondary">{{ n.expediente.predio.nombre }} · {{ n.expediente.predio.municipio.nombre }}</div></td>
-    <td><strong>{{ n.get_tipo_display }}</strong><div class="text-secondary">{{ n.asunto }}</div>
+    <td><strong>{{ n.tipo_texto }}</strong><div class="text-secondary">{{ n.asunto }}</div>
       <div class="text-secondary">Persona: {{ n.destinatario.nombre }} · {{ n.delegacion.nombre }}</div></td>
     <td class="text-nowrap">{{ n.enviada_en|date:"d/m/Y H:i:s" }} h{% if n.acuse_envio %}<div><a href="{% url 'nucleo:acuse' n.acuse_envio.folio %}" target="_blank">{{ n.acuse_envio.folio }}</a></div>{% endif %}</td>
     <td>

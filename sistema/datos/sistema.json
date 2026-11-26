@@ -94,7 +94,7 @@
       "entrega_comprobacion": {"nombre": "Entrega del informe final de actividades", "nota": "CC: 15 días hábiles para entregar el Informe Final o la minuta desde el último día hábil de la conclusión (13-nov-2026; línea 4180). R-04: plazo de entrega, no de visita."}
     },
     "PS": {
-      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "nota": "En PS la Convocatoria cuenta la firma desde la notificación de que hay recurso (R-13)."},
+      "firma_programada": {"nombre": "Fecha programada de firma del contrato", "evento": "notificacion_persona", "tope": {"uso": "firma_liberacion"}, "nota": "En PS la Convocatoria cuenta la firma desde la notificación de que hay recurso (R-13); como la baja corre desde la publicación, la fecha programada no pasa del vencimiento para liberar el recurso (D-38)."},
       "firma_liberacion": {"nombre": "Vencimiento para liberar el recurso por falta de firma", "evento": "publicacion_resultados", "evento_reasignada": "notificacion_persona", "nota": "En PS la causa de baja (8.1.9 b) inciso d) la cuenta desde la publicación de resultados (R-13); las reasignadas, desde su notificación."},
       "cita_firma": {"nombre": "Cita a firma por la Delegación", "plazo": "cita_firma_contrato", "evento": "publicacion_resultados", "nota": "La Delegación notifica y cita a firma dentro de 5 días hábiles desde la publicación (PS 10.1 h)."},
       "recoger_planta": {"nombre": "Vigencia del Vale de Planta (recoger la planta)", "plazo": "recoger_planta_vivero", "evento": "entrega_vale", "unidad": "dias_naturales", "nota": "Las ROP dicen «30 días» sin precisar: se toman naturales (lectura literal, R-13; por decidir)."},

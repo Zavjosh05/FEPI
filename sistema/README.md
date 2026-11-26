@@ -705,7 +705,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   observaciones) o lo **devuelve** con observaciones. Cambiar el texto crea una versión nueva **por validar**; la
   versión anterior se conserva y los contratos ya elaborados guardan la suya. Incluye una **plantilla base propia** por
   tipo, marcada «BORRADOR – modelo por validar» en el nombre, en el texto y en las pantallas: hay que quitarle la marca
-  (versión nueva) y validarla antes de usarla.
+  (versión nueva) y validarla antes de usarla. Un texto con la marca no se valida, y al validarlo la marca sale del nombre y
+  de las pantallas (`ModeloContrato.por_validar_base`, D-38).
 - **Elaborar.** `contratos.elaborar_contrato(usuario, expediente, modelo)`: solo la Dirección Instancia Ejecutora, solo
   de una solicitud **aprobada, publicada y notificada** (estado `notificada`; antes dice qué falta), solo sobre la
   versión vigente **validada** de un modelo del mismo programa-ejercicio y del tipo que toca (Convenio de Concertación
@@ -742,7 +743,8 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
   liberar el recurso** (`firma_liberacion`), con los días hábiles que faltan. Una firma posterior a la programada y anterior
   a la de liberación es válida y queda «fuera de la fecha programada»; una posterior a la de liberación no se recibe. En PS la
   programada corre desde la notificación y la de liberación desde la publicación (R-13): la de liberación puede caer antes;
-  el servicio aplica la de liberación como tope. Los casos «fuera de la fecha programada» solo se dan en CC (programada desde
+  la programada la lleva como tope (`"tope": {"uso": "firma_liberacion"}` en `datos/sistema.json`, D-38), así que nunca se
+  muestra después del vencimiento. Los casos «fuera de la fecha programada» solo se dan en CC (programada desde
   la publicación, liberación desde la notificación) y se cubren en las pruebas; en la demostración no hay uno porque la
   publicación de CC queda pendiente a propósito.
 - **Formalización propia (criterio 2).** Las reglas de MFS y PEG nombran estos elementos solo en el texto: están en

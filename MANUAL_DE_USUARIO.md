@@ -458,7 +458,8 @@ con fondos concurrentes) ni del Adendum, así que el sistema trabaja con **model
    validar»; hay que quitarla (con **Guardar versión nueva**) antes de usarla. El texto usa campos entre llaves
    dobles; un campo desconocido se rechaza.
 2. La Unidad Jurídica (`juridica`) abre el modelo, lo revisa y pulsa **Registrar la revisión**: lo **valida** o lo
-   devuelve con observaciones. Queda fecha, hora, quién y las observaciones.
+   devuelve con observaciones. Queda fecha, hora, quién y las observaciones. Un texto que todavía lleva la marca
+   «BORRADOR» no se valida; al validar la plantilla base, la marca sale de su nombre y de las pantallas.
 3. Cualquier cambio de texto crea una versión nueva **por validar**; la anterior se conserva y los contratos ya
    elaborados guardan la suya.
 

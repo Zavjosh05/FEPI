@@ -14,7 +14,7 @@
     <tbody>
     {% for x in modelos %}{% with m=x.m v=x.v %}
     <tr data-modelo="{{ m.pk }}">
-      <td class="fw-semibold">{{ m.nombre }}{% if m.es_base %} <span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}</td>
+      <td class="fw-semibold">{{ m.nombre }}{% if m.por_validar_base %} <span class="badge text-bg-danger">BORRADOR – modelo por validar</span>{% endif %}</td>
       <td>{{ m.ejercicio.programa.clave }} {{ m.ejercicio.anio }}</td>
       <td>{{ m.get_tipo_display }}</td>
       <td>{{ v.numero }}</td>

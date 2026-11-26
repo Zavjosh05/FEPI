@@ -18,7 +18,7 @@
   <tbody>
   {% for f in notificaciones_exp %}{% with n=f.n %}
   <tr data-tipo="{{ n.tipo }}">
-    <td><strong>{{ n.get_tipo_display }}</strong><div class="text-secondary">{{ n.asunto }}</div></td>
+    <td><strong>{{ n.tipo_texto }}</strong><div class="text-secondary">{{ n.asunto }}</div></td>
     <td class="text-nowrap">{{ n.enviada_en|date:"d/m/Y H:i:s" }} h{% if n.acuse_envio %}<div><a href="{% url 'nucleo:acuse' n.acuse_envio.folio %}" target="_blank">{{ n.acuse_envio.folio }}</a></div>{% endif %}<div class="text-secondary">Por conducto de {{ n.delegacion.nombre }}</div></td>
     <td>{% if n.notificada_en %}<div class="text-nowrap">{{ n.notificada_en|date:"d/m/Y H:i:s" }} h</div><div class="text-secondary">{{ n.get_medio_display }}</div>{% if n.acuse_notificacion %}<a href="{% url 'nucleo:acuse' n.acuse_notificacion.folio %}" target="_blank">{{ n.acuse_notificacion.folio }}</a>{% endif %}
       {% else %}<span class="badge text-bg-warning">Por notificar</span>{% if f.puede_entregar %} <a href="{% url 'contrato:notificaciones' %}">Registrar entrega</a>{% endif %}{% endif %}</td>
