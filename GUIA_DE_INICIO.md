@@ -188,6 +188,7 @@ un servidor real.
 | `docker: command not found` o `permission denied` al usar Docker | Docker no está instalado, o tu usuario no está en el grupo `docker`: repite el paso 2 de 1.1 y cierra la sesión de Ubuntu (`wsl --shutdown`). |
 | `port is already allocated` o la página no abre | Otro programa usa el puerto 8080; puede ser otra versión del sistema (otra rama) que sigue levantada: detenla con `docker compose down` en su carpeta `sistema/`. Ciérralo, o cambia `"8080:80"` en `sistema/docker-compose.yml` por otro puerto, por ejemplo `"8090:80"`, y entra por ese puerto. |
 | La página da error 502 o no deja entrar | La primera carga sigue en curso. Espera a que la ventana de `docker compose` deje de escribir y recarga. |
+| El mapa muestra «403 Access blocked» de OpenStreetMap | OSM bloquea las teselas que llegan sin Referer. Esta versión ya lo envía; si lo ves, levanta con `--build` para tomar el JavaScript nuevo y recarga con Ctrl+F5. Para un servidor real, usa un servidor de teselas propio en `MAPA_TESELAS_URL` (sección 1.6). |
 | Ves una versión vieja después de actualizar el código | Faltó `--build`. |
 | El sistema se apagó solo en Windows | WSL apaga Ubuntu cuando no hay ventanas suyas abiertas. Deja abierta la ventana donde corre `docker compose up`. |
 | Quieres ver qué falló | `docker compose logs web` muestra lo que escribió la aplicación. |
