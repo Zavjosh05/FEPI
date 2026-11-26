@@ -139,6 +139,31 @@ def test_hu_1_3_pantalla_carga_archivo_y_dibujo(client, nueva_solicitud, contras
     assert client.get(f"/recepcion/expediente/{exp.folio}/?pestana=ubicacion").status_code == 200
 
 
+def test_hu_1_3_vista_previa_del_archivo_sin_registrar(client, nueva_solicitud, usuarios, contrasena):
+    """Al elegir el archivo, la pantalla lo muestra en el mapa con su superficie y ubicación; no se guarda nada."""
+    exp = nueva_solicitud()
+    mun = exp.predio.municipio
+    url = f"/recepcion/expediente/{exp.folio}/poligono/vista-previa/"
+    client.login(username="del_amecameca", password=contrasena)
+    r = client.post(url, {"archivo": SimpleUploadedFile("p.geojson", cuadro_en_municipio(mun, 5).geojson.encode())})
+    datos = r.json()
+    assert r.status_code == 200 and datos["geometria"]["type"] == "MultiPolygon"
+    assert abs(datos["superficie_ha"] - 5) < 0.05 and datos["ubicacion"] == "dentro" and not datos["pide_motivo"]
+    assert not exp.poligonos.exists()
+    _registrar(usuarios, exp, cuadro_en_municipio(mun, 4))
+    otro = cuadro_en_municipio(Municipio.objects.get(nombre="Toluca"), 4).geojson.encode()
+    datos = client.post(url, {"archivo": SimpleUploadedFile("p.geojson", otro)}).json()
+    assert datos["pide_motivo"] and datos["tipo_cambio"] == "Cambio de lugar" and datos["traslape_pct"] == 0
+    assert datos["ubicacion"] == "fuera" and "fuera del municipio de Amecameca" in datos["aviso"]
+    assert exp.poligonos.count() == 1
+    r = client.post(url, {"archivo": SimpleUploadedFile("p.txt", b"hola")})
+    assert r.status_code == 400 and "Formato no admitido" in r.json()["error"]
+    assert client.get(url).status_code == 405
+    client.login(username="dir_drff", password=contrasena)            # solo la Delegación registra polígonos
+    r = client.post(url, {"archivo": SimpleUploadedFile("p.geojson", cuadro_en_municipio(mun, 5).geojson.encode())})
+    assert r.status_code in (400, 403, 404)
+
+
 def _shapefile_zip(geom_utm):
     """Arma a mano un shapefile de un polígono (shp, shx, dbf, prj) y lo comprime en zip."""
     import struct

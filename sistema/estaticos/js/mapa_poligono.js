@@ -54,4 +54,42 @@
     actualizar();
   });
   mapa.on("pm:remove", actualizar);
+
+  // Vista previa del archivo elegido: el sistema lo lee (igual que al registrar) y se dibuja punteado en azul, con su
+  // superficie y su ubicación. No se guarda hasta pulsar «Registrar polígono».
+  const entrada = document.querySelector("#form-poligono input[name=archivo]");
+  const aviso = document.getElementById("vista-previa-poligono");
+  let previa = null;
+  function texto(clase, html) { aviso.className = "small mb-2 alert py-1 px-2 " + clase; aviso.innerHTML = html; }
+  if (entrada && aviso && div.dataset.vistaPrevia) {
+    entrada.addEventListener("change", () => {
+      if (previa) { mapa.removeLayer(previa); previa = null; }
+      if (!entrada.files.length) { aviso.className = "small mb-2"; aviso.textContent = ""; return; }
+      const datos = new FormData();
+      datos.append("archivo", entrada.files[0]);
+      datos.append("csrfmiddlewaretoken", document.querySelector("#form-poligono input[name=csrfmiddlewaretoken]").value);
+      texto("alert-secondary", "Leyendo el archivo…");
+      fetch(div.dataset.vistaPrevia, { method: "POST", body: datos, credentials: "same-origin" })
+        .then((r) => r.json())
+        .then((r) => {
+          if (r.error) { texto("alert-danger", r.error); return; }
+          previa = L.geoJSON(r.geometria, {
+            style: { color: "#1d5fbf", weight: 3, dashArray: "8 5", fillOpacity: 0.15 }, pmIgnore: true,
+          }).addTo(mapa);
+          previa.bindTooltip("Archivo elegido: " + r.superficie_ha.toFixed(2) + " ha (sin registrar)");
+          mapa.fitBounds(previa.getBounds(), { padding: [30, 30], maxZoom: 15 });
+          const ubicacion = { dentro: "dentro del municipio", parcial: "parte fuera del municipio", fuera: "fuera del municipio" };
+          let html = "<strong>Vista previa, aún sin registrar:</strong> " + r.superficie_ha.toFixed(2) + " ha, " +
+            ubicacion[r.ubicacion] + ". " + r.tipo_cambio +
+            (r.traslape_pct !== null ? " (cubre el " + r.traslape_pct.toFixed(1) + " % del polígono vigente)" : "") + ".";
+          if (r.aviso) html += "<div>" + r.aviso + "</div>";
+          html += "<div>Complete los datos" + (r.pide_motivo ? ", incluido el <strong>motivo del cambio</strong>," : "") +
+            " y pulse «Registrar polígono».</div>";
+          texto(r.ubicacion === "dentro" ? "alert-info" : "alert-warning", html);
+          const motivo = document.querySelector("#form-poligono [name=motivo_cambio]");
+          if (motivo) motivo.required = !!r.pide_motivo;
+        })
+        .catch(() => texto("alert-danger", "No se pudo leer el archivo. Intente de nuevo."));
+    });
+  }
 })();

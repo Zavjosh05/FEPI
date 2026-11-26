@@ -209,7 +209,9 @@ En la pestaña **Ubicación** se registra el polígono del predio, levantado en 
 expediente: las reglas lo levantan después de la entrega.
 
 1. Sube el archivo del polígono (**GeoJSON, KML o Shapefile en .zip**) o dibújalo en el mapa con la herramienta de
-   polígono.
+   polígono. Al elegir el archivo, el mapa lo muestra punteado en azul como **vista previa**, con su superficie, si cae
+   dentro del municipio y si es corrección o cambio de lugar. **Todavía no se guarda**: el mapa y el historial cambian
+   hasta que pulsas **Registrar polígono** (paso 4).
 2. Indica quién lo levantó (personal de la Delegación o prestador de servicios forestales, con su RFN), su nombre y
    la fecha del levantamiento.
 3. Si ya había un polígono, escribe el motivo del cambio.
@@ -288,6 +290,14 @@ Pulsa **Registrar dictamen técnico**. El sistema **expide el documento «Dictam
 de los criterios, resultado y motivo, plazo, fundamento y firmas (elaboró y Vo. Bo.). El documento queda **adjunto al
 expediente**: se abre con el botón de la pestaña **Dictámenes** o desde **Documentos y acuses**.
 
+Ejemplo del documento (Las Trojes, `CC-2026-VAL-0011`): la primera página con los datos de la solicitud y el análisis
+cartográfico, y la última con el resultado y las firmas. Las cuatro páginas están en `entregas/sprint_1/capturas/`
+(`hu_2_1_07_…`).
+
+![Dictamen técnico en PDF, página 1](entregas/sprint_1/capturas/hu_2_1_07_documento_dictamen_tecnico_pagina_1.png)
+
+![Dictamen técnico en PDF, resultado y firmas](entregas/sprint_1/capturas/hu_2_1_07_documento_dictamen_tecnico_pagina_4.png)
+
 ![Análisis cartográfico y lista de verificación](entregas/sprint_1/capturas/hu_2_1_02_analisis_cartografico_y_lista_de_verificacion.png)
 
 ### Listado preliminar
@@ -331,6 +341,12 @@ El sistema **no permite el dictamen procedente** si un documento legal no es vá
 legal posesión, o si hay coincidencias en los catálogos. Al registrarlo **expide el documento «Dictamen jurídico»** en PDF
 (folio `DJ-…`), con la revisión de la documentación, la de la propiedad, el cotejo, el resultado y las firmas, adjunto al
 expediente.
+
+Ejemplo del documento (Las Trojes, `CC-2026-VAL-0011`), en sus dos páginas:
+
+![Dictamen jurídico en PDF, página 1](entregas/sprint_1/capturas/hu_2_2_09_documento_dictamen_juridico_pagina_1.png)
+
+![Dictamen jurídico en PDF, propiedad, resultado y firmas](entregas/sprint_1/capturas/hu_2_2_09_documento_dictamen_juridico_pagina_2.png)
 
 ![Cotejo automático](entregas/sprint_1/capturas/hu_2_2_03_cotejo_automatico.png)
 

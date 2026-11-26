@@ -303,6 +303,23 @@ def poligono_vigente(expediente):
     return expediente.poligonos.filter(vigente=True).first()
 
 
+def vista_previa_poligono(usuario, expediente, geom):
+    """Lo que resultaría de registrar el polígono (superficie, ubicación en el municipio, tipo de cambio), sin guardar nada:
+    la Delegación lo ve en el mapa al elegir el archivo, antes de pulsar «Registrar polígono»."""
+    _exigir_unidad(usuario, TipoUnidad.DELEGACION)
+    _exigir_acceso(usuario, expediente)
+    geometria.revisar_validez(geom)
+    ubicacion, aviso = geometria.ubicacion_en_municipio(geom, expediente.predio.municipio)
+    anterior = poligono_vigente(expediente)
+    tipo_cambio, traslape = TipoCambio.INICIAL, None
+    if anterior:
+        traslape = geometria.traslape_pct(geom, anterior.geom)
+        tipo_cambio = TipoCambio.CAMBIO_LUGAR if traslape < UMBRAL_CAMBIO_LUGAR_PCT else TipoCambio.CORRECCION
+    return {"superficie_ha": float(geometria.superficie_ha(geom)), "ubicacion": ubicacion, "aviso": aviso,
+            "tipo_cambio": TipoCambio(tipo_cambio).label, "traslape_pct": float(traslape) if traslape is not None else None,
+            "pide_motivo": anterior is not None}
+
+
 @registra_usuario
 def registrar_poligono(usuario, expediente, geom, origen, levantado_por, responsable, fecha_levantamiento,
                        prestador=None, archivo=None, motivo_cambio=""):
