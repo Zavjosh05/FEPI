@@ -244,6 +244,22 @@ def registrar_poligono(request, folio):
 
 
 @login_required
+@require_POST
+def vista_previa_poligono(request, folio):
+    """HU-1.3: lee el archivo elegido y devuelve el polígono y lo que resultaría al registrarlo, sin guardarlo."""
+    exp = _expediente(request, folio)
+    archivo = request.FILES.get("archivo")
+    if archivo is None:
+        return JsonResponse({"error": "Elija un archivo GeoJSON, KML o Shapefile en .zip."}, status=400)
+    try:
+        geom, _ = geometria.leer_archivo(archivo)
+        datos = servicios.vista_previa_poligono(request.user, exp, geom)
+    except (ValidationError, PermissionDenied) as e:
+        return JsonResponse({"error": " ".join(_mensajes_error(e))}, status=400)
+    return JsonResponse({"geometria": json.loads(geom.geojson), **datos})
+
+
+@login_required
 def poligonos_geojson(request, folio):
     exp = _expediente(request, folio)
     elementos = []
