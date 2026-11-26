@@ -8,6 +8,9 @@
     L.tileLayer(div.dataset.teselas, {
       maxZoom: 19,
       attribution: "&copy; colaboradores de OpenStreetMap",
+      // OSM bloquea las teselas que llegan sin Referer; el sistema no lo envía a otros sitios (Referrer-Policy:
+      // same-origin), así que las teselas mandan solo el origen (sin la ruta ni el folio).
+      referrerPolicy: "strict-origin-when-cross-origin",
     }).addTo(mapa);
   }
   mapa.setView([19.35, -99.6], 9);
