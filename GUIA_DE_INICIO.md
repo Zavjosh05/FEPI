@@ -111,6 +111,7 @@ en un servidor real.
 | `finanzas` | Administración y Finanzas | Solicitudes de pago, pagos y depósitos de reintegro |
 | `vivero` | Vivero | Vales de planta y salidas de planta |
 | `fiduciaria` | Fiduciaria | Cheques de PSAHEM |
+| `admin` | Superusuario | Administración de catálogos y reglas en http://localhost:8080/admin/ (no tiene enlace en el menú) |
 
 Para cambiar de unidad, sal con el botón «Salir» y entra con otro usuario. Cada usuario empieza en su **Bandeja**: lo
 que le toca atender, con el panel «Por vencer».
@@ -190,7 +191,7 @@ un servidor real.
 | La página da error 502 o no deja entrar | La primera carga sigue en curso. Espera a que la ventana de `docker compose` deje de escribir y recarga. |
 | El mapa muestra «403 Access blocked» de OpenStreetMap | OSM bloquea las teselas que llegan sin Referer. Esta versión ya lo envía; si lo ves, levanta con `--build` y recarga la página (si persiste, Ctrl+Shift+R). Para un servidor real, usa un servidor de teselas propio en `MAPA_TESELAS_URL` (sección 1.6). |
 | Ves una versión vieja después de actualizar el código | Faltó `--build`. |
-| El sistema se apagó solo en Windows | WSL apaga Ubuntu cuando no hay ventanas suyas abiertas. Deja abierta la ventana donde corre `docker compose up`. |
+| El sistema se apagó solo en Windows, o da 502 un momento al volver | WSL apaga Ubuntu cuando no hay ventanas suyas abiertas, y con él el sistema; al volver a entrar, los contenedores se reinician y tardan unos segundos. Levanta sin `-d` y deja abierta esa ventana; si usas `-d`, deja abierta otra ventana de Ubuntu. |
 | Quieres ver qué falló | `docker compose logs web` muestra lo que escribió la aplicación. |
 
 ### 1.8 Pruebas automáticas (opcional)
