@@ -14,9 +14,10 @@ Pasos (desde `sistema/`, con la imagen de pruebas del sistema completo):
     docker compose --profile pruebas run --rm --no-deps --entrypoint python pruebas /entregas/diseno/generar_diseno_persistencia.py --preparar
     docker compose --profile pruebas run --rm --no-deps --entrypoint python pruebas /entregas/diseno/generar_diseno_persistencia.py
 
-`--preparar` agrega a cada tabla su área (de `sistema/docs/modelo_datos.md`), el sprint en que se construyó (de
-`nombres_sprint_1.txt` y `nombres_sprint_2.txt`, la lista de tablas de las ramas `sprint-1` y `sprint-2`) y la
-descripción de las tablas cuyo modelo no la trae. Con `--sin-diagramas` reutiliza los PNG ya dibujados.
+`--preparar` agrega a cada tabla su área (de `sistema/docs/modelo_datos.md`), el sprint desde el que la usan las
+pantallas y servicios (`sprint`; de `nombres_sprint_1.txt` y `nombres_sprint_2.txt`: las tablas que usaban las historias de
+las ramas `sprint-1` y `sprint-2` antes de programar en ellas la base completa) y la descripción de las tablas cuyo modelo
+no la trae. Las 78 tablas están programadas desde el sprint 1 en las tres ramas. Con `--sin-diagramas` reutiliza los PNG ya dibujados.
 """
 import html
 import json
@@ -183,18 +184,20 @@ def mapa_html(datos, con_leyenda=True):
         filas.append(f"<tr><td><b>{a['numero']}. {e(a['titulo'])}</b><br><span class='gris'>{e(a['modulo'])}</span></td>"
                      + "".join(f"<td>{c}</td>" for c in celdas) + "</tr>")
     cuenta = {s: sum(1 for t in datos["tablas"] if t["sprint"] == s) for s in (1, 2, 3)}
-    leyenda = ("<p class='meta'>Cada cuadro es una tabla (el nombre del modelo de Django; la tabla en PostgreSQL es "
-               "<code>&lt;app&gt;_&lt;modelo&gt;</code>). <span class='s1'>Sprint 1</span> "
-               "<span class='s2'>Sprint 2</span> <span class='s3'>Sprint 3</span></p>") if con_leyenda else ""
+    leyenda = (f"<p class='meta'>Cada cuadro es una tabla (el nombre del modelo de Django; la tabla en PostgreSQL es "
+               "<code>&lt;app&gt;_&lt;modelo&gt;</code>). Las {len(datos['tablas'])} están programadas desde el sprint 1; el "
+               "color dice desde qué sprint las usan las pantallas y servicios: <span class='s1'>sprint 1</span> "
+               "<span class='s2'>sprint 2</span> <span class='s3'>sprint 3</span></p>") if con_leyenda else ""
     return (leyenda + "<table class='mapa'><thead><tr><th>Área</th>"
-            f"<th>Sprint 1 ({cuenta[1]} tablas)</th><th>Sprint 2 ({cuenta[2]})</th><th>Sprint 3 ({cuenta[3]})</th></tr>"
+            f"<th>Se usan desde el sprint 1 ({cuenta[1]} tablas)</th><th>Desde el sprint 2 ({cuenta[2]})</th>"
+            f"<th>Desde el sprint 3 ({cuenta[3]})</th></tr>"
             "</thead><tbody>" + "".join(filas) + "</tbody></table>")
 
 
 def mapa_md(datos):
     cuenta = {s: sum(1 for t in datos["tablas"] if t["sprint"] == s) for s in (1, 2, 3)}
-    filas = ["| Área | Sprint 1 (" + str(cuenta[1]) + " tablas) | Sprint 2 (" + str(cuenta[2]) + ") | Sprint 3 ("
-             + str(cuenta[3]) + ") |", "| --- | --- | --- | --- |"]
+    filas = ["| Área | Se usan desde el sprint 1 (" + str(cuenta[1]) + " tablas) | Desde el sprint 2 (" + str(cuenta[2])
+             + ") | Desde el sprint 3 (" + str(cuenta[3]) + ") |", "| --- | --- | --- | --- |"]
     for a in datos["areas"]:
         celdas = []
         for s in (1, 2, 3):
@@ -282,7 +285,8 @@ def diccionario(datos):
         tablas = sorted((t for t in datos["tablas"] if t["area"] == a["numero"]), key=lambda t: (t["sprint"], t["modelo"]))
         partes.append(f"<h3 class='salto'>6.{a['numero']} {e(a['titulo'])} <span class='gris'>({e(a['modulo'])})</span></h3>")
         for t in tablas:
-            meta = [f"app <code>{t['app']}</code> ({APP_MODULO[t['app']]})", f"sprint {t['sprint']}"]
+            meta = [f"app <code>{t['app']}</code> ({APP_MODULO[t['app']]})", "programada en el sprint 1",
+                    f"se usa desde el sprint {t['sprint']}"]
             meta.append(f"historial en <code>{t['tabla_historial']}</code>" if t["historial"] else "sin historial")
             if t["orden"]:
                 meta.append("orden: " + ", ".join(f"<code>{e(o)}</code>" for o in t["orden"]))
@@ -324,7 +328,7 @@ def areas_html(datos):
             f"<p>{e(a['texto'])}</p>" if a["texto"] else
             f"<h3 class='salto'>5.{a['numero']} {e(a['titulo'])} <span class='gris'>({e(a['modulo'])})</span></h3>")
         partes.append(f"<!--FIG:er_area_{a['numero']}|Entidad-relación del área {a['numero']}: {e(a['titulo'])}-->")
-        partes.append("<table><thead><tr><th>Tabla</th><th>Sprint</th><th>Qué guarda</th></tr></thead>"
+        partes.append("<table><thead><tr><th>Tabla</th><th>Se usa desde</th><th>Qué guarda</th></tr></thead>"
                       f"<tbody>{lista}</tbody></table>")
     return "".join(partes)
 
@@ -332,7 +336,7 @@ def areas_html(datos):
 def historial_html(datos):
     filas = "".join(f"<tr><td><code>{e(t['tabla'])}</code></td><td><code>{e(t['tabla_historial'])}</code></td>"
                     f"<td>{t['sprint']}</td></tr>" for t in datos["tablas"] if t["historial"])
-    return ("<table><thead><tr><th>Tabla</th><th>Tabla de historial</th><th>Sprint</th></tr></thead>"
+    return ("<table><thead><tr><th>Tabla</th><th>Tabla de historial</th><th>Se usa desde</th></tr></thead>"
             f"<tbody>{filas}</tbody></table>")
 
 

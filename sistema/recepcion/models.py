@@ -11,7 +11,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from nucleo.models import Acuse, Documento, Expediente, Persona, Requisito
+from nucleo.models import Acuse, Documento, Expediente, Notificacion, Persona, Requisito
 
 
 class EstadoRevision(models.TextChoices):
@@ -137,6 +137,10 @@ class Validacion(models.Model):
     notificado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
                                        related_name="+")
     acuse_notificacion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    notificacion = models.OneToOneField(
+        Notificacion, null=True, blank=True, on_delete=models.SET_NULL, related_name="validacion",
+        help_text="Aviso de faltantes: su notificación por conducto de la Delegación (núcleo).",
+    )
     vencimiento_avisado = models.BooleanField(default=False)
     history = HistoricalRecords()
 

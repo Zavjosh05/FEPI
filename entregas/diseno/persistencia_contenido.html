@@ -1,7 +1,7 @@
 <div class="portada">
 <h1>Diseño de la capa de persistencia</h1>
-<p class="sub">Sistema de programas de PROBOSQUE 2026 · diseño completo de la base de datos de los siete módulos, con el
-sprint en que se construye cada tabla</p>
+<p class="sub">Sistema de programas de PROBOSQUE 2026 · base de datos completa de los siete módulos, programada desde el
+sprint 1, con el sprint desde el que se usa cada tabla</p>
 <table>
 <tr><td><b>Proyecto</b></td><td>Levantamiento de necesidades y prototipo de los programas de PROBOSQUE 2026</td></tr>
 <tr><td><b>Alcance</b></td><td>{{tablas}} tablas propias, {{columnas}} columnas, 8 áreas, sprints 1 a 3</td></tr>
@@ -15,21 +15,23 @@ escribe a mano)</td></tr>
 
 <h2 class="salto">1. Propósito y alcance</h2>
 <p>Este documento describe la capa de persistencia completa del Sistema de programas: dónde y cómo se guarda cada dato
-del trámite, de la solicitud al cierre del ejercicio, y por qué. Se presenta <b>completa desde el sprint 1</b>: las
-{{tablas}} tablas de los siete módulos (M1 a M6 y el núcleo común; la Calculadora forestal, M7, no usa base de datos)
-aparecen con el sprint en que se construye cada una, de modo que el sprint 1 ya muestra hacia dónde crece la base y
-cada sprint posterior agrega tablas a un diseño conocido.</p>
+del trámite, de la solicitud al cierre del ejercicio, y por qué. La base está <b>completa y programada desde el sprint
+1</b>: las {{tablas}} tablas de los siete módulos (M1 a M6 y el núcleo común; la Calculadora forestal, M7, no usa base de
+datos) existen desde ese sprint como modelos de Django con sus migraciones, en las ramas <code>sprint-1</code>,
+<code>sprint-2</code> y <code>main</code>. Lo que llega en cada sprint son las pantallas y los servicios que las usan:</p>
 <ul>
-<li><b>Sprint 1</b> ({{s1}} tablas): reglas por programa y catálogos, expediente y recepción (M1), dictamen y Comité (M2) y
-la trazabilidad común (bitácora, acuses, folios, historial).</li>
-<li><b>Sprint 2</b> ({{s2}} tablas): publicación y contrato (M3), pagos (M5) y las notificaciones y plazos que usan.</li>
-<li><b>Sprint 3</b> ({{s3}} tablas): ejecución y verificación (M4), seguimiento y cierre (M6) y el portal de personas
+<li><b>Desde el sprint 1</b> ({{s1}} tablas): reglas por programa y catálogos, expediente y recepción (M1), dictamen y
+Comité (M2) y la trazabilidad común (bitácora, acuses, folios, historial).</li>
+<li><b>Desde el sprint 2</b> ({{s2}} tablas): publicación y contrato (M3), pagos (M5) y las notificaciones y plazos que
+usan.</li>
+<li><b>Desde el sprint 3</b> ({{s3}} tablas): ejecución y verificación (M4), seguimiento y cierre (M6) y el portal de personas
 beneficiarias.</li>
 </ul>
-<div class="caja">El sprint de cada tabla es el de la versión entregada en que aparece por primera vez (ramas
-<code>sprint-1</code> y <code>sprint-2</code>; lo demás, sprint 3). El diccionario de datos muestra el estado final: algunas
-tablas del sprint 1 recibieron columnas en sprints posteriores (por ejemplo, la persona beneficiaria del expediente en
-Guardabosques), siempre con migraciones que conservan los datos.</div>
+<div class="caja">Las apps de los módulos que llegan después (por ejemplo, <code>contrato</code> y <code>pagos</code> en la rama
+<code>sprint-1</code>) traen desde el sprint 1 solo sus modelos y migraciones; sus pantallas y servicios se agregan en su
+sprint sin crear tablas. En la rama <code>sprint-1</code>, la tabla de validaciones conserva además las tres columnas con
+que el sprint 1 registra la notificación del aviso de faltantes (<code>notificado_en</code>, <code>notificado_por_id</code> y
+<code>acuse_notificacion_id</code>); desde el sprint 2 esa notificación vive en <code>nucleo_notificacion</code>.</div>
 <p>Contenido: la arquitectura de la persistencia (sección 2), las decisiones de diseño y su porqué (3), el mapa de tablas
 por área y sprint (4), el modelo entidad-relación de cada área (5), el diccionario de datos tabla por tabla (6), el
 historial para la trazabilidad (7), la integridad y la concurrencia (8) y la operación: migraciones, respaldo y cómo se
@@ -100,9 +102,10 @@ se muestran en hora del centro de México; los plazos en días hábiles usan la 
 </table>
 
 <h2 class="salto">4. Mapa de tablas por área y sprint</h2>
-<p>Las {{tablas}} tablas se agrupan en ocho áreas. El núcleo y los módulos M1 y M2 se construyen en el sprint 1; M3 y M5 en
-el sprint 2; M4, M6 y el portal en el sprint 3. Algunas áreas reciben tablas en más de un sprint: el núcleo suma en el
-sprint 2 las notificaciones y los hitos de plazo que usan la publicación y los pagos.</p>
+<p>Las {{tablas}} tablas se agrupan en ocho áreas y todas están programadas desde el sprint 1. El color de cada tabla dice
+desde qué sprint la usan las pantallas y servicios: el núcleo y los módulos M1 y M2 desde el sprint 1; M3 y M5 desde el
+sprint 2; M4, M6 y el portal desde el sprint 3. Las notificaciones y los hitos de plazo, del núcleo, empiezan a usarse en el
+sprint 2 con la publicación y los pagos.</p>
 <!--MAPA-->
 <p>En total: {{columnas}} columnas, {{fk}} llaves foráneas, {{m2m}} relaciones muchos a muchos y {{historial}} tablas con
 historial.</p>

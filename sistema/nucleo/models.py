@@ -317,6 +317,8 @@ class MontoApoyo(models.Model):
     unidad = models.CharField(max_length=120, blank=True)
     modalidad = models.ForeignKey(Modalidad, null=True, blank=True, on_delete=models.SET_NULL)
     fundamento = models.CharField(max_length=200, blank=True)
+    datos = models.JSONField(default=dict, blank=True,
+                             help_text="Campos adicionales del archivo de reglas (requiere, superficie mínima…).")
 
     class Meta:
         verbose_name = "monto de apoyo"
@@ -329,6 +331,8 @@ class Ministracion(models.Model):
     ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, related_name="ministraciones")
     numero = models.PositiveIntegerField()
     porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
+    supuesto = models.BooleanField(default=False, help_text="El porcentaje no está en las ROP: es un supuesto del archivo "
+                                                            "de reglas por confirmar (PEG).")
     regimen = models.CharField(max_length=60, blank=True)
     condicion = models.TextField(blank=True)
     fundamento = models.CharField(max_length=200, blank=True)
@@ -399,6 +403,7 @@ class TipoPersonaGeneral(models.TextChoices):
     JURIDICA_COLECTIVA = "juridica_colectiva", "Persona jurídico colectiva"
     NUCLEO_AGRARIO = "nucleo_agrario", "Núcleo agrario"
     PRESTADOR = "prestador", "Prestador de servicios forestales"
+    GUARDABOSQUE = "guardabosque", "Guardabosque"
 
 
 class Persona(models.Model):
@@ -469,6 +474,9 @@ class Expediente(models.Model):
     ejercicio = models.ForeignKey(Ejercicio, on_delete=models.PROTECT, related_name="expedientes")
     predio = models.ForeignKey(Predio, on_delete=models.PROTECT, related_name="expedientes")
     solicitante = models.ForeignKey(Persona, on_delete=models.PROTECT, related_name="solicitudes")
+    persona_beneficiaria = models.ForeignKey(
+        Persona, null=True, blank=True, on_delete=models.PROTECT, related_name="apoyos",
+        help_text="Persona beneficiaria cuando no es quien solicita (PEG: el Guardabosque que designa el núcleo agrario).")
     tipo_persona = models.ForeignKey(TipoPersona, on_delete=models.PROTECT)
     modalidad = models.ForeignKey(Modalidad, null=True, blank=True, on_delete=models.PROTECT)
     es_refrendo = models.BooleanField(default=False)
@@ -683,3 +691,102 @@ def bandeja(usuario):
     for filtro in FILTROS_BANDEJA:
         qs = filtro(usuario, qs)
     return qs
+
+
+# ----------------------------------------------------------------------------- notificaciones
+class TipoNotificacion(models.TextChoices):
+    """Qué se notifica a la persona. Los módulos usan estas claves; agregar aquí las nuevas."""
+
+    FALTANTES = "faltantes", "Aviso de faltantes"
+    RESULTADOS = "resultados", "Resultados (persona beneficiaria)"
+    CITA_FIRMA = "cita_firma", "Cita a firma del contrato"
+    OMISION = "omision", "Omisión o incumplimiento"
+    DEVOLUCION = "devolucion", "Devolución o reintegro"
+    PAGO = "pago", "Aviso de pago (ministración)"
+    OTRO = "otro", "Otra notificación"
+
+
+# Título del aviso de resultados según lo que se publicó (``Notificacion.datos["resultado"]``, claves de ``ResultadoListado``).
+RESULTADO_AVISO = {"beneficiaria": "Resultados (persona beneficiaria)", "lista_espera": "Resultados (lista de espera)",
+                   "no_factible": "Resultados (no factible)"}
+
+
+class MedioNotificacion(models.TextChoices):
+    PERSONAL = "personal", "En persona, en la Delegación o en el predio"
+    CORREO = "correo", "Correo electrónico"
+    TELEFONO = "telefono", "Teléfono"
+    ESTRADOS = "estrados", "Estrados o publicación"
+    OTRO = "otro", "Otro medio"
+
+
+class Notificacion(models.Model):
+    """Notificación a la persona solicitante o beneficiaria por conducto de la Delegación.
+
+    Tiene dos momentos, cada uno con su fecha, hora y acuse: el **envío** (la unidad que emite el
+    aviso lo manda a la Delegación) y la **notificación** a la persona (la Delegación la registra con
+    el medio usado). Los módulos guardan una referencia a la suya (por ejemplo,
+    ``recepcion.Validacion.notificacion``); los plazos que corren «desde la notificación» la leen aquí.
+    """
+
+    expediente = models.ForeignKey(Expediente, on_delete=models.CASCADE, related_name="notificaciones")
+    tipo = models.CharField(max_length=30, choices=TipoNotificacion.choices)
+    asunto = models.CharField(max_length=250)
+    destinatario = models.ForeignKey(Persona, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    enviada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    unidad_origen = models.ForeignKey(Unidad, null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    delegacion = models.ForeignKey(Unidad, on_delete=models.PROTECT, related_name="notificaciones",
+                                   limit_choices_to={"tipo": TipoUnidad.DELEGACION},
+                                   help_text="Delegación por cuyo conducto se notifica.")
+    enviada_en = models.DateTimeField(default=timezone.now)
+    acuse_envio = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    notificada_en = models.DateTimeField(null=True, blank=True, help_text="Fecha y hora en que se notificó a la persona.")
+    notificada_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+                                       related_name="+")
+    medio = models.CharField(max_length=20, choices=MedioNotificacion.choices, blank=True)
+    acuse_notificacion = models.ForeignKey(Acuse, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    observaciones = models.TextField(blank=True)
+    datos = models.JSONField(default=dict, blank=True)
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ["-enviada_en", "-id"]
+        verbose_name = "notificación"
+        verbose_name_plural = "notificaciones"
+
+    def __str__(self):
+        return f"{self.expediente.folio} · {self.tipo_texto} ({'notificada' if self.notificada_en else 'por notificar'})"
+
+    @property
+    def tipo_texto(self):
+        """Tipo de aviso para pantallas: el de resultados dice cuál fue (persona beneficiaria, lista de espera o no factible)."""
+        if self.tipo == TipoNotificacion.RESULTADOS:
+            return RESULTADO_AVISO.get((self.datos or {}).get("resultado"), "Resultados de la publicación")
+        return self.get_tipo_display()
+
+    @property
+    def notificada(self):
+        return self.notificada_en is not None
+
+
+# ----------------------------------------------------------------------------- hitos del trámite
+class Hito(models.Model):
+    """Evento fechado del trámite que puede arrancar un plazo (publicación de resultados, firma del
+    contrato, entrega del Vale o del cheque…). Lo registra cada módulo con ``nucleo.plazos.registrar_hito``;
+    el servicio de plazos lo lee sin conocer al módulo."""
+
+    expediente = models.ForeignKey(Expediente, on_delete=models.CASCADE, related_name="hitos")
+    clave = models.CharField(max_length=60)
+    fecha_hora = models.DateTimeField()
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+                                related_name="+")
+    referencia = models.CharField(max_length=120, blank=True)
+    datos = models.JSONField(default=dict, blank=True)
+    registrado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-fecha_hora", "-id"]
+        verbose_name = "hito del trámite"
+        verbose_name_plural = "hitos del trámite"
+
+    def __str__(self):
+        return f"{self.expediente.folio} · {self.clave} {self.fecha_hora:%Y-%m-%d}"

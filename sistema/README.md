@@ -112,6 +112,9 @@ sistema/
 │                      revisar_plazos), datos de demostración y trazabilidad.py (historial)
 ├── recepcion/         app M1: revisión de requisitos, polígonos, validación; servicios.py (reglas),
 │                      geometria.py (GeoJSON/KML/SHP), vistas y plantillas por pestaña
+├── contrato/, pagos/, portal/, ejecucion/, seguimiento/
+│                      apps de M3, M5, el portal, M4 y M6 con solo sus modelos y migraciones (base de datos completa
+│                      desde el sprint 1); sus pantallas y servicios llegan en los sprints 2 y 3
 ├── dictamen/          app M2, un módulo por historia: tecnico.py (HU-2.1), juridico.py (HU-2.2),
 │                      aprobacion.py (HU-2.3), seguimiento.py (HU-2.4); documentos.py (PDF de los
 │                      dictámenes), listados.py (candidatos y beneficiarios); sesiones.py y comun.py
@@ -124,7 +127,9 @@ sistema/
 ├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json,
 │                      dias_inhabiles_2026.json
 ├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
-├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON)
+├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación de las 78 tablas)
+├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON), diagrama_er.py y
+│                      regenerar_modelo_datos.py
 └── pruebas/           pytest (test_nucleo_*, test_hu_1_*, test_hu_2_*, fixtures_m2.py) y e2e/ (Playwright)
 ```
 
@@ -354,9 +359,10 @@ los **acuerdos del Comité** que le toca cumplir (HU-2.4).
 
 ## Modelo de datos y recorrido completo
 
-- [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
-  campos, está en `docs/modelo_datos.mmd`.
+- [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (las 78 tablas en ocho áreas),
+  generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los campos, está en
+  `docs/modelo_datos.mmd`.
+- **Base de datos completa desde el sprint 1**: las 78 tablas de los siete módulos están programadas (modelos y migraciones) aunque sus pantallas lleguen después. Las apps sin historias todavía traen solo `apps.py`, `models` y `migrations`; el diseño completo, con el diccionario de datos, está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
 - `pruebas/test_sprint_1_recorrido_completo.py`: una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
   aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
