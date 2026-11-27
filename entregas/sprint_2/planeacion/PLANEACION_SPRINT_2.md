@@ -71,6 +71,32 @@ la verificación), Manejo Forestal Sustentable y Guardabosques (sin reglas carga
 formalización y de pago), el uso del suelo y las especies de la Calculadora (HU-7.4 y HU-7.5, sprint 3) y la ampliación de
 plazo por causa externa en MFS.
 
+### Diseño de la capa de persistencia
+
+La base sigue el diseño completo fijado desde el sprint 1 (78 tablas en ocho áreas). En este sprint se construyen las 23 tablas de la columna «Sprint 2» (publicación y contrato, pagos, notificaciones e hitos de plazo); las del sprint 1 no cambian de diseño, solo reciben columnas con migraciones que conservan los datos. El detalle (arquitectura, decisiones, diagrama entidad-relación de cada área, diccionario de datos de cada tabla e historial) está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
+
+| Área | Sprint 1 (36 tablas) | Sprint 2 (23) | Sprint 3 (19) |
+| --- | --- | --- | --- |
+| 1. Reglas por programa y catálogos (Núcleo: base de todas las historias) | Consecutivo, DiaInhabil, Ejercicio, Estado, Formato, Ministracion, Modalidad, MontoApoyo, Municipio, Plazo, Programa, Requisito, TipoPersona, Transicion, Unidad, Usuario | — | — |
+| 2. Expediente y recepción (M1 · HU-1.1 a HU-1.4) | Acuse, Documento, Evento, Expediente, Persona, Predio, ObservacionValidacion, Poligono, RevisionRequisito, Validacion | Hito, Notificacion | — |
+| 3. Dictamen y Comité (M2 · HU-2.1 a HU-2.4) | Acuerdo, DictamenJuridico, DictamenTecnico, DocumentoSesion, MovimientoListado, PersonaIncumplida, PredioSancionado, ResolucionSesion, RevisionPropiedad, SesionComite | — | — |
+| 4. Publicación y contrato (M3 · HU-3.1 a HU-3.4) | — | Adendum, Contrato, ElementoFormalizacion, Especie, FirmaContrato, ModeloContrato, Publicacion, RenglonVale, ResultadoPublicado, SalidaPlanta, SinFirma, ValePlanta, VersionModelo, Vivero | — |
+| 5. Pagos (M5 · HU-5.1 a HU-5.3) | — | Cheque, ComprobanteCuenta, OficioPago, Pago, RemisionFiduciaria, RevisionSolicitud, SolicitudPago | — |
+| 6. Portal de personas beneficiarias (Apoyo a M4 y M6) | — | — | AccesoExpediente, CodigoConsulta, CuentaExterna |
+| 7. Ejecución y verificación (M4 · HU-4.1 a HU-4.3) | — | — | Comprobacion, EnvioEvaluacion, EvaluacionPeriodo, Incidencia, RevisionReporte, Verificacion |
+| 8. Seguimiento y cierre (M6 · HU-6.1 a HU-6.3) | — | — | AvisoOmision, CierreExpediente, CuentaReintegro, InformeAnual, PadronPublicacion, Propuesta, Prorroga, Requerimiento, Senalamiento, SolicitudPersona |
+
+Decisiones de diseño (su porqué está en el documento):
+
+- PostgreSQL 17 con PostGIS 3.5, a través del ORM de Django; una app por módulo y tablas `<app>_<modelo>`.
+- Polígonos y municipios como geometrías en EPSG:4326; superficies calculadas en EPSG:32614 (UTM 14N).
+- Reglas de operación como datos (programa, ejercicio, requisitos, plazos, montos, ministraciones), cargadas de
+  `sistema/reglas/<CLAVE>.json`; el trámite como máquina de estados en tablas (`Estado`, `Transicion`).
+- Trazabilidad con una tabla de historial por cada tabla del trámite (django-simple-history), además de la bitácora
+  (`Evento`) y los acuses con folio y huella SHA-256; folios con tabla de consecutivos y bloqueo de fila.
+- Archivos del expediente fuera de la base, en un volumen, entregados solo después de revisar el permiso.
+- Nada se borra del trámite: llaves foráneas protegidas y registros anteriores marcados como «no vigentes».
+
 ## 3. Trabajo del sprint (paquetes)
 
 Además de las nueve historias hay trabajo que no es de una sola historia: las reglas de los tres programas nuevos, la base
