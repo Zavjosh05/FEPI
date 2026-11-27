@@ -1,0 +1,170 @@
+<div class="portada">
+<h1>Diseño de la capa de persistencia</h1>
+<p class="sub">Sistema de programas de PROBOSQUE 2026 · diseño completo de la base de datos de los siete módulos, con el
+sprint en que se construye cada tabla</p>
+<table>
+<tr><td><b>Proyecto</b></td><td>Levantamiento de necesidades y prototipo de los programas de PROBOSQUE 2026</td></tr>
+<tr><td><b>Alcance</b></td><td>{{tablas}} tablas propias, {{columnas}} columnas, 8 áreas, sprints 1 a 3</td></tr>
+<tr><td><b>Motor</b></td><td>PostgreSQL 17 con PostGIS 3.5, a través del ORM de Django 5.2 (GeoDjango)</td></tr>
+<tr><td><b>Fuente</b></td><td>Los modelos de Django de la rama <code>main</code> (el diccionario se genera de ellos, no se
+escribe a mano)</td></tr>
+<tr><td><b>Fecha</b></td><td>26 de noviembre de 2026</td></tr>
+<tr><td><b>Equipo</b></td><td>Joshua, Omar, Cin y Angel</td></tr>
+</table>
+</div>
+
+<h2 class="salto">1. Propósito y alcance</h2>
+<p>Este documento describe la capa de persistencia completa del Sistema de programas: dónde y cómo se guarda cada dato
+del trámite, de la solicitud al cierre del ejercicio, y por qué. Se presenta <b>completa desde el sprint 1</b>: las
+{{tablas}} tablas de los siete módulos (M1 a M6 y el núcleo común; la Calculadora forestal, M7, no usa base de datos)
+aparecen con el sprint en que se construye cada una, de modo que el sprint 1 ya muestra hacia dónde crece la base y
+cada sprint posterior agrega tablas a un diseño conocido.</p>
+<ul>
+<li><b>Sprint 1</b> ({{s1}} tablas): reglas por programa y catálogos, expediente y recepción (M1), dictamen y Comité (M2) y
+la trazabilidad común (bitácora, acuses, folios, historial).</li>
+<li><b>Sprint 2</b> ({{s2}} tablas): publicación y contrato (M3), pagos (M5) y las notificaciones y plazos que usan.</li>
+<li><b>Sprint 3</b> ({{s3}} tablas): ejecución y verificación (M4), seguimiento y cierre (M6) y el portal de personas
+beneficiarias.</li>
+</ul>
+<div class="caja">El sprint de cada tabla es el de la versión entregada en que aparece por primera vez (ramas
+<code>sprint-1</code> y <code>sprint-2</code>; lo demás, sprint 3). El diccionario de datos muestra el estado final: algunas
+tablas del sprint 1 recibieron columnas en sprints posteriores (por ejemplo, la persona beneficiaria del expediente en
+Guardabosques), siempre con migraciones que conservan los datos.</div>
+<p>Contenido: la arquitectura de la persistencia (sección 2), las decisiones de diseño y su porqué (3), el mapa de tablas
+por área y sprint (4), el modelo entidad-relación de cada área (5), el diccionario de datos tabla por tabla (6), el
+historial para la trazabilidad (7), la integridad y la concurrencia (8) y la operación: migraciones, respaldo y cómo se
+mantiene al día este documento (9).</p>
+
+<h2 class="salto">2. Arquitectura de la persistencia</h2>
+<p>Las pantallas no escriben en la base: llaman a los <b>servicios</b> de cada historia (por ejemplo,
+<code>recepcion/servicios.py</code>), que validan las reglas, guardan con el ORM de Django dentro de una transacción y dejan
+la bitácora y el acuse. Los archivos del expediente (requisitos, polígonos, dictámenes, contratos) no van dentro de la base:
+se guardan en un volumen y la base guarda su ruta.</p>
+<pre class="mermaid" data-nombre="arquitectura" data-pie="Arquitectura de la capa de persistencia: de las pantallas a PostgreSQL/PostGIS y al almacén de archivos.">
+flowchart LR
+  UI["Pantallas<br>(Django + HTMX)"] --> SV["Servicios por historia<br>validan reglas · transacción atómica"]
+  SV --> ORM["Modelos de Django<br>8 apps · {{tablas}} tablas"]
+  ORM --> PG[("PostgreSQL 17 + PostGIS 3.5<br>volumen bd_datos")]
+  ORM --> HIS["Historial<br>django-simple-history<br>{{historial}} tablas Historical…"]
+  HIS --> PG
+  SV --> ARC[("Archivos del expediente<br>volumen archivos · /srv/archivos")]
+  NG["Nginx"] -- "X-Accel-Redirect<br>después de revisar el permiso" --> ARC
+  JS["reglas por programa<br>reglas/CLAVE.json · catalogos.json"] -- "cargar_reglas<br>cargar_catalogos" --> ORM
+  PL["revisar_plazos<br>(servicio diario)"] --> ORM
+</pre>
+<ul>
+<li><b>Una app de Django por módulo</b>: <code>nucleo</code> (común), <code>recepcion</code> (M1), <code>dictamen</code> (M2),
+<code>contrato</code> (M3), <code>ejecucion</code> (M4), <code>pagos</code> (M5), <code>seguimiento</code> (M6) y
+<code>portal</code>. Cada tabla se llama <code>&lt;app&gt;_&lt;modelo&gt;</code> y cada app lleva sus migraciones.</li>
+<li><b>El núcleo no conoce a los módulos</b>: el expediente, sus estados, la bitácora, los acuses, las notificaciones y los
+hitos de plazo son del núcleo; cada módulo los usa y se engancha con <code>nucleo/extensiones.py</code>.</li>
+<li><b>Un solo esquema</b> (<code>public</code>) en una sola base: el volumen <code>bd_datos</code> guarda la base y el volumen
+<code>archivos</code> los documentos. Los dos se respaldan juntos.</li>
+</ul>
+
+<h2 class="salto">3. Decisiones de diseño</h2>
+<table>
+<thead><tr><th style="width:27%">Decisión</th><th>Por qué</th></tr></thead>
+<tbody>
+<tr><td>PostgreSQL con PostGIS</td><td>Los polígonos de los predios y los límites municipales son geometrías: la base calcula
+intersecciones, traslapes entre solicitudes y si un polígono cae dentro del municipio. Pila libre, sin licencias.</td></tr>
+<tr><td>Geometrías en EPSG:4326; superficies en EPSG:32614</td><td>Se guardan en coordenadas geográficas (las de GPS, KML y
+GeoJSON) y se transforman a UTM 14N solo para medir hectáreas, que así coinciden con la cartografía de PROBOSQUE. Hay
+{{geom}} columnas geométricas.</td></tr>
+<tr><td>Las reglas de operación como datos</td><td>Programa, ejercicio, requisitos por tipo de persona y modalidad, plazos,
+montos, ministraciones y formatos viven en tablas que se cargan de <code>sistema/reglas/&lt;CLAVE&gt;.json</code> (con el
+numeral y la línea de las ROP). Un cambio de reglas en 2027 es un archivo nuevo, no código nuevo.</td></tr>
+<tr><td>El trámite como máquina de estados en tablas</td><td><code>Estado</code> y <code>Transicion</code> (con la unidad que
+puede hacer cada paso) deciden qué se puede hacer con un expediente; <code>Expediente.cambiar_estado</code> exige que la
+transición exista, bloquea la fila y deja el <code>Evento</code> en la bitácora.</td></tr>
+<tr><td>Trazabilidad con historial por tabla</td><td>django-simple-history crea una tabla <code>Historical…</code> por cada
+tabla del trámite ({{historial}}) con cada alta, cambio y baja, el usuario, la fecha y hora y los valores. Es el criterio de
+trazabilidad de las historias de M1 a M6 y se consulta en la pestaña «Trazabilidad» del expediente.</td></tr>
+<tr><td>Bitácora y acuses aparte del historial</td><td>El historial dice qué cambió en cada registro; la bitácora
+(<code>Evento</code>) dice qué pasó en el trámite, en lenguaje del usuario. Cada envío o entrega deja un <code>Acuse</code> con
+folio, fecha y hora, PDF y huella SHA-256.</td></tr>
+<tr><td>Folios con tabla de consecutivos</td><td><code>Consecutivo</code> guarda el último número de cada serie y se lee con
+bloqueo de fila (<code>SELECT … FOR UPDATE</code>): dos usuarios a la vez nunca obtienen el mismo folio.</td></tr>
+<tr><td>Archivos fuera de la base</td><td>La base guarda la ruta y el tipo; el archivo vive en el volumen. Nginx lo entrega
+solo cuando Django revisó el permiso (<code>X-Accel-Redirect</code>), así que un enlace copiado no abre el documento de otra
+Delegación.</td></tr>
+<tr><td>Nada se borra del trámite</td><td>Las llaves foráneas a catálogos y a lo ya registrado son <code>PROTECT</code>; un
+polígono, un dictamen o un contrato nuevo deja al anterior como «no vigente» en lugar de borrarlo. Solo los detalles que
+no tienen sentido sin su registro padre (renglones, salidas de un vale) se borran en cascada.</td></tr>
+<tr><td>JSON donde el contenido varía</td><td>Los renglones de un acuse, el análisis cartográfico o el detalle de una
+verificación cambian de forma entre programas: van en columnas <code>jsonb</code>, junto a las columnas fijas por las que se
+busca y se filtra.</td></tr>
+<tr><td>Fechas con zona horaria</td><td>Todas las fechas y horas se guardan en UTC (<code>timestamp with time zone</code>) y
+se muestran en hora del centro de México; los plazos en días hábiles usan la tabla de días inhábiles.</td></tr>
+</tbody>
+</table>
+
+<h2 class="salto">4. Mapa de tablas por área y sprint</h2>
+<p>Las {{tablas}} tablas se agrupan en ocho áreas. El núcleo y los módulos M1 y M2 se construyen en el sprint 1; M3 y M5 en
+el sprint 2; M4, M6 y el portal en el sprint 3. Algunas áreas reciben tablas en más de un sprint: el núcleo suma en el
+sprint 2 las notificaciones y los hitos de plazo que usan la publicación y los pagos.</p>
+<!--MAPA-->
+<p>En total: {{columnas}} columnas, {{fk}} llaves foráneas, {{m2m}} relaciones muchos a muchos y {{historial}} tablas con
+historial.</p>
+
+<h2 class="salto">5. Modelo entidad-relación por área</h2>
+<p>Cada diagrama muestra las tablas del área con su llave, sus llaves foráneas y sus primeros campos; las tablas de otras
+áreas a las que apuntan aparecen solo con su llave. No se dibujan las relaciones hacia <code>Usuario</code> y
+<code>Unidad</code> (quién y qué unidad registró: casi todas las tablas las tienen). Para leerlos: <code>||--o{</code> es «uno a
+muchos» obligatorio, <code>|o--o{</code> «uno a muchos» opcional, <code>||--o|</code> «uno a uno» y <code>}o--o{</code> «muchos
+a muchos». Las columnas completas están en el diccionario de datos (sección 6).</p>
+<!--AREAS-->
+
+<h2 class="salto">6. Diccionario de datos</h2>
+<p>Una ficha por tabla, agrupadas por área y ordenadas por sprint: el nombre de la tabla en PostgreSQL, el sprint, si guarda
+historial, qué guarda y sus columnas con el tipo en PostgreSQL, si admite nulo, su llave (PK llave primaria, FK llave
+foránea con la tabla a la que apunta y qué pasa al borrar, UK valor único) y su descripción, opciones o valor por omisión.
+Al final de cada ficha, las restricciones de unicidad compuesta.</p>
+<!--DICCIONARIO-->
+
+<h2 class="salto">7. Historial para la trazabilidad</h2>
+<p>Cada tabla del trámite tiene su tabla de historial, que django-simple-history llena sola en cada alta, cambio o baja.
+Además de las columnas de la tabla original, cada renglón del historial lleva:</p>
+<table>
+<thead><tr><th>Columna</th><th>Qué guarda</th></tr></thead>
+<tbody>
+<tr><td><code>history_id</code></td><td>Llave primaria del renglón de historial.</td></tr>
+<tr><td><code>history_date</code></td><td>Fecha y hora del cambio.</td></tr>
+<tr><td><code>history_type</code></td><td><code>+</code> alta, <code>~</code> cambio, <code>-</code> baja.</td></tr>
+<tr><td><code>history_user_id</code></td><td>Quién hizo el cambio (llave foránea a <code>nucleo_usuario</code>).
+<code>nucleo/trazabilidad.py</code> lo registra también cuando el cambio no viene de una pantalla (servicios y tareas
+diarias).</td></tr>
+<tr><td><code>history_change_reason</code></td><td>Motivo, cuando el servicio lo anota.</td></tr>
+</tbody>
+</table>
+<p>Los cambios se hacen con <code>save()</code> (no con actualizaciones masivas) para que siempre queden en el historial.
+Las {{historial}} tablas con historial:</p>
+<!--HISTORIAL-->
+
+<h2 class="salto">8. Integridad y concurrencia</h2>
+<ul>
+<li><b>En la base</b>: llaves primarias y foráneas, columnas no nulas, valores únicos (folios, claves de catálogo) y
+unicidad compuesta (por ejemplo, un requisito por clave en cada ejercicio) que PostgreSQL hace cumplir aunque falle el
+código.</li>
+<li><b>En los servicios</b>: las reglas del trámite (quién puede hacer cada paso, plazos, montos, «no se elabora contrato sin
+modelo validado») se revisan antes de guardar; cada servicio corre en una transacción atómica: o se guarda todo
+(registro, bitácora, acuse, historial) o nada.</li>
+<li><b>Concurrencia</b>: el cambio de estado del expediente y el folio consecutivo bloquean su fila mientras se escriben
+(<code>SELECT … FOR UPDATE</code>).</li>
+<li><b>Opciones cerradas</b>: los campos de estado, tipo o resultado usan listas de opciones de Django; el diccionario las
+muestra en cada columna.</li>
+</ul>
+
+<h2>9. Operación: migraciones, respaldo y mantenimiento de este documento</h2>
+<ul>
+<li><b>Migraciones</b>: cada app tiene las suyas (<code>&lt;app&gt;/migrations/</code>); al levantar, el sistema aplica las
+pendientes. Las pruebas automáticas crean la base desde cero con todas ellas y revisan que no falte ninguna
+(<code>makemigrations --check</code>).</li>
+<li><b>Carga inicial</b>: <code>cargar_catalogos</code> (municipios, Delegaciones, días inhábiles), <code>cargar_reglas</code>
+(las reglas de cada programa) y, en demostración, <code>cargar_demo</code>.</li>
+<li><b>Respaldo</b>: <code>pg_dump</code> de la base y copia del volumen <code>archivos</code>, juntos; restaurar uno sin el otro deja
+rutas sin archivo.</li>
+<li><b>Este documento</b> se genera de los modelos: <code>entregas/diseno/extraer_persistencia.py</code> los lee y
+<code>generar_diseno_persistencia.py</code> arma el PDF, el mapa para los resúmenes y la tabla para las planeaciones. Si un
+modelo cambia, se vuelve a generar; no se edita a mano.</li>
+</ul>
