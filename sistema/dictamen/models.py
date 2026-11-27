@@ -309,6 +309,7 @@ class Acuerdo(models.Model):
 class TipoMovimiento(models.TextChoices):
     SALE = "sale", "Sale de la Lista de Personas Beneficiarias"
     ENTRA = "entra", "Entra desde la Lista de espera"
+    LIBERA = "libera", "Libera recurso sin salir de la lista"
 
 
 class MovimientoListado(models.Model):
@@ -321,13 +322,17 @@ class MovimientoListado(models.Model):
     acuerdo = models.ForeignKey(Acuerdo, null=True, blank=True, on_delete=models.PROTECT, related_name="movimientos",
                                 help_text="Vacío cuando el recurso se liberó por falta de firma del contrato en plazo (HU-3.3).")
     motivo = models.CharField(max_length=300, blank=True, help_text="Origen del movimiento cuando no viene de un acuerdo.")
+    origen = models.CharField(max_length=30, blank=True,
+                              help_text="Clave de datos/dictamen.json (movimientos.origenes): desistimiento, sin_firma, reintegro…")
+    referencia = models.CharField(max_length=120, blank=True, help_text="Acuse o acuerdo que lo origina.")
     expediente = models.ForeignKey(Expediente, on_delete=models.PROTECT, related_name="movimientos_listado")
     movimiento = models.CharField(max_length=10, choices=TipoMovimiento.choices)
     estado_anterior = models.CharField(max_length=40)
     estado_nuevo = models.CharField(max_length=40)
     lugar_lista_espera = models.PositiveIntegerField(null=True, blank=True, help_text="Lugar que tenía en la lista de espera.")
     monto = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+",
+                                help_text="Vacío cuando lo registra el sistema (ajuste de superficie de la verificación).")
     fecha_hora = models.DateTimeField(default=timezone.now)
     history = HistoricalRecords()
 

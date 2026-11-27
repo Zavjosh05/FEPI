@@ -1,32 +1,57 @@
 erDiagram
   Acuerdo |o--o{ MovimientoListado : acuerdo
+  Acuerdo |o--o{ Requerimiento : acuerdo
+  Acuerdo ||--o| Propuesta : acuerdo
   Acuerdo }o--o{ Expediente : expedientes
+  Acuse |o--o{ AccesoExpediente : acuse
+  Acuse |o--o{ AvisoOmision : acuse
   Acuse |o--o{ Cheque : acuse_emision
   Acuse |o--o{ Cheque : acuse_entrega
   Acuse |o--o{ Cheque : acuse_envio
+  Acuse |o--o{ CierreExpediente : acuse
+  Acuse |o--o{ CodigoConsulta : acuse
+  Acuse |o--o{ Comprobacion : acuse
   Acuse |o--o{ Contrato : acuse_envio
+  Acuse |o--o{ EnvioEvaluacion : acuse
   Acuse |o--o{ Evento : acuse
   Acuse |o--o{ FirmaContrato : acuse
+  Acuse |o--o{ InformeAnual : acuse
+  Acuse |o--o{ InformeAnual : acuse_recepcion
   Acuse |o--o{ Notificacion : acuse_envio
   Acuse |o--o{ Notificacion : acuse_notificacion
   Acuse |o--o{ OficioPago : acuse
+  Acuse |o--o{ PadronPublicacion : acuse
   Acuse |o--o{ Pago : acuse
+  Acuse |o--o{ Propuesta : acuse
+  Acuse |o--o{ Prorroga : acuse
+  Acuse |o--o{ Prorroga : acuse_resolucion
   Acuse |o--o{ Publicacion : acuse
   Acuse |o--o{ RemisionFiduciaria : acuse
+  Acuse |o--o{ Requerimiento : acuse
+  Acuse |o--o{ Requerimiento : acuse_deposito
   Acuse |o--o{ RevisionSolicitud : acuse
   Acuse |o--o{ SalidaPlanta : acuse
   Acuse |o--o{ SesionComite : acuse_acta
   Acuse |o--o{ SesionComite : acuse_convocatoria
   Acuse |o--o{ SinFirma : acuse_liberacion
   Acuse |o--o{ SolicitudPago : acuse_envio
+  Acuse |o--o{ SolicitudPersona : acuse
   Acuse |o--o{ ValePlanta : acuse
   Acuse |o--o{ Validacion : acuse
+  Acuse |o--o{ Verificacion : acuse
+  Adendum |o--o{ Prorroga : adendum
+  Comprobacion |o--o{ EvaluacionPeriodo : comprobacion
+  Comprobacion |o--o{ Verificacion : comprobacion
+  Comprobacion ||--o{ RevisionReporte : comprobacion
   Contrato ||--o{ Adendum : contrato
   Contrato ||--o| FirmaContrato : contrato
+  CuentaExterna ||--o{ AccesoExpediente : cuenta
+  CuentaReintegro |o--o{ Requerimiento : cuenta
   DictamenJuridico ||--o| RevisionPropiedad : dictamen
   Documento |o--o{ DictamenJuridico : documento
   Documento |o--o{ DictamenTecnico : documento
   Documento |o--o{ RevisionRequisito : documento
+  Ejercicio ||--o{ EnvioEvaluacion : ejercicio
   Ejercicio ||--o{ Expediente : ejercicio
   Ejercicio ||--o{ Formato : ejercicio
   Ejercicio ||--o{ Ministracion : ejercicio
@@ -34,10 +59,14 @@ erDiagram
   Ejercicio ||--o{ ModeloContrato : ejercicio
   Ejercicio ||--o{ MontoApoyo : ejercicio
   Ejercicio ||--o{ Plazo : ejercicio
+  Ejercicio ||--o{ Propuesta : ejercicio
   Ejercicio ||--o{ Publicacion : ejercicio
   Ejercicio ||--o{ Requisito : ejercicio
   Ejercicio ||--o{ SesionComite : ejercicio
   Ejercicio ||--o{ TipoPersona : ejercicio
+  Ejercicio ||--o| InformeAnual : ejercicio
+  Ejercicio ||--o| PadronPublicacion : ejercicio
+  EnvioEvaluacion |o--o{ EvaluacionPeriodo : envio
   Especie ||--o{ RenglonVale : especie
   Estado |o--o{ Evento : estado_destino
   Estado |o--o{ Evento : estado_origen
@@ -45,22 +74,35 @@ erDiagram
   Estado ||--o{ Transicion : destino
   Estado ||--o{ Transicion : origen
   Expediente |o--o{ Acuse : expediente
+  Expediente ||--o{ AccesoExpediente : expediente
+  Expediente ||--o{ AvisoOmision : expediente
   Expediente ||--o{ Cheque : expediente
+  Expediente ||--o{ Comprobacion : expediente
   Expediente ||--o{ ComprobanteCuenta : expediente
   Expediente ||--o{ Documento : expediente
+  Expediente ||--o{ EvaluacionPeriodo : expediente
   Expediente ||--o{ Evento : expediente
   Expediente ||--o{ Hito : expediente
+  Expediente ||--o{ Incidencia : expediente
   Expediente ||--o{ MovimientoListado : expediente
   Expediente ||--o{ Notificacion : expediente
   Expediente ||--o{ Pago : expediente
   Expediente ||--o{ Poligono : expediente
+  Expediente ||--o{ Prorroga : expediente
   Expediente ||--o{ RemisionFiduciaria : expediente
+  Expediente ||--o{ Requerimiento : expediente
   Expediente ||--o{ ResolucionSesion : expediente
   Expediente ||--o{ ResultadoPublicado : expediente
+  Expediente ||--o{ RevisionReporte : expediente
   Expediente ||--o{ RevisionRequisito : expediente
+  Expediente ||--o{ Senalamiento : expediente
   Expediente ||--o{ SolicitudPago : expediente
+  Expediente ||--o{ SolicitudPersona : expediente
   Expediente ||--o{ ValePlanta : expediente
   Expediente ||--o{ Validacion : expediente
+  Expediente ||--o{ Verificacion : expediente
+  Expediente ||--o| CierreExpediente : expediente
+  Expediente ||--o| CodigoConsulta : expediente
   Expediente ||--o| Contrato : expediente
   Expediente ||--o| DictamenJuridico : expediente
   Expediente ||--o| DictamenTecnico : expediente
@@ -68,25 +110,36 @@ erDiagram
   Expediente ||--o| OficioPago : expediente
   Expediente ||--o| SinFirma : expediente
   FirmaContrato ||--o{ ElementoFormalizacion : firma
+  Incidencia |o--o{ AvisoOmision : incidencia
   Modalidad |o--o{ Expediente : modalidad
   Modalidad |o--o{ MontoApoyo : modalidad
   ModeloContrato ||--o{ VersionModelo : modelo
   Municipio |o--o{ PredioSancionado : municipio
   Municipio ||--o{ Predio : municipio
+  Notificacion |o--o{ AvisoOmision : notificacion
   Notificacion |o--o{ Cheque : aviso
   Notificacion |o--o{ Pago : aviso
+  Notificacion |o--o{ Requerimiento : notificacion
   Notificacion ||--o| Validacion : notificacion
+  Persona |o--o{ Expediente : persona_beneficiaria
   Persona |o--o{ Notificacion : destinatario
   Persona |o--o{ PersonaIncumplida : persona
   Persona |o--o{ Poligono : prestador
+  Persona |o--o{ SolicitudPersona : segunda_persona
   Persona ||--o{ Cheque : persona
+  Persona ||--o{ CuentaExterna : persona
   Persona ||--o{ Expediente : solicitante
   Persona ||--o{ Predio : titular
   Poligono |o--o{ Poligono : anterior
   Predio |o--o{ PredioSancionado : predio
   Predio ||--o{ Expediente : predio
   Programa |o--o{ Transicion : programa
+  Programa ||--o{ CuentaReintegro : programa
   Programa ||--o{ Ejercicio : programa
+  Propuesta |o--o{ Requerimiento : propuesta
+  Propuesta |o--o{ Senalamiento : propuesta
+  Propuesta |o--o{ SolicitudPersona : propuesta
+  Propuesta }o--o{ Expediente : expedientes
   Publicacion ||--o{ ResultadoPublicado : publicacion
   RemisionFiduciaria ||--o| Cheque : remision
   RenglonVale ||--o{ SalidaPlanta : renglon
@@ -95,6 +148,7 @@ erDiagram
   Requisito }o--o{ Modalidad : modalidades
   Requisito }o--o{ TipoPersona : tipos_persona
   RevisionRequisito ||--o{ ObservacionValidacion : revision
+  SesionComite |o--o{ InformeAnual : sesion
   SesionComite ||--o{ Acuerdo : sesion
   SesionComite ||--o{ DocumentoSesion : sesion
   SesionComite ||--o{ ResolucionSesion : sesion
@@ -106,10 +160,15 @@ erDiagram
   TipoPersona ||--o{ Expediente : tipo_persona
   Unidad |o--o{ Acuse : unidad
   Unidad |o--o{ Documento : unidad
+  Unidad |o--o{ EnvioEvaluacion : unidad
+  Unidad |o--o{ EvaluacionPeriodo : unidad
   Unidad |o--o{ Evento : unidad
   Unidad |o--o{ Municipio : delegacion
   Unidad |o--o{ Notificacion : unidad_origen
+  Unidad |o--o{ Propuesta : unidad
+  Unidad |o--o{ RevisionReporte : unidad
   Unidad |o--o{ Usuario : unidad
+  Unidad |o--o{ Verificacion : unidad
   Unidad ||--o{ Acuerdo : unidad_responsable
   Unidad ||--o{ Cheque : delegacion
   Unidad ||--o{ Expediente : delegacion
@@ -121,6 +180,7 @@ erDiagram
   ValePlanta ||--o{ SalidaPlanta : vale
   Validacion ||--o{ ObservacionValidacion : validacion
   Validacion }o--o{ RevisionRequisito : faltantes
+  Verificacion ||--o{ Incidencia : verificacion
   VersionModelo |o--o{ Adendum : version_modelo
   VersionModelo ||--o{ Contrato : version_modelo
   Vivero ||--o{ ValePlanta : vivero
@@ -346,6 +406,8 @@ erDiagram
     int id PK
     int acuerdo_id FK
     texto motivo
+    texto origen
+    texto referencia
     int expediente_id FK
     texto movimiento
     texto estado_anterior
@@ -432,6 +494,113 @@ erDiagram
     int acuse_acta_id FK
     int creada_por_id FK
   }
+  Comprobacion {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    texto fundamento
+    texto medio
+    fecha_hora enviada_en
+    int enviada_por_id FK
+    texto persona_entrega
+    int recibida_por_id FK
+    texto descripcion
+    fecha fecha_hecho
+    texto periodo
+    archivo archivo
+    texto huella
+    int acuse_id FK
+    texto plazo_uso
+    fecha vence
+    bool en_plazo
+    texto plazo_texto
+    texto estado_al_enviar
+    texto cambio_estado
+    int revisada_por_id FK
+    fecha_hora revisada_en
+    json datos
+  }
+  EnvioEvaluacion {
+    int id PK
+    int ejercicio_id FK
+    texto periodo
+    texto nombre_periodo
+    int enviado_por_id FK
+    int unidad_id FK
+    fecha_hora enviado_en
+    int acuse_id FK
+    int cumplen
+    int no_cumplen
+    int no_entregaron
+    json datos
+  }
+  EvaluacionPeriodo {
+    int id PK
+    int expediente_id FK
+    texto periodo
+    texto nombre_periodo
+    texto resultado
+    texto motivo
+    int comprobacion_id FK
+    bool automatica
+    int evaluada_por_id FK
+    int unidad_id FK
+    fecha_hora evaluada_en
+    int envio_id FK
+  }
+  Incidencia {
+    int id PK
+    int verificacion_id FK
+    int expediente_id FK
+    texto tipo
+    texto descripcion
+    archivo archivo
+    texto huella
+    fecha_hora registrada_en
+    fecha_hora atendida_en
+    json datos
+  }
+  RevisionReporte {
+    int id PK
+    int comprobacion_id FK
+    int expediente_id FK
+    texto periodo
+    texto resultado
+    texto observaciones
+    int revisada_por_id FK
+    int unidad_id FK
+    fecha_hora revisada_en
+  }
+  Verificacion {
+    int id PK
+    int expediente_id FK
+    int comprobacion_id FK
+    texto tipo_documento
+    texto nombre_documento
+    fecha fecha_visita
+    decimal superficie_aprobada_ha
+    decimal superficie_verificada_ha
+    decimal ajuste_pct
+    decimal sobrevivencia_pct
+    texto resultado
+    texto observaciones
+    archivo archivo
+    texto huella
+    int registrada_por_id FK
+    int unidad_id FK
+    fecha_hora registrada_en
+    fecha vence
+    bool en_plazo
+    texto plazo_texto
+    bool pago_proporcional
+    decimal total_verificado
+    decimal importe_ajustado
+    int ministracion_ajustada
+    decimal excedente_ministrado
+    int acuse_id FK
+    json datos
+  }
   Acuse {
     int id PK
     texto folio UK
@@ -511,6 +680,7 @@ erDiagram
     int ejercicio_id FK
     int predio_id FK
     int solicitante_id FK
+    int persona_beneficiaria_id FK
     int tipo_persona_id FK
     int modalidad_id FK
     bool es_refrendo
@@ -548,6 +718,7 @@ erDiagram
     int ejercicio_id FK
     int numero
     decimal porcentaje
+    bool supuesto
     texto regimen
     texto condicion
     texto fundamento
@@ -793,6 +964,32 @@ erDiagram
     json soportes
     texto observaciones
   }
+  AccesoExpediente {
+    int id PK
+    int cuenta_id FK
+    int expediente_id FK
+    texto rol
+    fecha_hora otorgado_en
+    int otorgado_por_id FK
+    int acuse_id FK
+  }
+  CodigoConsulta {
+    int id PK
+    int expediente_id FK
+    texto codigo_hash
+    fecha_hora creado_en
+    int acuse_id FK
+  }
+  CuentaExterna {
+    int id PK
+    int usuario_id FK
+    int persona_id FK
+    fecha_hora creada_en
+    int creada_por_id FK
+    texto codigo_hash
+    fecha_hora codigo_emitido_en
+    fecha_hora activada_en
+  }
   ObservacionValidacion {
     int id PK
     int validacion_id FK
@@ -847,4 +1044,172 @@ erDiagram
     int acuse_id FK
     int notificacion_id FK
     bool vencimiento_avisado
+  }
+  AvisoOmision {
+    int id PK
+    int expediente_id FK
+    texto omisiones
+    texto causa
+    fecha vence
+    texto plazo_texto
+    int incidencia_id FK
+    texto estado_al_avisar
+    int creado_por_id FK
+    fecha_hora creado_en
+    int acuse_id FK
+    int notificacion_id FK
+    fecha_hora subsanada_en
+    int subsanada_por_id FK
+    texto motivo_subsanacion
+  }
+  CierreExpediente {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    json resumen
+    texto motivo
+    int cerrado_por_id FK
+    fecha_hora cerrado_en
+    int acuse_id FK
+  }
+  CuentaReintegro {
+    int id PK
+    int programa_id FK
+    texto titular
+    texto banco
+    texto cuenta
+    texto referencia
+    texto nota
+    bool vigente
+    int registrada_por_id FK
+    fecha_hora registrada_en
+  }
+  InformeAnual {
+    int id PK
+    int ejercicio_id FK
+    json resumen
+    archivo archivo
+    texto huella
+    int enviado_por_id FK
+    fecha_hora enviado_en
+    int acuse_id FK
+    int sesion_id FK
+    int recibido_por_id FK
+    fecha_hora recibido_en
+    int acuse_recepcion_id FK
+    texto observaciones
+  }
+  PadronPublicacion {
+    int id PK
+    int ejercicio_id FK
+    fecha_hora publicada_en
+    int publicada_por_id FK
+    int acuse_id FK
+    texto fundamento
+  }
+  Propuesta {
+    int id PK
+    int ejercicio_id FK
+    texto tipo
+    texto descripcion
+    texto fundamento
+    decimal monto_liberado
+    decimal monto_asignado
+    decimal saldo
+    json datos
+    texto estado
+    int creada_por_id FK
+    int unidad_id FK
+    fecha_hora creada_en
+    int acuse_id FK
+    int acuerdo_id FK
+    bool aprobada
+    fecha_hora ejecutada_en
+  }
+  Prorroga {
+    int id PK
+    int expediente_id FK
+    texto causa
+    fecha plazo_original
+    fecha plazo_solicitado
+    fecha_hora solicitada_en
+    int solicitada_por_id FK
+    archivo archivo
+    int acuse_id FK
+    texto estado_al_solicitar
+    bool autorizada
+    fecha_hora resuelta_en
+    int resuelta_por_id FK
+    texto motivo_resolucion
+    int adendum_id FK
+    int acuse_resolucion_id FK
+  }
+  Requerimiento {
+    int id PK
+    int expediente_id FK
+    int propuesta_id FK
+    int acuerdo_id FK
+    texto motivo
+    texto base
+    decimal monto_ministrado
+    decimal monto_base
+    int plantas_no_establecidas
+    decimal precio_planta
+    texto fuente_precio
+    decimal monto_planta
+    decimal monto_total
+    int cuenta_id FK
+    texto estado
+    fecha_hora preparado_en
+    int emitido_por_id FK
+    fecha_hora emitido_en
+    texto plazo_texto
+    int acuse_id FK
+    int notificacion_id FK
+    fecha deposito_fecha
+    decimal deposito_importe
+    texto deposito_referencia
+    archivo deposito_archivo
+    texto deposito_huella
+    int comprobado_por_id FK
+    fecha_hora comprobado_en
+    int acuse_deposito_id FK
+  }
+  Senalamiento {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto clave
+    texto descripcion
+    texto fundamento
+    json datos
+    fecha_hora creado_en
+    fecha_hora atendido_en
+    int atendido_por_id FK
+    texto resultado
+    int propuesta_id FK
+  }
+  SolicitudPersona {
+    int id PK
+    int expediente_id FK
+    texto tipo
+    texto nombre
+    texto medio
+    fecha_hora presentada_en
+    int presentada_por_id FK
+    texto persona_presenta
+    texto motivo
+    fecha fecha_hecho
+    int segunda_persona_id FK
+    texto causa
+    archivo archivo
+    texto huella
+    json firmas
+    fecha vence
+    bool en_plazo
+    texto plazo_texto
+    texto estado_al_presentar
+    int acuse_id FK
+    int propuesta_id FK
+    json datos
   }

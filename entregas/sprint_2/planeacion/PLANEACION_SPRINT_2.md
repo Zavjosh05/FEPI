@@ -73,9 +73,9 @@ plazo por causa externa en MFS.
 
 ### Diseño de la capa de persistencia
 
-La base sigue el diseño completo fijado desde el sprint 1 (78 tablas en ocho áreas). En este sprint se construyen las 23 tablas de la columna «Sprint 2» (publicación y contrato, pagos, notificaciones e hitos de plazo); las del sprint 1 no cambian de diseño, solo reciben columnas con migraciones que conservan los datos. El detalle (arquitectura, decisiones, diagrama entidad-relación de cada área, diccionario de datos de cada tabla e historial) está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
+La base de datos completa (78 tablas en ocho áreas) está programada desde el sprint 1; en este sprint no se crean tablas. Las historias empiezan a usar las 23 de la columna «Desde el sprint 2» (publicación y contrato, pagos, notificaciones e hitos de plazo). El detalle (arquitectura, decisiones, diagrama entidad-relación de cada área, diccionario de datos de cada tabla e historial) está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
 
-| Área | Sprint 1 (36 tablas) | Sprint 2 (23) | Sprint 3 (19) |
+| Área | Se usan desde el sprint 1 (36 tablas) | Desde el sprint 2 (23) | Desde el sprint 3 (19) |
 | --- | --- | --- | --- |
 | 1. Reglas por programa y catálogos (Núcleo: base de todas las historias) | Consecutivo, DiaInhabil, Ejercicio, Estado, Formato, Ministracion, Modalidad, MontoApoyo, Municipio, Plazo, Programa, Requisito, TipoPersona, Transicion, Unidad, Usuario | — | — |
 | 2. Expediente y recepción (M1 · HU-1.1 a HU-1.4) | Acuse, Documento, Evento, Expediente, Persona, Predio, ObservacionValidacion, Poligono, RevisionRequisito, Validacion | Hito, Notificacion | — |

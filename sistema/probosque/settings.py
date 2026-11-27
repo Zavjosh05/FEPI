@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     "dictamen",
     "contrato",
     "pagos",
+    "portal",
+    "ejecucion",
+    "seguimiento",
 ]
 
 MIDDLEWARE = [

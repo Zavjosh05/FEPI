@@ -1,9 +1,6 @@
-"""Vuelve a generar los diagramas de `docs/modelo_datos.md` y el diagrama completo `docs/modelo_datos.mmd`.
-
-Cada sección de `modelo_datos.md` tiene un bloque Mermaid de un área; este script toma las entidades que ya dibuja cada
-bloque, le agrega las que se indiquen en NUEVAS (tablas que aparecieron después) y lo reemplaza con la salida de
-`diagrama_er.py --resumen --entidades ...`. El texto de las secciones no se toca, salvo el número de tablas del
-primer párrafo.
+"""Regenera los diagramas de ``docs/modelo_datos.md`` (cada bloque ``mermaid`` con las entidades que ya dibuja) y el
+completo ``docs/modelo_datos.mmd`` con ``herramientas/diagrama_er.py``. El texto de cada sección se escribe a mano; los
+diagramas, no.
 
     docker compose --profile pruebas run --rm --no-deps --entrypoint python pruebas herramientas/regenerar_modelo_datos.py
 """
@@ -13,54 +10,24 @@ import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
-DOC = RAIZ / "docs" / "modelo_datos.md"
-MMD = RAIZ / "docs" / "modelo_datos.mmd"
-ER = [sys.executable, str(RAIZ / "herramientas" / "diagrama_er.py")]
-# título de la sección (inicio) -> entidades nuevas que se agregan a su diagrama
-NUEVAS = {"## 2.": ["ObservacionValidacion"], "## 3.": ["RevisionPropiedad", "MovimientoListado"]}
+MD = RAIZ / "docs" / "modelo_datos.md"
+HERRAMIENTA = [sys.executable, str(RAIZ / "herramientas" / "diagrama_er.py")]
+BLOQUE = re.compile(r"```mermaid\nerDiagram\n(.*?)```", re.S)
 
 
-def entidades_de(bloque):
-    nombres = set()
-    for linea in bloque.splitlines():
-        linea = linea.strip()
-        m = re.match(r"^(\w+)\s+[|}o][^ ]*\s+(\w+)\s*:", linea)
-        if m:
-            nombres.update(m.groups())
-            continue
-        m = re.match(r"^(\w+)\s*\{", linea)
-        if m:
-            nombres.add(m.group(1))
-    nombres.discard("erDiagram")
-    return sorted(nombres)
-
-
-def generar(*args):
-    return subprocess.run(ER + list(args), capture_output=True, text=True, check=True).stdout.strip("\n")
+def diagrama(*args):
+    return subprocess.run(HERRAMIENTA + list(args), check=True, capture_output=True, text=True, cwd=RAIZ).stdout
 
 
 def main():
-    texto = DOC.read_text(encoding="utf-8")
-    partes = re.split(r"(?m)^(## .*)$", texto)
-    salida = [partes[0]]
-    for titulo, cuerpo in zip(partes[1::2], partes[2::2]):
-        bloques = list(re.finditer(r"```mermaid\n(.*?)```", cuerpo, flags=re.S))
-        if bloques:
-            m = bloques[0]
-            nombres = entidades_de(m.group(1))
-            for prefijo, extra in NUEVAS.items():
-                if titulo.startswith(prefijo):
-                    nombres = sorted(set(nombres) | set(extra))
-            nuevo = generar("--resumen", "--entidades", *nombres)
-            cuerpo = cuerpo[:m.start()] + "```mermaid\n" + nuevo + "\n```" + cuerpo[m.end():]
-        salida += [titulo, cuerpo]
-    texto = "".join(salida)
-    completo = generar()
-    MMD.write_text(completo + "\n", encoding="utf-8")
-    tablas = len(re.findall(r"(?m)^  \w+ \{", completo))
-    texto = re.sub(r"\b\d+ tablas propias", f"{tablas} tablas propias", texto, count=1)
-    DOC.write_text(texto, encoding="utf-8")
-    print(f"{tablas} tablas")
+    texto = MD.read_text(encoding="utf-8")
+
+    def nuevo(m):
+        entidades = re.findall(r"^  (\w+) \{$", m.group(1), re.M)
+        return "```mermaid\n" + diagrama("--resumen", "--entidades", *entidades) + "```"
+
+    MD.write_text(BLOQUE.sub(nuevo, texto), encoding="utf-8")
+    (RAIZ / "docs" / "modelo_datos.mmd").write_text(diagrama(), encoding="utf-8")
 
 
 if __name__ == "__main__":

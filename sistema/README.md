@@ -162,6 +162,9 @@ sistema/
 ├── contrato/, pagos/  apps M3 (HU-3.1 a 3.4) y M5 (HU-5.1 a 5.3): models/ (paquete, un módulo por historia), vistas/,
 │                      formularios/, templates/, urls.py, registro.py y demo.py (contrato: aprobadas de PS,
 │                      RHF y PSAHEM)
+├── portal/, ejecucion/, seguimiento/
+│                      apps del portal, M4 y M6 con solo sus modelos y migraciones (base de datos completa desde el
+│                      sprint 1); sus pantallas y servicios llegan en el sprint 3
 ├── plantillas/        base.html y 403.html (acceso no permitido)
 ├── estaticos/         css, js del mapa y vendor/ (Bootstrap 5.3.9, htmx 2.0.11, Leaflet 1.9.4,
 │                      Leaflet-Geoman 2.20.6; sin CDN)
@@ -170,7 +173,7 @@ sistema/
 ├── datos/             municipios_edomex.geojson, flujo_tramite.json, sistema.json, dictamen.json, contrato.json,
 │                      pagos.json, dias_inhabiles_2026.json
 ├── especificacion/    modelo.json, necesidades_v12.json y el texto de las ROP 2026
-├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación)
+├── docs/              modelo_datos.md y .mmd (diagrama entidad-relación de las 78 tablas)
 ├── herramientas/      preparar_municipios.py (convierte la capa de IDEFOR a GeoJSON) y diagrama_er.py
 └── pruebas/           pytest (test_nucleo_*, test_hu_1_* a test_hu_5_*, recorrido completo, fixtures_m2/m3/m5.py) y e2e/ (Playwright)
 ```
@@ -862,8 +865,9 @@ vales y pagos quedan sin renglones en esa prueba (el generador llega hasta la pu
 ## Modelo de datos y recorrido completo
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md): diagrama entidad-relación por áreas (núcleo, recepción,
-  dictamen, contrato y pagos: 56 tablas, cinco áreas), generado desde los modelos con `herramientas/diagrama_er.py`; el completo, con todos los
-  campos, está en `docs/modelo_datos.mmd`.
+  dictamen, contrato, pagos, portal, ejecución y seguimiento: 78 tablas, ocho áreas), generado desde los modelos con
+  `herramientas/diagrama_er.py`; el completo, con todos los campos, está en `docs/modelo_datos.mmd`.
+- **Base de datos completa desde el sprint 1**: las 78 tablas de los siete módulos están programadas (modelos y migraciones) aunque sus pantallas lleguen después. Las apps sin historias todavía traen solo `apps.py`, `models` y `migrations`; el diseño completo, con el diccionario de datos, está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
 - `pruebas/test_sprint_1_recorrido_completo.py` (parametrizada por programa: CC, PS, RHF y PSAHEM): una sola solicitud recorre el registro, los requisitos, el
   polígono, el envío, el aviso de faltantes y su reenvío, la validación, los dos dictámenes, la sesión de
   aprobación y un acuerdo de seguimiento. En cada relevo comprueba el estado, en la bandeja de qué unidad
