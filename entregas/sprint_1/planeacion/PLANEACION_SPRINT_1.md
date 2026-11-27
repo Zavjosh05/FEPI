@@ -62,9 +62,9 @@ de los otros cinco programas.
 
 ### Diseño de la capa de persistencia
 
-Desde este sprint se diseña la base de datos completa del sistema: las 78 tablas de los siete módulos, en ocho áreas, con el sprint en que se construye cada una. En el sprint 1 se construyen las 36 de la primera columna; las de los sprints 2 y 3 se agregan después sobre este mismo diseño. El detalle (arquitectura, decisiones, diagrama entidad-relación de cada área, diccionario de datos de cada tabla e historial) está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
+Desde este sprint se diseña y se programa la base de datos completa del sistema: las 78 tablas de los siete módulos, en ocho áreas, como modelos de Django con sus migraciones (paquete T02). Las apps de los módulos que llegan después traen por ahora solo sus tablas; sus pantallas y servicios se agregan en su sprint sin crear tablas. La tabla dice desde qué sprint usan cada tabla las historias: en el sprint 1, las 36 de la primera columna. El detalle (arquitectura, decisiones, diagrama entidad-relación de cada área, diccionario de datos de cada tabla e historial) está en `entregas/diseno/Diseno_capa_de_persistencia.pdf`.
 
-| Área | Sprint 1 (36 tablas) | Sprint 2 (23) | Sprint 3 (19) |
+| Área | Se usan desde el sprint 1 (36 tablas) | Desde el sprint 2 (23) | Desde el sprint 3 (19) |
 | --- | --- | --- | --- |
 | 1. Reglas por programa y catálogos (Núcleo: base de todas las historias) | Consecutivo, DiaInhabil, Ejercicio, Estado, Formato, Ministracion, Modalidad, MontoApoyo, Municipio, Plazo, Programa, Requisito, TipoPersona, Transicion, Unidad, Usuario | — | — |
 | 2. Expediente y recepción (M1 · HU-1.1 a HU-1.4) | Acuse, Documento, Evento, Expediente, Persona, Predio, ObservacionValidacion, Poligono, RevisionRequisito, Validacion | Hito, Notificacion | — |
@@ -94,7 +94,7 @@ punta a punta y la documentación. Se estimó con la misma escala de la especifi
 | ID | Paquete de trabajo | Historia | Puntos | Responsable | Depende de |
 | --- | --- | --- | ---: | --- | --- |
 | T01 | Infraestructura: Docker Compose (PostGIS, Django con Gunicorn, Nginx, revisión de plazos, perfil de pruebas), arranque y variables | Base | 3 | Joshua | — |
-| T02 | Núcleo común: unidades y usuarios, catálogos (125 municipios y Delegaciones), expediente y predio, estados y transiciones como datos, días hábiles, acuses PDF, bitácora, bandeja y permisos | Base | 5 | Joshua | T01 |
+| T02 | Núcleo común: base de datos completa (las 78 tablas de los siete módulos, con sus migraciones), unidades y usuarios, catálogos (125 municipios y Delegaciones), expediente y predio, estados y transiciones como datos, días hábiles, acuses PDF, bitácora, bandeja y permisos | Base | 5 | Joshua | T01 |
 | T03 | Extracción de las reglas de Capturando Carbono de las Reglas de Operación a `reglas/CC.json` (requisitos, plazos, montos, criterios, Comité) con numeral y línea | Base | 3 | Cin | — |
 | T04 | Registro de la solicitud y acuse | HU-1.1 | 3 | Omar | T02, T03 |
 | T05 | Revisión de requisitos y envío a la Dirección | HU-1.2 | 3 | Omar | T04 |
